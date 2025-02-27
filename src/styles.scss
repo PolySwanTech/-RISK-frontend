@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/rose-red.css';
+
+
+// tester d'autre theme 
+// azure-blue.css
+// magenta-violet.css
+// cyan-orange.css
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html, body > app-root {
+    height: 100%;
+    margin: 0;
+  }
+  
+  body > app-root {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Place le contenu principal et le footer de manière égale */
+  }
+  
+  main {
+    flex: 1; /* Permet au contenu principal de prendre toute la hauteur disponible */
+  }
