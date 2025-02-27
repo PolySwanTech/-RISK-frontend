@@ -53,7 +53,7 @@ my-angular-project/
 └── README.md                          # Documentation du projet
 ```
 
-## Variables css à utiliser en priorité (peut etre vu en inspectant la page de l'appli)
+## Variables css à utiliser en priorité (peut etre vu en inspectant la page de l'appli ou dans le readme sur vscode pour voir les couleurs)
 
 ```
 html {
