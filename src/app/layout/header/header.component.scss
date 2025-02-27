@@ -20,3 +20,19 @@ mat-toolbar {
   span{
     color: var(--mat-sys-primary);
   }
+
+  mat-icon{
+    font-size: 24px !important;
+    height: 24px !important;
+    width: 24px !important;
+    margin-inline: 0px !important;
+  }
+
+  button[mat-menu-item] {
+    display: flex;
+    gap: 5px;
+    mat-icon{
+        color: var(--mat-sys-primary);
+        margin-right: 10px;
+    }
+  }
