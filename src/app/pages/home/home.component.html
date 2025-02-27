@@ -1,3 +1,6 @@
-<mat-card appearance="outlined">
-  <mat-card-content>Simple card</mat-card-content>
+
+@for(item of listTest; track item.id){
+<mat-card appearance="outlined" [id]="item.id">
+  <mat-card-content>{{item.title}}</mat-card-content>
 </mat-card>
+}

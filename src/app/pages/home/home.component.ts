@@ -10,13 +10,14 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class HomeComponent implements OnInit {
 
+  listTest : any = [];
   constructor(private utilisateurService : UtilisateurService){
 
   }
 
   ngOnInit() {
     this.utilisateurService.getPosts().subscribe((data) => {
-      console.log(data)
+      this.listTest = data.slice(0, 5);
     });
   }
 }
