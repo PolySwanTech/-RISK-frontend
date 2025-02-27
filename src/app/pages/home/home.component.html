@@ -1,6 +1,11 @@
 
 @for(item of listTest; track item.id){
 <mat-card appearance="outlined" [id]="item.id">
+  @if(item.id == 3){
+
+  }
   <mat-card-content>{{item.title}}</mat-card-content>
 </mat-card>
-}
+} @empty {
+  <li>There are no items.</li>
+  }
