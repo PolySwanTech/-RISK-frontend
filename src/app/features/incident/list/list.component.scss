@@ -1,0 +1,25 @@
+.add-button {
+    position: fixed;
+    margin-left: -120px;
+}
+
+.list-container {
+    margin-left: 150px;
+    width: 600px;
+}
+
+.mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+    font-weight: bold;
+    color: var(--mat-sys-tertiary);
+}
+
+th.mat-sort-header-sorted {
+    color: black;
+}
