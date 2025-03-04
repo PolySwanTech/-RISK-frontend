@@ -1,1 +1,89 @@
-<p>view works!</p>
+<mat-card class="incident-card">
+    <mat-card-header>
+        <mat-card-title>Incident Details</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="incident-info">
+            <!-- <mat-grid-list cols="2">
+                @for(field of incidentFields; track field){
+                <mat-grid-tile *ngFor="let field of incidentFields">
+                    <div class="incident-detail">
+                        <span class="detail-label">{{ field.label }}:</span>
+                        <span class="detail-value">{{ field.value }}</span>
+                    </div>
+                </mat-grid-tile>
+            </mat-grid-list> -->
+        </div>
+    </mat-card-content>
+</mat-card>
+
+<mat-card class="impact-card">
+    <mat-card-header>
+        <mat-card-title>Impacts</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-list class="impacts-list">
+            <div class="impacts-container">
+                @for(impact of incident?.impacts; track impact){
+                <mat-list-item>
+                    <mat-icon mat-list-icon>attach_money</mat-icon>
+                    <div class="impact-info">
+                        <span><strong>{{ impact.type }}:</strong> {{ impact.montant }}€</span>
+                        <span>{{ impact.date | date }}</span>
+                    </div>
+                </mat-list-item>
+                }
+            </div>
+        </mat-list>
+    </mat-card-content>
+</mat-card>
+
+<mat-card class="process-card">
+    <mat-card-header>
+        <mat-card-title>Processus Impact</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-list>
+            @for(processus of incident?.processusImpact; track processus){
+            <mat-list-item>
+                <mat-icon mat-list-icon>build</mat-icon>
+                <div class="processus-info">
+                    <span><strong>{{ processus.name }}</strong></span>
+                    <span>Responsable: {{ processus.entiteResponsable.name }}</span>
+                </div>
+            </mat-list-item>
+
+            }
+        </mat-list>
+    </mat-card-content>
+</mat-card>
+
+<mat-card class="entities-card">
+    <mat-card-header>
+        <mat-card-title>Entités Impactées</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-list>
+            @for(entite of incident?.entiteImpacte; track entite){
+            <mat-list-item>
+                <mat-icon mat-list-icon>business</mat-icon>
+                <div class="entity-info">
+                    <span><strong>{{ entite.name }}</strong></span>
+                </div>
+            </mat-list-item>
+            }
+        </mat-list>
+    </mat-card-content>
+</mat-card>
+
+<mat-card class="state-card">
+    <mat-card-header>
+        <mat-card-title>Status</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="incident-state">
+            <span>Status: <strong>{{ incident?.state }}</strong></span>
+            <button mat-raised-button color="warn" (click)="changeStatus()">Change Status</button>
+        </div>
+    </mat-card-content>
+</mat-card>
