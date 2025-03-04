@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef  } from '@angular/core';
 import { EntiteResponsable } from '../../core/models/EntiteResponsable';
 import { CommonModule } from '@angular/common';
 import {MatTreeModule} from '@angular/material/tree';
@@ -40,6 +40,7 @@ export class ReglagesComponent {
   createNode(node : EntiteResponsable){
     const new_node = new EntiteResponsable(1, 'US', true)
     node.children.push(new_node);
+    this.changeDetectorRef.markForCheck();  // This triggers the change detection
   }
 
   dataSource = TREE_DATA;
@@ -47,5 +48,7 @@ export class ReglagesComponent {
   childrenAccessor = (node: EntiteResponsable) => node.children ?? [];
 
   hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
+
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
 }

@@ -1,21 +1,25 @@
+
+<h2>Paramétrage des entités responsable</h2>
 <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
     <!-- This is the tree node template for leaf nodes -->
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-      <!-- use a disabled button to provide padding for tree leaf -->
-      <button mat-icon-button disabled></button>
-      {{node.name}}
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="leaf">
+        <!-- use a disabled button to provide padding for tree leaf -->
+        {{node.name}}
     </mat-tree-node>
     <!-- This is the tree node template for expandable nodes -->
     <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodeToggle
-                   [cdkTreeNodeTypeaheadLabel]="node.name">
-      <button mat-icon-button matTreeNodeToggle
-              [attr.aria-label]="'Toggle ' + node.name">
-        <mat-icon class="mat-icon-rtl-mirror">
-          {{tree.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-        </mat-icon>
-      </button>
-      {{node.name}}
-      <button mat-raised-button (click)="createNode(node)">Add Child</button>
+        [cdkTreeNodeTypeaheadLabel]="node.name" class="node">
+        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+            <mat-icon class="mat-icon-rtl-mirror">
+                {{tree.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+        </button>
+        <label>
+            {{node.name}}
+        </label>
+        <button mat-fab-button (click)="createNode(node); $event.stopPropagation()">
+            <mat-icon class="mat-icon-rtl-mirror">add</mat-icon>
+        </button>
     </mat-tree-node>
-  </mat-tree>
-  
+
+</mat-tree>
