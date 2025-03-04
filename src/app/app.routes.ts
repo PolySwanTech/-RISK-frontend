@@ -5,9 +5,9 @@ import { incidentRoute } from './features/incident/incident.routes';
 import { reglagesRoute } from './features/reglages/reglage.routes';
 
 export const routes: Routes = [
-    {pathMatch : 'full', path: '', redirectTo: 'auth/login'},
-    { path: 'dashboard', component: HomeComponent },
-    { path: 'auth', children: authRoutes },
-    { path: 'incident', children: incidentRoute },
-    { path: 'reglages', children: reglagesRoute },
+  {pathMatch : 'full', path: '', redirectTo: 'auth/login'},
+  { path: 'dashboard', component: HomeComponent },
+  { path: 'auth', children: authRoutes },
+  { path: 'incident', children: incidentRoute },
+  { path: 'reglages', children: reglagesRoute },
   ];
