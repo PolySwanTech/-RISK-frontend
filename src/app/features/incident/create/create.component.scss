@@ -1,0 +1,11 @@
+form {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    gap: 16px;
+    /* Optional, adds spacing between form fields */
+}
+
+#step2{
+    display: none;
+}
