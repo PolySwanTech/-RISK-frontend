@@ -1,48 +1,29 @@
 <div class="list-container">
     <button class="add-button" mat-raised-button (click)="add()">Ajouter</button>
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-        (matSortChange)="announceSortChange($event)">
-        <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef> ID </th>
-            <td mat-cell *matCellDef="let incident"> #{{incident.id}} </td>
+    <mat-form-field>
+        <mat-label>Rechercher</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. 1" #input>
+    </mat-form-field>
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+        @for (column of columns; track column) {
+        <ng-container [matColumnDef]="column.columnDef">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{column.header}}
+            </th>
+            <td mat-cell *matCellDef="let row">
+                {{column.cell(row)}}
+            </td>
         </ng-container>
+        }
 
-        <!-- Symbol Column -->
-        <ng-container matColumnDef="dateDeclaration">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Date de déclaration </th>
-            <td mat-cell *matCellDef="let incident"> {{incident.dateDeclaration.split('T')[0]}} </td>
-        </ng-container>
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">Aucun résultat pour "{{input.value}}"</td>
+        </tr>
 
-        <ng-container matColumnDef="dateSurvenance">
-            <th mat-header-cell *matHeaderCellDef> Date de survenance </th>
-            <td mat-cell *matCellDef="let incident"> {{incident.dateSurvenance.split('T')[0]}} </td>
-        </ng-container>
-
-
-        <ng-container matColumnDef="entiteResponsable">
-            <th mat-header-cell *matHeaderCellDef> Entité Responsable </th>
-            <td mat-cell *matCellDef="let incident"> {{incident.entiteImpacte[0].name}} </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky : true"></tr>
-        <tr mat-row (click)="onRowClick(row)" *matRowDef="let row; columns: displayedColumns;"></tr>
-
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
-    </mat-paginator>
-
-    <!-- @if(selectedIncident){
-    @for(impact of selectedIncident.impacts; track impact.id){
-    <mat-card class="impact-card">
-        <mat-card-header>
-            <mat-card-title>{{impact.type}}</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <p>Montant: {{impact.montant}}</p>
-            <p>Date: {{impact.date.toString().split('T')[0]}}</p>
-            <p>Entité Responsable: {{impact.entiteResponsable.name}}</p>
-        </mat-card-content>
-    </mat-card>
-    }
-    } -->
+    <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[5, 10, 15]"
+        aria-label="Page selection pour le tableau"></mat-paginator>
 </div>

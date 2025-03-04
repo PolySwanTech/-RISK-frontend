@@ -6,35 +6,55 @@ import { Incident } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-list',
-  imports: [MatButtonModule, MatTableModule, MatCardModule, MatPaginatorModule, MatSortModule],
+  imports: [MatButtonModule, MatTableModule, MatSortModule,
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
 export class ListComponent implements OnInit, AfterViewInit {
 
-  private _liveAnnouncer = inject(LiveAnnouncer);
+  columns = [
+    {
+      columnDef: 'id',
+      header: 'ID.',
+      cell: (element: Incident) => `#${element.id}`,
+    },
+    {
+      columnDef: 'dateDeclaration',
+      header: 'Date de déclaration',
+      cell: (element: Incident) => `${element.dateDeclaration.toString().split('T')[0]}`,
+    },
+    {
+      columnDef: 'entiteImpacteName',
+      header: 'Entité impacté',
+      cell: (element: Incident) => `${element.entiteImpacte[0]?.name}`,
+      sortBy : (element : Incident) => `${element.entiteImpacte[0]?.name}`
+    }
+  ];
 
-  displayedColumns: string[] = ['id', 'dateDeclaration', 'dateSurvenance', 'entiteResponsable'];
+  displayedColumns = this.columns.map(c => c.columnDef);
 
   dataSource = new MatTableDataSource<Incident>([]);
 
   selectedIncident: Incident | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   @ViewChild(MatSort) sort!: MatSort;
 
-  totalIDS = 5
 
   ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
+
 
   constructor(private router: Router, private incidentService: IncidentService) {
   }
@@ -54,23 +74,39 @@ export class ListComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  /** Announce the change in sort state for assistive technology. */
-  announceSortChange(sortState: Sort) {
-    // This example uses English messages. If your application supports
-    // multiple language, you would internationalize these strings.
-    // Furthermore, you can customize the message to add additional
-    // details about the values being sorted.
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+
+    // If the value is empty, reset the filter to include all rows
+    if (!filterValue) {
+      this.dataSource.filter = '';
     } else {
-      this._liveAnnouncer.announce('Sorting cleared');
+      // Use a custom filter predicate to filter by the entire object converted to string
+      this.dataSource.filterPredicate = (data: Incident, filter: string) => {
+        return this.customFilterPredicate(data, filter);
+      };
+
+      // Apply the filter to the data source
+      this.dataSource.filter = filterValue;
+    }
+
+    // If paginator is available, reset to the first page
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
     }
   }
+
+  customFilterPredicate(data: Incident, filter: string): boolean {
+    // Convert the entire object (including nested objects) to a string and check if it contains the filter term
+    const stringifiedData = JSON.stringify(data).toLowerCase();  // Convert the entire data object to a string
+    return stringifiedData.includes(filter.toLowerCase()); // Check if the filter term is present in the stringified object
+  }
+
+
 
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
       this.dataSource.data = data.concat(data).concat(data);
-      console.table(this.dataSource.data)
     });
   }
 
