@@ -1,9 +1,13 @@
+
 <div class="list-container">
-    <button class="add-button" mat-raised-button (click)="add()">Ajouter</button>
-    <mat-form-field>
-        <mat-label>Rechercher</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. 1" #input>
-    </mat-form-field>
+    <h2>Liste des incidents en cours</h2>
+    <div class="actions">
+        <mat-form-field>
+            <mat-label>Rechercher</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Ex. 1" #input>
+        </mat-form-field>
+        <button class="add-button" mat-raised-button (click)="add()">Ajouter</button>
+    </div>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
         @for (column of columns; track column) {
         <ng-container [matColumnDef]="column.columnDef">

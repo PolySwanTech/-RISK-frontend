@@ -1,11 +1,8 @@
-.add-button {
-    position: fixed;
-    margin-left: -120px;
-}
-
 .list-container {
-    margin-left: 150px;
-    width: 600px;
+    margin-top: 2%;
+    margin-left: 25%;
+    width: 50%;
+    margin-bottom: 2%;
 }
 
 .mat-mdc-row .mat-mdc-cell {
@@ -26,4 +23,16 @@ th.mat-sort-header-sorted {
 
 tr.mat-mdc-footer-row td {
     font-weight: bold;
-  }
+}
+
+
+.actions {
+    display: flex;
+    justify-content: space-between; /* Space between the search field and the button */
+    align-items: center; /* Vertically center both elements */
+    width: 100%; /* Ensure it takes up the full width of the parent */
+}
+
+.add-button {
+    margin-left: auto; /* Push the button to the right */
+}

@@ -3,6 +3,11 @@ import { Impact } from "./Impact"
 import { ProcessusInterface } from "./ProcessusInterface"
 import { Risk } from "./Risk"
 
+export enum State {
+    OPEN = "Ouvert",
+    CLOSED = "Fermé"
+}
+
 export class Incident {
     id: number
 
@@ -16,6 +21,8 @@ export class Incident {
     entiteImpacte: EntiteResponsable[]
 
     impacts: Impact[]
+
+    state : State = State.OPEN
 
     constructor(
         id: number,

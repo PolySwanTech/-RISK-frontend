@@ -35,7 +35,13 @@ export class ListComponent implements OnInit, AfterViewInit {
       header: 'Entité impacté',
       cell: (element: Incident) => `${element.entiteImpacte[0]?.name}`,
       sortBy : (element : Incident) => `${element.entiteImpacte[0]?.name}`
-    }
+    }, 
+    {
+      columnDef: 'state',
+      header: 'Etat',
+      cell: (element: Incident) => `${element.state}`,
+    }, 
+
   ];
 
   displayedColumns = this.columns.map(c => c.columnDef);
