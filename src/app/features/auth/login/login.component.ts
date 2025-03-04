@@ -59,7 +59,7 @@ export class LoginComponent {
     console.log('Login attempt for', email, password);
 
     // Mock successful login (Replace with your backend logic)
-    this.router.navigate(['/']);
+    this.router.navigate(['/dashboard']);
   }
 
   resetPassword(email: string) {
