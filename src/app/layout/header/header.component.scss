@@ -8,8 +8,8 @@ mat-toolbar {
   color: white;
 }
 
-nav a {
-  margin: 0 5px;
+nav a button {
+  margin: 0 10px;
 }
 
 button{
@@ -37,7 +37,8 @@ mat-icon {
 
 button[mat-menu-item] {
   display: flex;
-  gap: 5px;
+  // gap: 5px;
+  overflow-y: hidden;
 
   mat-icon {
     color: var(--mat-sys-primary);

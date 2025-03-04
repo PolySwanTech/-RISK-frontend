@@ -2,8 +2,8 @@
     <span>Risk View</span>
     <span class="spacer"></span>
     <nav>
-        <a routerLink="/" mat-button>Tableau de bord</a>
-        <a routerLink="/incident" mat-button>Incidents</a>
+        <a routerLink="/dashboard" mat-button>Tableau de bord</a>
+        <a routerLink="/incident" [matBadge]="unreadIncidents" matBadgeColor="warn" matBadgePosition="above after" mat-button>Incidents</a>
         <button routerLink="/reglages" mat-raised-button>
             <mat-icon>settings</mat-icon>
         </button>

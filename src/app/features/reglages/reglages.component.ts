@@ -1,9 +1,12 @@
-import { Component, ChangeDetectorRef  } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { EntiteResponsable } from '../../core/models/EntiteResponsable';
 import { CommonModule } from '@angular/common';
-import {MatTreeModule} from '@angular/material/tree';
-import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
+import { MatTreeModule } from '@angular/material/tree';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
+import { AddEntityDialogComponent } from './add-entity-dialog/add-entity-dialog.component';
 
 
 const TREE_DATA: EntiteResponsable[] = [
@@ -31,16 +34,26 @@ const TREE_DATA: EntiteResponsable[] = [
 
 @Component({
   selector: 'app-reglages',
-  imports: [CommonModule, MatTreeModule,MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatTreeModule, MatButtonModule,
+    MatIconModule, MatDialogModule],
   templateUrl: './reglages.component.html',
   styleUrl: './reglages.component.scss'
 })
 export class ReglagesComponent {
 
-  createNode(node : EntiteResponsable){
-    const new_node = new EntiteResponsable(1, 'US', true)
-    node.children.push(new_node);
-    this.changeDetectorRef.markForCheck();  // This triggers the change detection
+
+
+  createNode(node: EntiteResponsable) {
+    const dialogRef = this.dialog.open(AddEntityDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // If a name was provided, create a new entity
+        const newNode = new EntiteResponsable(1, result, true); // Create new entity with the provided name
+        node.children.push(newNode); // Add the new entity to the parent
+        this.changeDetectorRef.markForCheck();  // This triggers change detection
+      }
+    });  // This triggers the change detection
   }
 
   dataSource = TREE_DATA;
@@ -49,6 +62,8 @@ export class ReglagesComponent {
 
   hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef,
+    private dialog: MatDialog
+  ) { }
 
 }

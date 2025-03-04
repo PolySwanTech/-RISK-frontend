@@ -1,0 +1,64 @@
+/* Style the dialog container */
+::ng-deep .mat-dialog-container {
+    padding: 20px;
+    width: 400px;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+/* Title of the dialog */
+h2.mat-dialog-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #3f51b5;
+    /* You can change the color to suit your theme */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Form field styling */
+mat-form-field {
+    width: 100%;
+    /* Ensure it stretches full width */
+    margin-bottom: 20px;
+}
+
+/* Input field styling */
+mat-input-element {
+    padding: 10px;
+}
+
+/* Button styling */
+button.mat-button {
+    margin: 0 10px;
+}
+
+/* Style for the cancel button */
+button.mat-button:first-child {
+    background-color: #f44336;
+    /* Red color for Cancel */
+    color: white;
+}
+
+/* Style for the save button */
+button.mat-button:last-child {
+    background-color: #4caf50;
+    /* Green color for Save */
+    color: white;
+    font-weight: bold;
+}
+
+/* Disabled state of the save button */
+button.mat-button[disabled] {
+    background-color: #e0e0e0;
+    /* Light grey */
+    color: #9e9e9e;
+    /* Light grey text */
+}
+
+/* Space out the buttons */
+.mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    /* Align buttons to the right */
+}

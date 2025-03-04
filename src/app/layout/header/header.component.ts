@@ -5,16 +5,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import {MatBadgeModule} from '@angular/material/badge';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [MatToolbarModule, CommonModule, RouterLink, MatButtonModule, MatMenuModule, MatIconModule],
+  imports: [MatToolbarModule, CommonModule, MatBadgeModule,
+    RouterLink, MatButtonModule, MatMenuModule, MatIconModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
 
+  unreadIncidents = 5;
 
   currentRoute: string = '';
 

@@ -5,6 +5,9 @@
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="leaf">
         <!-- use a disabled button to provide padding for tree leaf -->
         {{node.name}}
+        <button mat-fab-button (click)="createNode(node); $event.stopPropagation()">
+            <mat-icon class="mat-icon-rtl-mirror">add</mat-icon>
+        </button>
     </mat-tree-node>
     <!-- This is the tree node template for expandable nodes -->
     <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodeToggle
