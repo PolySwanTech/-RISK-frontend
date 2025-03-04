@@ -50,7 +50,9 @@
           "id": 1,
           "name": "IT Department",
           "isLM": true
-        }
+        }, 
+        
+        "state" : "closed"
       },
       {
         "id": 2,
@@ -61,7 +63,8 @@
           "id": 2,
           "name": "Data Center",
           "isLM": false
-        }
+        }, 
+        "state" : "open"
       }
     ], 
     "state" : "open"
@@ -241,7 +244,8 @@
           "id": 6,
           "name": "Energy Team",
           "isLM": true
-        }
+        }, 
+        "state" : "closed"
       }
     ], 
     "state" : "closed"

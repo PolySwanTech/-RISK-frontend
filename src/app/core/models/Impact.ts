@@ -1,4 +1,5 @@
 import { EntiteResponsable } from "./EntiteResponsable";
+import { State } from "./Incident";
 
 export class Impact{
     id : number;
@@ -6,6 +7,8 @@ export class Impact{
     type : string;
     date : Date;
     entiteResponsable : EntiteResponsable
+
+    state : State = State.OPEN
 
     constructor(
         id : number,

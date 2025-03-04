@@ -3,7 +3,7 @@
 .process-card,
 .entities-card,
 .state-card {
-  margin: 20px 0;
+  margin: 20px 20px;
   // padding: 15px;
 }
 
@@ -12,9 +12,8 @@
 .processus-info,
 .entity-info {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  // padding: 10px;
+  flex-direction: row;
+  gap : 5px;
 }
 
 .incident-info mat-grid-list {
@@ -62,14 +61,4 @@ button.mat-raised-button {
 
 button.mat-raised-button:hover {
   background-color: #e53935;
-}
-
-.impacts-list {
-  overflow-x: auto;
-  white-space: nowrap; /* Prevent the list items from wrapping */
-}
-
-.impacts-container {
-  display: flex;
-  flex-wrap: nowrap;
 }

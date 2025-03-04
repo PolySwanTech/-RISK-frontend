@@ -20,6 +20,11 @@
 <mat-card class="impact-card">
     <mat-card-header>
         <mat-card-title>Impacts</mat-card-title>
+        <button mat-raised-button color="primary" (click)="addImpact()">
+            <span>
+                <mat-icon>add</mat-icon>
+            </span>
+        </button>
     </mat-card-header>
     <mat-card-content>
         <mat-list class="impacts-list">
@@ -30,6 +35,7 @@
                     <div class="impact-info">
                         <span><strong>{{ impact.type }}:</strong> {{ impact.montant }}€</span>
                         <span>{{ impact.date | date }}</span>
+                        <span> <strong>{{ impact.state }}</strong></span>
                     </div>
                 </mat-list-item>
                 }
