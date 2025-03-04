@@ -1,3 +1,42 @@
-mat-card{
+mat-card {
     margin-top: 10px;
+}
+
+.dashboard-container {
+    padding: 20px;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 240px;
+}
+
+.card-body {
+    text-align: center;
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #007bff;
+}
+
+.row {
+    display: flex;
+    gap : 20px;
+    justify-content: space-between;
+}
+
+.col-md-4 {
+    padding: 10px;
 }
