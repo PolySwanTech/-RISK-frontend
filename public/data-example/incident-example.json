@@ -548,5 +548,49 @@
         }
       }
     ]
+  },
+  {
+    "id": 99,
+    "dateDeclaration": "2025-12-01T08:00:00Z",
+    "dateSurvenance": "2025-11-30T14:00:00Z",
+    "dateDetection": "2025-12-01T10:00:00Z",
+    "dateCloture": null,
+    "riskPrincipal": {
+      "id": 999,
+      "taxonomie": "Test Incident",
+      "balois": "Low"
+    },
+    "processusImpact": [
+      {
+        "id": 99,
+        "name": "Test Process",
+        "entiteResponsable": {
+          "id": 99,
+          "name": "Test Team",
+          "isLM": false
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 99,
+        "name": "Test Team",
+        "isLM": false
+      }
+    ],
+    "impacts": [
+      {
+        "id": 99,
+        "montant": 0,
+        "type": "No Impact",
+        "date": "2025-11-30T14:00:00Z",
+        "entiteResponsable": {
+          "id": 99,
+          "name": "Test Team",
+          "isLM": false
+        }
+      }
+    ]
   }
 ]

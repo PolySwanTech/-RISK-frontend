@@ -14,6 +14,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 
 @Component({
@@ -55,8 +57,8 @@ export class ListComponent implements OnInit, AfterViewInit {
     }
   ];
 
-  displayedColumns = this.columns.map(c => c.columnDef);
-
+  displayedColumns = [...this.columns.map(c => c.columnDef),  'actions'];
+  
   dataSource = new MatTableDataSource<Incident>([]);
 
   selectedIncident: Incident | null = null;
@@ -79,7 +81,7 @@ export class ListComponent implements OnInit, AfterViewInit {
   }
 
 
-  constructor(private router: Router, private incidentService: IncidentService) {
+  constructor(private router: Router, private incidentService: IncidentService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -152,5 +154,19 @@ export class ListComponent implements OnInit, AfterViewInit {
     );
   }
 
-
+  onConfirmAction(incidentId: number) {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Suppression',
+        message: 'Voulez-vous vraiment supprimer cet élément ?'
+      }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log(`Incident ${incidentId} supprimé`);
+      }
+    });
+  }  
 }
