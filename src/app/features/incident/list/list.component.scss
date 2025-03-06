@@ -1,17 +1,45 @@
 .add-button {
-    position: fixed;
-    margin-left: -120px;
+    display: block;
+    margin: auto;
+    margin-bottom: 20px;
 }
 
 .list-container {
-    margin-left: 150px;
-    width: 600px;
+    max-width: 80%;
+    margin: auto;
+    padding: 20px;
+}
+
+.filters-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+mat-form-field {
+    width: 250px;
+}
+
+table {
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+mat-paginator {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .mat-mdc-row .mat-mdc-cell {
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     border-top: 1px solid transparent;
     cursor: pointer;
+    text-align: center;
 }
 
 .mat-mdc-row:hover .mat-mdc-cell {
@@ -20,10 +48,15 @@
     color: var(--mat-sys-tertiary);
 }
 
+th.mat-mdc-header-cell {
+    text-align: center;
+}
+
 th.mat-sort-header-sorted {
     color: black;
 }
 
 tr.mat-mdc-footer-row td {
     font-weight: bold;
-  }
+    text-align: center;
+}
