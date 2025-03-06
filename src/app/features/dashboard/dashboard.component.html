@@ -1,0 +1,12 @@
+<div class="chart-container">
+    <div class="chart-buttons">
+        <button (click)="updateChart('category')">📊 Incidents par catégorie</button>
+        <button (click)="updateChart('month')">📅 Incidents par mois</button>
+    </div>
+
+    <canvas baseChart 
+            [data]="barChartData"
+            [options]="barChartOptions"
+            [type]="'bar'">
+    </canvas>
+</div>
