@@ -1,15 +1,12 @@
-
 <h2>Paramétrage des entités responsable</h2>
-<mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
-    <!-- This is the tree node template for leaf nodes -->
+<app-category-selection [settings]="settings"></app-category-selection>
+<!-- <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="leaf">
-        <!-- use a disabled button to provide padding for tree leaf -->
         {{node.name}}
         <button mat-fab-button (click)="createNode(node); $event.stopPropagation()">
             <mat-icon class="mat-icon-rtl-mirror">add</mat-icon>
         </button>
     </mat-tree-node>
-    <!-- This is the tree node template for expandable nodes -->
     <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodeToggle
         [cdkTreeNodeTypeaheadLabel]="node.name" class="node">
         <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
@@ -24,5 +21,6 @@
             <mat-icon class="mat-icon-rtl-mirror">add</mat-icon>
         </button>
     </mat-tree-node>
-
 </mat-tree>
+-->
+

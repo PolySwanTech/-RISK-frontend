@@ -1,11 +1,18 @@
-<h2 mat-dialog-title>Enter Entity Name</h2>
+<h2 mat-dialog-title>Création d'une entité responsable</h2>
 <mat-dialog-content>
-  <mat-form-field>
-    <mat-label>Entity Name</mat-label>
-    <input matInput [(ngModel)]="entityName">
-  </mat-form-field>
+  <form [formGroup]="formGroup">
+    <mat-form-field>
+      <input matInput formControlName="name" placeholder="Nom">
+    </mat-form-field>
+
+    <div class="toggle-container">
+      <mat-label>
+        Ligne Métier ?
+      </mat-label>
+      <mat-slide-toggle formControlName="isLM"></mat-slide-toggle>
+    </div>
+  </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-button (click)="onSave()" [disabled]="!entityName">Save</button>
+  <button mat-button class="save-button" (click)="onSave()">Enregitrer</button>
 </mat-dialog-actions>

@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Utilisateur } from '../../../../core/models/Utilisateur';
-import { CategorySelectionComponent } from '../../category-selection/category-selection.component';
+import { CategorySelectionComponent } from '../../../../shared/components/category-selection/category-selection.component';
 
 @Component({
   selector: 'app-create-user',

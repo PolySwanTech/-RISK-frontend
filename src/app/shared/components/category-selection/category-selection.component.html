@@ -1,0 +1,37 @@
+@if(entities.length > 0){
+<div class="category-container">
+    <h2>Sélectionner une entité</h2>
+    <ul>
+        @if(settings){
+            <button (click)="addEntity()">+</button>
+        }
+        @for(entite of viewEntities; track entite){
+        <li>
+            @if(!settings){
+            <input type="checkbox" [checked]="isChecked(entite)" (change)="toggleSelection(entite, $event)"
+                (click)="$event.stopPropagation()">
+            }
+            <span>
+                {{ entite.name }}
+            </span>
+            @if(entite.children && entite.children.length > 0){
+            <button (click)="handleCategoryAndNavigate(entite, $event)">
+                ➡
+            </button>
+            }
+        </li>
+        }
+    </ul>
+    <div class="buttons">
+        <button (click)="goBack()">Retour</button>
+        <button (click)="confirmSelection()">Valider</button>
+    </div>
+
+</div>
+}
+@else{
+<div class="category-container">
+    <h2>Sélectionner une entité</h2>
+    <p>Aucune entité disponible</p>
+</div>
+}

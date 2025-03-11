@@ -1,10 +1,12 @@
 [
     {
+        "id" : 1,
         "name": "LE",
-        "subcategories": [
+        "isLM": true,
+        "children": [
             {
                 "name": "IT",
-                "subcategories": [
+                "children": [
                     {
                         "name": "Dev"
                     },
@@ -24,7 +26,10 @@
             }
         ]
     },
-    {
-        "name": "BD"
+    {   
+        "id" : 2,
+        "isLM" : false,
+        "name": "BD", 
+        "children" : []
     }
 ]

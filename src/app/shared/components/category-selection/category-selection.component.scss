@@ -56,6 +56,10 @@ button:hover {
     margin-top: 15px;
 }
 
+span{
+    pointer-events: auto;
+}
+
 input[type="checkbox"] {
     transform: scale(1.2);
     margin-right: 8px;
