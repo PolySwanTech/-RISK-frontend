@@ -18,13 +18,16 @@ export class CreateUserComponent implements OnInit {
   categories: any[] = [];
   selectedCategories: string[] = [];
 
+  rights : string[] = ['VIEWER', 'EDITOR', 'ADMIN', 'CENTRAL'];
+
   constructor(private fb: FormBuilder, private http: HttpClient, private dialog: MatDialog) {
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       firstname: ['', Validators.required],
       mail: ['', Validators.required],
       password: ['', Validators.required],
-      equipe: ['', Validators.required]
+      equipe: ['', Validators.required],
+      rights: ['', Validators.required],
     });
   }
 

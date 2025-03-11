@@ -22,9 +22,18 @@
     </div>
 
     <div class="form-group">
-      <label for="equipe">Équipe</label>
+      <label for="equipe">Entité</label>
       <input id="equipe" type="text" formControlName="equipe" placeholder="Cliquez pour sélectionner une équipe"
         (click)="openCategoryDialog()" readonly>
+    </div>
+
+    <div class="form-group">
+      <label for="rights">Droit d'accès</label>
+      <select name="rights" id="rights" formControlName="rights">
+        @for(right of rights; track right){
+        <option ngValue=right> {{ right }}</option>
+        }
+      </select>
     </div>
 
     <button type="submit" [disabled]="userForm.invalid">Créer</button>

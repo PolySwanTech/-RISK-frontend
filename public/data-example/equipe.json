@@ -6,21 +6,7 @@
                 "name": "IT",
                 "subcategories": [
                     {
-                        "name": "Dev",
-                        "subcategories": [
-                            {
-                                "name": "Viewer"
-                            },
-                            {
-                                "name": "Admin Délégué"
-                            },
-                            {
-                                "name": "Admin Central"
-                            },
-                            {
-                                "name": "Validation"
-                            }
-                        ]
+                        "name": "Dev"
                     },
                     {
                         "name": "Projet"
