@@ -58,11 +58,9 @@ export class CategorySelectionComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(entiteResponsable => {
       if (entiteResponsable) {
+        // save entiteResponsable
         // add entiteResponsable to the children of this.parent
         console.log(entiteResponsable)
-        // save entiteResponsable
-        // this.selectedCategories = result;
-        // this.userForm.patchValue({ equipe: this.selectedCategories.join(' > ') });
       }
     });
   }

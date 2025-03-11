@@ -1,11 +1,41 @@
-form {
+.add-incident {
+    width: 57%;
+    margin-left: 20%;
+    align-items: center;
+    border-radius: 20px;
+    border: 1px solid black;
+    text-align: center;
+}
+
+form,#step1,#step2{
     display: flex;
     flex-direction: column;
-    width: 200px;
-    gap: 16px;
-    /* Optional, adds spacing between form fields */
+    width: 95%;
 }
 
 #step2{
     display: none;
+}
+
+mat-form-field input:read-only {
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px; /* Adjust the gap between the form and button */
+}
+
+.form-container {
+    flex: 1; /* This allows the form container to take up available space */
+    padding: 10px;
+}
+
+.next-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5%; 
 }

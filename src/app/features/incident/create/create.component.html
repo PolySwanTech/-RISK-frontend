@@ -1,56 +1,62 @@
 <app-go-back></app-go-back>
 
-<form id="step1" [formGroup]="incidentForm">
-    <mat-form-field>
-        <mat-label>Titre</mat-label>
-        <input matInput placeholder="Titre" formControlName="titre">
-        @if (incidentForm.get('titre')?.invalid) {
-        <mat-error>{{errorMessage()}}</mat-error>
-        }
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de survenance</mat-label>
-        <input matInput formControlName="dateDeSurvenance">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de détection</mat-label>
-        <input matInput formControlName="dateDeDetection">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de déclaration</mat-label>
-        <input matInput formControlName="dateDeDeclaration">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de clôture (si clôturer)</mat-label>
-        <input matInput>
-    </mat-form-field>
-    <button (click)="next(1)" mat-raised-button>Suivant</button>
-</form>
-
-<form id="step2" (submit)="next(2)" [formGroup]="incidentForm">
-    <mat-form-field>
-        <mat-label>Titre</mat-label>
-        <input matInput placeholder="Titre" formControlName="titre">
-        @if (incidentForm.get('titre')?.invalid) {
-        <mat-error>{{errorMessage()}}</mat-error>
-        }
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de survenance</mat-label>
-        <input matInput formControlName="dateDeSurvenance">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de détection</mat-label>
-        <input matInput formControlName="dateDeDetection">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de déclaration</mat-label>
-        <input matInput formControlName="dateDeDeclaration">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Date de clôture (si clôturer)</mat-label>
-        <input matInput>
-    </mat-form-field>
-    <button type="submit" mat-raised-button>Suivant</button>
-</form>
-
+<div class="add-incident">
+    <h2>Déclaration d'un incident</h2>
+    <div class="container">
+        <div class="form-container">
+            <form id="step1" [formGroup]="incidentForm">
+                <mat-form-field>
+                    <mat-label>Titre</mat-label>
+                    <input matInput placeholder="Titre" formControlName="titre">
+                    @if (incidentForm.get('titre')?.invalid) {
+                    <mat-error>{{errorMessage()}}</mat-error>
+                    }
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de survenance</mat-label>
+                    <input matInput formControlName="dateDeSurvenance">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de détection</mat-label>
+                    <input matInput formControlName="dateDeDetection">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de déclaration</mat-label>
+                    <input matInput readonly type="date" formControlName="dateDeDeclaration">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de clôture (si clôturer)</mat-label>
+                    <input matInput>
+                </mat-form-field>
+            </form>
+            <form id="step2" [formGroup]="incidentForm">
+                <mat-form-field>
+                    <mat-label>Titre</mat-label>
+                    <input matInput placeholder="Titre" formControlName="titre">
+                    @if (incidentForm.get('titre')?.invalid) {
+                        <mat-error>{{errorMessage()}}</mat-error>
+                    }
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de survenance</mat-label>
+                    <input matInput formControlName="dateDeSurvenance">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de détection</mat-label>
+                    <input matInput formControlName="dateDeDetection">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de déclaration</mat-label>
+                    <input matInput formControlName="dateDeDeclaration">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Date de clôture (si clôturer)</mat-label>
+                    <input matInput>
+                </mat-form-field>
+            </form>
+        </div>
+        <div class="next-container">
+            <button (click)="next()" mat-raised-button>Suivant</button>
+        </div>
+    </div>
+</div>

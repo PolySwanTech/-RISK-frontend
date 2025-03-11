@@ -19,10 +19,12 @@ export class CreateComponent {
     titre: new FormControl('', [Validators.required, Validators.email]),
     dateDeSurvenance: new FormControl('', [Validators.required]),
     dateDeDetection: new FormControl('', [Validators.required]),
-    dateDeDeclaration: new FormControl('', [Validators.required])
+    dateDeDeclaration: new FormControl(new Date().toISOString().split('T')[0], [Validators.required]),
   });
 
   errorMessage = signal('');
+
+  currentIndex = 1
 
   constructor() {
     merge(
@@ -50,9 +52,9 @@ export class CreateComponent {
     }
   }
 
-  next(index : number){
-    const currentStep = document.getElementById(`step${index}`);
-    const nextStep = document.getElementById(`step${index + 1}`);
+  next(){
+    const currentStep = document.getElementById(`step${this.currentIndex}`);
+    const nextStep = document.getElementById(`step${this.currentIndex + 1}`);
 
     if (currentStep && nextStep) {
       currentStep.style.display = 'none';
