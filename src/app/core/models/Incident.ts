@@ -9,7 +9,7 @@ export enum State {
 }
 
 export class Incident {
-    id: number
+    id: string
 
     dateDeclaration: Date
     dateSurvenance: Date
@@ -25,7 +25,7 @@ export class Incident {
     state : State = State.OPEN
 
     constructor(
-        id: number,
+        id: string,
         dateDeclaration: Date,
         dateSurvenance: Date,
         dateDetection: Date,

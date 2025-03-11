@@ -1,12 +1,12 @@
 export class EntiteResponsable {
-    id : number
+    id : string
     name : string
     isLM : boolean // make cash
     children : EntiteResponsable[] = []
     childrenVisible = false
 
     constructor(
-        id : number,
+        id : string,
         name : string, 
         isLM : boolean,
         children : EntiteResponsable[] = []

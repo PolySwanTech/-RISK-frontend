@@ -24,7 +24,7 @@ export class AddEntityDialogComponent {
     isLM: [false], // Default to false if not provided
   });
 
-  entiteResponsable = new EntiteResponsable(0, '', false, []);
+  entiteResponsable = new EntiteResponsable("", '', false, []);
 
   constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>) {}
 

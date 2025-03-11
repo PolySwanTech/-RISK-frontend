@@ -1,26 +1,33 @@
 import { EntiteResponsable } from "./EntiteResponsable"
 
+export enum Right{
+    VIEWER = 'VIEWER',
+    EDITOR = 'EDITOR',
+    ADMIN = 'ADMIN',
+    CENTRAL = 'CENTRAL'
+}
+
 export class Utilisateur {
-    id: number;
-    name: string;
-    firstname: string;
-    mail: string;
+    id: string;
+    username: string;
+    email: string;
     password: string;
     equipe: EntiteResponsable;
+    right : Right
 
     constructor(
-        id: number,
-        name: string,
-        firstname: string,
-        mail: string,
+        id: string,
+        username: string,
+        email: string,
         password: string,
         equipe: EntiteResponsable,
+        right : Right
     ) {
         this.id = id;
-        this.name = name;
-        this.firstname = firstname;
-        this.mail = mail;
+        this.username = username;
+        this.email = email;
         this.password = password;
         this.equipe = equipe;
+        this.right = right;
     }
 }

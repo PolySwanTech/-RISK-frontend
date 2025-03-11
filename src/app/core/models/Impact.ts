@@ -2,7 +2,7 @@ import { EntiteResponsable } from "./EntiteResponsable";
 import { State } from "./Incident";
 
 export class Impact{
-    id : number;
+    id : string;
     montant : number;
     type : string;
     date : Date;
@@ -11,7 +11,7 @@ export class Impact{
     state : State = State.OPEN
 
     constructor(
-        id : number,
+        id : string,
         montant : number,
         type : string,
         date : Date,
