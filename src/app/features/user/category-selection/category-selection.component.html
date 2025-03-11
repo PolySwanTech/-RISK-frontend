@@ -1,0 +1,22 @@
+<div class="category-container">
+    <h2>Sélectionner une catégorie</h2>
+    <ul>
+        <li *ngFor="let category of data.categories">
+            <input type="checkbox" [checked]="isChecked(category)" (change)="toggleSelection(category, $event)"
+                (click)="$event.stopPropagation()">
+
+            <span (click)="toggleSelection(category, !isChecked(category))">
+                {{ category.name }}
+            </span>
+
+            <button *ngIf="category.subcategories" (click)="handleCategoryAndNavigate(category, $event)">
+                ➡
+            </button>
+        </li>
+    </ul>
+
+    <div class="buttons">
+        <button (click)="goBack()" *ngIf="breadcrumb.length > 0">Retour</button>
+        <button (click)="confirmSelection()">Valider</button>
+    </div>
+</div>

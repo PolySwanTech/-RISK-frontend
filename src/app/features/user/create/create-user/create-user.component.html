@@ -1,0 +1,32 @@
+<div class="form-container">
+  <h2>Créer un utilisateur</h2>
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Nom</label>
+      <input id="name" type="text" formControlName="name" placeholder="Nom">
+    </div>
+
+    <div class="form-group">
+      <label for="firstname">Prénom</label>
+      <input id="firstname" type="text" formControlName="firstname" placeholder="Prénom">
+    </div>
+
+    <div class="form-group">
+      <label for="mail">Email</label>
+      <input id="mail" type="email" formControlName="mail" placeholder="Email">
+    </div>
+
+    <div class="form-group">
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" formControlName="password" placeholder="Mot de passe">
+    </div>
+
+    <div class="form-group">
+      <label for="equipe">Équipe</label>
+      <input id="equipe" type="text" formControlName="equipe" placeholder="Cliquez pour sélectionner une équipe"
+        (click)="openCategoryDialog()" readonly>
+    </div>
+
+    <button type="submit" [disabled]="userForm.invalid">Créer</button>
+  </form>
+</div>

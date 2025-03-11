@@ -1,33 +1,59 @@
-
 <div class="list-container">
-    <h2>Liste des incidents en cours</h2>
-    <div class="actions">
-        <mat-form-field>
-            <mat-label>Rechercher</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Ex. 1" #input>
+    <button class="add-button" mat-raised-button (click)="add()">Ajouter</button>
+    <div class="filters-container">
+        <mat-form-field appearance="outline">
+            <mat-label>Date de survenance</mat-label>
+            <input matInput [matDatepicker]="picker" [formControl]="dateFilter">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
-        <button class="add-button" mat-raised-button (click)="add()">Ajouter</button>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Catégorie</mat-label>
+            <mat-select [formControl]="categoryFilter">
+                <mat-option value="">Toutes</mat-option>
+                <mat-option *ngFor="let category of getUniqueCategories()" [value]="category">{{ category
+                    }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Statut</mat-label>
+            <mat-select [formControl]="statusFilter">
+                <mat-option value="">Tous</mat-option>
+                <mat-option value="En cours">En cours</mat-option>
+                <mat-option value="Clôturé">Clôturé</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+            @for (column of columns; track column) {
+            <ng-container [matColumnDef]="column.columnDef">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    {{column.header}}
+                </th>
+                <td mat-cell *matCellDef="let row" (click)="onRowClick(row)">
+                    {{column.cell(row)}}
+                </td>
+            </ng-container>
+            }
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let row">
+                    <button mat-icon-button color="warn" (click)="onConfirmAction(row.id)">
+                        🗑️
+                    </button>
+                </td>
+            </ng-container>
+
+            <!-- Row shown when there is no matching data. -->
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="5">Aucun résultat trouvé"</td>
+            </tr>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </mat-table>
     </div>
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
-        @for (column of columns; track column) {
-        <ng-container [matColumnDef]="column.columnDef">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                {{column.header}}
-            </th>
-            <td mat-cell *matCellDef="let row" (click)="onRowClick(row)">
-                {{column.cell(row)}}
-            </td>
-        </ng-container>
-        }
-
-        <!-- Row shown when there is no matching data. -->
-        <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" colspan="4">Aucun résultat pour "{{input.value}}"</td>
-        </tr>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
     <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[5, 10, 15]"
         aria-label="Page selection pour le tableau"></mat-paginator>
 </div>

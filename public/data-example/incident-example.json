@@ -247,7 +247,358 @@
         }, 
         "state" : "closed"
       }
-    ], 
-    "state" : "closed"
+    ]
+  },
+  {
+    "id": 6,
+    "dateDeclaration": "2025-04-02T10:15:00Z",
+    "dateSurvenance": "2025-04-01T08:30:00Z",
+    "dateDetection": "2025-04-01T14:00:00Z",
+    "dateCloture": "2025-04-05T17:45:00Z",
+    "riskPrincipal": {
+      "id": 106,
+      "taxonomie": "Cyber Attack",
+      "balois": "High"
+    },
+    "processusImpact": [
+      {
+        "id": 6,
+        "name": "Cyber Attack Prevention Process",
+        "entiteResponsable": {
+          "id": 6,
+          "name": "IT Department",
+          "isLM": true
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 6,
+        "name": "IT Department",
+        "isLM": true
+      }
+    ],
+    "impacts": [
+      {
+        "id": 6,
+        "montant": 15000,
+        "type": "System Downtime",
+        "date": "2025-04-01T08:30:00Z",
+        "entiteResponsable": {
+          "id": 6,
+          "name": "IT Department",
+          "isLM": true
+        }
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "dateDeclaration": "2025-04-07T11:25:00Z",
+    "dateSurvenance": "2025-04-05T09:45:00Z",
+    "dateDetection": "2025-04-06T12:30:00Z",
+    "dateCloture": "2025-04-10T15:00:00Z",
+    "riskPrincipal": {
+      "id": 107,
+      "taxonomie": "Server Failure",
+      "balois": "Medium"
+    },
+    "processusImpact": [
+      {
+        "id": 7,
+        "name": "Server Maintenance Process",
+        "entiteResponsable": {
+          "id": 7,
+          "name": "Infrastructure Team",
+          "isLM": false
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 7,
+        "name": "Infrastructure Team",
+        "isLM": false
+      }
+    ],
+    "impacts": [
+      {
+        "id": 7,
+        "montant": 12000,
+        "type": "Service Interruption",
+        "date": "2025-04-05T09:45:00Z",
+        "entiteResponsable": {
+          "id": 7,
+          "name": "Infrastructure Team",
+          "isLM": false
+        }
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "dateDeclaration": "2025-04-10T14:10:00Z",
+    "dateSurvenance": "2025-04-08T16:20:00Z",
+    "dateDetection": "2025-04-09T13:50:00Z",
+    "dateCloture": "2025-04-12T18:30:00Z",
+    "riskPrincipal": {
+      "id": 108,
+      "taxonomie": "Security Breach",
+      "balois": "Critical"
+    },
+    "processusImpact": [
+      {
+        "id": 8,
+        "name": "Firewall Maintenance",
+        "entiteResponsable": {
+          "id": 8,
+          "name": "Network Team",
+          "isLM": true
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 8,
+        "name": "Network Team",
+        "isLM": true
+      }
+    ],
+    "impacts": [
+      {
+        "id": 8,
+        "montant": 45000,
+        "type": "Data Breach",
+        "date": "2025-04-08T16:20:00Z",
+        "entiteResponsable": {
+          "id": 8,
+          "name": "Network Team",
+          "isLM": true
+        }
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "dateDeclaration": "2025-04-12T09:35:00Z",
+    "dateSurvenance": "2025-04-10T15:30:00Z",
+    "dateDetection": "2025-04-11T14:15:00Z",
+    "dateCloture": "2025-04-14T18:00:00Z",
+    "riskPrincipal": {
+      "id": 109,
+      "taxonomie": "Natural Disaster",
+      "balois": "High"
+    },
+    "processusImpact": [
+      {
+        "id": 9,
+        "name": "Disaster Recovery",
+        "entiteResponsable": {
+          "id": 9,
+          "name": "Crisis Management Team",
+          "isLM": false
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 9,
+        "name": "Crisis Management Team",
+        "isLM": false
+      }
+    ],
+    "impacts": [
+      {
+        "id": 9,
+        "montant": 70000,
+        "type": "Property Damage",
+        "date": "2025-04-10T15:30:00Z",
+        "entiteResponsable": {
+          "id": 9,
+          "name": "Facilities Department",
+          "isLM": false
+        }
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "dateDeclaration": "2025-04-15T12:20:00Z",
+    "dateSurvenance": "2025-04-13T08:45:00Z",
+    "dateDetection": "2025-04-14T11:30:00Z",
+    "dateCloture": "2025-04-18T16:00:00Z",
+    "riskPrincipal": {
+      "id": 110,
+      "taxonomie": "Power Outage",
+      "balois": "Low"
+    },
+    "processusImpact": [
+      {
+        "id": 10,
+        "name": "Power Management Process",
+        "entiteResponsable": {
+          "id": 10,
+          "name": "Energy Team",
+          "isLM": true
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 10,
+        "name": "Energy Team",
+        "isLM": true
+      }
+    ],
+    "impacts": [
+      {
+        "id": 10,
+        "montant": 5000,
+        "type": "Service Interruption",
+        "date": "2025-04-13T08:45:00Z",
+        "entiteResponsable": {
+          "id": 10,
+          "name": "Energy Team",
+          "isLM": true
+        }
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "dateDeclaration": "2025-04-18T13:50:00Z",
+    "dateSurvenance": "2025-04-16T17:40:00Z",
+    "dateDetection": "2025-04-17T14:20:00Z",
+    "dateCloture": "2025-04-22T19:00:00Z",
+    "riskPrincipal": {
+      "id": 111,
+      "taxonomie": "Cyber Attack",
+      "balois": "Critical"
+    },
+    "processusImpact": [
+      {
+        "id": 11,
+        "name": "Cybersecurity Enhancement",
+        "entiteResponsable": {
+          "id": 11,
+          "name": "Security Department",
+          "isLM": true
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 11,
+        "name": "Security Department",
+        "isLM": true
+      }
+    ],
+    "impacts": [
+      {
+        "id": 11,
+        "montant": 60000,
+        "type": "Data Breach",
+        "date": "2025-04-16T17:40:00Z",
+        "entiteResponsable": {
+          "id": 11,
+          "name": "Security Department",
+          "isLM": true
+        }
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "dateDeclaration": "2025-04-22T11:10:00Z",
+    "dateSurvenance": "2025-04-20T10:25:00Z",
+    "dateDetection": "2025-04-21T13:45:00Z",
+    "dateCloture": "2025-04-25T16:15:00Z",
+    "riskPrincipal": {
+      "id": 112,
+      "taxonomie": "Server Failure",
+      "balois": "Medium"
+    },
+    "processusImpact": [
+      {
+        "id": 12,
+        "name": "Server Hardware Upgrade",
+        "entiteResponsable": {
+          "id": 12,
+          "name": "Infrastructure Team",
+          "isLM": false
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 12,
+        "name": "Infrastructure Team",
+        "isLM": false
+      }
+    ],
+    "impacts": [
+      {
+        "id": 12,
+        "montant": 9000,
+        "type": "Server Downtime",
+        "date": "2025-04-20T10:25:00Z",
+        "entiteResponsable": {
+          "id": 12,
+          "name": "Infrastructure Team",
+          "isLM": false
+        }
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "dateDeclaration": "2025-12-01T08:00:00Z",
+    "dateSurvenance": "2025-11-30T14:00:00Z",
+    "dateDetection": "2025-12-01T10:00:00Z",
+    "dateCloture": null,
+    "riskPrincipal": {
+      "id": 999,
+      "taxonomie": "Test Incident",
+      "balois": "Low"
+    },
+    "processusImpact": [
+      {
+        "id": 99,
+        "name": "Test Process",
+        "entiteResponsable": {
+          "id": 99,
+          "name": "Test Team",
+          "isLM": false
+        },
+        "underProcess": []
+      }
+    ],
+    "entiteImpacte": [
+      {
+        "id": 99,
+        "name": "Test Team",
+        "isLM": false
+      }
+    ],
+    "impacts": [
+      {
+        "id": 99,
+        "montant": 0,
+        "type": "No Impact",
+        "date": "2025-11-30T14:00:00Z",
+        "entiteResponsable": {
+          "id": 99,
+          "name": "Test Team",
+          "isLM": false
+        }
+      }
+    ]
   }
 ]

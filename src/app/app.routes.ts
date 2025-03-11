@@ -1,13 +1,15 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { authRoutes } from './features/auth/auth.routes';
+import { userRoutes } from './features/user/user.routes'
 import { incidentRoute } from './features/incident/incident.routes';
 import { reglagesRoute } from './features/reglages/reglage.routes';
 
 export const routes: Routes = [
-  {pathMatch : 'full', path: '', redirectTo: 'auth/login'},
+  { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent },
   { path: 'auth', children: authRoutes },
+  { path: 'user', children: userRoutes },
   { path: 'incident', children: incidentRoute },
   { path: 'reglages', children: reglagesRoute },
-  ];
+];
