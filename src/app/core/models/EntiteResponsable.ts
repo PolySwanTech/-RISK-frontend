@@ -2,10 +2,7 @@ export class EntiteResponsable {
     id : number
     name : string
     isLM : boolean // make cash
-
     children : EntiteResponsable[] = []
-
-
     childrenVisible = false
 
     constructor(

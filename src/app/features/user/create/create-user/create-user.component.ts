@@ -60,7 +60,9 @@ export class CreateUserComponent implements OnInit {
       newUser.equipe = {
         id: 0,
         name: this.selectedCategories.join(' > '),
-        isLM: false
+        isLM: false, 
+        children : [],
+        childrenVisible : false
       };
 
       localStorage.setItem('user', JSON.stringify(newUser));
