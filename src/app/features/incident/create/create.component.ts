@@ -58,7 +58,7 @@ export class CreateComponent {
 
     if (currentStep && nextStep) {
       currentStep.style.display = 'none';
-      nextStep.style.display = 'block';
+      nextStep.style.display = 'flex';
     }
   }
 }

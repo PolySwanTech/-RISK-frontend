@@ -16,4 +16,8 @@ export class AuthService {
   register(user : Utilisateur){
     return this.http.post<Utilisateur>(this.base + '/auth/register', user);
   }
+
+  login(username : string, mdp : string){
+    return this.http.post<string>(this.base + '/auth/login', {username : username, password : mdp});
+  }
 }

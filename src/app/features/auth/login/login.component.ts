@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -17,23 +17,21 @@ export class LoginComponent {
   isForgotPassword: boolean = false;
   errorMessage: string = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private fb: FormBuilder,
+    private router: Router) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
   // Login form submit
   onLogin() {
-    const { email, password } = this.loginForm.value;
-    if (this.loginForm.invalid) {
-      this.errorMessage = 'Please enter a valid email and password.';
-      return;
-    }
-
+    const { username, password } = this.loginForm.value;
     // Call API to authenticate
-    this.authenticateUser(email, password);
+    this.authenticateUser(username, password);
   }
 
   // Forgot Password handler
@@ -55,11 +53,14 @@ export class LoginComponent {
 
   // Simulated API calls (Replace these with real API calls)
   authenticateUser(email: string, password: string) {
-    // Simulating API call
-    console.log('Login attempt for', email, password);
-
-    // Mock successful login (Replace with your backend logic)
-    this.router.navigate(['/dashboard']);
+    this.authService.login(email, password).subscribe({
+      next: res => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: err => {
+        this.errorMessage = 'Invalid email or password.';
+      }
+    });
   }
 
   resetPassword(email: string) {

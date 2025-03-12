@@ -18,8 +18,7 @@ export class CreateUserComponent implements OnInit {
   userForm: FormGroup;
   
   constructor(private fb: FormBuilder, 
-    private authService : AuthService,
-    private http: HttpClient, private dialog: MatDialog) {
+    private authService : AuthService) {
     this.userForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', Validators.required],
