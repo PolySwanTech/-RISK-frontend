@@ -32,7 +32,7 @@ export class ViewComponent {
   changeStatus(): void {
     // Logic to change the state of the incident
     if(this.incident){
-      this.incident.state = this.incident.state === 'Ouvert' ? State.CLOSED : State.OPEN;
+      // this.incident.state = this.incident.state === 'Ouvert' ? State.CLOSED : State.OPEN;
     }
   }
 

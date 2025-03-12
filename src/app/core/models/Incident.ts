@@ -1,6 +1,6 @@
 import { EntiteResponsable } from "./EntiteResponsable"
 import { Impact } from "./Impact"
-import { ProcessusInterface } from "./ProcessusInterface"
+import { Process } from "./Process"
 import { Risk } from "./Risk"
 
 export enum State {
@@ -11,38 +11,38 @@ export enum State {
 export class Incident {
     id: string
 
-    dateDeclaration: Date
-    dateSurvenance: Date
-    dateDetection: Date
-    dateCloture: Date
+    declaredAt: Date
+    survenueAt: Date
+    detectedAt: Date
+    closedAt: Date
 
-    riskPrincipal: Risk
-    processusImpact: ProcessusInterface[]
-    entiteImpacte: EntiteResponsable[]
+    // riskPrincipal: Risk
+    processusImpact: string
+    entiteResponsable: string
 
     impacts: Impact[]
 
-    state : State = State.OPEN
+    // state : State = State.OPEN
 
     constructor(
         id: string,
-        dateDeclaration: Date,
-        dateSurvenance: Date,
-        dateDetection: Date,
-        dateCloture: Date,
-        riskPrincipal: Risk,
-        processusImpact: ProcessusInterface[],
-        entiteImpacte: EntiteResponsable[],
+        declaredAt: Date,
+        survenueAt: Date,
+        detectedAt: Date,
+        closedAt: Date,
+        // riskPrincipal: Risk,
+        processusImpact: string,
+        entiteResponsable: string,
         impacts: Impact[]
     ) {
         this.id = id;
-        this.dateDeclaration = dateDeclaration;
-        this.dateSurvenance = dateSurvenance;
-        this.dateDetection = dateDetection;
-        this.dateCloture = dateCloture;
-        this.riskPrincipal = riskPrincipal;
+        this.declaredAt = declaredAt;
+        this.survenueAt = survenueAt;
+        this.detectedAt = detectedAt;
+        this.closedAt = closedAt;
+        // this.riskPrincipal = riskPrincipal;
         this.processusImpact = processusImpact;
-        this.entiteImpacte = entiteImpacte;
+        this.entiteResponsable = entiteResponsable;
         this.impacts = impacts;
     }
 

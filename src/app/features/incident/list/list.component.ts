@@ -37,23 +37,23 @@ export class ListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'dateDeclaration',
       header: 'Date de déclaration',
-      cell: (element: Incident) => `${element.dateDeclaration.toString().split('T')[0]}`,
+      cell: (element: Incident) => `${element.declaredAt}`,
     },
     {
       columnDef: 'entiteImpacteName',
       header: 'Entité impacté',
-      cell: (element: Incident) => `${element.entiteImpacte[0]?.name}`,
-      sortBy: (element: Incident) => `${element.entiteImpacte[0]?.name}`,
+      cell: (element: Incident) => `${element.entiteResponsable}`,
+      sortBy: (element: Incident) => `${element.entiteResponsable}`,
     },
-    {
-      columnDef: 'riskPrincipal',
-      header: 'Catégorie',
-      cell: (incident: Incident) => incident.riskPrincipal?.taxonomie || 'Autre'
-    },
+    // {
+    //   columnDef: 'riskPrincipal',
+    //   header: 'Catégorie',
+    //   cell: (incident: Incident) => incident.riskPrincipal?.taxonomie || 'Autre'
+    // },
     {
       columnDef: 'statut',
       header: 'Statut',
-      cell: (incident: Incident) => incident.dateCloture ? 'Clôturé' : 'En cours'
+      cell: (incident: Incident) => incident.closedAt ? 'Clôturé' : 'En cours'
     }
   ];
 
@@ -95,12 +95,6 @@ export class ListComponent implements OnInit, AfterViewInit {
   // This method will be triggered when a row is clicked
   onRowClick(incident: Incident) {
     this.router.navigate(['incident', incident.id]);
-    // if (this.selectedIncident === incident) {
-    //   // If the same row is clicked again, toggle the impacts visibility
-    //   this.selectedIncident = null;
-    // } else {
-    //   this.selectedIncident = incident;
-    // }
   }
 
   applyAdvancedFilters() {
@@ -109,19 +103,19 @@ export class ListComponent implements OnInit, AfterViewInit {
     if (this.dateFilter.value) {
       const formattedDate = this.dateFilter.value;
       filteredData = filteredData.filter(incident =>
-        incident.dateSurvenance && new Date(incident.dateSurvenance).toISOString().split('T')[0] === formattedDate
+        incident.survenueAt && new Date(incident.survenueAt).toISOString().split('T')[0] === formattedDate
       );
     }
 
-    if (this.categoryFilter.value) {
-      filteredData = filteredData.filter(incident =>
-        incident.riskPrincipal?.taxonomie === this.categoryFilter.value
-      );
-    }
+    // if (this.categoryFilter.value) {
+    //   filteredData = filteredData.filter(incident =>
+    //     incident.riskPrincipal?.taxonomie === this.categoryFilter.value
+    //   );
+    // }
 
     if (this.statusFilter.value) {
       filteredData = filteredData.filter(incident =>
-        this.statusFilter.value === 'Clôturé' ? incident.dateCloture !== null : incident.dateCloture === null
+        this.statusFilter.value === 'Clôturé' ? incident.closedAt !== null : incident.closedAt === null
       );
     }
 
@@ -144,7 +138,8 @@ export class ListComponent implements OnInit, AfterViewInit {
   }
 
   getUniqueCategories(): string[] {
-    return [...new Set(this.incidents.map(incident => incident.riskPrincipal?.taxonomie || 'Autre'))];
+    return []
+    // return [...new Set(this.incidents.map(incident => incident.riskPrincipal?.taxonomie || 'Autre'))];
   }
 
 
