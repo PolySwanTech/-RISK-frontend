@@ -4,12 +4,13 @@ import { authRoutes } from './features/auth/auth.routes';
 import { userRoutes } from './features/user/user.routes'
 import { incidentRoute } from './features/incident/incident.routes';
 import { reglagesRoute } from './features/reglages/reglage.routes';
+import { AuthGuard } from './auth.guard';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
-  { path: 'dashboard', component: HomeComponent },
+  { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'auth', children: authRoutes },
-  { path: 'user', children: userRoutes },
-  { path: 'incident', children: incidentRoute },
-  { path: 'reglages', children: reglagesRoute },
+  { path: 'user', children: userRoutes, canActivate: [AuthGuard] },
+  { path: 'incident', children: incidentRoute, canActivate: [AuthGuard] },
+  { path: 'reglages', children: reglagesRoute, canActivate: [AuthGuard] },
 ];

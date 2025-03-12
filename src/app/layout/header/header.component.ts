@@ -32,4 +32,9 @@ export class HeaderComponent {
   isActive(route: string): boolean {
     return this.currentRoute === route;
   }
+
+  onLogout() {
+    sessionStorage.clear();
+    this.router.navigateByUrl('/auth/login')
+  }
 }

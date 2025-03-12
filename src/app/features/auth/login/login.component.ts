@@ -55,6 +55,7 @@ export class LoginComponent {
   authenticateUser(email: string, password: string) {
     this.authService.login(email, password).subscribe({
       next: res => {
+        sessionStorage.setItem('token', res.token);
         this.router.navigate(['/dashboard']);
       },
       error: err => {

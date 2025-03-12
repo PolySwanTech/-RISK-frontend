@@ -18,6 +18,6 @@ export class AuthService {
   }
 
   login(username : string, mdp : string){
-    return this.http.post<string>(this.base + '/auth/login', {username : username, password : mdp});
+    return this.http.post<any>(this.base + '/auth/login', {username : username, password : mdp});
   }
 }
