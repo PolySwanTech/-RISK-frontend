@@ -59,7 +59,7 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       },
       error: err => {
-        this.errorMessage = 'Invalid email or password.';
+        this.errorMessage = 'Nom ou Mot de passe incorrect';
       }
     });
   }

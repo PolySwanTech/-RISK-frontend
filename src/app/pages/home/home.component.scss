@@ -7,10 +7,10 @@ mat-card {
 }
 
 .card {
-    border: 1px solid #ddd;
+    border: 1px solid var(--mat-sys-surface-container-high);
     border-radius: 10px;
     margin-bottom: 20px;
-    background-color: #f9f9f9;
+    background-color: var(--mat-sys-surface-container-low);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     width: 240px;
 }
@@ -28,13 +28,14 @@ mat-card {
 .card-text {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #007bff;
+    color: var(--mat-sys-primary);
 }
 
 .row {
     display: flex;
     gap : 20px;
-    justify-content: space-between;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .col-md-4 {

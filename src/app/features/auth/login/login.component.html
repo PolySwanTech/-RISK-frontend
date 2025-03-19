@@ -1,6 +1,9 @@
+<section>
 <div class="login-container">
-    <h2>Login</h2>
-  
+    <h2>Connexion</h2>
+    <div *ngIf="errorMessage" class="error-message">
+      <p>{{ errorMessage }}</p>
+    </div>
     <div *ngIf="!isForgotPassword">
       <!-- Login Form -->
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
@@ -11,10 +14,6 @@
         <div class="form-group">
           <label for="password">Mot de passe</label>
           <input type="password" id="password" formControlName="password" placeholder="Password">
-        </div>
-  
-        <div *ngIf="errorMessage" class="error-message">
-          <p>{{ errorMessage }}</p>
         </div>
   
         <button type="submit" [disabled]="loginForm.invalid">Connexion</button>
@@ -40,4 +39,4 @@
       </form>
     </div>
   </div>
-  
+</section>
