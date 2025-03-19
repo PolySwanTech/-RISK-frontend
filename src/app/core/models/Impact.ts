@@ -1,21 +1,24 @@
-import { EntiteResponsable } from "./EntiteResponsable";
-import { State } from "./Incident";
-
 export class Impact{
     id : string;
     montant : number;
+    processName : string; 
+    entityName : string;
     type : string;
-    date : Date;
+    createdAt : Date;
 
     constructor(
         id : string,
         montant : number,
+        processName : string,
+        entityName : string,
         type : string,
-        date : Date,
+        createdAt : Date,
     ){
         this.id = id
         this.montant = montant
+        this.processName = processName
+        this.entityName = entityName
         this.type = type
-        this.date = date
+        this.createdAt = createdAt
     }
 }

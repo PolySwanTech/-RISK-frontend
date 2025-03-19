@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { EntiteResponsable } from '../../models/EntiteResponsable';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +11,9 @@ import { EntiteResponsable } from '../../models/EntiteResponsable';
 export class EntitiesService {
 
   http = inject(HttpClient);
+  baseUrl = environment.apiUrl
 
   loadEntities(): Observable<EntiteResponsable[]> {
-    return this.http.get<EntiteResponsable[]>('/data-example/equipe.json');
+    return this.http.get<EntiteResponsable[]>(this.baseUrl + '/entites');
   }
 }

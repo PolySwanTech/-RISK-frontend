@@ -21,38 +21,10 @@
         <mat-list class="impacts-list">
             <div class="impacts-container">
                 @for(impact of incident?.impacts; track impact){
-                <mat-list-item>
-                    <mat-icon mat-list-icon>attach_money</mat-icon>
-                    <div class="impact-info">
-                        <span><strong>{{ impact.type }}:</strong> {{ impact.montant }}€</span>
-                        <span>{{ impact.date | date }}</span>
-                    </div>
-                </mat-list-item>
+                <app-impact-card [impact]="impact"></app-impact-card>
                 }
             </div>
         </mat-list>
-    </mat-card-content>
-</mat-card>
-
-<mat-card class="process-card">
-    <mat-card-header>
-        <mat-card-title>Processus impacté</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <div class="incident-state">
-            <span>Processus impacté: <strong>{{ incident?.processName }}</strong></span>
-        </div>
-    </mat-card-content>
-</mat-card>
-
-<mat-card class="entities-card">
-    <mat-card-header>
-        <mat-card-title>Entité impactée</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <div class="incident-state">
-            <span>Entité responsable: <strong>{{ incident?.entiteResponsable }}</strong></span>
-        </div>
     </mat-card-content>
 </mat-card>
 

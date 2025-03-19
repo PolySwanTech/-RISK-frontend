@@ -11,12 +11,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Impact } from '../../../core/models/Impact';
 import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ImpactCardComponent } from '../impact-card/impact-card.component';
 
 
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule,
-    MatGridListModule, DatePipe, MatButtonModule],
+    MatGridListModule, MatButtonModule, ImpactCardComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss'
 })
@@ -54,11 +55,16 @@ export class ViewComponent {
     });
 
     // Wait for the result when the dialog is closed
-    dialogRef.afterClosed().subscribe((result: Impact) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
+        console.log(result)
+        const {impact, process} = result
         if (this.incident)
-          this.incidentService.addImpact(result, this.incident.id).subscribe(
-            _ => alert("Impact ajouté")
+          this.incidentService.addImpact(impact, process, this.incident.id).subscribe(
+            _ => {
+              alert("Impact ajouté");
+              this.ngOnInit();
+            }
           )
       }
     });

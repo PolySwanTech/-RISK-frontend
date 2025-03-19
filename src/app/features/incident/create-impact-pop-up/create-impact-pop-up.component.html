@@ -1,20 +1,41 @@
 <h2 mat-dialog-title>Ajouter un Impact</h2>
 <mat-dialog-content>
   <form (ngSubmit)="addImpact()">
-    <mat-form-field>
+    <div>
       <mat-label>Montant</mat-label>
       <input matInput type="number" [(ngModel)]="impact.montant" name="montant" required />
-    </mat-form-field>
+    </div>
 
-    <mat-form-field>
+    <div>
       <mat-label>Type</mat-label>
       <input matInput type="text" [(ngModel)]="impact.type" name="type" required />
-    </mat-form-field>
+    </div>
 
-    <mat-form-field>
-      <mat-label>Date</mat-label>
-      <input matInput type="date" [(ngModel)]="impact.date" name="date" required />
-    </mat-form-field>
+    <!-- Select Entity -->
+    <div>
+      <mat-label>Entité Responsable</mat-label>
+      <mat-select required (selectionChange)="loadProcessus($event.value);">
+        @for(entite of entites; track entite){
+          <mat-option [value]="entite">
+            {{ entite.name }}
+          </mat-option>
+        }
+      </mat-select>
+    </div>
+    
+    <!-- Select Process -->
+     @if(processes.length > 0){
+       <div>
+         <mat-label>Processus</mat-label>
+         <mat-select required matNativeControl [(ngModel)]="selectedProcess" name="process">
+           @for(process of processes; track process){
+             <mat-option [value]="process.id">
+               {{ process.name }}
+             </mat-option>
+           }
+         </mat-select>
+       </div>
+     }
 
     <div mat-dialog-actions>
       <button mat-button (click)="close()">Annuler</button>

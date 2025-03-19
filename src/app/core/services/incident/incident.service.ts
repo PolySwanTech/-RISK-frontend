@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
@@ -48,7 +48,9 @@ export class IncidentService {
     );
   }
 
-  addImpact(impact : Impact, id : string){
-    return this.http.post(this.baseUrl + '/incidents/impact/' + id, impact)
+  addImpact(impact : Impact, processId : string,  incidentId : string){
+    let params = new HttpParams();
+    params = params.set("idP", processId).set("idI", incidentId)
+    return this.http.post(this.baseUrl + '/impact', impact, {params : params})
   }
 }
