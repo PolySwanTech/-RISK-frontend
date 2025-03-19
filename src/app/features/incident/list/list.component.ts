@@ -160,7 +160,6 @@ export class ListComponent implements OnInit, AfterViewInit {
   
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log(`Incident ${incidentId} supprimé`);
       }
     });
   }  

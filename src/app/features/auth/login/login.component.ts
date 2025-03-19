@@ -65,7 +65,6 @@ export class LoginComponent {
   }
 
   resetPassword(email: string) {
-    console.log('Password reset requested for', email);
     // Simulating API call for password reset
     // You can make an actual HTTP request here using Angular's HttpClient service.
     this.errorMessage = 'Password reset link has been sent to your email.';

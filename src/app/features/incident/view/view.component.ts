@@ -57,7 +57,6 @@ export class ViewComponent {
     // Wait for the result when the dialog is closed
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        console.log(result)
         const {impact, process} = result
         if (this.incident)
           this.incidentService.addImpact(impact, process, this.incident.id).subscribe(

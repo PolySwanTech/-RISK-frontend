@@ -60,7 +60,6 @@ export class CategorySelectionComponent implements OnInit {
       if (entiteResponsable) {
         // save entiteResponsable
         // add entiteResponsable to the children of this.parent
-        console.log(entiteResponsable)
       }
     });
   }

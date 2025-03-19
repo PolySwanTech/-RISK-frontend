@@ -18,7 +18,6 @@ export class AuthService {
   }
 
   login(username : string, mdp : string){
-    console.log(username, mdp);
     return this.http.post<any>(this.base + '/auth/login', {username : username, password : mdp});
   }
 }

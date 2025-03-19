@@ -33,7 +33,6 @@ export class CreateUserComponent implements OnInit {
 
     this.authService.register(this.userForm.value).subscribe(
       (data) => {
-        console.log(data);
       }
     );
     
