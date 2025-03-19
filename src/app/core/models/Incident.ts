@@ -14,24 +14,24 @@ export class Incident {
     declaredAt: Date
     survenueAt: Date
     detectedAt: Date
-    closedAt: Date
+    closedAt: Date | null
 
     // riskPrincipal: Risk
-    processusImpact: string
+    processName: string
     entiteResponsable: string
 
     impacts: Impact[]
 
-    // state : State = State.OPEN
+    state : State = State.OPEN
 
     constructor(
         id: string,
         declaredAt: Date,
         survenueAt: Date,
         detectedAt: Date,
-        closedAt: Date,
+        closedAt: Date | null,
         // riskPrincipal: Risk,
-        processusImpact: string,
+        processName: string,
         entiteResponsable: string,
         impacts: Impact[]
     ) {
@@ -41,9 +41,13 @@ export class Incident {
         this.detectedAt = detectedAt;
         this.closedAt = closedAt;
         // this.riskPrincipal = riskPrincipal;
-        this.processusImpact = processusImpact;
+        this.processName = processName;
         this.entiteResponsable = entiteResponsable;
         this.impacts = impacts;
+
+        if(this.closedAt){
+            this.state = State.CLOSED
+        }
     }
 
 }

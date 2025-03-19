@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>Ajouter un Impact</h2>
+<mat-dialog-content>
+  <form (ngSubmit)="addImpact()">
+    <mat-form-field>
+      <mat-label>Montant</mat-label>
+      <input matInput type="number" [(ngModel)]="impact.montant" name="montant" required />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Type</mat-label>
+      <input matInput type="text" [(ngModel)]="impact.type" name="type" required />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Date</mat-label>
+      <input matInput type="date" [(ngModel)]="impact.date" name="date" required />
+    </mat-form-field>
+
+    <div mat-dialog-actions>
+      <button mat-button (click)="close()">Annuler</button>
+      <button mat-button type="submit" color="primary">Ajouter</button>
+    </div>
+  </form>
+</mat-dialog-content>

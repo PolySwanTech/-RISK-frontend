@@ -1,18 +1,9 @@
 <mat-card class="incident-card">
     <mat-card-header>
-        <mat-card-title>Incident Details</mat-card-title>
+        <mat-card-title>Détails de l'incident</mat-card-title>
     </mat-card-header>
     <mat-card-content>
         <div class="incident-info">
-            <!-- <mat-grid-list cols="2">
-                @for(field of incidentFields; track field){
-                <mat-grid-tile *ngFor="let field of incidentFields">
-                    <div class="incident-detail">
-                        <span class="detail-label">{{ field.label }}:</span>
-                        <span class="detail-value">{{ field.value }}</span>
-                    </div>
-                </mat-grid-tile>
-            </mat-grid-list> -->
         </div>
     </mat-card-content>
 </mat-card>
@@ -45,31 +36,29 @@
 
 <mat-card class="process-card">
     <mat-card-header>
-        <mat-card-title>Processus Impact</mat-card-title>
+        <mat-card-title>Processus impacté</mat-card-title>
     </mat-card-header>
     <mat-card-content>
         <div class="incident-state">
-            <span>Processus impacté: <strong>{{ incident?.processusImpact }}</strong></span>
-            <button mat-raised-button color="warn" (click)="changeStatus()">Change Status</button>
+            <span>Processus impacté: <strong>{{ incident?.processName }}</strong></span>
         </div>
     </mat-card-content>
 </mat-card>
 
 <mat-card class="entities-card">
     <mat-card-header>
-        <mat-card-title>Entités Impactées</mat-card-title>
+        <mat-card-title>Entité impactée</mat-card-title>
     </mat-card-header>
     <mat-card-content>
         <div class="incident-state">
             <span>Entité responsable: <strong>{{ incident?.entiteResponsable }}</strong></span>
-            <button mat-raised-button color="warn" (click)="changeStatus()">Change Status</button>
         </div>
     </mat-card-content>
 </mat-card>
 
-<!-- <mat-card class="state-card">
+<mat-card class="state-card">
     <mat-card-header>
-        <mat-card-title>Status</mat-card-title>
+        <mat-card-title>Statut</mat-card-title>
     </mat-card-header>
     <mat-card-content>
         <div class="incident-state">
@@ -77,4 +66,4 @@
             <button mat-raised-button color="warn" (click)="changeStatus()">Change Status</button>
         </div>
     </mat-card-content>
-</mat-card> -->
+</mat-card>
