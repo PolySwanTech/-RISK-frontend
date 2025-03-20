@@ -16,13 +16,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @Component({
   selector: 'app-list',
   standalone: true,
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule],
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss', 
   providers : [DatePipe]
@@ -116,6 +118,7 @@ export class ListComponent implements OnInit, AfterViewInit {
 
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
+      console.log(data)
       this.incidents = data;
       this.dataSource.data = data;
     });

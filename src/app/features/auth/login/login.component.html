@@ -1,8 +1,9 @@
 <section>
 <div class="login-container">
-    <h2>Connexion</h2>
+  
     @if(!isForgotPassword){
       <div *ngIf="!isForgotPassword">
+        <h2>Connexion</h2>
         <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
           <div class="form-group">
