@@ -53,16 +53,7 @@ export class LoginComponent {
 
   // Simulated API calls (Replace these with real API calls)
   authenticateUser(email: string, password: string) {
-    this.authService.login(email, password).subscribe({
-      next: res => {
-        sessionStorage.setItem('token', res.token);
-        this.authService.isLogin$.next(true)
-        this.router.navigate(['/dashboard']);
-      },
-      error: err => {
-        this.errorMessage = 'Nom ou Mot de passe incorrect';
-      }
-    });
+    this.authService.login(email, password)
   }
 
   resetPassword(email: string) {
