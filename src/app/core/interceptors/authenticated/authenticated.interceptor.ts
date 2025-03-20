@@ -1,4 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { tap } from 'rxjs';
 
 export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
   var token = sessionStorage.getItem('token');
@@ -11,5 +12,15 @@ export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
     })
     : req;
 
-  return next(modifiedReq);
+  return next(modifiedReq).pipe(
+    tap(
+      {
+        error : (error) => {
+          if (error.status === 401) {
+            window.location.href = '/auth/login';
+          }
+        }
+      }
+    )
+  );
 };

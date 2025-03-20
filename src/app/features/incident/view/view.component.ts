@@ -36,7 +36,6 @@ export class ViewComponent {
     const id = this.route.snapshot.params['id'];
 
     this.incidentService.getIncidentById(id).subscribe((incident) => {
-      console.log(incident)
       this.incident = incident;
       this.prevCommentaire = this.incident.comments || ''
     });
@@ -79,10 +78,28 @@ export class ViewComponent {
     return false;
   }
 
+  isNotClosed(){
+    if(this.incident){
+      return this.incident.closedAt == null
+    }
+    return false
+  }
+
   updateCommentaire(){
     if(this.incident){
       this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
         _ => alert("commentaire mis à jour")
+      )
+    }
+  }
+
+  close(){
+    if(this.incident){
+      this.incidentService.close(this.incident.id).subscribe(
+        _ => {
+          alert("incident cloturé")
+          this.ngOnInit();
+        }
       )
     }
   }

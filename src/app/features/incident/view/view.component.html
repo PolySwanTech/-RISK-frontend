@@ -1,7 +1,11 @@
 @if(incident){
     <mat-card class="incident-card">
         <mat-card-header>
-            <mat-card-title>Détails de l'incident - <span>Status: <strong>{{ incident.state }}</strong></span> </mat-card-title>
+            <mat-card-title>Détails de l'incident - <span>Status: <strong>{{ incident.state }}</strong></span> 
+                @if(isNotClosed()){
+                    <button (click)="close()">close</button>
+                }
+             </mat-card-title>
         </mat-card-header>
         <mat-card-content>
             <div class="incident-info">
@@ -12,11 +16,13 @@
     <mat-card class="impact-card">
         <mat-card-header>
             <mat-card-title>Impacts</mat-card-title>
-            <button mat-raised-button color="primary" (click)="addImpact()">
-                <span>
-                    <mat-icon>add</mat-icon>
-                </span>
-            </button>
+            @if(isNotClosed()){
+                <button mat-raised-button color="primary" (click)="addImpact()">
+                    <span>
+                        <mat-icon>add</mat-icon>
+                    </span>
+                </button>
+            }
         </mat-card-header>
         <mat-card-content>
             <mat-list class="impacts-list">
@@ -31,7 +37,7 @@
     
     <mat-card class="state-card">
         <mat-card-header>
-            <mat-card-title>Commentaire</mat-card-title>
+            <mat-card-title>Commentaires</mat-card-title>
         </mat-card-header>
         <mat-card-content>
             <div class="incident-state">

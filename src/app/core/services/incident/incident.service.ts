@@ -57,4 +57,8 @@ export class IncidentService {
   updateCommentaire(id : string, commentaire : string){
     return this.http.put(this.baseUrl + `/incidents/${id}/commentaire`, commentaire)
   }
+
+  close(id: string) {
+    return this.http.put(this.baseUrl + `/incidents/${id}/close`, null)
+  }
 }
