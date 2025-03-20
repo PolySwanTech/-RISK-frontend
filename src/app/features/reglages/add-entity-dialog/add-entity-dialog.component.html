@@ -1,18 +1,17 @@
 <h2 mat-dialog-title>Création d'une entité responsable</h2>
 <mat-dialog-content>
   <form [formGroup]="formGroup">
-    <mat-form-field>
-      <input matInput formControlName="name" placeholder="Nom">
-    </mat-form-field>
+    <div class="form-group">
+      <label for="reset-email">Nom :</label>
+      <input formControlName="name" placeholder="Nom" required />
+    </div>
 
-    <div class="toggle-container">
-      <mat-label>
-        Ligne Métier ?
-      </mat-label>
-      <mat-slide-toggle formControlName="isLM"></mat-slide-toggle>
+    <div class="form-group">
+      <label>Ligne Métier ?</label>
+      <mat-slide-toggle formControlName="isLM"/>
     </div>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button class="save-button" (click)="onSave()">Enregitrer</button>
+  <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
 </mat-dialog-actions>

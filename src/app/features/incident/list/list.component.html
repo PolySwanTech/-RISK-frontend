@@ -51,7 +51,7 @@
                 </ng-container>
     
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquer pour voir plus"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus"></tr>
     
             </table>
             <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[5, 10, 15]"

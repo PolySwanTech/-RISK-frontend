@@ -11,35 +11,34 @@
       <input matInput type="text" [(ngModel)]="impact.type" name="type" required />
     </div>
 
-    <!-- Select Entity -->
-    <div>
+    <mat-form-field appearance="outline">
       <mat-label>Entité Responsable</mat-label>
       <mat-select required (selectionChange)="loadProcessus($event.value);">
         @for(entite of entites; track entite){
-          <mat-option [value]="entite">
-            {{ entite.name }}
-          </mat-option>
+        <mat-option [value]="entite">
+          {{ entite.name }}
+        </mat-option>
         }
       </mat-select>
-    </div>
-    
-    <!-- Select Process -->
-     @if(processes.length > 0){
-       <div>
-         <mat-label>Processus</mat-label>
-         <mat-select required matNativeControl [(ngModel)]="selectedProcess" name="process">
-           @for(process of processes; track process){
-             <mat-option [value]="process.id">
-               {{ process.name }}
-             </mat-option>
-           }
-         </mat-select>
-       </div>
-     }
+    </mat-form-field>
 
-    <div mat-dialog-actions>
-      <button mat-button (click)="close()">Annuler</button>
-      <button mat-button type="submit" color="primary">Ajouter</button>
+    <!-- Select Process -->
+    @if(processes.length > 0){
+    <mat-form-field appearance="outline">
+      <mat-label>Processus</mat-label>
+      <mat-select required matNativeControl [(ngModel)]="selectedProcess" name="process">
+        @for(process of processes; track process){
+        <mat-option [value]="process.id">
+          {{ process.name }}
+        </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    }
+
+    <div class="actions">
+      <button [disabled]="!impact.montant || !impact.type" mat-button type="submit" color="primary">Ajouter</button>
+      <button mat-button type="button" (click)="close()">Annuler</button>
     </div>
   </form>
 </mat-dialog-content>

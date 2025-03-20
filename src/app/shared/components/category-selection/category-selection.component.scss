@@ -19,35 +19,35 @@ ul {
     margin: 0;
 }
 
-li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    background: #f4f4f4;
-    margin: 5px 0;
+button {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: var(--mat-sys-primary-container);
+    color: var(--mat-sys-surface-tint);
+    border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s;
-}
+    font-size: 16px;
+    transition: 0.3s;
 
-li:hover {
-    background: #ddd;
-}
+    &[mat-mini-fab]{
+        padding: 0px 4px;
+    }
 
-button {
-    padding: 8px 12px;
-    border: none;
-    background: #007bff;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-}
+    mat-icon{
+        display: block;
+    }
 
-button:hover {
-    background: #0056b3;
+    &:hover {
+        background-color: var(--mat-sys-surface-tint);
+        color: var(--mat-sys-primary-container);
+    }
+
+    &:disabled {
+        background-color: #ccc;
+        color: #e0e0e0;
+        cursor: not-allowed;
+    }
 }
 
 .buttons {
@@ -63,4 +63,69 @@ span{
 input[type="checkbox"] {
     transform: scale(1.2);
     margin-right: 8px;
+}
+
+.category-container {
+    width: 35%; /* Défini à 50% de la page */
+    max-width: 600px; /* Pour éviter qu'il devienne trop large sur grands écrans */
+    padding: 25px;
+    background-color: var(--mat-sys-surface-container-low);
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border: 1px solid var(--mat-sys-surface-container-high);
+
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--mat-sys-secondary);
+      text-align: justify;
+  }
+
+  form{
+    margin-block: 20px;
+  }
+  
+  button {
+
+    margin-top: 20px;
+    padding: 12px;
+    background-color: var(--mat-sys-primary-container);
+    color: var(--mat-sys-surface-tint);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+
+    &:hover {
+        background-color: var(--mat-sys-surface-tint);
+        color: var(--mat-sys-primary-container);
+    }
+
+    &:disabled {
+        background-color: #ccc;
+        color: #e0e0e0;
+        cursor: not-allowed;
+    }
+}
+a {
+  display: block;
+  margin-top: 10px;
+  color: var(--mat-sys-on-primary-container);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+}
+
+mat-chip-set{
+    margin-top: 20px;
+}
+
+section{
+    height: 80vh;
 }

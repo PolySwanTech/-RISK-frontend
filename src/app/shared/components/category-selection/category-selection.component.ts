@@ -1,14 +1,17 @@
-import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { Component, Input, OnInit, Optional } from '@angular/core';
+import { MatDialogRef, MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRippleModule } from '@angular/material/core';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-category-selection',
   standalone: true,
-  imports: [CommonModule, MatDialogModule],
+  imports: [CommonModule, MatDialogModule, MatIconModule, MatRippleModule, MatChipsModule],
   templateUrl: './category-selection.component.html',
   styleUrls: ['./category-selection.component.scss']
 })

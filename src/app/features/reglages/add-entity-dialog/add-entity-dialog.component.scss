@@ -1,23 +1,12 @@
-/* Style the dialog container */
-::ng-deep .mat-dialog-container {
-    padding: 20px;
-    max-width: 100%;
-    border-radius: 8px;
-}
+
 
 mat-dialog-content {
     overflow: hidden;
 }
 
-/* Title of the dialog */
-h2.mat-dialog-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #3f51b5;
-    /* You can change the color to suit your theme */
-    margin-bottom: 20px;
+h2{
     text-align: center;
-    overflow: hidden;
+    font-weight: bold !important;
 }
 
 /* Form field styling */
@@ -53,7 +42,30 @@ input {
     border-radius: 5px;
 }
 
-/* Style the circle inside the toggle */
-mat-slide-toggle {
-    background-color: #8e8e8e; /* Set color for the background bar */
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background-color: var(--mat-sys-primary-container);
+    color: var(--mat-sys-surface-tint);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+
+    &:hover {
+        background-color: var(--mat-sys-surface-tint);
+        color: var(--mat-sys-primary-container);
+    }
+
+    &:disabled {
+        background-color: #ccc;
+        color: #e0e0e0;
+        cursor: not-allowed;
+    }
+}
+
+mat-slide-toggle{
+    margin-top: 5px;
 }

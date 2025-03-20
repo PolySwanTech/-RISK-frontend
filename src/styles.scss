@@ -151,9 +151,9 @@ a:hover {
 }
 
 h2 {
-    font-size: 22px;
+    font-size: 22px !important;
     margin-bottom: 20px;
-    color: var(--mat-sys-primary);
+    color: var(--mat-sys-primary) !important;
 }
 
 .form-group {
