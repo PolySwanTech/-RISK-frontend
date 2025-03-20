@@ -43,7 +43,7 @@ export class LoginComponent {
   onResetPassword() {
     const email = this.loginForm.value.email;
     if (!email) {
-      this.errorMessage = 'Please provide your email for password reset.';
+      this.errorMessage = 'Merci de renseigner un mail pour la réinitialisation du mot de passe.';
       return;
     }
 
