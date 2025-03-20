@@ -11,14 +11,12 @@ export enum State {
 export class Incident {
     id: string
 
+    titre : string
+
     declaredAt: Date
     survenueAt: Date
     detectedAt: Date
     closedAt: Date | null
-
-    // riskPrincipal: Risk
-    processName: string
-    entiteResponsable: string
 
     impacts: Impact[]
 
@@ -26,23 +24,19 @@ export class Incident {
 
     constructor(
         id: string,
+        titre: string,
         declaredAt: Date,
         survenueAt: Date,
         detectedAt: Date,
         closedAt: Date | null,
-        // riskPrincipal: Risk,
-        processName: string,
-        entiteResponsable: string,
         impacts: Impact[]
     ) {
         this.id = id;
+        this.titre = titre;
         this.declaredAt = declaredAt;
         this.survenueAt = survenueAt;
         this.detectedAt = detectedAt;
         this.closedAt = closedAt;
-        // this.riskPrincipal = riskPrincipal;
-        this.processName = processName;
-        this.entiteResponsable = entiteResponsable;
         this.impacts = impacts;
 
         if(this.closedAt){

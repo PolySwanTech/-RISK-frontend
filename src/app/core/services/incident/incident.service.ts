@@ -20,28 +20,26 @@ export class IncidentService {
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(
-      map((responseData: { id: any; declaredAt: any; survenueAt: any; detectedAt: any; closedAt: any; processName: any; entiteResponsable: any; impacts: any; }) => {
+      map((responseData: { id: string; titre : string; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; impacts: Impact[]; }) => {
         // Constructing an Incident instance using the constructor
         const {
           id,
+          titre,
           declaredAt,
           survenueAt,
           detectedAt,
           closedAt,
-          processName,
-          entiteResponsable,
           impacts
         } = responseData;
 
         // Convert string dates to Date objects if necessary
         return new Incident(
           id,
+          titre,
           new Date(declaredAt),
           new Date(survenueAt),
           new Date(detectedAt),
           closedAt ? new Date(closedAt) : null, // Handle the possibility of a null closedAt
-          processName,
-          entiteResponsable,
           impacts // Assuming impacts is already an array of Impact objects or needs further processing
         );
       })

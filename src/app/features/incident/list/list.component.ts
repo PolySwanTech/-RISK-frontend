@@ -13,7 +13,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
@@ -24,32 +24,22 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.scss'
+  styleUrl: './list.component.scss', 
+  providers : [DatePipe]
 })
 export class ListComponent implements OnInit, AfterViewInit {
 
   columns = [
     {
-      columnDef: 'id',
-      header: 'ID.',
-      cell: (element: Incident) => `#${element.id}`,
+      columnDef: 'titre',
+      header: 'Titre',
+      cell: (element: Incident) => `${element.titre}`,
     },
     {
       columnDef: 'dateDeclaration',
       header: 'Date de déclaration',
-      cell: (element: Incident) => `${element.declaredAt}`,
+      cell: (element: Incident) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
     },
-    {
-      columnDef: 'entiteImpacteName',
-      header: 'Entité impacté',
-      cell: (element: Incident) => `${element.entiteResponsable}`,
-      sortBy: (element: Incident) => `${element.entiteResponsable}`,
-    },
-    // {
-    //   columnDef: 'riskPrincipal',
-    //   header: 'Catégorie',
-    //   cell: (incident: Incident) => incident.riskPrincipal?.taxonomie || 'Autre'
-    // },
     {
       columnDef: 'statut',
       header: 'Statut',
@@ -81,7 +71,8 @@ export class ListComponent implements OnInit, AfterViewInit {
   }
 
 
-  constructor(private router: Router, private incidentService: IncidentService, private dialog: MatDialog) {
+  constructor(private router: Router, private datePipe: DatePipe,
+    private incidentService: IncidentService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -106,13 +97,6 @@ export class ListComponent implements OnInit, AfterViewInit {
         incident.survenueAt && new Date(incident.survenueAt).toISOString().split('T')[0] === formattedDate
       );
     }
-
-    // if (this.categoryFilter.value) {
-    //   filteredData = filteredData.filter(incident =>
-    //     incident.riskPrincipal?.taxonomie === this.categoryFilter.value
-    //   );
-    // }
-
     if (this.statusFilter.value) {
       filteredData = filteredData.filter(incident =>
         this.statusFilter.value === 'Clôturé' ? incident.closedAt !== null : incident.closedAt === null

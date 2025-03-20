@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,7 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,18 +19,19 @@ import { BehaviorSubject } from 'rxjs';
     MatIconModule,
     MatButtonModule,
     MatToolbarModule,
+    AsyncPipe,
     MatMenuModule, RouterLink, MatBadgeModule],
   styleUrls: ['./sidebar.component.scss']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   isSidebarOpen = true;
   unreadIncidents = 5;
 
   currentRoute: string = '';
 
-  isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
+  storageSubscription: any;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, public authService : AuthService) { }
 
   ngOnInit(): void {
     this.updateLoginStatus();
@@ -38,7 +40,7 @@ export class SidebarComponent {
   // Method to update login status
   updateLoginStatus(): void {
     const token = sessionStorage.getItem('token');
-    this.isLogin$.next(!!token);
+    this.authService.isLogin$.next(!!token);
   }
 
   // Set the active route based on the clicked link
@@ -53,6 +55,7 @@ export class SidebarComponent {
 
   onLogout() {
     sessionStorage.clear();
+    this.updateLoginStatus();
     this.router.navigateByUrl('/auth/login')
   }
 }
