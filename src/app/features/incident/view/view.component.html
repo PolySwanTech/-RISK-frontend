@@ -1,41 +1,45 @@
-<mat-card class="incident-card">
-    <mat-card-header>
-        <mat-card-title>Détails de l'incident</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <div class="incident-info">
-        </div>
-    </mat-card-content>
-</mat-card>
-
-<mat-card class="impact-card">
-    <mat-card-header>
-        <mat-card-title>Impacts</mat-card-title>
-        <button mat-raised-button color="primary" (click)="addImpact()">
-            <span>
-                <mat-icon>add</mat-icon>
-            </span>
-        </button>
-    </mat-card-header>
-    <mat-card-content>
-        <mat-list class="impacts-list">
-            <div class="impacts-container">
-                @for(impact of incident?.impacts; track impact){
-                <app-impact-card [impact]="impact"></app-impact-card>
+@if(incident){
+    <mat-card class="incident-card">
+        <mat-card-header>
+            <mat-card-title>Détails de l'incident - <span>Status: <strong>{{ incident.state }}</strong></span> </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="incident-info">
+            </div>
+        </mat-card-content>
+    </mat-card>
+    
+    <mat-card class="impact-card">
+        <mat-card-header>
+            <mat-card-title>Impacts</mat-card-title>
+            <button mat-raised-button color="primary" (click)="addImpact()">
+                <span>
+                    <mat-icon>add</mat-icon>
+                </span>
+            </button>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-list class="impacts-list">
+                <div class="impacts-container">
+                    @for(impact of incident.impacts; track impact){
+                    <app-impact-card [impact]="impact"></app-impact-card>
+                    }
+                </div>
+            </mat-list>
+        </mat-card-content>
+    </mat-card>
+    
+    <mat-card class="state-card">
+        <mat-card-header>
+            <mat-card-title>Commentaire</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="incident-state">
+                <textarea name="incident-com" id="commentaire" [(ngModel)]="incident.comments"></textarea>            
+                @if(hasChange()){
+                    <button (click)="updateCommentaire()">Mettre à jour</button>
                 }
             </div>
-        </mat-list>
-    </mat-card-content>
-</mat-card>
-
-<mat-card class="state-card">
-    <mat-card-header>
-        <mat-card-title>Statut</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <div class="incident-state">
-            <span>Status: <strong>{{ incident?.state }}</strong></span>
-            <button mat-raised-button color="warn" (click)="changeStatus()">Change Status</button>
-        </div>
-    </mat-card-content>
-</mat-card>
+        </mat-card-content>
+    </mat-card>
+}

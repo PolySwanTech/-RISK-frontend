@@ -20,7 +20,7 @@ export class IncidentService {
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(
-      map((responseData: { id: string; titre : string; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; impacts: Impact[]; }) => {
+      map((responseData: { id: string; titre : string; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; impacts: Impact[]; comments : string}) => {
         // Constructing an Incident instance using the constructor
         const {
           id,
@@ -29,7 +29,8 @@ export class IncidentService {
           survenueAt,
           detectedAt,
           closedAt,
-          impacts
+          impacts, 
+          comments
         } = responseData;
 
         // Convert string dates to Date objects if necessary
@@ -40,7 +41,8 @@ export class IncidentService {
           new Date(survenueAt),
           new Date(detectedAt),
           closedAt ? new Date(closedAt) : null, // Handle the possibility of a null closedAt
-          impacts // Assuming impacts is already an array of Impact objects or needs further processing
+          impacts, 
+          comments // Assuming impacts is already an array of Impact objects or needs further processing
         );
       })
     );
@@ -50,5 +52,9 @@ export class IncidentService {
     let params = new HttpParams();
     params = params.set("idP", processId).set("idI", incidentId)
     return this.http.post(this.baseUrl + '/impact', impact, {params : params})
+  }
+
+  updateCommentaire(id : string, commentaire : string){
+    return this.http.put(this.baseUrl + `/incidents/${id}/commentaire`, commentaire)
   }
 }

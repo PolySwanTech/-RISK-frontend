@@ -22,6 +22,8 @@ export class Incident {
 
     state : State = State.OPEN
 
+    comments : string 
+
     constructor(
         id: string,
         titre: string,
@@ -29,7 +31,8 @@ export class Incident {
         survenueAt: Date,
         detectedAt: Date,
         closedAt: Date | null,
-        impacts: Impact[]
+        impacts: Impact[], 
+        comments : string
     ) {
         this.id = id;
         this.titre = titre;
@@ -38,6 +41,7 @@ export class Incident {
         this.detectedAt = detectedAt;
         this.closedAt = closedAt;
         this.impacts = impacts;
+        this.comments = comments;
 
         if(this.closedAt){
             this.state = State.CLOSED

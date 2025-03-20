@@ -4,19 +4,18 @@ import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { DatePipe } from '@angular/common';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Impact } from '../../../core/models/Impact';
+import { ActivatedRoute } from '@angular/router';
 import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ImpactCardComponent } from '../impact-card/impact-card.component';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule,
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule ,
     MatGridListModule, MatButtonModule, ImpactCardComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss'
@@ -24,6 +23,7 @@ import { ImpactCardComponent } from '../impact-card/impact-card.component';
 export class ViewComponent {
 
   incident: Incident | undefined
+  prevCommentaire : string = ''
 
   constructor(
     private incidentService: IncidentService,
@@ -36,7 +36,9 @@ export class ViewComponent {
     const id = this.route.snapshot.params['id'];
 
     this.incidentService.getIncidentById(id).subscribe((incident) => {
+      console.log(incident)
       this.incident = incident;
+      this.prevCommentaire = this.incident.comments || ''
     });
   }
 
@@ -68,5 +70,20 @@ export class ViewComponent {
       }
     });
     // open dialog to add a new impact 
+  }
+
+  hasChange(){
+    if(this.incident){
+      return this.prevCommentaire !== this.incident.comments
+    }
+    return false;
+  }
+
+  updateCommentaire(){
+    if(this.incident){
+      this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
+        _ => alert("commentaire mis à jour")
+      )
+    }
   }
 }
