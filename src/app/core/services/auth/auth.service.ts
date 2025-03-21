@@ -4,6 +4,7 @@ import { Utilisateur } from '../../models/Utilisateur';
 import { environment } from '../../../environments/environment.prod';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Router } from '@angular/router';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,20 @@ export class AuthService {
   
   register(user : Utilisateur){
     return this.http.post<Utilisateur>(this.base + '/auth/register', user);
+  }
+
+  decryptToken(){
+    const token = sessionStorage.getItem('token');
+    return jwtDecode(token ? token : '');
+  }
+
+  isTokenExpired(token: any): boolean {
+    if (!token.exp) {
+      return true; // Si le token n'a pas d'expiration, considère-le comme invalide
+    }
+  
+    const currentTime = Math.floor(Date.now() / 1000); // Temps actuel en secondes
+    return token.exp < currentTime;
   }
   
   login(username : string, mdp : string){

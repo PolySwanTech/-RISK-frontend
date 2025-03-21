@@ -10,6 +10,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { IncidentService } from '../../core/services/incident/incident.service';
+import { jwtDecode } from 'jwt-decode';
+
 
 @Component({
   selector: 'app-sidebar',
@@ -36,9 +38,12 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateLoginStatus();
-    this.incidentService.countIncidentsNonClotures().subscribe(resp => {
-      this.unreadIncidents = resp;
-     })
+    const token = this.authService.decryptToken();
+    if(!this.authService.isTokenExpired(token)){
+      this.incidentService.countIncidentsNonClotures().subscribe(resp => {
+        this.unreadIncidents = resp;
+       })
+    }
   }
 
   // Method to update login status
