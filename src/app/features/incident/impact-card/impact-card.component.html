@@ -1,17 +1,21 @@
 @if(impact){
-<mat-card class="card">
+<mat-card>
     <mat-card-content>
         <div>
-            <strong>Montant:</strong> {{ impact.montant | currency : 'EUR' }}
+            <strong>Montant :</strong>
+            <span> {{ impact.montant | currency : 'EUR' }}</span>
         </div>
         <div>
-            <strong>Process:</strong> {{ impact.processName }}
+            <strong>Processus :</strong>
+            <span> {{ impact.processName }}</span>
         </div>
         <div>
-            <strong>Entity:</strong> {{ impact.entityName }}
+            <strong>Entité :</strong>
+            <span> {{ impact.entityName }}</span>
         </div>
         <div>
-            <strong>Date:</strong> {{ impact.createdAt | date: 'dd/MM/yyyy à HH:mm' }}
+            <strong>Date de création :</strong>
+            <span> {{ impact.createdAt | date: 'dd/MM/yyyy à HH:mm' }}</span>
         </div>
     </mat-card-content>
 </mat-card>

@@ -1,3 +1,12 @@
-.card{
-    width : 200px
+.mat-mdc-card {
+    width : 100%;
+    background-color: #5a616f;
+}
+
+strong{
+    color: var(--mat-sys-on-tertiary);
+}
+
+span{
+    color: var(--mat-sys-surface-container);
 }

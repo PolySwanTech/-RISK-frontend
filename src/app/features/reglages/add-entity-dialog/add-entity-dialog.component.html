@@ -8,10 +8,12 @@
 
     <div class="form-group">
       <label>Ligne Métier ?</label>
-      <mat-slide-toggle formControlName="isLM"/>
+      <mat-slide-toggle formControlName="isLM" />
     </div>
   </form>
+
+  <div class="actions">
+    <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
+    <button class="red" (click)="goBack()">Retour</button>
+  </div>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
-</mat-dialog-actions>

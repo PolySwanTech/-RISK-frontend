@@ -13,7 +13,7 @@
 .entity-info {
   display: flex;
   flex-direction: row;
-  gap : 5px;
+  gap: 5px;
 }
 
 .incident-info mat-grid-list {
@@ -63,7 +63,58 @@ button.mat-raised-button:hover {
   background-color: #e53935;
 }
 
-.impacts-container{
+.impacts-container {
   display: flex;
-  gap : 10px;
+  justify-content: left;
+  row-gap: 20px;
+  column-gap: 5%;
+  flex-wrap: wrap;
+
+  app-impact-card {
+    min-width: 180px;
+    width: 21.2%;
+  }
+}
+
+button {
+
+  padding: 8px 10px;
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-surface-tint);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+
+  &.add {
+    margin-block: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  &:hover {
+    background-color: var(--mat-sys-surface-tint);
+    color: var(--mat-sys-primary-container);
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    color: #e0e0e0;
+    cursor: not-allowed;
+  }
+}
+
+.full-width {
+  width: 50%;
+}
+
+::ng-deep .mat-mdc-card-header-text {
+  width: 100%;
+}
+
+mat-card-title {
+  display: flex;
+  justify-content: space-between;
 }

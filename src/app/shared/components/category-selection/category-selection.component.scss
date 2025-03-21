@@ -22,8 +22,6 @@ ul {
 button {
     margin-top: 20px;
     padding: 12px;
-    background-color: var(--mat-sys-primary-container);
-    color: var(--mat-sys-surface-tint);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -36,17 +34,6 @@ button {
 
     mat-icon{
         display: block;
-    }
-
-    &:hover {
-        background-color: var(--mat-sys-surface-tint);
-        color: var(--mat-sys-primary-container);
-    }
-
-    &:disabled {
-        background-color: #ccc;
-        color: #e0e0e0;
-        cursor: not-allowed;
     }
 }
 
@@ -90,24 +77,11 @@ input[type="checkbox"] {
 
     margin-top: 20px;
     padding: 12px;
-    background-color: var(--mat-sys-primary-container);
-    color: var(--mat-sys-surface-tint);
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
     transition: 0.3s;
-
-    &:hover {
-        background-color: var(--mat-sys-surface-tint);
-        color: var(--mat-sys-primary-container);
-    }
-
-    &:disabled {
-        background-color: #ccc;
-        color: #e0e0e0;
-        cursor: not-allowed;
-    }
 }
 a {
   display: block;

@@ -9,6 +9,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { IncidentService } from '../../core/services/incident/incident.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -25,16 +26,19 @@ import { AuthService } from '../../core/services/auth/auth.service';
 })
 export class SidebarComponent implements OnInit {
   isSidebarOpen = true;
-  unreadIncidents = 5;
+  unreadIncidents = 0;
 
   currentRoute: string = '';
 
   storageSubscription: any;
 
-  constructor(private router: Router, public authService : AuthService) { }
+  constructor(private router: Router, public authService : AuthService, private incidentService : IncidentService) { }
 
   ngOnInit(): void {
     this.updateLoginStatus();
+    this.incidentService.countIncidentsNonClotures().subscribe(resp => {
+      this.unreadIncidents = resp;
+     })
   }
 
   // Method to update login status

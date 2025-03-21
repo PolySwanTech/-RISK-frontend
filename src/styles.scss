@@ -118,24 +118,12 @@ html, body > app-root {
       width: 100%;
       margin-top: 20px;
       padding: 12px;
-      background-color: var(--mat-sys-primary-container);
-      color: var(--mat-sys-surface-tint);
       border: none;
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
       transition: 0.3s;
   
-      &:hover {
-          background-color: var(--mat-sys-surface-tint);
-          color: var(--mat-sys-primary-container);
-      }
-  
-      &:disabled {
-          background-color: #ccc;
-          color: #e0e0e0;
-          cursor: not-allowed;
-      }
   }
   a {
     display: block;
@@ -194,5 +182,47 @@ h2 {
 @media (max-width: 480px) {
     .form-container, .login-container {
         width: 90%;
+    }
+}
+
+mat-drawer-content{
+    overflow: hidden !important;
+}
+
+.actions{
+    display: flex;
+    gap: 20px;
+}
+
+button {
+
+    background-color: var(--mat-sys-primary-container);
+    color: var(--mat-sys-surface-tint);
+
+
+    &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger) {
+        background-color: var(--mat-sys-surface-tint);
+        color: var(--mat-sys-primary-container);
+    }
+
+    &.red{
+        background-color: var(--mat-sys-on-error-background);
+        color: var(--mat-sys-on-error-container);
+    }
+
+    &.red:hover{
+        background-color: var(--mat-sys-on-error-container);
+        color: var(--mat-sys-on-error-background);
+    }
+
+    &:disabled {
+        background-color: #ccc;
+        color: #e0e0e0;
+        cursor: not-allowed;
+    }
+    &:disabled:hover {
+        background-color: #ccc;
+        color: #e0e0e0;
+        cursor: not-allowed;
     }
 }

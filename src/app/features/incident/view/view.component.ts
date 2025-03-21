@@ -11,12 +11,15 @@ import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impac
 import { MatDialog } from '@angular/material/dialog';
 import { ImpactCardComponent } from '../impact-card/impact-card.component';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule ,
-    MatGridListModule, MatButtonModule, ImpactCardComponent],
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
+    MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule, MatInputModule, GoBackComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss'
 })

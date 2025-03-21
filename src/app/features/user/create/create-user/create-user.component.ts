@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -15,15 +15,15 @@ import { AuthService } from '../../../../core/services/auth/auth.service';
   styleUrls: ['./create-user.component.scss']
 })
 export class CreateUserComponent implements OnInit {
-  userForm: FormGroup;
-  
-  constructor(private fb: FormBuilder, 
-    private authService : AuthService) {
-    this.userForm = this.fb.group({
-      username: ['', Validators.required],
-      email: ['', Validators.required],
-      password: ['', Validators.required]
-    });
+  private _formBuilder = inject(FormBuilder);
+  userForm: FormGroup = this._formBuilder.group({
+    username: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]]
+  });
+
+  constructor(
+    private authService: AuthService) {
   }
 
   ngOnInit() {
@@ -31,11 +31,13 @@ export class CreateUserComponent implements OnInit {
 
   onSubmit() {
 
+    console.log(this.userForm)
+
     this.authService.register(this.userForm.value).subscribe(
       (data) => {
       }
     );
-    
+
 
     // if (this.userForm.valid) {
     //   const newUser: Utilisateur = this.userForm.value;

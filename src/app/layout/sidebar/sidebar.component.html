@@ -11,7 +11,7 @@
         </a>
         <a mat-list-item routerLink="/incident">
           <mat-icon>warning</mat-icon>
-          <span [matBadge]="unreadIncidents" matBadgeColor="warn" matBadgePosition="above after"
+          <span [matBadge]="unreadIncidents > 0 ? unreadIncidents : null " matBadgeColor="warn" matBadgePosition="above after"
             mat-button>Incidents</span>
         </a>
         <a mat-list-item [matMenuTriggerFor]="menu">
@@ -35,7 +35,6 @@
       </mat-nav-list>
     }
   </mat-drawer>
-
   <mat-drawer-content>
     <ng-content></ng-content>
   </mat-drawer-content>

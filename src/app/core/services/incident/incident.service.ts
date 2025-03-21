@@ -17,6 +17,10 @@ export class IncidentService {
   loadIncidents() : Observable<Incident[]> {
     return this.http.get<Incident[]>(this.baseUrl + '/incidents');
   }
+
+  countIncidentsNonClotures() : Observable<number> {
+    return this.http.get<number>(this.baseUrl + '/incidents/nb/cloture');
+  }
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(

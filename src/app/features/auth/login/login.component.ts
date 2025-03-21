@@ -14,6 +14,7 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 export class LoginComponent {
 
   loginForm: FormGroup;
+  resetMdpForm: FormGroup;
   isForgotPassword: boolean = false;
   errorMessage: string = '';
 
@@ -24,6 +25,10 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+
+    this.resetMdpForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -41,7 +46,7 @@ export class LoginComponent {
 
   // Reset Password functionality (send email for password reset)
   onResetPassword() {
-    const email = this.loginForm.value.email;
+    const email = this.resetMdpForm.value.email;
     if (!email) {
       this.errorMessage = 'Merci de renseigner un mail pour la réinitialisation du mot de passe.';
       return;
