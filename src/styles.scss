@@ -200,7 +200,7 @@ button {
     color: var(--mat-sys-surface-tint);
 
 
-    &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger) {
+    &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger, .mat-mdc-icon-button) {
         background-color: var(--mat-sys-surface-tint);
         color: var(--mat-sys-primary-container);
     }

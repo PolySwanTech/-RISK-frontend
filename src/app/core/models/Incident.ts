@@ -11,7 +11,7 @@ export enum State {
 export class Incident {
     id: string
 
-    titre : string
+    title : string
 
     declaredAt: Date
     survenueAt: Date
@@ -26,7 +26,7 @@ export class Incident {
 
     constructor(
         id: string,
-        titre: string,
+        title: string,
         declaredAt: Date,
         survenueAt: Date,
         detectedAt: Date,
@@ -35,7 +35,7 @@ export class Incident {
         comments : string
     ) {
         this.id = id;
-        this.titre = titre;
+        this.title = title;
         this.declaredAt = declaredAt;
         this.survenueAt = survenueAt;
         this.detectedAt = detectedAt;

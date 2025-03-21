@@ -27,7 +27,7 @@
             </mat-form-field>
 
             <div>
-              <button [disabled]="incidentForm.invalid" mat-button matStepperNext>Suivant</button>
+              <button [disabled]="incidentForm.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
@@ -38,9 +38,9 @@
             <input matInput type="date">
           </mat-form-field>
 
-          <div>
-            <button mat-button matStepperPrevious>Retour</button>
-            <button mat-button (click)="addIncident()">Soumettre</button>
+          <div class="actions">
+            <button (click)="addIncident()">Soumettre</button>
+            <button class="red" matStepperPrevious>Retour</button>
           </div>
         </mat-step>
       </mat-stepper>

@@ -24,11 +24,11 @@ export class IncidentService {
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(
-      map((responseData: { id: string; titre : string; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; impacts: Impact[]; comments : string}) => {
+      map((responseData: { id: string; title : string; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; impacts: Impact[]; comments : string}) => {
         // Constructing an Incident instance using the constructor
         const {
           id,
-          titre,
+          title,
           declaredAt,
           survenueAt,
           detectedAt,
@@ -40,7 +40,7 @@ export class IncidentService {
         // Convert string dates to Date objects if necessary
         return new Incident(
           id,
-          titre,
+          title,
           new Date(declaredAt),
           new Date(survenueAt),
           new Date(detectedAt),
@@ -59,6 +59,7 @@ export class IncidentService {
   }
 
   updateCommentaire(id : string, commentaire : string){
+    console.log(id, commentaire)
     return this.http.put(this.baseUrl + `/incidents/${id}/commentaire`, commentaire)
   }
 

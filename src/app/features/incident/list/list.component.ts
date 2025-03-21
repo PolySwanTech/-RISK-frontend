@@ -35,7 +35,7 @@ export class ListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'titre',
       header: 'Titre',
-      cell: (element: Incident) => `${element.titre}`,
+      cell: (element: Incident) => `${element.title}`,
     },
     {
       columnDef: 'dateDeclaration',

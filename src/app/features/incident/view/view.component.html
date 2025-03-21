@@ -1,6 +1,6 @@
 <div style="margin: 15px;">
-    <app-go-back previousPageName="Liste des incidents" currentPageName="Détails de l'incident 123"></app-go-back>
     @if(incident){
+    <app-go-back previousPageName="Liste des incidents" [currentPageName]="`Détails de l'incident - ` + incident.title"></app-go-back>
     <mat-card class="incident-card">
         <mat-card-header>
             <mat-card-title> <span>Détails de l'incident - Status : <strong>{{ incident.state }}</strong></span>
