@@ -32,11 +32,13 @@
           </form>
         </mat-step>
 
-        <mat-step label="Autres détails">
-          <mat-form-field>
-            <mat-label>Date de clôture (si clôturé)</mat-label>
-            <input matInput type="date">
-          </mat-form-field>
+        <mat-step [stepControl]="incidentForm" label="Autres détails">
+          <form [formGroup]="incidentForm">
+            <mat-form-field>
+              <mat-label>Date de clôture (si clôturé)</mat-label>
+              <input matInput type="date" formControlName="dateDeCloture">
+            </mat-form-field>
+          </form>
 
           <div class="actions">
             <button (click)="addIncident()">Soumettre</button>

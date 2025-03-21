@@ -58,6 +58,10 @@ export class IncidentService {
     return this.http.post(this.baseUrl + '/impact', impact, {params : params})
   }
 
+  saveIncident(incident: any): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/incidents`, incident);
+  }
+
   updateCommentaire(id : string, commentaire : string){
     console.log(id, commentaire)
     return this.http.put(this.baseUrl + `/incidents/${id}/commentaire`, commentaire)

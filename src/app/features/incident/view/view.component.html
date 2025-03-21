@@ -1,9 +1,13 @@
 <div style="margin: 15px;">
     @if(incident){
-    <app-go-back previousPageName="Liste des incidents" [currentPageName]="`Détails de l'incident - ` + incident.title"></app-go-back>
+    <app-go-back previousPageName="Liste des incidents"
+        [currentPageName]="`Détails de l'incident - ` + incident.title"></app-go-back>
     <mat-card class="incident-card">
         <mat-card-header>
-            <mat-card-title> <span>Détails de l'incident - Status : <strong>{{ incident.state }}</strong></span>
+            <mat-card-title> 
+                <span>Détails de l'incident - <strong>{{ incident.title }}</strong> - Status : <strong>{{
+                        incident.state }}</strong>
+                </span>
                 @if(isNotClosed()){
                 <button (click)="close()">Cloturer</button>
                 }
