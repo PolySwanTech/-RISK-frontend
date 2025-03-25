@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Incident } from '../../../core/models/Incident';
+import { Incident, State } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -35,7 +35,7 @@ export class ListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'titre',
       header: 'Titre',
-      cell: (element: Incident) => `${element.title}`,
+      cell: (element: Incident) => `${element.titre}`,
     },
     {
       columnDef: 'dateDeclaration',
@@ -45,7 +45,7 @@ export class ListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'statut',
       header: 'Statut',
-      cell: (incident: Incident) => incident.closedAt ? 'Clôturé' : 'En cours'
+      cell: (incident: Incident) => State[incident.state.toString() as keyof typeof State] || 'Inconnu'
     }
   ];
 

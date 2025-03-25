@@ -6,6 +6,7 @@ import { SubRisk } from "./SubRisk";
 import { Cause } from "./Cause";
 
 export enum State {
+    NEW = "Nouveau",
     OPEN = "Ouvert",
     CLOSED = "Fermé"
 }
@@ -13,7 +14,7 @@ export enum State {
 export class Incident {
     id: string;
 
-    title: string;
+    titre: string;
     location: string;
 
     declaredAt: Date;
@@ -35,7 +36,7 @@ export class Incident {
 
     constructor(
         id: string,
-        title: string,
+        titre: string,
         location: string,
         declaredAt: Date,
         survenueAt: Date,
@@ -49,7 +50,7 @@ export class Incident {
         comments: string
     ) {
         this.id = id;
-        this.title = title;
+        this.titre = titre;
         this.location = location;
         this.declaredAt = declaredAt;
         this.survenueAt = survenueAt;

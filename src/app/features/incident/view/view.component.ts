@@ -41,7 +41,6 @@ export class ViewComponent {
    
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
-      console.log(this.incident)
       this.prevCommentaire = this.incident.comments || ''
     });
   }
