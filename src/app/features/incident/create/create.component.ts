@@ -19,6 +19,9 @@ import { CauseService } from '../../../core/services/cause/cause.service';
 import { Cause } from '../../../core/models/Cause';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
+import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-create',
@@ -41,6 +44,8 @@ import { Process } from '../../../core/models/Process';
 })
 export class CreateComponent {
   private _formBuilder = inject(FormBuilder);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
@@ -110,20 +115,36 @@ export class CreateComponent {
       process: this.incidentForm3.value.process
     
     };
-
-    console.log(incident);
-
     this.incidentService.saveIncident(incident).subscribe(
-      resp => {
-        console.log("Incident ajouté avec succès", resp);
+      {
+        next : resp => {
+          this.afterCreation(resp);
+        }, 
+        error : err => {
+          console.error("Erreur lors de la création de l'incident", err);
+        }
       },
-      error => {
-        console.error("Erreur lors de la création de l'incident", error);
-      }
     );
-
-    console.log("Incident envoyé :", incident);
   }
+
+  afterCreation(incidentId: string) {
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        width: '400px',
+        data: {
+          title: 'Création réussie',
+          message: 'Allez vers la consultation ?'
+        }
+      });
+    
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.router.navigate(['incident', incidentId])
+        }
+        else{
+          this.router.navigate(['incident'])
+        }
+      });
+    } 
 
   parseDate(date: string | null | undefined): string | null {
     return date ? new Date(date).toISOString() : null;

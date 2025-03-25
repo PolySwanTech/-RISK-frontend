@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -30,6 +30,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   providers : [DatePipe]
 })
 export class ListComponent implements OnInit, AfterViewInit {
+
+  private dialog = inject(MatDialog);
+  private incidentService = inject(IncidentService)
+  private datePipe =  inject(DatePipe)
+  private router = inject(Router);
 
   columns = [
     {
@@ -70,11 +75,6 @@ export class ListComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
 
     this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-  }
-
-
-  constructor(private router: Router, private datePipe: DatePipe,
-    private incidentService: IncidentService, private dialog: MatDialog) {
   }
 
   ngOnInit(): void {
