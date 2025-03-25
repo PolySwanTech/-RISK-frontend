@@ -38,11 +38,18 @@ export class ViewComponent {
 
     const id = this.route.snapshot.params['id'];
 
+   
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
+      console.log(this.incident)
       this.prevCommentaire = this.incident.comments || ''
     });
   }
+
+  formatDate (dateString : any) { 
+    return dateString ? dateString.toLocaleDateString("fr-FR") : null;
+  }
+
 
   changeStatus(): void {
     // Logic to change the state of the incident
@@ -74,11 +81,11 @@ export class ViewComponent {
     // open dialog to add a new impact 
   }
 
-  hasChange(){
-    if(this.incident){
-      return this.prevCommentaire !== this.incident.comments
+  noChange(){
+    if(this.incident && this.incident.comments){
+      return this.prevCommentaire === this.incident.comments
     }
-    return false;
+    return true;
   }
 
   isNotClosed(){

@@ -1,0 +1,18 @@
+<div class="button-add-file">
+    <!-- Bouton de téléchargement -->
+    <label for="file-upload" class="custom-file-upload">
+      <mat-icon>cloud_upload</mat-icon>
+      <span>{{ label }}</span>
+    </label>
+    <input type="file" id="file-upload" (change)="onFileChange($event)" [accept]="accept" multiple />
+  
+    <!-- Prévisualisation des fichiers -->
+    <div *ngIf="preview && filePreviews.length > 0" class="file-preview">
+      <div *ngFor="let preview of filePreviews" class="preview-item">
+        <button *ngIf="list" class="delete-image-btn" (click)="onDeleteImagePreview(list, preview)">
+          ✖
+        </button>
+        <img [src]="preview" alt="Prévisualisation"/>    
+      </div>
+    </div>
+  </div>

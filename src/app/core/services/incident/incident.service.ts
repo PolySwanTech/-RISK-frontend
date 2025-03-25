@@ -4,6 +4,10 @@ import { map, Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment.prod';
 import { Impact } from '../../models/Impact';
+import { Risk } from '../../models/Risk';
+import { Cause } from '../../models/Cause';
+import { SubRisk } from '../../models/SubRisk';
+import { Process } from '../../models/Process';
 
 @Injectable({
   providedIn: 'root'
@@ -24,29 +28,39 @@ export class IncidentService {
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(
-      map((responseData: { id: string; title : string; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; impacts: Impact[]; comments : string}) => {
+      map((responseData: { id: string; title : string; location : string; comments : string; cause : Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk : Risk; subRisk : SubRisk; process : Process; impacts: Impact[];}) => {
         // Constructing an Incident instance using the constructor
         const {
           id,
           title,
+          location,
+          comments,
+          cause,
           declaredAt,
           survenueAt,
           detectedAt,
           closedAt,
-          impacts, 
-          comments
+          risk,
+          subRisk,
+          process,
+          impacts
         } = responseData;
-
-        // Convert string dates to Date objects if necessary
+  
+        // Conversion des dates en objets Date
         return new Incident(
           id,
           title,
+          location,
           new Date(declaredAt),
           new Date(survenueAt),
           new Date(detectedAt),
-          closedAt ? new Date(closedAt) : null, // Handle the possibility of a null closedAt
-          impacts, 
-          comments // Assuming impacts is already an array of Impact objects or needs further processing
+          closedAt ? new Date(closedAt) : null, // Gestion du cas où closedAt est null
+          risk,
+          subRisk,
+          process,
+          cause,
+          impacts,
+          comments
         );
       })
     );

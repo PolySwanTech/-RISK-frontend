@@ -8,6 +8,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
 import { merge } from 'rxjs';
 import { IncidentService } from '../../../core/services/incident/incident.service';
+import { RiskService } from '../../../core/services/risk/risk.service';
+import {MatRadioModule} from '@angular/material/radio';
+import { Risk } from '../../../core/models/Risk';
+import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
+import { Utilisateur } from '../../../core/models/Utilisateur';
+import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
+import { MatSelectModule } from '@angular/material/select';
+import { CauseService } from '../../../core/services/cause/cause.service';
+import { Cause } from '../../../core/models/Cause';
+import { ProcessService } from '../../../core/services/process/process.service';
+import { Process } from '../../../core/models/Process';
 
 @Component({
   selector: 'app-create',
@@ -20,53 +31,87 @@ import { IncidentService } from '../../../core/services/incident/incident.servic
     FormsModule,
     ReactiveFormsModule,
     MatStepperModule,
-  ],
+    MatRadioModule,
+    SelectUsersComponent,
+    ButtonAddFileComponent,
+    MatSelectModule
+],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
 export class CreateComponent {
   private _formBuilder = inject(FormBuilder);
 
-  incidentForm = this._formBuilder.group({
+  incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
+    location: ['', Validators.required],
+    commentaire: ['', Validators.required],
+    cause: ['', Validators.required]
+    
+  });
+  
+  incidentForm2 = this._formBuilder.group({
+    dateDeDeclaration: [new Date().toISOString().split('T')[0], Validators.required],
     dateDeSurvenance: ['', Validators.required],
     dateDeDetection: ['', Validators.required],
-    dateDeDeclaration: [new Date().toISOString().split('T')[0], Validators.required],
     dateDeCloture: ['']
   });
 
+  incidentForm3 = this._formBuilder.group({
+    risk: ['', Validators.required],
+    subRisk: ['', Validators.required],
+    userMail: [''],
+    files: [''],
+    process: ['', Validators.required]
+  });
+
+  listRisk : Risk[] = [];
+  listCause : Cause[] = [];
+  listProcess : Process[] = [];
+
   errorMessage = signal('');
 
-  constructor(private incidentService: IncidentService) {
-    merge(
-      this.incidentForm.get('titre')!.valueChanges,
-      this.incidentForm.get('dateDeSurvenance')!.valueChanges,
-      this.incidentForm.get('dateDeDetection')!.valueChanges,
-      this.incidentForm.get('dateDeDeclaration')!.valueChanges
-    ).pipe(
-      takeUntilDestroyed()
-    ).subscribe(() => {
-      if (this.incidentForm.invalid) {
-        this.errorMessage.set('Tous les champs ne sont pas remplis correctement.');
-      } else {
-        this.errorMessage.set('');
-      }
+  constructor(private incidentService: IncidentService, private riskService: RiskService, 
+    private causeService: CauseService, private processService: ProcessService) {
+    this.riskService.getAll().subscribe( (resp: any) => {
+      this.listRisk = resp;
+    });
+    this.causeService.getAll().subscribe( (resp: any) => {
+      this.listCause = resp;
+    });
+    this.processService.getAll().subscribe( (resp: any) => {
+      this.listProcess = resp;
     });
   }
 
+  changeUser(event: any){
+    this.incidentForm3.get('userMail')!.setValue(event.email);
+  }
+
   addIncident() {
-    if (this.incidentForm.invalid) {
+    if (this.incidentForm1.invalid || this.incidentForm2.invalid) {
       alert("Tous les champs obligatoires ne sont pas remplis");
       return;
     }
 
     const incident = {
-      title: this.incidentForm.value.titre,
-      declaredAt: this.parseDate(this.incidentForm.value.dateDeDeclaration),
-      survenueAt: this.parseDate(this.incidentForm.value.dateDeSurvenance),
-      detectedAt: this.parseDate(this.incidentForm.value.dateDeDetection),
-      closedAt: this.parseDate(this.incidentForm.value.dateDeCloture),
+      title: this.incidentForm1.value.titre,
+      location: this.incidentForm1.value.location,
+      commentaire: this.incidentForm1.value.commentaire,
+      cause: this.incidentForm1.value.cause,
+      declaredAt: this.parseDate(this.incidentForm2.value.dateDeDeclaration),
+      survenueAt: this.parseDate(this.incidentForm2.value.dateDeSurvenance),
+      detectedAt: this.parseDate(this.incidentForm2.value.dateDeDetection),
+      closedAt: this.parseDate(this.incidentForm2.value.dateDeCloture),
+      risk: this.incidentForm3.value.risk,
+      subRisk: this.incidentForm3.value.subRisk,
+      userMail: this.incidentForm3.value.userMail,
+      files: this.incidentForm3.value.files,
+      process: this.incidentForm3.value.process
+    
     };
+
+    console.log(incident);
 
     this.incidentService.saveIncident(incident).subscribe(
       resp => {
@@ -82,5 +127,17 @@ export class CreateComponent {
 
   parseDate(date: string | null | undefined): string | null {
     return date ? new Date(date).toISOString() : null;
+  }
+
+  onFilesChange(event: any){
+    this.incidentForm3.get('files')!.setValue(event);
+  }
+
+  getSubRisk() : any{
+    let risk : any = this.incidentForm3.get('risk')!.value;
+    if(this.incidentForm3.get('risk')!.value != ''){
+      return risk.subRisks
+    }
+    return risk;
   }
 }

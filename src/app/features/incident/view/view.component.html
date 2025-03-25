@@ -4,7 +4,7 @@
         [currentPageName]="`Détails de l'incident - ` + incident.title"></app-go-back>
     <mat-card class="incident-card">
         <mat-card-header>
-            <mat-card-title> 
+            <mat-card-title>
                 <span>Détails de l'incident - <strong>{{ incident.title }}</strong> - Status : <strong>{{
                         incident.state }}</strong>
                 </span>
@@ -19,9 +19,44 @@
         </mat-card-content>
     </mat-card>
 
+    <mat-card class="incident-card">
+        <mat-card-header>
+            <mat-card-title>
+                <span>Info globale</span>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="date-info">
+                <span>Ref : {{ incident.id }}</span>
+            </div>
+            
+            <div class="incident-details">
+                <mat-form-field class="full-width">
+                    <mat-label>Location</mat-label>
+                    <input matInput [value]="incident.location" readonly>
+                </mat-form-field>
+    
+                <mat-form-field class="full-width">
+                    <mat-label>Cause</mat-label>
+                    <input matInput [value]="incident.cause.name" readonly>
+                </mat-form-field>
+    
+                <mat-form-field class="full-width">
+                    <mat-label>Type de risque</mat-label>
+                    <input matInput [value]="incident.risk.balois" readonly>
+                </mat-form-field>
+    
+                <mat-form-field class="full-width">
+                    <mat-label>Sous Catégorie de risque</mat-label>
+                    <input matInput [value]="incident.subRisk.balois" readonly>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
     <mat-card class="impact-card">
         <mat-card-header>
-            <mat-card-title>Impacts</mat-card-title>
+            <mat-card-title><span>Impacts</span></mat-card-title>
         </mat-card-header>
         <mat-card-content>
             @if(isNotClosed()){
@@ -40,9 +75,42 @@
         </mat-card-content>
     </mat-card>
 
+    <mat-card class="incident-card">
+        <mat-card-header>
+            <mat-card-title>
+                <span>Date
+                </span>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="date-info">
+                <mat-form-field>
+                    <mat-label>Date de déclaration</mat-label>
+                    <input matInput [value]="formatDate(incident.declaredAt)" readonly>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Date de survenance</mat-label>
+                    <input matInput [value]="formatDate(incident.survenueAt)" readonly>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Date de détection</mat-label>
+                    <input matInput [value]="formatDate(incident.detectedAt)" readonly>
+                </mat-form-field>
+                @if(incident.closedAt){
+                <mat-form-field>
+                    <mat-label>Date de clôture</mat-label>
+                    <input matInput [value]="formatDate(incident.closedAt)" readonly>
+                </mat-form-field>
+                }
+            </div>
+        </mat-card-content>
+    </mat-card>
+
     <mat-card class="state-card">
         <mat-card-header>
-            <mat-card-title>Commentaires</mat-card-title>
+            <mat-card-title><span>Commentaires</span></mat-card-title>
         </mat-card-header>
         <mat-card-content>
             <div class="incident-state">
@@ -53,7 +121,7 @@
 
             </div>
             <div style="text-align: end;">
-                <button [disabled]="!hasChange()" (click)="updateCommentaire()">Mettre à jour</button>
+                <button [disabled]="noChange()" (click)="updateCommentaire()">Mettre à jour</button>
             </div>
         </mat-card-content>
     </mat-card>
