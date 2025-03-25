@@ -1,4 +1,4 @@
-<div class="list-container">
+<div class="list-container" *appHasPermission="'VIEW_INCIDENTS'">
     <h2>Liste des incidents</h2>
     <div class="filters-container">
         <mat-form-field appearance="outline">
@@ -49,16 +49,22 @@
                         </button>
                     </td>
                 </ng-container>
-    
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus"></tr>
-    
+
             </table>
             <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[4, 10, 15]"
                 aria-label="Page selection pour le tableau" showFirstLastButtons></mat-paginator>
-    
+
         </div>
-        
+
     </div>
 
+</div>
+
+<!-- Sinon, message d’accès refusé -->
+<div *ngIf="!(authService.hasPermission('VIEW_INCIDENTS'))" style="text-align: center; margin-top: 50px;">
+    <h2>Accès refusé</h2>
+    <p>Vous n'avez pas la permission de voir cette page.</p>
 </div>

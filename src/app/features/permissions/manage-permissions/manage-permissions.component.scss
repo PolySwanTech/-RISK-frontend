@@ -1,0 +1,34 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px;
+  }
+  
+  .user-list {
+    list-style: none;
+    padding: 0;
+  
+    .user-item {
+      padding: 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #ccc;
+      transition: background-color 0.2s;
+  
+      &:hover {
+        background-color: #f2f2f2;
+      }
+  
+      &.selected {
+        background-color: #e0f7fa;
+        font-weight: bold;
+      }
+    }
+  }
+  
+  .permissions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  

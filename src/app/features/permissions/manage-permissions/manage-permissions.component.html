@@ -1,0 +1,41 @@
+<h2>Gestion des permissions</h2>
+
+<div class="container">
+  <mat-card class="user-list-card">
+    <mat-card-title>Utilisateurs</mat-card-title>
+    <mat-card-content>
+      <ul class="user-list">
+        <li
+          *ngFor="let user of users"
+          (click)="selectUser(user)"
+          [ngClass]="{ selected: selectedUser?.id === user.id }"
+          class="user-item"
+        >
+          {{ user.username }} ({{ user.email }})
+        </li>
+      </ul>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="permissions-card" *ngIf="selectedUser">
+    <mat-card-title>
+      Permissions de {{ selectedUser.username }}
+    </mat-card-title>
+    <mat-card-content>
+      <div class="permissions-list">
+        <mat-checkbox
+          *ngFor="let permission of permissions"
+          [checked]="hasPermission(permission.name)"
+          (change)="togglePermission(permission)"
+        >
+          {{ permission.description }}
+        </mat-checkbox>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="savePermissions()">
+        Valider
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

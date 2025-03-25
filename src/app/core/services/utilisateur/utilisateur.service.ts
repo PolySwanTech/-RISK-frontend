@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment'
+import { Utilisateur } from '../../models/Utilisateur';
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +11,20 @@ export class UtilisateurService {
 
   private readonly http: HttpClient = inject(HttpClient);
 
-  private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+  baseUrl = environment.apiUrl;
 
   constructor() { }
 
   getPosts(): Observable<any> {
-    return this.http.get(this.apiUrl);
+    return this.http.get(this.baseUrl + '/posts');
   }
+
+  getUsers(): Observable<Utilisateur[]> {
+    return this.http.get<Utilisateur[]>(this.baseUrl + '/user');
+  }    
+
+  updateUserPermissions(userId: string, permissionIds: string[]) {
+    return this.http.put(`${this.baseUrl}/user/${userId}/permissions`, permissionIds);
+  }
+  
 }

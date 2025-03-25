@@ -16,6 +16,8 @@ export class AuthService {
   router = inject(Router);
   
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
+
+  private permissions: string[] = [];
   
   constructor() { }
   
@@ -55,5 +57,20 @@ export class AuthService {
     sessionStorage.clear();
     this.isLogin$.next(false);
     this.router.navigate(['auth', 'login'])
+  }
+
+  setPermissions(permissions: string[]): void {
+    this.permissions = permissions;
+  }
+  
+  getPermissions(): string[] {
+    if (this.permissions.length > 0) return this.permissions;
+  
+    const token: any = this.decryptToken();
+    return token?.permissions || [];
+  }
+  
+  hasPermission(permission: string): boolean {
+    return this.getPermissions().includes(permission);
   }
 }

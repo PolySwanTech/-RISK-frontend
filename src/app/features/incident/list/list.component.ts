@@ -18,13 +18,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 
 @Component({
   selector: 'app-list',
   standalone: true,
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule],
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss', 
   providers : [DatePipe]
@@ -74,7 +76,7 @@ export class ListComponent implements OnInit, AfterViewInit {
 
 
   constructor(private router: Router, private datePipe: DatePipe,
-    private incidentService: IncidentService, private dialog: MatDialog) {
+    private incidentService: IncidentService, private dialog: MatDialog, public authService: AuthService) {
   }
 
   ngOnInit(): void {

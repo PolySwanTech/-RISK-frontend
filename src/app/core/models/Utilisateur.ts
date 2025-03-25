@@ -1,4 +1,5 @@
 import { EntiteResponsable } from "./EntiteResponsable"
+import { Permission } from "./permission";
 
 export enum Right{
     VIEWER = 'VIEWER',
@@ -13,7 +14,8 @@ export class Utilisateur {
     email: string;
     password: string;
     equipe: EntiteResponsable;
-    right : Right
+    right : Right;
+    permissions: Permission[] = [];
 
     constructor(
         id: string,
