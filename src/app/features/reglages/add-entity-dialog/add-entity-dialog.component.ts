@@ -6,12 +6,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { SelectEntitiesComponent } from "../../../shared/components/select-entities/select-entities.component";
 
 @Component({
   selector: 'app-add-entity-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule, 
-    MatSlideToggleModule, ReactiveFormsModule ],
+  imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
+    MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent],
   templateUrl: './add-entity-dialog.component.html',
   styleUrls: ['./add-entity-dialog.component.scss']
 })
@@ -21,17 +23,26 @@ export class AddEntityDialogComponent {
 
   formGroup: FormGroup = this._formBuilder.group({
     name: ['', Validators.required],
-    isLM: [false], // Default to false if not provided
+    isLM: [false],
+    parent: [null]
   });
 
-  entiteResponsable = new EntiteResponsable("", '', false, []);
+  entitiesList : EntiteResponsable[] = [];
 
-  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>) {}
+  entiteResponsable = new EntiteResponsable("", '', false, [], null);
+
+  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService) {
+  }
+
+  entiteChange(event: any) {
+    console.log(event);
+    this.formGroup.get('parent')?.setValue(event);
+  }
 
   onSave(): void {
-    // Ensure form value is applied to the entity
     this.entiteResponsable.name = this.formGroup.get('name')?.value;
     this.entiteResponsable.isLM = this.formGroup.get('isLM')?.value;
+    this.entiteResponsable.parent = this.formGroup.get('parent')?.value;
     this.dialogRef.close(this.entiteResponsable);
   }
 

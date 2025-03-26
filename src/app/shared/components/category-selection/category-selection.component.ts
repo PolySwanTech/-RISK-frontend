@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Optional } from '@angular/core';
-import { MatDialogRef, MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDialogRef, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
@@ -7,11 +7,17 @@ import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTreeModule } from '@angular/material/tree';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { ModifEntityDialogComponent } from '../../../features/reglages/modif-entity-dialog/modif-entity-dialog.component';
 
 @Component({
   selector: 'app-category-selection',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatIconModule, MatRippleModule, MatChipsModule],
+  imports: [CommonModule, MatDialogModule, MatIconModule, 
+    MatRippleModule, MatChipsModule, MatTreeModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   templateUrl: './category-selection.component.html',
   styleUrls: ['./category-selection.component.scss']
 })
@@ -20,38 +26,28 @@ export class CategorySelectionComponent implements OnInit {
   @Input() settings: boolean = false;
 
   entities: EntiteResponsable[] = [];
-  viewEntities: EntiteResponsable[] = [];
-  previous: EntiteResponsable[][] = [];
-
-  parent : EntiteResponsable | null = null;
-
-  breadcrumb: any[] = [];
-  selectedItems: Set<string> = new Set();
+  filteredEntities: EntiteResponsable[] = [];
 
   constructor(
     private entityService: EntitiesService,
     @Optional() public dialogRef: MatDialogRef<CategorySelectionComponent>,
+    @Optional() public dialogRefModif: MatDialogRef<CategorySelectionComponent>,
     private dialog: MatDialog
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     this.getEntities();
   }
 
-  getEntities() {
-    this.entityService.loadEntities().subscribe((res: any) => {
-      this.entities = res;
-      this.viewEntities = this.entities;
-      this.previous.push(this.entities)
-    });
-  }
+  childrenAccessor = (node: EntiteResponsable) => node.children ?? [];
 
-  handleCategoryAndNavigate(entite: EntiteResponsable, event: Event) {
-    event.stopPropagation();
-    this.parent = entite;
-    this.selectedItems.add(entite.name);
-    this.goToSubcategories(entite);
+  hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
+
+  getEntities() {
+    this.entityService.loadEntitiesTree().subscribe((res: any) => {
+      this.entities = res;
+      this.filteredEntities = this.entities; // Initialiser avec toutes les entités
+    });
   }
 
   addEntity() {
@@ -61,62 +57,53 @@ export class CategorySelectionComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(entiteResponsable => {
       if (entiteResponsable) {
-        // save entiteResponsable
-        // add entiteResponsable to the children of this.parent
+        this.entityService.save(entiteResponsable).subscribe(() => {
+          this.ngOnInit(); // Rechargement des entités après ajout
+        });
       }
     });
   }
 
-  toggleSelection(entite: EntiteResponsable, event: Event | boolean) {
-    let isChecked: boolean;
+  modifEntity(event : any, entite: EntiteResponsable) {
+    event.stopPropagation();
+    const dialogRef = this.dialog.open(ModifEntityDialogComponent, {
+      width: '500px',
+      data: entite
+    });
 
-    if (typeof event === 'boolean') {
-      isChecked = event;
-    } else {
-      isChecked = (event.target as HTMLInputElement).checked;
-    }
-
-    if (isChecked) {
-      this.selectCategoryWithChildren(entite);
-    } else {
-      this.selectCategoryWithChildren(entite);
-    }
+    dialogRef.afterClosed().subscribe(entiteResponsable => {
+      if (entiteResponsable) {
+        this.entityService.update(entiteResponsable).subscribe((resp) => {
+          console.log(resp)
+        });
+      }
+    });
   }
 
-  selectCategoryWithChildren(entite: EntiteResponsable) {
-    this.selectedItems.add(entite.name);
-    if (entite.children.length > 0) {
-      entite.children.forEach((sub: any) => this.selectCategoryWithChildren(sub));
-    }
+  applyFilter(event: any) {
+    const filterValue = event.target.value.trim().toLowerCase();
+    this.filteredEntities = this.filterNodes(this.entities, filterValue);
   }
 
-  deselectCategoryWithChildren(entite: EntiteResponsable) {
-    this.selectedItems.delete(entite.name);
-    if (entite.children.length > 0) {
-      entite.children.forEach((sub: any) => this.deselectCategoryWithChildren(sub));
-    }
-  }
+  private filterNodes(nodes: EntiteResponsable[], filter: string): EntiteResponsable[] {
+    return nodes
+      .map(node => {
+        const filteredChildren = node.children ? this.filterNodes(node.children, filter) : [];
+        const isMatchingParent = node.name.toLowerCase().includes(filter);
+        const hasMatchingChild = filteredChildren.length > 0;
 
-  isChecked(entite: EntiteResponsable): boolean {
-    return this.selectedItems.has(entite.name);
-  }
-
-  goToSubcategories(entite: EntiteResponsable) {
-    if (entite.children.length > 0) {
-      this.previous.push(this.viewEntities);
-      // this.breadcrumb.push(this.data.categories);
-      this.viewEntities = entite.children;
-    }
-  }
-
-  goBack() {
-    const prev = this.previous.pop();
-    if (prev) {
-      this.viewEntities = prev;
-    }
+        if (isMatchingParent) {
+          return { ...node, children: node.children || [] };
+        }
+        if (hasMatchingChild) {
+          return { ...node, children: filteredChildren };
+        }
+        return null;
+      })
+      .filter((node): node is EntiteResponsable => node !== null);
   }
 
   confirmSelection() {
-    this.dialogRef?.close(Array.from(this.selectedItems));
+    this.dialogRef?.close(this.filteredEntities); // Renvoie les entités filtrées
   }
 }

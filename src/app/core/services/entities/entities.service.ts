@@ -11,9 +11,21 @@ import { environment } from '../../../environments/environment.prod';
 export class EntitiesService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl
+  baseUrl = environment.apiUrl + '/entites'
 
   loadEntities(): Observable<EntiteResponsable[]> {
-    return this.http.get<EntiteResponsable[]>(this.baseUrl + '/entites');
+    return this.http.get<EntiteResponsable[]>(this.baseUrl);
+  }
+
+  loadEntitiesTree(): Observable<EntiteResponsable[]> {
+    return this.http.get<EntiteResponsable[]>(this.baseUrl + '/tree');
+  }
+
+  save(entite: EntiteResponsable) {
+    return this.http.post(this.baseUrl, entite);
+  }
+
+  update(entite: EntiteResponsable) {
+    return this.http.put(this.baseUrl, entite);
   }
 }
