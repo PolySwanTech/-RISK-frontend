@@ -13,7 +13,7 @@ import { Process } from '../../models/Process';
   providedIn: 'root'
 })
 export class IncidentService {
-
+  
   baseUrl = environment.apiUrl
 
   http = inject(HttpClient);
@@ -25,6 +25,13 @@ export class IncidentService {
   countIncidentsNonClotures() : Observable<number> {
     return this.http.get<number>(this.baseUrl + '/incidents/nb/cloture');
   }
+
+  sum(id: string) {
+    let params = new HttpParams();
+    params = params.set("incidentId", id);
+    return this.http.get<number>(this.baseUrl + '/impact/sum', {params : params})
+  }
+
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(

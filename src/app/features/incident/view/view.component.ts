@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, LOCALE_ID } from '@angular/core';
 import { Incident, State } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -16,14 +16,18 @@ import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { CurrencyPipe } from '@angular/common';
 
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe,
     MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule, MatInputModule, GoBackComponent],
   templateUrl: './view.component.html',
-  styleUrl: './view.component.scss'
+  styleUrl: './view.component.scss',
+  providers: [
+    { provide: LOCALE_ID, useValue: 'fr' }
+  ]
 })
 export class ViewComponent {
   private incidentService = inject(IncidentService);
@@ -33,7 +37,7 @@ export class ViewComponent {
 
   incident: Incident | undefined
   prevCommentaire: string = ''
-
+  totalAmount = 0
 
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
@@ -42,6 +46,10 @@ export class ViewComponent {
       this.incident = incident;
       this.prevCommentaire = this.incident.comments || ''
     });
+
+    this.incidentService.sum(id).subscribe(
+      result => this.totalAmount = result
+    )
   }
 
   getState() {
@@ -77,7 +85,7 @@ export class ViewComponent {
           result.incidentId = this.incident.id
           this.incidentService.addImpact(result).subscribe(
             _ => {
-              alert("Impact ajouté");
+              this.confirmService.openConfirmDialog("Impact ajouté", "L'impact a bien été ajouté à l'incident", false);
               this.ngOnInit();
             }
           )
@@ -104,7 +112,7 @@ export class ViewComponent {
     if (this.incident) {
       this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
         _ => {
-          this.confirmService.openConfirmDialog("Mise à jour effectuée", 
+          this.confirmService.openConfirmDialog("Mise à jour effectuée",
             "Commentaire mis à jour avec succès", false).subscribe();
           this.ngOnInit();
         }
