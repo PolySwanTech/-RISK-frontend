@@ -3,7 +3,7 @@ import { Process } from "./Process";
 import { SubRisk } from "./SubRisk";
 
 export class Risk{
-    id : number
+    id : string
     titre : string = ""
     taxonomie : string
     balois : string
@@ -13,7 +13,7 @@ export class Risk{
     subRisks : SubRisk[]
     
     constructor(
-        id : number,
+        id : string,
         taxonomie : string,
         balois : string,
         subRisks : SubRisk[]

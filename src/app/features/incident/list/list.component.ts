@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, resource, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 
 @Component({
@@ -35,6 +36,7 @@ export class ListComponent implements OnInit, AfterViewInit {
   private incidentService = inject(IncidentService)
   private datePipe =  inject(DatePipe)
   private router = inject(Router);
+  private confirmService = inject(ConfirmService)
 
   columns = [
     {
@@ -118,7 +120,6 @@ export class ListComponent implements OnInit, AfterViewInit {
 
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
-      console.log(data)
       this.incidents = data;
       this.dataSource.data = data;
     });
@@ -137,17 +138,10 @@ export class ListComponent implements OnInit, AfterViewInit {
   }
 
   onConfirmAction(incidentId: number) {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
-      data: {
-        title: 'Suppression',
-        message: 'Voulez-vous vraiment supprimer cet élément ?'
-      }
-    });
-  
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-      }
-    });
+
+    this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
+      .subscribe(res => {
+        // delete incidentId
+      })
   }  
 }

@@ -1,7 +1,7 @@
 <div class="risk-settings">
     <h1>Paramétrage des Risques</h1>
     
-    @if(risk && risk.titre){
+    @if(risk){
         <form (submit)="createRisk()">
             <div class="form-group">
                 <label for="risk-title">Titre du risque</label>

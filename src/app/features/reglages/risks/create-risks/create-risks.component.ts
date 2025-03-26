@@ -22,6 +22,7 @@ export class CreateRisksComponent {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id') || "";
     if(id === 'create'){
+      this.risk = new Risk('', '', '', []);
       // creation mode
     }
     else{

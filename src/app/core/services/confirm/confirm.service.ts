@@ -9,7 +9,7 @@ export class ConfirmService {
 
   private dialog = inject(MatDialog);
 
-  openConfirmDialog(title: string, text : string, buttons : boolean) {
+  openConfirmDialog(title: string, text : string, buttons : boolean = true) {
     return this.dialog.open(ConfirmationDialogComponent, {
       width: '400px',
       data: {
