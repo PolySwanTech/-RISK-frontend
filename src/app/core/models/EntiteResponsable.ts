@@ -4,16 +4,19 @@ export class EntiteResponsable {
     isLM : boolean // make cash
     children : EntiteResponsable[] = []
     childrenVisible = false
+    parent : EntiteResponsable | null = null
 
     constructor(
         id : string,
         name : string, 
         isLM : boolean,
-        children : EntiteResponsable[] = []
+        children : EntiteResponsable[] = [],
+        parent : EntiteResponsable | null = null
     ){
         this.id = id;
         this.name = name;
         this.isLM = isLM;
         this.children = children;
+        this.parent = parent;
     }
 }

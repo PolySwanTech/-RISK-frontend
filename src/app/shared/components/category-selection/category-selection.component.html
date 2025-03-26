@@ -1,38 +1,38 @@
 <section>
 <div class="category-container">
-    <h2>Sélectionnez une entité</h2>
     @if(entities.length > 0){
-    <ul>
         @if(settings){
-        <button matRipple mat-mini-fab (click)="addEntity()" aria-label="Example icon button with a menu icon">
-            <mat-icon>add</mat-icon>
+        <button class="add" matRipple (click)="addEntity()" aria-label="Example icon button with a menu icon">
+             <mat-icon>add</mat-icon><span>Ajouter</span>
         </button>
         }
-        <mat-chip-set>
-            @for(entite of viewEntities; track entite){
-                @if(!settings){
-                <input type="checkbox" [checked]="isChecked(entite)" (change)="toggleSelection(entite, $event)"
-                    (click)="$event.stopPropagation()">
-                }
-                <mat-chip>
-                    {{ entite.name }}
-                </mat-chip>
-                
-                @if(entite.children && entite.children.length > 0){
-                <button (click)="handleCategoryAndNavigate(entite, $event)">
-                    ➡
-                </button>
-                }
-            }
-        </mat-chip-set>
-    </ul>
-    <div class="buttons">
-        <button class="red" (click)="goBack()">Retour</button>
-        <button (click)="confirmSelection()">Valider</button>
-    </div>
     }
     @else{
     <p>Aucune entité disponible</p>
     }
+
+    
 </div>
+<mat-form-field appearance="outline">
+    <mat-label>Rechercher</mat-label>
+    <input matInput (input)="applyFilter($event)" placeholder="Entrez une entité...">
+  </mat-form-field>
+  
+  <mat-tree #tree [dataSource]="filteredEntities" [childrenAccessor]="childrenAccessor">
+    <!-- Nœud feuille -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <button mat-icon-button disabled></button>
+      <span>{{node.name}}</span>
+      <button (click)="modifEntity($event, node)" mat-icon-button><mat-icon>edit</mat-icon></button>
+    </mat-tree-node>
+  
+    <!-- Nœud avec enfants -->
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodeToggle>
+        <button mat-icon-button matTreeNodeToggle>
+        <mat-icon>{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+      </button>
+      <span>{{node.name}}</span>
+      <button (click)="modifEntity($event, node)" mat-icon-button><mat-icon>edit</mat-icon></button>
+    </mat-tree-node>
+  </mat-tree>
 </section>

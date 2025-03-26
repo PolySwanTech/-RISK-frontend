@@ -225,7 +225,7 @@ button {
     color: var(--mat-sys-surface-container-lowest);
 
 
-    &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger, .mat-mdc-icon-button) {
+    &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger, .mat-mdc-icon-button, .mdc-switch) {
         background-color: var(--btn-background-hover);
         color: var(--mat-sys-primary-container);
     }
@@ -248,7 +248,7 @@ button {
         background-color: var(--draft-color-hover);
     }
 
-    &:disabled {
+    &:disabled:not(.mat-mdc-icon-button) {
         background-color: #ccc;
         color: #e0e0e0;
         cursor: not-allowed;

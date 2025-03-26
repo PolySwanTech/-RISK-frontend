@@ -11,7 +11,7 @@
       <mat-slide-toggle formControlName="isLM" />
     </div>
   </form>
-
+  <app-select-entities (entitieSelected)="entiteChange($event)"></app-select-entities>
   <div class="actions">
     <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
     <button class="red" (click)="goBack()">Retour</button>

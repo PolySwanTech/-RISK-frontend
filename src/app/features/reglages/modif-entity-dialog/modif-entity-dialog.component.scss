@@ -1,0 +1,58 @@
+
+
+mat-dialog-content {
+    overflow: hidden;
+}
+
+h2{
+    text-align: center;
+    font-weight: bold !important;
+}
+
+/* Form field styling */
+mat-form-field {
+    width: 100%;
+    /* Ensure it stretches full width */
+    margin-bottom: 20px;
+}
+
+/* Button styling */
+button.save-button {
+    color: black;
+    background-color: var(--mat-sys-primary-fixed);
+    color: var(--mat-sys-on-secondary);
+    border: 0px;
+    border-radius: 20px;
+    padding: 8px
+}
+
+button.save-button:hover {
+    cursor: pointer;
+    background-color: var(--mat-sys-primary-fixed-dim);
+}
+
+.toggle-container {
+    margin-left: 4%;
+}
+
+input {
+    width: 95%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+mat-slide-toggle{
+    margin-top: 5px;
+}
