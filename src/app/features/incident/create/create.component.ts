@@ -9,7 +9,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { merge } from 'rxjs';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
-import {MatRadioModule} from '@angular/material/radio';
+import { MatRadioModule } from '@angular/material/radio';
 import { Risk } from '../../../core/models/Risk';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
 import { Utilisateur } from '../../../core/models/Utilisateur';
@@ -22,6 +22,8 @@ import { Process } from '../../../core/models/Process';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { State } from '../../../core/models/Incident';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-create',
@@ -38,23 +40,23 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
     SelectUsersComponent,
     ButtonAddFileComponent,
     MatSelectModule
-],
+  ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
 export class CreateComponent {
   private _formBuilder = inject(FormBuilder);
   private router = inject(Router);
-  private dialog = inject(MatDialog);
+  private confirmService = inject(ConfirmService);
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
     location: ['', Validators.required],
     commentaire: ['', Validators.required],
     cause: ['', Validators.required]
-    
+
   });
-  
+
   incidentForm2 = this._formBuilder.group({
     dateDeDeclaration: [new Date().toISOString().split('T')[0], Validators.required],
     dateDeSurvenance: ['', Validators.required],
@@ -70,35 +72,45 @@ export class CreateComponent {
     process: ['', Validators.required]
   });
 
-  listRisk : Risk[] = [];
-  listCause : Cause[] = [];
-  listProcess : Process[] = [];
+  listRisk: Risk[] = [];
+  listCause: Cause[] = [];
+  listProcess: Process[] = [];
 
   errorMessage = signal('');
 
-  constructor(private incidentService: IncidentService, private riskService: RiskService, 
+  constructor(private incidentService: IncidentService, private riskService: RiskService,
     private causeService: CauseService, private processService: ProcessService) {
-    this.riskService.getAll().subscribe( (resp: any) => {
+    this.riskService.getAll().subscribe((resp: any) => {
       this.listRisk = resp;
     });
-    this.causeService.getAll().subscribe( (resp: any) => {
+    this.causeService.getAll().subscribe((resp: any) => {
       this.listCause = resp;
     });
-    this.processService.getAll().subscribe( (resp: any) => {
+    this.processService.getAll().subscribe((resp: any) => {
       this.listProcess = resp;
     });
   }
 
-  changeUser(event: any){
+  changeUser(event: any) {
     this.incidentForm3.get('userMail')!.setValue(event.email);
   }
 
-  addIncident() {
-    if (this.incidentForm1.invalid || this.incidentForm2.invalid) {
-      alert("Tous les champs obligatoires ne sont pas remplis");
-      return;
-    }
+  draft() {
+    const incident = this.convertFormToIncident();
 
+    this.incidentService.draftIncident(incident).subscribe(
+      {
+        next: resp => {
+          this.afterCreation("Brouillon enregistré", resp);
+        },
+        error: err => {
+          console.error("Erreur lors de la création de l'incident", err);
+        }
+      },
+    );
+  }
+
+  private convertFormToIncident() {
     const incident = {
       title: this.incidentForm1.value.titre,
       location: this.incidentForm1.value.location,
@@ -112,51 +124,54 @@ export class CreateComponent {
       subRisk: this.incidentForm3.value.subRisk,
       userMail: this.incidentForm3.value.userMail,
       files: this.incidentForm3.value.files,
-      process: this.incidentForm3.value.process
-    
+      process: this.incidentForm3.value.process,
     };
+    return incident;
+  }
+
+  addIncident() {
+    if (this.incidentForm1.invalid || this.incidentForm2.invalid) {
+      alert("Tous les champs obligatoires ne sont pas remplis");
+      return;
+    }
+
+    const incident = this.convertFormToIncident();
+
     this.incidentService.saveIncident(incident).subscribe(
       {
-        next : resp => {
-          this.afterCreation(resp);
-        }, 
-        error : err => {
+        next: resp => {
+          this.afterCreation("Création réussie", resp);
+        },
+        error: err => {
           console.error("Erreur lors de la création de l'incident", err);
         }
       },
     );
   }
 
-  afterCreation(incidentId: string) {
-      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-        width: '400px',
-        data: {
-          title: 'Création réussie',
-          message: 'Allez vers la consultation ?'
-        }
-      });
-    
-      dialogRef.afterClosed().subscribe(result => {
+  afterCreation(title: string, incidentId: string) {
+    this.confirmService.openConfirmDialog(title, "Allez vers la consultation ?", true)
+      .subscribe(result => {
         if (result) {
           this.router.navigate(['incident', incidentId])
         }
-        else{
+        else {
           this.router.navigate(['incident'])
         }
       });
-    } 
+  }
 
   parseDate(date: string | null | undefined): string | null {
     return date ? new Date(date).toISOString() : null;
   }
 
-  onFilesChange(event: any){
+  onFilesChange(event: any) {
     this.incidentForm3.get('files')!.setValue(event);
   }
 
-  getSubRisk() : any{
-    let risk : any = this.incidentForm3.get('risk')!.value;
-    if(this.incidentForm3.get('risk')!.value != ''){
+  getSubRisk(): any {
+    let risk: any = this.incidentForm3.get('risk')!.value;
+    if (this.incidentForm3.get('risk')!.value != '') {
       return risk.subRisks
     }
     return risk;

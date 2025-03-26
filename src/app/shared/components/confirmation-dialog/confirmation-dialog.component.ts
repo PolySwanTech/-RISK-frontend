@@ -14,7 +14,7 @@ export class ConfirmationDialogComponent {
 
   constructor(
     public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string }
+    @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string, buttons : boolean }
   ) { }
 
   onConfirm(): void {

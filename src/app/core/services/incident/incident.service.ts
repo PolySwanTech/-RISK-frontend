@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { Incident } from '../../models/Incident';
+import { Incident, State } from '../../models/Incident';
 import { environment } from '../../../environments/environment.prod';
 import { Impact } from '../../models/Impact';
 import { Risk } from '../../models/Risk';
@@ -28,7 +28,7 @@ export class IncidentService {
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(
-      map((responseData: { id: string; titre : string; location : string; comments : string; cause : Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk : Risk; subRisk : SubRisk; process : Process; impacts: Impact[];}) => {
+      map((responseData: { id: string; titre : string; location : string; comments : string; cause : Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk : Risk; subRisk : SubRisk; process : Process; impacts: Impact[]; state : State}) => {
         // Constructing an Incident instance using the constructor
         const {
           id,
@@ -43,7 +43,8 @@ export class IncidentService {
           risk,
           subRisk,
           process,
-          impacts
+          impacts,
+          state
         } = responseData;
   
         // Conversion des dates en objets Date
@@ -60,7 +61,8 @@ export class IncidentService {
           process,
           cause,
           impacts,
-          comments
+          comments,
+          state
         );
       })
     );
@@ -74,8 +76,11 @@ export class IncidentService {
     return this.http.post<string>(`${this.baseUrl}/incidents`, incident);
   }
 
+  draftIncident(incident: any): Observable<string> {
+    return this.http.post<string>(`${this.baseUrl}/incidents/draft`, incident);
+  }
+
   updateCommentaire(id : string, commentaire : string){
-    console.log(id, commentaire)
     return this.http.put(this.baseUrl + `/incidents/${id}/commentaire`, commentaire)
   }
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Incident, State } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -15,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 
 @Component({
@@ -25,25 +26,29 @@ import { Impact } from '../../../core/models/Impact';
   styleUrl: './view.component.scss'
 })
 export class ViewComponent {
+  private incidentService = inject(IncidentService);
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private confirmService = inject(ConfirmService)
 
   incident: Incident | undefined
   prevCommentaire: string = ''
 
-  constructor(
-    private incidentService: IncidentService,
-    private dialog: MatDialog,
-    private route: ActivatedRoute) {
-  }
 
   ngOnInit(): void {
-
     const id = this.route.snapshot.params['id'];
-
 
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
       this.prevCommentaire = this.incident.comments || ''
     });
+  }
+
+  getState() {
+    if (this.incident) {
+      return State[this.incident.state.toString() as keyof typeof State]
+    }
+    return "Inconnu"
   }
 
   formatDate(dateString: any) {
@@ -98,7 +103,11 @@ export class ViewComponent {
   updateCommentaire() {
     if (this.incident) {
       this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
-        _ => alert("commentaire mis à jour")
+        _ => {
+          this.confirmService.openConfirmDialog("Mise à jour effectuée", 
+            "Commentaire mis à jour avec succès", false).subscribe();
+          this.ngOnInit();
+        }
       )
     }
   }
