@@ -66,10 +66,8 @@ export class IncidentService {
     );
   }
 
-  addImpact(impact : Impact, processId : string,  incidentId : string){
-    let params = new HttpParams();
-    params = params.set("idP", processId).set("idI", incidentId)
-    return this.http.post(this.baseUrl + '/impact', impact, {params : params})
+  addImpact(impact : Impact){
+    return this.http.post(this.baseUrl + '/impact', impact)
   }
 
   saveIncident(incident: any): Observable<string> {

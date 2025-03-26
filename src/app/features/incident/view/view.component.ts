@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
+import { Impact } from '../../../core/models/Impact';
 
 
 @Component({
@@ -26,7 +27,7 @@ import { GoBackComponent } from "../../../shared/components/go-back/go-back.comp
 export class ViewComponent {
 
   incident: Incident | undefined
-  prevCommentaire : string = ''
+  prevCommentaire: string = ''
 
   constructor(
     private incidentService: IncidentService,
@@ -38,14 +39,14 @@ export class ViewComponent {
 
     const id = this.route.snapshot.params['id'];
 
-   
+
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
       this.prevCommentaire = this.incident.comments || ''
     });
   }
 
-  formatDate (dateString : any) { 
+  formatDate(dateString: any) {
     return dateString ? dateString.toLocaleDateString("fr-FR") : null;
   }
 
@@ -65,45 +66,45 @@ export class ViewComponent {
     });
 
     // Wait for the result when the dialog is closed
-    dialogRef.afterClosed().subscribe((result: any) => {
+    dialogRef.afterClosed().subscribe((result: Impact) => {
       if (result) {
-        const {impact, process} = result
-        if (this.incident)
-          this.incidentService.addImpact(impact, process, this.incident.id).subscribe(
+        if (this.incident) {
+          result.incidentId = this.incident.id
+          this.incidentService.addImpact(result).subscribe(
             _ => {
               alert("Impact ajouté");
               this.ngOnInit();
             }
           )
+        }
       }
     });
-    // open dialog to add a new impact 
   }
 
-  noChange(){
-    if(this.incident && this.incident.comments){
+  noChange() {
+    if (this.incident && this.incident.comments) {
       return this.prevCommentaire === this.incident.comments
     }
     return true;
   }
 
-  isNotClosed(){
-    if(this.incident){
+  isNotClosed() {
+    if (this.incident) {
       return this.incident.closedAt == null
     }
     return false
   }
 
-  updateCommentaire(){
-    if(this.incident){
+  updateCommentaire() {
+    if (this.incident) {
       this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
         _ => alert("commentaire mis à jour")
       )
     }
   }
 
-  close(){
-    if(this.incident){
+  close() {
+    if (this.incident) {
       this.incidentService.close(this.incident.id).subscribe(
         _ => {
           alert("incident cloturé")
