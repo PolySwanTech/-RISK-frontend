@@ -10,8 +10,17 @@ export class RiskService {
   
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/risk';
-
+  
   getAll(){
     return this.http.get<Risk[]>(this.baseUrl)
   }
+  
+  getById(id: string) {
+    return this.http.get<Risk>(this.baseUrl + '/' + id)
+  }
+  
+  save(risk: Risk) {
+    return this.http.post<Risk>(this.baseUrl, risk)
+  }
 }
+

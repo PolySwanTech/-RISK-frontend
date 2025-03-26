@@ -1,5 +1,12 @@
-<h2>Paramétrage des entités responsable</h2>
-<app-category-selection [settings]="settings"></app-category-selection>
+<h2>Paramétrage</h2>
+
+<button (click)="navToEntites();">
+    Entité responsable
+</button>
+<button (click)="navToRisk();">
+    Risques
+</button>
+<!-- <app-category-selection [settings]="settings"></app-category-selection> -->
 <!-- <mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor">
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="leaf">
         {{node.name}}
