@@ -1,20 +1,15 @@
-import { SubRisk } from "./SubRisk";
-
-export class Risk{
+export class SubRisk{
     id : number
     taxonomie : string
     balois : string
-    subRisks : SubRisk[]
     
     constructor(
         id : number,
         taxonomie : string,
-        balois : string,
-        subRisks : SubRisk[]
+        balois : string
     ){
         this.id = id;
         this.taxonomie = taxonomie;
         this.balois = balois;
-        this.subRisks = subRisks;
     }
 }

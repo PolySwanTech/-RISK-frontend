@@ -6,6 +6,9 @@ export class Impact{
     type : string;
     createdAt : Date;
 
+    entityId : string = ''
+    incidentId : string = ''
+
     constructor(
         id : string,
         montant : number,

@@ -1,10 +1,154 @@
-.incident-card,
-.impact-card,
-.process-card,
-.entities-card,
-.state-card {
+// .incident-card,
+// .impact-card,
+// .process-card,
+// .entities-card,
+// .state-card {
+//   margin: 20px 20px;
+//   // padding: 15px;
+// }
+
+// .incident-info,
+// .impact-info,
+// .processus-info,
+// .entity-info {
+//   display: flex;
+//   flex-direction: row;
+//   gap: 5px;
+// }
+
+// .incident-info mat-grid-list {
+//   margin-top: 20px;
+// }
+
+// .incident-detail {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: space-between;
+//   margin-bottom: 10px;
+// }
+
+// .detail-label {
+//   font-weight: bold;
+//   color: #1976d2;
+// }
+
+// .detail-value {
+//   font-size: 14px;
+//   color: #424242;
+// }
+
+// mat-list-item {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+// }
+
+// .incident-state {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   margin-top: 15px;
+// }
+
+// .impacts-container {
+//   display: flex;
+//   justify-content: left;
+//   row-gap: 20px;
+//   column-gap: 5%;
+//   flex-wrap: wrap;
+
+//   app-impact-card {
+//     min-width: 180px;
+//     width: 21.2%;
+//   }
+// }
+
+// button {
+
+//   padding: 8px 10px;
+//   background-color: var(--mat-sys-primary-container);
+//   color: var(--mat-sys-surface-tint);
+//   border: none;
+//   border-radius: 5px;
+//   cursor: pointer;
+//   font-size: 16px;
+//   transition: 0.3s;
+
+//   &.add {
+//     margin-block: 20px;
+//     display: flex;
+//     align-items: center;
+//     gap: 5px;
+//   }
+
+//   &:hover {
+//     background-color: var(--mat-sys-surface-tint);
+//     color: var(--mat-sys-primary-container);
+//   }
+
+//   &:disabled {
+//     background-color: #ccc;
+//     color: #e0e0e0;
+//     cursor: not-allowed;
+//   }
+// }
+
+// .full-width {
+//   width: 50%;
+// }
+
+// ::ng-deep .mat-mdc-card-header-text {
+//   width: 100%;
+// }
+
+// mat-card-title {
+//   display: flex;
+//   justify-content: space-between;
+// }
+
+// .date-info{
+//   margin-top: 20px;
+//   display: flex;
+//   justify-content: flex-start;
+//   gap: 30px;
+//   align-items: center;
+//   margin-bottom: 15px;
+// }
+
+// mat-form-field {
+//   width: 100%;
+//   margin-bottom: 10px;
+// }
+
+// .full-width {
+//   width: 100%;
+// }
+
+// button {
+//   background-color: #1976d2;
+//   color: white;
+// }
+
+// button:hover {
+//   background-color: #1565c0;
+// }
+
+mat-card {
   margin: 20px 20px;
-  // padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  padding: 20px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.incident-card:hover,
+.impact-card:hover,
+.process-card:hover,
+.entities-card:hover,
+.state-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .incident-info,
@@ -12,8 +156,8 @@
 .processus-info,
 .entity-info {
   display: flex;
-  flex-direction: row;
-  gap: 5px;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .incident-info mat-grid-list {
@@ -23,19 +167,11 @@
 .incident-detail {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.detail-label {
-  font-weight: bold;
-  color: #1976d2;
-}
 
-.detail-value {
-  font-size: 14px;
-  color: #424242;
-}
+
 
 mat-list-item {
   display: flex;
@@ -43,9 +179,7 @@ mat-list-item {
   align-items: center;
 }
 
-mat-list-item mat-icon {
-  color: #1976d2;
-}
+
 
 .incident-state {
   display: flex;
@@ -54,60 +188,40 @@ mat-list-item mat-icon {
   margin-top: 15px;
 }
 
-button.mat-raised-button {
-  background-color: #f44336;
-  color: white;
-}
 
-button.mat-raised-button:hover {
-  background-color: #e53935;
-}
 
 .impacts-container {
   display: flex;
-  justify-content: left;
-  row-gap: 20px;
-  column-gap: 5%;
+  justify-content: flex-start;
   flex-wrap: wrap;
+  gap: 20px;
+}
 
-  app-impact-card {
-    min-width: 180px;
-    width: 21.2%;
-  }
+app-impact-card {
+  min-width: 180px;
+  flex: 1 1 21%;
+  max-width: 180px;
 }
 
 button {
-
-  padding: 8px 10px;
-  background-color: var(--mat-sys-primary-container);
-  color: var(--mat-sys-surface-tint);
+  padding: 10px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
   transition: 0.3s;
-
-  &.add {
-    margin-block: 20px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  &:hover {
-    background-color: var(--mat-sys-surface-tint);
-    color: var(--mat-sys-primary-container);
-  }
-
-  &:disabled {
-    background-color: #ccc;
-    color: #e0e0e0;
-    cursor: not-allowed;
-  }
 }
 
+button.add {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+
 .full-width {
-  width: 50%;
+  width: 100%;
 }
 
 ::ng-deep .mat-mdc-card-header-text {
@@ -117,4 +231,72 @@ button {
 mat-card-title {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.date-info {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 40px;
+  align-items: center;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+mat-form-field mat-label {
+  font-weight: bold;
+}
+
+mat-form-field input {
+  color: #424242;
+}
+
+mat-form-field .mat-form-field-appearance-outline .mat-form-field-outline {
+  border-radius: 4px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+  max-height: 200px;
+}
+
+textarea.mat-input-element {
+  font-size: 14px;
+}
+
+mat-form-field textarea {
+  font-size: 14px;
+}
+
+mat-card-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+mat-card-header span {
+font-size: 20px;
+  font-weight: bold;
+}
+
+mat-card-content {
+  padding-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .impacts-container {
+    flex-direction: column;
+  }
+
+  app-impact-card {
+    width: 100%;
+    margin-bottom: 20px;
+  }
 }

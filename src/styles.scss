@@ -56,6 +56,9 @@
 --mat-sys-tertiary-fixed-dim: #a8acff;
 --mat-sys-neutral-variant20: #2a2d35;
 --mat-sys-neutral10: #121417;
+
+--btn-background: #1976d2;
+--btn-background-hover: #1565c0;
 }
 
 
@@ -196,12 +199,12 @@ mat-drawer-content{
 
 button {
 
-    background-color: var(--mat-sys-primary-container);
-    color: var(--mat-sys-surface-tint);
+    background-color: var(--btn-background);
+    color: var(--mat-sys-surface-container-lowest);
 
 
     &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger, .mat-mdc-icon-button) {
-        background-color: var(--mat-sys-surface-tint);
+        background-color: var(--btn-background-hover);
         color: var(--mat-sys-primary-container);
     }
 

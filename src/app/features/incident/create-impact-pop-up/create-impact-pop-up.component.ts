@@ -18,7 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 export class CreateImpactPopUpComponent implements OnInit{
 
   impact : Impact = new Impact('', 0, '', '', '', new Date())
-  selectedProcess : string = ''
+  selectedEntite : EntiteResponsable | undefined
   processes : Process[] = []
   entites : EntiteResponsable[] = []
 
@@ -36,10 +36,8 @@ export class CreateImpactPopUpComponent implements OnInit{
     )
   }
 
-  loadProcessus(entite : EntiteResponsable){
-    this.processService.getAllByEntite(entite).subscribe(
-      list => this.processes = list
-    )
+  setEntite(entite : EntiteResponsable){
+    this.impact.entityId = entite.id
   }
 
   close(){
@@ -48,6 +46,6 @@ export class CreateImpactPopUpComponent implements OnInit{
 
 
   addImpact() {
-    this.dialogRef.close({impact : this.impact, process : this.selectedProcess })
+    this.dialogRef.close(this.impact)
   }
 }

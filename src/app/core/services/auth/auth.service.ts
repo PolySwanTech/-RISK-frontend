@@ -18,6 +18,8 @@ export class AuthService {
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 
   private permissions: string[] = [];
+
+  private utilisateurConnecte!: Utilisateur;
   
   constructor() { }
   
@@ -73,4 +75,14 @@ export class AuthService {
   hasPermission(permission: string): boolean {
     return this.getPermissions().includes(permission);
   }
+
+  setUtilisateur(user: Utilisateur): void {
+    this.utilisateurConnecte = user;
+  }
+
+  getUtilisateur(): Utilisateur {
+    return this.utilisateurConnecte;
+  }
+
+
 }

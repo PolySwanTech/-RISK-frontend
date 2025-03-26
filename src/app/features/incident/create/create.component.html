@@ -3,12 +3,44 @@
   <section>
     <div class="form-container">
       <h2>Ajout d'un incident</h2>
-      <mat-stepper [linear]="true" #stepper>
-        <mat-step [stepControl]="incidentForm" label="Informations de base">
-          <form [formGroup]="incidentForm">
+      <mat-stepper [linear]="false" #stepper>
+        <mat-step [stepControl]="incidentForm1" label="Informations de base">
+          <form [formGroup]="incidentForm1">
             <mat-form-field>
               <mat-label>Titre</mat-label>
               <input matInput formControlName="titre" placeholder="Titre">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description de l'incident</mat-label>
+              <textarea matInput formControlName="commentaire"></textarea>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Cause</mat-label>
+              <mat-select formControlName="cause" placeholder="Cause de l'incident">
+                @for(cause of listCause; track cause){
+                <mat-option [value]="cause">{{ cause.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Location de l'incident</mat-label>
+              <input matInput formControlName="location" placeholder="Location">
+            </mat-form-field>
+
+            <div>
+              <button [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step [stepControl]="incidentForm2" label="Dates">
+          <form [formGroup]="incidentForm2">
+            <mat-form-field>
+              <mat-label>Date de déclaration</mat-label>
+              <input matInput type="date" formControlName="dateDeDeclaration" readonly>
             </mat-form-field>
 
             <mat-form-field>
@@ -22,26 +54,55 @@
             </mat-form-field>
 
             <mat-form-field>
-              <mat-label>Date de déclaration</mat-label>
-              <input matInput type="date" formControlName="dateDeDeclaration" readonly>
+              <mat-label>Date de clôture (si clôturé)</mat-label>
+              <input matInput type="date" formControlName="dateDeCloture">
             </mat-form-field>
 
             <div>
-              <button [disabled]="incidentForm.invalid" matStepperNext>Suivant</button>
+              <button [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
 
-        <mat-step [stepControl]="incidentForm" label="Autres détails">
-          <form [formGroup]="incidentForm">
+        <mat-step [stepControl]="incidentForm3" label="Autres info">
+          <form [formGroup]="incidentForm3">
+
+            <app-button-add-file label="Télécharger des images" [accept]="'image/*'" [preview]="true"
+              property="newImages" (filesSelected)="onFilesChange($event)">
+            </app-button-add-file>
+
+            <mat-radio-group formControlName="risk">
+              @for(risk of listRisk; track risk){
+              <mat-radio-button [value]="risk">{{risk.balois}}</mat-radio-button>
+              }
+            </mat-radio-group>
+
+            @if(getSubRisk() != ''){
             <mat-form-field>
-              <mat-label>Date de clôture (si clôturé)</mat-label>
-              <input matInput type="date" formControlName="dateDeCloture">
+              <mat-label>Sous catégorie du Risque</mat-label>
+              <mat-select formControlName="subRisk" placeholder="Sous catégorie du Risque">
+                @for(subRisk of getSubRisk(); track subRisk){
+                <mat-option [value]="subRisk">{{ subRisk.balois }}</mat-option>
+                }
+              </mat-select>
             </mat-form-field>
+            }
+
+            <mat-form-field>
+              <mat-label>Processus</mat-label>
+              <mat-select formControlName="process" placeholder="Processus">
+                @for(process of listProcess; track process){
+                <mat-option [value]="process">{{ process.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <app-select-users (userSelected)="changeUser($event)" placeholder="Collaborateur pouvant vous aider" />
+
           </form>
 
           <div class="actions">
-            <button (click)="addIncident()">Soumettre</button>
+            <button [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
             <button class="red" matStepperPrevious>Retour</button>
           </div>
         </mat-step>

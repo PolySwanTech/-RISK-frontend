@@ -13,7 +13,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Entité Responsable</mat-label>
-      <mat-select required (selectionChange)="loadProcessus($event.value);">
+      <mat-select required (selectionChange)="setEntite($event.value);">
         @for(entite of entites; track entite){
         <mat-option [value]="entite">
           {{ entite.name }}
@@ -21,20 +21,6 @@
         }
       </mat-select>
     </mat-form-field>
-
-    <!-- Select Process -->
-    @if(processes.length > 0){
-    <mat-form-field appearance="outline">
-      <mat-label>Processus</mat-label>
-      <mat-select required matNativeControl [(ngModel)]="selectedProcess" name="process">
-        @for(process of processes; track process){
-        <mat-option [value]="process.id">
-          {{ process.name }}
-        </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    }
 
     <div class="actions">
       <button [disabled]="!impact.montant || !impact.type" mat-button type="submit" color="primary">Ajouter</button>
