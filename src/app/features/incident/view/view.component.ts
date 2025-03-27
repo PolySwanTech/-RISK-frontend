@@ -30,6 +30,10 @@ export class ViewComponent {
 
   incident: Incident | undefined
   prevCommentaire: string = ''
+  userRole: string | undefined;
+  userTeam: string | undefined;
+  canClose: boolean = false;
+
 
   constructor(
     private incidentService: IncidentService,
@@ -38,14 +42,44 @@ export class ViewComponent {
   }
 
   ngOnInit(): void {
+    this.loadIncident();
+  }
 
+  loadIncident(): void {
     const id = this.route.snapshot.params['id'];
-
-
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
-      this.prevCommentaire = this.incident.comments || ''
+      this.prevCommentaire = incident.comments || '';
+      this.extractTokenInfo();
+      this.checkCloseAuthorization();
     });
+  }
+
+  extractTokenInfo(): void {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      console.warn("⛔ Aucun token trouvé");
+      return;
+    }
+
+    const base64Payload = token.split('.')[1];
+    const jsonPayload = new TextDecoder().decode(
+      Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
+    );
+    const payload = JSON.parse(jsonPayload);
+    this.userRole = payload.role;
+    this.userTeam = payload.team;
+  }
+
+  checkCloseAuthorization(): void {
+    const normalizedUserTeam = this.normalize(this.userTeam);
+    const normalizedIncidentTeam = this.normalize(this.incident?.equipeName);
+
+    this.canClose = this.userRole === 'VALIDATEUR' && normalizedUserTeam === normalizedIncidentTeam;
+  }
+
+  normalize(str?: string): string {
+    return str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() || '';
   }
 
   formatDate(dateString: any) {

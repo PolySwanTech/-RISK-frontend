@@ -28,7 +28,7 @@ export class IncidentService {
   
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(
-      map((responseData: { id: string; titre : string; location : string; comments : string; cause : Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk : Risk; subRisk : SubRisk; process : Process; impacts: Impact[];}) => {
+      map((responseData: { id: string; titre : string; location : string; comments : string; cause : Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk : Risk; subRisk : SubRisk; process : Process; impacts: Impact[]; equipeName?: string;}) => {
         // Constructing an Incident instance using the constructor
         const {
           id,
@@ -43,7 +43,8 @@ export class IncidentService {
           risk,
           subRisk,
           process,
-          impacts
+          impacts,
+          equipeName 
         } = responseData;
   
         // Conversion des dates en objets Date
@@ -60,7 +61,8 @@ export class IncidentService {
           process,
           cause,
           impacts,
-          comments
+          comments,
+          equipeName 
         );
       })
     );

@@ -8,7 +8,7 @@
                 <span>Détails de l'incident - <strong>{{ incident.titre }}</strong> - Status : <strong>{{
                         incident.state }}</strong>
                 </span>
-                @if(isNotClosed()){
+                @if(canClose && isNotClosed()){
                 <button (click)="close()">Cloturer</button>
                 }
             </mat-card-title>
