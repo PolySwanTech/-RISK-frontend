@@ -6,15 +6,23 @@
                 (keydown.enter)="filterBySearch()" />
     
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)" [displayWith]="displayFn">
-                <mat-option *ngIf="(filteredStates | async)?.length === 0" disabled class="no-results">
-                    Aucune entité trouvé
+                <mat-option [value]="aucunEntite" class="autocomplete-option">
+                    <div class="option-content">
+                        <div class="product-info">
+                            <span class="product-name">Aucun</span>
+                        </div>
+                    </div>
                 </mat-option>
+                
                 <mat-option *ngFor="let entitie of filteredStates | async" [value]="entitie" class="autocomplete-option">
                     <div class="option-content">
                         <div class="product-info">
                             <span class="product-name">{{ entitie.name }}</span>
                         </div>
                     </div>
+                </mat-option>
+                <mat-option *ngIf="(filteredStates | async)?.length === 0" disabled class="no-results">
+                    Aucune entité trouvé
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>

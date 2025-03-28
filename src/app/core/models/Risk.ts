@@ -8,6 +8,7 @@ export class Risk{
     taxonomie : string
     balois : string
     description : string = ""
+    level : string = ""
     entiteResponsable : EntiteResponsable[] = []
     processes : Process[] = []
     subRisks : SubRisk[]

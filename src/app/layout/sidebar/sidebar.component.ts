@@ -39,11 +39,14 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     this.updateLoginStatus();
     const token = this.authService.decryptToken();
-    if(!this.authService.isTokenExpired(token)){
-      this.incidentService.countIncidentsNonClotures().subscribe(resp => {
-        this.unreadIncidents = resp;
-       })
-    }
+    setTimeout(() => {
+      if(!this.authService.isTokenExpired(token)){
+        this.incidentService.countIncidentsNonClotures().subscribe(resp => {
+          this.unreadIncidents = resp;
+         })
+      }
+    }, 1000)
+    
   }
 
   // Method to update login status

@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-reglages',
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './reglages.component.html',
   styleUrl: './reglages.component.scss'
 })

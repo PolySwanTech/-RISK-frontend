@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Création d'une entité responsable</h2>
+<h2 mat-dialog-title>{{titlePage}}</h2>
 <mat-dialog-content>
   <form [formGroup]="formGroup">
     <div class="form-group">
@@ -11,7 +11,7 @@
       <mat-slide-toggle formControlName="isLM" />
     </div>
   </form>
-  <app-select-entities (entitieSelected)="entiteChange($event)"></app-select-entities>
+  <app-select-entities [selectId]="entiteResponsable.parentId ? entiteResponsable.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>
   <div class="actions">
     <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
     <button class="red" (click)="goBack()">Retour</button>

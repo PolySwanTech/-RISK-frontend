@@ -53,7 +53,7 @@ export class CreateComponent {
     titre: ['', Validators.required],
     location: ['', Validators.required],
     commentaire: ['', Validators.required],
-    cause: ['', Validators.required]
+    cause: [null, Validators.required]
 
   });
 
@@ -65,11 +65,11 @@ export class CreateComponent {
   });
 
   incidentForm3 = this._formBuilder.group({
-    risk: ['', Validators.required],
-    subRisk: ['', Validators.required],
+    risk: [null, Validators.required],
+    subRisk: [null, Validators.required],
     userMail: [''],
     files: [''],
-    process: ['', Validators.required]
+    process: [null, Validators.required]
   });
 
   listRisk: Risk[] = [];
@@ -171,7 +171,7 @@ export class CreateComponent {
 
   getSubRisk(): any {
     let risk: any = this.incidentForm3.get('risk')!.value;
-    if (this.incidentForm3.get('risk')!.value != '') {
+    if (this.incidentForm3.get('risk')!.value != null) {
       return risk.subRisks
     }
     return risk;

@@ -56,10 +56,14 @@
     --mat-sys-tertiary-fixed-dim: #a8acff;
     --mat-sys-neutral-variant20: #2a2d35;
     --mat-sys-neutral10: #121417;
+    --mat-select-panel-background-color: #abc7ff;
+    --mat-autocomplete-background-color: #abc7ff;
     --btn-background: #1976d2;
     --btn-background-hover: #1565c0;
     --draft-color: #29850b;
     --draft-color-hover: #257a09;
+    --box-background-color: #345c94;
+    --box-background-color-hover: #2b4b7a;
 }
 
 
@@ -260,3 +264,39 @@ button {
         cursor: not-allowed;
     }
 }
+
+tr:last-child{
+    border-bottom: 1px solid dimgrey;
+  }
+
+  
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    min-width: 50px;
+
+    &.new {
+      background-color: #52e3cb; 
+    }
+    
+    &.moyen {
+      background-color: #ffc107; 
+    }
+    
+    &.closed, &.faible {
+      background-color: #28a745; 
+    }
+
+    &.fort {
+        background-color: #e44239; 
+      }
+    
+    &.unknown {
+      background-color: #6c757d; 
+    }
+  }

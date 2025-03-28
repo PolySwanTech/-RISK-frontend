@@ -17,6 +17,10 @@ export class EntitiesService {
     return this.http.get<EntiteResponsable[]>(this.baseUrl);
   }
 
+  findById(id : string): Observable<EntiteResponsable> {
+    return this.http.get<EntiteResponsable>(this.baseUrl + '/' + id);
+  }
+
   loadEntitiesTree(): Observable<EntiteResponsable[]> {
     return this.http.get<EntiteResponsable[]>(this.baseUrl + '/tree');
   }

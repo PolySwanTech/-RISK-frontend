@@ -23,7 +23,11 @@ export class SelectEntitiesComponent {
   filteredEntities!: EntiteResponsable[];
 
   @Input() placeholder: string = 'Entité parent';
+  @Input() selectId: string = '';
+  selectedEntity: any;
   @Output() entitieSelected = new EventEmitter<any>();
+
+  aucunEntite = new EntiteResponsable('', 'Aucun', false, [], null);
 
   constructor(
     private entitiesService: EntitiesService) {
@@ -32,12 +36,21 @@ export class SelectEntitiesComponent {
 
   ngOnInit(): void {
     this.loadEntites();
+    
   }
 
   loadEntites(): void {
     this.entitiesService.loadEntities().subscribe(resp => {
       this.entities = resp;
-      console.log(this.entities);
+      if (this.selectId) {
+        this.entitiesService.findById(this.selectId).subscribe(entite => {
+          this.selectedEntity = entite;
+          this.stateCtrl.setValue(this.selectedEntity);
+          this.entitieSelected.emit(this.selectedEntity ? this.selectedEntity : this.aucunEntite);
+        });
+       
+      }
+      this.entitieSelected.emit(this.searchQuery ? this.searchQuery : this.aucunEntite);
     });
   }
 
@@ -57,13 +70,14 @@ export class SelectEntitiesComponent {
 
   onOptionSelected(event: MatAutocompleteSelectedEvent): void {
     this.searchQuery = event.option.value; // Stocke l'objet utilisateur
+    console.log(this.searchQuery);
     this.entitieSelected.emit(this.searchQuery)
   }
 
   changeAutocompleteList() {
     this.filteredStates = this.stateCtrl.valueChanges.pipe(
       startWith(''),
-      map(state => (state ? this._filterStates(state) : this.filteredEntities.slice())),
+      map(state => (state ? this._filterStates(state) : this.filteredEntities?.slice())),
     );
   }
 

@@ -43,11 +43,21 @@ mat-tree {
   section{
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     height: auto;
     gap: 20px;
-    margin: 5%;
+    margin: 15px;
+    width: auto;
   }
+
+  .entite-container{
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    padding: 2%;
+    width: 90%;
+    gap: 20px;
+  }
+  
 
   button.add {
     padding: 10px 15px;
@@ -60,4 +70,9 @@ mat-tree {
     align-items: center;
     gap: 10px;
   }
-  
+
+  app-go-back {
+    width: 100%;
+  }
+
+

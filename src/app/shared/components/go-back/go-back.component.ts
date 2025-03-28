@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class GoBackComponent implements OnInit {
   @Input() previousPageName: string = '';
   @Input() currentPageName: string = '';
+  @Input() redirectUrl: string[] = [];
 
   previousPage: string = 'Accueil'; // Valeur par défaut
   currentPage: string = '';
@@ -32,6 +33,6 @@ export class GoBackComponent implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+    this.redirectUrl.length != 0 ? this.router.navigate(this.redirectUrl) : this.location.back();
   }
 }

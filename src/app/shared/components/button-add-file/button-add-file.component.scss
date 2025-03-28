@@ -34,8 +34,8 @@
   
     .file-preview {
       img {
-        max-width: 150px;
-        max-height: 150px;
+        max-width: 120px;
+        max-height: 120px;
         object-fit: cover;
         border-radius: 8px;
         border: 1px solid #ddd;
@@ -45,12 +45,14 @@
 
     .preview-item{
       position: relative;
+      display: inline-block;
+      margin-right: 10px;
     }
   }
 
   .delete-image-btn {
     position: absolute;
-    top: -8px; /* Légèrement au-dessus de l'image */
+    top: -30px;
     right: -8px; /* Légèrement à droite de l'image */
     background: rgba(255, 255, 255, 0.9); /* Fond blanc semi-transparent */
     color: #ff0000; /* Couleur rouge vive */

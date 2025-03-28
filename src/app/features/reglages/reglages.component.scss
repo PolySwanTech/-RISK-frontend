@@ -1,54 +1,126 @@
-mat-tree {
-  display: block;
-  max-width: 50%;
-  max-height: 500px;
-  overflow-y: auto;
-  position: relative;
-  margin-left: 25%;
-  margin-top: 5%;
-  background-color: white;
+
+
+.container-box-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
 }
 
-h2{
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--box-background-color); /* Couleur principale */
+  color: #fff;
+  padding: 20px;
   text-align: center;
+  cursor: pointer;
+  width: 110px;
+  height: 110px;
+  border-radius: 8px; /* Coins arrondis pour un effet plus doux */
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ombre de base */
+}
+
+.box:hover {
+  background-color: var(--box-background-color-hover);
+  transform: translateY(-5px);
+}
+
+.box-admin{
+  background-color: indianred; /* Couleur principale */
+}
+
+.box-admin:hover{
+  background-color: rgb(185, 83, 83);
+}
+
+.box mat-icon {
+  font-size: 35px;
+  height: 35px;
+  width: 35px;
+  margin-bottom: 6px;
+}
+
+.box span {
+  font-size: 15px;
 
 }
 
-mat-tree-node {
-  margin-bottom: 5%;
-  border-radius: 4px;
-  margin-bottom: 1%;
+.main-content {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 8px;
 }
 
-mat-tree-node:hover {
-  background-color: var(--mat-sys-outline);
+h3{
+  text-align: center;
+  margin-top: 20px;
 }
 
-/* For leaves (non-expandable nodes) */
-.leaf {
-  margin-left : 5%;
-  background-color: var(--mat-sys-outline);
+.btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.leaf:hover {
-  background-color: var(--mat-sys-outline);
+.container-user-choice{
+  margin-inline: 15%;
 }
 
-/* For nodes (expandable nodes) */
-.node {
-  background-color: var(--mat-sys-tertiary-fixed-dim);  /* Light cyan background for nodes */
+.mat-badge-content{
+  background-color: red;
+  margin: -15px !important;
 }
 
-.node:hover{
-  background-color: var(--mat-sys-tertiary-fixed-dim);  /* Light cyan background for nodes */
+/* Media query pour les écrans moyens */
+@media (max-width: 768px) {
+.box {
+  width: 90px;
+  height: 90px;
 }
 
-/* You can also customize the button appearance */
-button.mat-fab-button {
-  margin-left: 50px;
+.box mat-icon {
+  font-size: 30px;
+  height: 30px;
+  width: 30px;
 }
 
-/* Style for the expand icon */
-button.mat-icon-button {
-  margin-right: 8px;
+.box span {
+  font-size: 14px;
+}
+
+.container-user-choice{
+  margin-inline: 10%;
+}
+}
+
+/* Media query pour les petits écrans */
+@media (max-width: 480px) {
+.box {
+  width: 70px;
+  height: 70px;
+  padding: 10px;
+}
+
+.box mat-icon {
+  font-size: 25px;
+  height: 25px;
+  width: 25px;
+}
+
+.box span {
+  font-size: 11px;
+}
+
+.container-user-choice{
+  margin-inline: 5%;
+}
+
+.box-extend{
+  width: 179px;
+}
 }

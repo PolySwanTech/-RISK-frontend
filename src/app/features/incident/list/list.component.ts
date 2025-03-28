@@ -27,18 +27,23 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.scss', 
-  providers : [DatePipe]
+  styleUrl: './list.component.scss',
+  providers: [DatePipe]
 })
 export class ListComponent implements OnInit, AfterViewInit {
 
   private dialog = inject(MatDialog);
   private incidentService = inject(IncidentService)
-  private datePipe =  inject(DatePipe)
+  private datePipe = inject(DatePipe)
   private router = inject(Router);
   private confirmService = inject(ConfirmService)
 
   columns = [
+    {
+      columnDef: 'id',
+      header: 'ID',
+      cell: (element: Incident) => `${element.id}`,
+    },
     {
       columnDef: 'titre',
       header: 'Titre',
@@ -50,14 +55,24 @@ export class ListComponent implements OnInit, AfterViewInit {
       cell: (element: Incident) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
     },
     {
+      columnDef: 'dateSurvenance',
+      header: 'Date de survenance',
+      cell: (element: Incident) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
+    },
+
+    {
       columnDef: 'statut',
       header: 'Statut',
-      cell: (incident: Incident) => State[incident.state.toString() as keyof typeof State] || 'Inconnu'
+      cell: (incident: Incident) => `
+  <span class="badge ${incident.state.toLowerCase()}">
+    ${State[incident.state.toString() as keyof typeof State] || 'Inconnu'}
+  </span>
+`
     }
   ];
 
-  displayedColumns = [...this.columns.map(c => c.columnDef),  'actions'];
-  
+  displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
+
   dataSource = new MatTableDataSource<Incident>([]);
 
   selectedIncident: Incident | null = null;
@@ -92,11 +107,18 @@ export class ListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['incident', incident.id]);
   }
 
+  formatDate(date: any): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Les mois commencent à 0
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  }
+
   applyAdvancedFilters() {
     let filteredData = [...this.incidents];
 
     if (this.dateFilter.value) {
-      const formattedDate = this.dateFilter.value;
+      const formattedDate = this.formatDate(this.dateFilter.value);
       filteredData = filteredData.filter(incident =>
         incident.survenueAt && new Date(incident.survenueAt).toISOString().split('T')[0] === formattedDate
       );
@@ -143,5 +165,5 @@ export class ListComponent implements OnInit, AfterViewInit {
       .subscribe(res => {
         // delete incidentId
       })
-  }  
+  }
 }

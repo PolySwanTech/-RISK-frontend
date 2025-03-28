@@ -1,13 +1,18 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RiskService } from '../../../../core/services/risk/risk.service';
 import { Risk } from '../../../../core/models/Risk';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { CommonModule } from '@angular/common';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { GoBackComponent } from "../../../../shared/components/go-back/go-back.component";
 
 @Component({
   selector: 'app-create-risks',
-  imports: [FormsModule],
+  imports: [FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatSelectModule, GoBackComponent],
   templateUrl: './create-risks.component.html',
   styleUrl: './create-risks.component.scss'
 })
@@ -16,29 +21,64 @@ export class CreateRisksComponent {
   private route = inject(ActivatedRoute)
   private riskService = inject(RiskService);
   private confirmService = inject(ConfirmService);
+  private _formBuilder = inject(FormBuilder);
+  private router = inject(Router);
 
-  risk : Risk | undefined
+  riskForm = this._formBuilder.group({
+    titre: ['', Validators.required],
+    taxonomie: ['', Validators.required],
+    balois: ['', Validators.required],
+    description: ['', Validators.required],
+    level: ['', Validators.required]
+  });
+
+  pageTitle = "Création d'un risque"
+  responseMessage = { title: 'Création', message: 'création' }
+
+  levels = ["FAIBLE", "MOYEN", "FORT"]
+
+  risk: Risk | undefined
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id') || "";
-    if(id === 'create'){
+    if (id === 'create') {
       this.risk = new Risk('', '', '', []);
-      // creation mode
     }
-    else{
+    else {
       this.loadRiskById(id);
     }
   }
 
-  loadRiskById(id: string) {
-    this.riskService.getById(id).subscribe(rep => this.risk = rep);
+  setLevel(level: string) {
+    console.log(level);
   }
 
-  createRisk(){
-    if(this.risk){
+  loadRiskById(id: string) {
+    this.riskService.getById(id).subscribe(rep => 
+      { 
+        this.risk = rep 
+        this.pageTitle = "Mise à jour du risque : " + this.risk.titre;
+        this.responseMessage = { title: 'Mise à jour', message: 'mise à jour' }
+        this.riskForm.get('titre')?.setValue(this.risk.titre);
+        this.riskForm.get('taxonomie')?.setValue(this.risk.taxonomie);
+        this.riskForm.get('balois')?.setValue(this.risk.balois);
+        this.riskForm.get('description')?.setValue(this.risk.description);
+        this.riskForm.get('level')?.setValue(this.risk.level);
+      });
+  }
+
+  createRisk() {
+    if (this.risk && this.riskForm.valid) {
+      this.risk.titre = this.riskForm.get('titre')?.value ?? '';
+      this.risk.taxonomie = this.riskForm.get('taxonomie')?.value ?? '';
+      this.risk.balois = this.riskForm.get('balois')?.value ?? '';
+      this.risk.description = this.riskForm.get('description')?.value ?? '';
+      this.risk.level = this.riskForm.get('level')?.value ?? '';
+
       this.riskService.save(this.risk).subscribe(
         risk => {
-          this.confirmService.openConfirmDialog("Mise à jour", "La mise à jour du risque a été réalisé avec succès", false)
+          this.confirmService.openConfirmDialog(this.responseMessage.title, "La " + this.responseMessage.message + " du risque a été réalisé avec succès", false)
+          this.router.navigate(['reglages', 'risks'])
         }
       )
     }

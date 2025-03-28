@@ -1,46 +1,45 @@
-<div class="risk-settings">
-    <h1>Paramétrage des Risques</h1>
+<div style="margin: 15px;">
+<app-go-back previousPageName="Gestion des risques" [currentPageName]="pageTitle" />
+<section>
+<div class="form-container">
+    <h2>{{pageTitle}}</h2>
     
     @if(risk){
-        <form (submit)="createRisk()">
+        <form [formGroup]="riskForm" (submit)="createRisk()">
             <div class="form-group">
                 <label for="risk-title">Titre du risque</label>
-                <input type="text" id="risk-title" name="titre" placeholder="Entrez le titre du risque" [(ngModel)]="risk.titre" />
+                <input type="text" id="risk-title" name="titre" formControlName="titre" placeholder="Entrez le titre du risque" [(ngModel)]="risk.titre" />
             </div>
     
             <div class="form-group">
                 <label for="risk-taxonomie">Taxonomie</label>
-                <input type="text" id="risk-taxonomie" name="taxonomie" placeholder="Entrez la taxonomie" [(ngModel)]="risk.taxonomie"/>
+                <input type="text" id="risk-taxonomie" name="taxonomie" formControlName="taxonomie" placeholder="Entrez la taxonomie" [(ngModel)]="risk.taxonomie"/>
             </div>
     
             <div class="form-group">
                 <label for="risk-balois">Balois</label>
-                <input type="text" id="risk-balois" name="balois" placeholder="Entrez le balois" [(ngModel)]="risk.balois"/>
+                <input type="text" id="risk-balois" name="balois" formControlName="balois" placeholder="Entrez le balois" [(ngModel)]="risk.balois"/>
             </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description du risque</mat-label>
+              <textarea matInput formControlName="description"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Niveau</mat-label>
+                <mat-select formControlName="level" required>
+                  @for(level of levels; track level){
+                  <mat-option [value]="level">
+                    {{ level }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
     
-            <div class="form-group">
-                <label for="risk-commentaire">Commentaire</label>
-                <textarea id="risk-commentaire" name="commentaire" placeholder="Ajoutez un commentaire" [(ngModel)]="risk.description"></textarea>
-            </div>
-    
-            <!-- <div class="form-group">
-                <label for="entite-responsable">Entités Responsables</label>
-                <select id="entite-responsable" name="entiteResponsable" multiple>
-                    <option value="entite1">Entité 1</option>
-                    <option value="entite2">Entité 2</option>
-                    <option value="entite3">Entité 3</option>
-                </select>
-            </div> -->
-    
-            <!-- <div class="form-group">
-                <label for="processes">Processus</label>
-                <select id="processes" name="processes" multiple>
-                    <option value="process1">Processus 1</option>
-                    <option value="process2">Processus 2</option>
-                    <option value="process3">Processus 3</option>
-                </select>
-            </div> -->
-            <button type="submit">Enregistrer</button>
+            <button [disabled]="riskForm.invalid" type="submit">Enregistrer</button>
         </form>
     }
+</div>
+</section>
 </div>

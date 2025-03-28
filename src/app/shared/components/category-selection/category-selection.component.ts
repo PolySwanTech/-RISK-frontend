@@ -12,18 +12,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ModifEntityDialogComponent } from '../../../features/reglages/modif-entity-dialog/modif-entity-dialog.component';
+import { GoBackComponent } from "../go-back/go-back.component";
 
 @Component({
   selector: 'app-category-selection',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatIconModule, 
-    MatRippleModule, MatChipsModule, MatTreeModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [CommonModule, MatDialogModule, MatIconModule,
+    MatRippleModule, MatChipsModule, MatTreeModule, MatButtonModule, MatFormFieldModule, MatInputModule, GoBackComponent],
   templateUrl: './category-selection.component.html',
   styleUrls: ['./category-selection.component.scss']
 })
 export class CategorySelectionComponent implements OnInit {
 
-  @Input() settings: boolean = false;
+  @Input() settings: boolean = true;
 
   entities: EntiteResponsable[] = [];
   filteredEntities: EntiteResponsable[] = [];
@@ -50,31 +51,20 @@ export class CategorySelectionComponent implements OnInit {
     });
   }
 
-  addEntity() {
+  openEntityDialog(entite?: EntiteResponsable, event?: Event) {
+    if (event) {
+      event.stopPropagation(); // Empêche la propagation du clic
+    }
+  
     const dialogRef = this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
+      data: entite || null // Passe l'entité si c'est une modification, sinon null
     });
-
+  
     dialogRef.afterClosed().subscribe(entiteResponsable => {
       if (entiteResponsable) {
         this.entityService.save(entiteResponsable).subscribe(() => {
-          this.ngOnInit(); // Rechargement des entités après ajout
-        });
-      }
-    });
-  }
-
-  modifEntity(event : any, entite: EntiteResponsable) {
-    event.stopPropagation();
-    const dialogRef = this.dialog.open(ModifEntityDialogComponent, {
-      width: '500px',
-      data: entite
-    });
-
-    dialogRef.afterClosed().subscribe(entiteResponsable => {
-      if (entiteResponsable) {
-        this.entityService.update(entiteResponsable).subscribe((resp) => {
-          console.log(resp)
+          this.ngOnInit(); // Rafraîchir après ajout/modification
         });
       }
     });

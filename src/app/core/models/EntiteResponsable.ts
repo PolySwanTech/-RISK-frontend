@@ -5,6 +5,7 @@ export class EntiteResponsable {
     children : EntiteResponsable[] = []
     childrenVisible = false
     parent : EntiteResponsable | null = null
+    parentId : string | null = null
 
     constructor(
         id : string,

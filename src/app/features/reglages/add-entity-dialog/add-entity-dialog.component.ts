@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { ChangeDetectorRef, Component, Inject, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -31,18 +31,35 @@ export class AddEntityDialogComponent {
 
   entiteResponsable = new EntiteResponsable("", '', false, [], null);
 
-  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService) {
+  titlePage = "Création d'une entité responsable";
+
+  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService,
+    @Inject(MAT_DIALOG_DATA) public data: EntiteResponsable, private cdRef: ChangeDetectorRef
+  ) {
+    this.entiteResponsable = data || new EntiteResponsable("", '', false, [], null);
+  }
+
+  ngOnInit(): void {
+    if(this.data){
+      this.titlePage = "Modification de l'entité responsable : " + this.data.name;
+      this.formGroup.get('name')?.setValue(this.data.name);
+      this.formGroup.get('isLM')?.setValue(this.data.isLM);
+      this.formGroup.get('parent')?.setValue(this.data.parent);
+    }
+    setTimeout(() => {
+      this.cdRef.detectChanges(); // Force la détection des changements
+    }, 0);
   }
 
   entiteChange(event: any) {
     console.log(event);
-    this.formGroup.get('parent')?.setValue(event);
+    this.formGroup.get('parent')?.setValue(event.id);
   }
 
   onSave(): void {
     this.entiteResponsable.name = this.formGroup.get('name')?.value;
     this.entiteResponsable.isLM = this.formGroup.get('isLM')?.value;
-    this.entiteResponsable.parent = this.formGroup.get('parent')?.value;
+    this.entiteResponsable.parentId = this.formGroup.get('parent')?.value;
     this.dialogRef.close(this.entiteResponsable);
   }
 
