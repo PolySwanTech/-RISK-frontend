@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Right, Utilisateur } from '../../../../core/models/Utilisateur';
 import { CategorySelectionComponent } from '../../../../shared/components/category-selection/category-selection.component';
 import { AuthService } from '../../../../core/services/auth/auth.service';
@@ -28,7 +28,7 @@ export class CreateUserComponent implements OnInit {
   });
 
   constructor(
-    private authService: AuthService) {
+    private authService: AuthService, private dialogRef: MatDialogRef<CreateUserComponent>) {
   }
 
   ngOnInit() {
@@ -42,10 +42,15 @@ export class CreateUserComponent implements OnInit {
     console.log(this.userForm)
 
     if (this.userForm.valid) {
-      this.authService.register(this.userForm.value).subscribe(
-        () => alert("✅ Utilisateur créé !"),
-        () => alert("❌ Une erreur est survenue")
-      );
+      this.authService.register(this.userForm.value).subscribe({
+        next: () => {
+          alert("✅ Utilisateur créé !");
+          this.dialogRef.close(true);
+        },
+        error: () => {
+          alert("❌ Une erreur est survenue");
+        }
+      });
     }
 
 

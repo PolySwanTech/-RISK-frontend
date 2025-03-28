@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { UtilisateurProfil } from '../../../../core/models/UtilisateurProfil';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateUserPopUpComponent } from '../../update/update-user-pop-up/update-user-pop-up.component';
+import { CreateUserComponent } from '../../create/create-user/create-user.component';
 
 @Component({
   selector: 'app-user-list',
@@ -72,6 +73,20 @@ export class UserListComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
+  openCreateUserDialog(): void {
+    const dialogRef = this.dialog.open(CreateUserComponent, {
+      width: '500px'
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('✅ Nouvel utilisateur créé');
+        this.loadUsers();
+      }
+    });
+  }
+  
   
 
   ngAfterViewInit(): void {
