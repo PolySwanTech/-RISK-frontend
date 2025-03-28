@@ -32,5 +32,9 @@ export class UtilisateurService {
   updateUserPermissions(userId: string, permissionIds: string[]) {
     return this.http.put(`${this.baseUrl}/user/${userId}/permissions`, permissionIds);
   }
+
+  updateUser(userId: string, payload: any) {
+    return this.http.put(`${this.baseUrl}/user/${userId}`, payload);
+  }  
   
 }

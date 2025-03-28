@@ -6,6 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Right, Utilisateur } from '../../../../core/models/Utilisateur';
 import { CategorySelectionComponent } from '../../../../shared/components/category-selection/category-selection.component';
 import { AuthService } from '../../../../core/services/auth/auth.service';
+import { Equipe, EquipeService } from '../../../../core/services/equipe/equipe.service';
 
 @Component({
   selector: 'app-create-user',
@@ -16,10 +17,14 @@ import { AuthService } from '../../../../core/services/auth/auth.service';
 })
 export class CreateUserComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
+  private equipeService = inject(EquipeService);
+  equipes: Equipe[] = [];
   userForm: FormGroup = this._formBuilder.group({
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    equipeId: [null, Validators.required],
+    role: ['MEMBRE', Validators.required]
   });
 
   constructor(
@@ -27,16 +32,21 @@ export class CreateUserComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.equipeService.getAllEquipes().subscribe(equipes => {
+      this.equipes = equipes;
+    });
   }
 
   onSubmit() {
 
     console.log(this.userForm)
 
-    this.authService.register(this.userForm.value).subscribe(
-      (data) => {
-      }
-    );
+    if (this.userForm.valid) {
+      this.authService.register(this.userForm.value).subscribe(
+        () => alert("✅ Utilisateur créé !"),
+        () => alert("❌ Une erreur est survenue")
+      );
+    }
 
 
     // if (this.userForm.valid) {
