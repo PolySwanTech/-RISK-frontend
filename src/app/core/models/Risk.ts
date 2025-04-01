@@ -1,4 +1,4 @@
-import { EntiteResponsable } from "./EntiteResponsable";
+import { EntiteImpactee } from "./EntiteImpactee";
 import { Process } from "./Process";
 import { SubRisk } from "./SubRisk";
 
@@ -9,7 +9,7 @@ export class Risk{
     balois : string
     description : string = ""
     level : string = ""
-    entiteResponsable : EntiteResponsable[] = []
+    entiteImpactee : EntiteImpactee[] = []
     processes : Process[] = []
     subRisks : SubRisk[]
     

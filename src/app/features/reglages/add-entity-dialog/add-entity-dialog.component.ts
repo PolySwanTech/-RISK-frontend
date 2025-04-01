@@ -5,7 +5,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { EntiteImpactee } from '../../../core/models/EntiteImpactee';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { SelectEntitiesComponent } from "../../../shared/components/select-entities/select-entities.component";
 
@@ -27,21 +27,21 @@ export class AddEntityDialogComponent {
     parent: [null]
   });
 
-  entitiesList : EntiteResponsable[] = [];
+  entitiesList : EntiteImpactee[] = [];
 
-  entiteResponsable = new EntiteResponsable("", '', false, [], null);
+  entiteImpactee = new EntiteImpactee("", '', false, [], null);
 
-  titlePage = "Création d'une entité responsable";
+  titlePage = "Création d'une entité impactée";
 
   constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService,
-    @Inject(MAT_DIALOG_DATA) public data: EntiteResponsable, private cdRef: ChangeDetectorRef
+    @Inject(MAT_DIALOG_DATA) public data: EntiteImpactee, private cdRef: ChangeDetectorRef
   ) {
-    this.entiteResponsable = data || new EntiteResponsable("", '', false, [], null);
+    this.entiteImpactee = data || new EntiteImpactee("", '', false, [], null);
   }
 
   ngOnInit(): void {
     if(this.data){
-      this.titlePage = "Modification de l'entité responsable : " + this.data.name;
+      this.titlePage = "Modification de l'entité impactée : " + this.data.name;
       this.formGroup.get('name')?.setValue(this.data.name);
       this.formGroup.get('isLM')?.setValue(this.data.isLM);
       this.formGroup.get('parent')?.setValue(this.data.parent);
@@ -57,10 +57,10 @@ export class AddEntityDialogComponent {
   }
 
   onSave(): void {
-    this.entiteResponsable.name = this.formGroup.get('name')?.value;
-    this.entiteResponsable.isLM = this.formGroup.get('isLM')?.value;
-    this.entiteResponsable.parentId = this.formGroup.get('parent')?.value;
-    this.dialogRef.close(this.entiteResponsable);
+    this.entiteImpactee.name = this.formGroup.get('name')?.value;
+    this.entiteImpactee.isLM = this.formGroup.get('isLM')?.value;
+    this.entiteImpactee.parentId = this.formGroup.get('parent')?.value;
+    this.dialogRef.close(this.entiteImpactee);
   }
 
   change() {

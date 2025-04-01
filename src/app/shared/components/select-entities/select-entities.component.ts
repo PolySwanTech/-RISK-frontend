@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { EntiteImpactee } from '../../../core/models/EntiteImpactee';
 import { map, Observable, startWith } from 'rxjs';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 
@@ -15,19 +15,19 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
   styleUrl: './select-entities.component.scss'
 })
 export class SelectEntitiesComponent {
-  entities: EntiteResponsable[] = []
+  entities: EntiteImpactee[] = []
 
   searchQuery: string | null = null;
   stateCtrl = new FormControl('');
-  filteredStates!: Observable<EntiteResponsable[]>;
-  filteredEntities!: EntiteResponsable[];
+  filteredStates!: Observable<EntiteImpactee[]>;
+  filteredEntities!: EntiteImpactee[];
 
   @Input() placeholder: string = 'Entité parent';
   @Input() selectId: string = '';
   selectedEntity: any;
   @Output() entitieSelected = new EventEmitter<any>();
 
-  aucunEntite = new EntiteResponsable('', 'Aucun', false, [], null);
+  aucunEntite = new EntiteImpactee('', 'Aucun', false, [], null);
 
   constructor(
     private entitiesService: EntitiesService) {
@@ -81,7 +81,7 @@ export class SelectEntitiesComponent {
     );
   }
 
-  private _filterStates(value: any): EntiteResponsable[] {
+  private _filterStates(value: any): EntiteImpactee[] {
     if (!value) return this.entities;
 
     let filterValue: string;
@@ -100,7 +100,7 @@ export class SelectEntitiesComponent {
     );
   }
 
-  displayFn = (entitie?: EntiteResponsable): string => {
+  displayFn = (entitie?: EntiteImpactee): string => {
     return entitie ? entitie.name : '';
   };
 

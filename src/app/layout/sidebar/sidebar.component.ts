@@ -38,21 +38,19 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateLoginStatus();
-    const token = this.authService.decryptToken();
-    setTimeout(() => {
-      if(!this.authService.isTokenExpired(token)){
-        this.incidentService.countIncidentsNonClotures().subscribe(resp => {
-          this.unreadIncidents = resp;
-         })
-      }
-    }, 1000)
-    
+    const decryptToken = this.authService.decryptToken();
+    if(!this.authService.isTokenExpired(decryptToken)){
+      this.incidentService.countIncidentsNonClotures().subscribe(resp => {
+        this.unreadIncidents = resp;
+       })
+    }
   }
 
   // Method to update login status
   updateLoginStatus(): void {
     const token = sessionStorage.getItem('token');
     this.authService.isLogin$.next(!!token);
+    
   }
 
   // Set the active route based on the clicked link

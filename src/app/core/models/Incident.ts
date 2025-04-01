@@ -1,4 +1,4 @@
-import { EntiteResponsable } from "./EntiteResponsable";
+import { EntiteImpactee } from "./EntiteImpactee";
 import { Impact } from "./Impact";
 import { Process } from "./Process";
 import { Risk } from "./Risk";

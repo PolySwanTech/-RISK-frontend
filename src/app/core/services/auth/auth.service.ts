@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment.prod';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,10 @@ export class AuthService {
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
   
   constructor() { }
+
+  getLoginStatus(): Observable<boolean> {
+    return this.isLogin$.asObservable();
+  }
   
   register(user : Utilisateur){
     return this.http.post<Utilisateur>(this.base + '/auth/register', user);
@@ -43,7 +48,9 @@ export class AuthService {
       next: res => {
         sessionStorage.setItem('token', res.token);
         this.isLogin$.next(true)
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard']).then(() => {
+          window.location.reload();
+        });
       },
       error: err => {
         alert("Nom ou mot de passe incorrect")
