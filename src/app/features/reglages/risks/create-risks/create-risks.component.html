@@ -25,18 +25,23 @@
               <mat-label>Description du risque</mat-label>
               <textarea matInput formControlName="description"></textarea>
             </mat-form-field>
-
+            
             <mat-form-field appearance="outline">
                 <mat-label>Niveau</mat-label>
                 <mat-select formControlName="level" required>
                   @for(level of levels; track level){
-                  <mat-option [value]="level">
-                    {{ level }}
-                  </mat-option>
+                    <mat-option [value]="level">
+                      {{ level }}
+                    </mat-option>
                   }
                 </mat-select>
               </mat-form-field>
-    
+              
+              <mat-form-field appearance="outline" class="full-width plan-action">
+                <mat-label>Plan d'action</mat-label>
+                <textarea matInput formControlName="plan"></textarea>
+              </mat-form-field>
+
             <button [disabled]="riskForm.invalid" type="submit">Enregistrer</button>
         </form>
     }
