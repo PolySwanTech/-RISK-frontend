@@ -1,4 +1,4 @@
-import { EntiteImpactee } from "./EntiteImpactee"
+import { EntiteResponsable } from "./EntiteResponsable"
 
 export enum Right{
     VIEWER = 'VIEWER',
@@ -12,7 +12,7 @@ export class Utilisateur {
     username: string;
     email: string;
     password: string;
-    equipe: EntiteImpactee;
+    equipe: EntiteResponsable;
     right : Right
 
     constructor(
@@ -20,7 +20,7 @@ export class Utilisateur {
         username: string,
         email: string,
         password: string,
-        equipe: EntiteImpactee,
+        equipe: EntiteResponsable,
         right : Right
     ) {
         this.id = id;

@@ -1,4 +1,4 @@
-import { EntiteImpactee } from "./EntiteImpactee";
+import { EntiteResponsable } from "./EntiteResponsable";
 import { Process } from "./Process";
 import { SubRisk } from "./SubRisk";
 
@@ -10,7 +10,7 @@ export class Risk{
     description : string = ""
     actionPlan : string = ""
     level : string = ""
-    entiteImpactee : EntiteImpactee[] = []
+    entiteResponsable : EntiteResponsable[] = []
     processes : Process[] = []
     subRisks : SubRisk[]
     

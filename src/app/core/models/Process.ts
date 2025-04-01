@@ -1,16 +1,16 @@
-import { EntiteImpactee } from "./EntiteImpactee"
+import { EntiteResponsable } from "./EntiteResponsable"
 
 export class Process {
     id: number
     name: string
-    entiteImpactee: EntiteImpactee
+    entiteResponsable: EntiteResponsable
 
     constructor(
         id: number,
         name: string,
-        entiteImpactee: EntiteImpactee) {
+        entiteResponsable: EntiteResponsable) {
         this.id = id
         this.name = name
-        this.entiteImpactee = entiteImpactee
+        this.entiteResponsable = entiteResponsable
     }
 }

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
-import { EntiteImpactee } from '../../models/EntiteImpactee';
+import { EntiteResponsable } from '../../models/EntiteResponsable';
 import { environment } from '../../../environments/environment.prod';
 
 @Injectable({
@@ -13,23 +13,23 @@ export class EntitiesService {
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/entites'
 
-  loadEntities(): Observable<EntiteImpactee[]> {
-    return this.http.get<EntiteImpactee[]>(this.baseUrl);
+  loadEntities(): Observable<EntiteResponsable[]> {
+    return this.http.get<EntiteResponsable[]>(this.baseUrl);
   }
 
-  findById(id : string): Observable<EntiteImpactee> {
-    return this.http.get<EntiteImpactee>(this.baseUrl + '/' + id);
+  findById(id : string): Observable<EntiteResponsable> {
+    return this.http.get<EntiteResponsable>(this.baseUrl + '/' + id);
   }
 
-  loadEntitiesTree(): Observable<EntiteImpactee[]> {
-    return this.http.get<EntiteImpactee[]>(this.baseUrl + '/tree');
+  loadEntitiesTree(): Observable<EntiteResponsable[]> {
+    return this.http.get<EntiteResponsable[]>(this.baseUrl + '/tree');
   }
 
-  save(entite: EntiteImpactee) {
+  save(entite: EntiteResponsable) {
     return this.http.post(this.baseUrl, entite);
   }
 
-  update(entite: EntiteImpactee) {
+  update(entite: EntiteResponsable) {
     return this.http.put(this.baseUrl, entite);
   }
 }

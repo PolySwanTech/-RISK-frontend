@@ -6,7 +6,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
-import { EntiteImpactee } from '../../../core/models/EntiteImpactee';
+import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
@@ -18,9 +18,9 @@ import { MatSelectModule } from '@angular/material/select';
 export class CreateImpactPopUpComponent implements OnInit{
 
   impact : Impact = new Impact('', 0, '', '', '', new Date())
-  selectedEntite : EntiteImpactee | undefined
+  selectedEntite : EntiteResponsable | undefined
   processes : Process[] = []
-  entites : EntiteImpactee[] = []
+  entites : EntiteResponsable[] = []
 
   constructor(
     private processService : ProcessService,
@@ -36,7 +36,7 @@ export class CreateImpactPopUpComponent implements OnInit{
     )
   }
 
-  setEntite(entite : EntiteImpactee){
+  setEntite(entite : EntiteResponsable){
     this.impact.entityId = entite.id
   }
 

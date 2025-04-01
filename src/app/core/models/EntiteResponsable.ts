@@ -1,18 +1,18 @@
-export class EntiteImpactee {
+export class EntiteResponsable {
     id : string
     name : string
     isLM : boolean // make cash
-    children : EntiteImpactee[] = []
+    children : EntiteResponsable[] = []
     childrenVisible = false
-    parent : EntiteImpactee | null = null
+    parent : EntiteResponsable | null = null
     parentId : string | null = null
 
     constructor(
         id : string,
         name : string, 
         isLM : boolean,
-        children : EntiteImpactee[] = [],
-        parent : EntiteImpactee | null = null
+        children : EntiteResponsable[] = [],
+        parent : EntiteResponsable | null = null
     ){
         this.id = id;
         this.name = name;
