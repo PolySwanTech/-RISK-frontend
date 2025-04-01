@@ -55,8 +55,8 @@ export class CreateComponent implements OnInit {
     location: ['', Validators.required],
     commentaire: ['', Validators.required],
     cause: ['', Validators.required],
+    equipeId: [''],
     equipeName: ['']
-
   });
 
   incidentForm2 = this._formBuilder.group({
@@ -96,10 +96,10 @@ export class CreateComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const team = this.getUserTeamFromToken();
-    if (team) {
+    const teamName = this.getUserTeamFromToken();
+    if (teamName ) {
       this.hasTeam = true;
-      this.incidentForm1.get('equipeName')?.setValue(team);
+      this.incidentForm1.get('equipeName')?.setValue(teamName);
     } else {
       this.hasTeam = false;
       this.fetchTeams();
@@ -149,6 +149,7 @@ export class CreateComponent implements OnInit {
       location: this.incidentForm1.value.location,
       commentaire: this.incidentForm1.value.commentaire,
       cause: this.incidentForm1.value.cause,
+      equipeId: this.incidentForm1.value.equipeId,
       equipeName: this.incidentForm1.value.equipeName,
       declaredAt: this.parseDate(this.incidentForm2.value.dateDeDeclaration),
       survenueAt: this.parseDate(this.incidentForm2.value.dateDeSurvenance),

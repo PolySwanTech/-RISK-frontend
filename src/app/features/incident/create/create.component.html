@@ -14,7 +14,7 @@
             <ng-container *ngIf="hasTeam; else selectTeam">
               <mat-form-field appearance="outline">
                 <mat-label>Équipe</mat-label>
-                <input matInput formControlName="equipeName" readonly>
+                <input matInput [value]="incidentForm1.get('equipeName')?.value" readonly>
               </mat-form-field>
             </ng-container>
             
