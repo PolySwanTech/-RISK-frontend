@@ -29,6 +29,7 @@ export class CreateRisksComponent {
     taxonomie: ['', Validators.required],
     balois: ['', Validators.required],
     description: ['', Validators.required],
+    plan: ['', Validators.required],
     level: ['', Validators.required]
   });
 
@@ -63,6 +64,7 @@ export class CreateRisksComponent {
         this.riskForm.get('taxonomie')?.setValue(this.risk.taxonomie);
         this.riskForm.get('balois')?.setValue(this.risk.balois);
         this.riskForm.get('description')?.setValue(this.risk.description);
+        this.riskForm.get('plan')?.setValue(this.risk.actionPlan);
         this.riskForm.get('level')?.setValue(this.risk.level);
       });
   }
@@ -73,7 +75,10 @@ export class CreateRisksComponent {
       this.risk.taxonomie = this.riskForm.get('taxonomie')?.value ?? '';
       this.risk.balois = this.riskForm.get('balois')?.value ?? '';
       this.risk.description = this.riskForm.get('description')?.value ?? '';
+      this.risk.actionPlan = this.riskForm.get('plan')?.value ?? '';
       this.risk.level = this.riskForm.get('level')?.value ?? '';
+
+      console.log(this.risk)
 
       this.riskService.save(this.risk).subscribe(
         risk => {
