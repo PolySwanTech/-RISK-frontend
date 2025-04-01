@@ -113,7 +113,7 @@ export class ViewComponent {
       this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
         _ => {
           this.confirmService.openConfirmDialog("Mise à jour effectuée",
-            "Commentaire mis à jour avec succès", false).subscribe();
+            "Description mis à jour avec succès", false).subscribe();
           this.ngOnInit();
         }
       )
