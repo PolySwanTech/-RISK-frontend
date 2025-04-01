@@ -19,7 +19,7 @@
 
             <ng-container matColumnDef="equipeName">
                 <th mat-header-cell *matHeaderCellDef>Équipe</th>
-                <td mat-cell *matCellDef="let user">{{ user.equipeName }}</td>
+                <td mat-cell *matCellDef="let user">{{ user.equipeName || 'AE' }}</td>
             </ng-container>
 
             <ng-container matColumnDef="role">

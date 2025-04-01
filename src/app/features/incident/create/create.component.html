@@ -11,6 +11,22 @@
               <input matInput formControlName="titre" placeholder="Titre">
             </mat-form-field>
 
+            <ng-container *ngIf="hasTeam; else selectTeam">
+              <mat-form-field appearance="outline">
+                <mat-label>Équipe</mat-label>
+                <input matInput formControlName="equipeName" readonly>
+              </mat-form-field>
+            </ng-container>
+            
+            <ng-template #selectTeam>
+              <mat-form-field appearance="outline">
+                <mat-label>Choisissez une équipe</mat-label>
+                <mat-select formControlName="equipeName">
+                  <mat-option *ngFor="let team of listTeams" [value]="team">{{ team }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ng-template>                      
+
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Description de l'incident</mat-label>
               <textarea matInput formControlName="commentaire"></textarea>

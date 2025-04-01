@@ -19,7 +19,6 @@ import { MatInputModule } from "@angular/material/input";
 export class SelectUsersComponent {
   users: Utilisateur[] = []
 
-  searchQuery: string | Utilisateur | null = null;
   stateCtrl = new FormControl('');
   filteredStates!: Observable<Utilisateur[]>;
   filteredUsers!: Utilisateur[];
@@ -30,7 +29,7 @@ export class SelectUsersComponent {
 
   constructor(
     private userService: UtilisateurService, private authService: AuthService) {
-      
+
   }
 
 
@@ -46,22 +45,21 @@ export class SelectUsersComponent {
   }
 
   filterBySearch() {
-    if (!this.searchQuery) {
+    const value = this.stateCtrl.value;
+    if (!value) {
       this.filteredUsers = this.users;
-    } else {
-      if (typeof this.searchQuery === 'string') {
-        const searchLower = this.searchQuery.toLowerCase();
-        this.filteredUsers = this.users.filter(user =>
-          user.username.toLowerCase().includes(searchLower)
-        );
-      }
+    } else if (typeof value === 'string') {
+      const searchLower = value.toLowerCase();
+      this.filteredUsers = this.users.filter(user =>
+        user.username.toLowerCase().includes(searchLower)
+      );
     }
     this.changeAutocompleteList();
   }
 
   onOptionSelected(event: MatAutocompleteSelectedEvent): void {
-    this.searchQuery = event.option.value; // Stocke l'objet utilisateur
-    this.userSelected.emit(this.searchQuery)
+    const user = event.option.value; // Stocke l'objet utilisateur
+    this.userSelected.emit(user)
   }
 
   changeAutocompleteList() {

@@ -1,7 +1,7 @@
 @if(users && users.length > 0){
 <div class="user-list">
     <mat-form-field class="full-width autocomplete-field" >
-        <input type="text" matInput [placeholder]="placeholder" [matAutocomplete]="auto" [(ngModel)]="searchQuery"
+        <input type="text" matInput [placeholder]="placeholder" [matAutocomplete]="auto"
             [formControl]="stateCtrl" (input)="filterBySearch();" (focus)="filterBySearch()"
             (keydown.enter)="filterBySearch()" />
 

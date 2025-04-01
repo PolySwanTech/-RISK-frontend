@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatButtonModule } from '@angular/material/button';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,7 +9,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { merge } from 'rxjs';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
-import {MatRadioModule} from '@angular/material/radio';
+import { MatRadioModule } from '@angular/material/radio';
 import { Risk } from '../../../core/models/Risk';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
 import { Utilisateur } from '../../../core/models/Utilisateur';
@@ -22,6 +22,8 @@ import { Process } from '../../../core/models/Process';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { EquipeService } from '../../../core/services/equipe/equipe.service';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-create',
@@ -37,12 +39,13 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
     MatRadioModule,
     SelectUsersComponent,
     ButtonAddFileComponent,
-    MatSelectModule
-],
+    MatSelectModule,
+    NgIf, NgFor
+  ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
-export class CreateComponent {
+export class CreateComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
   private router = inject(Router);
   private dialog = inject(MatDialog);
@@ -51,10 +54,11 @@ export class CreateComponent {
     titre: ['', Validators.required],
     location: ['', Validators.required],
     commentaire: ['', Validators.required],
-    cause: ['', Validators.required]
-    
+    cause: ['', Validators.required],
+    equipeName: ['']
+
   });
-  
+
   incidentForm2 = this._formBuilder.group({
     dateDeDeclaration: [new Date().toISOString().split('T')[0], Validators.required],
     dateDeSurvenance: ['', Validators.required],
@@ -70,26 +74,67 @@ export class CreateComponent {
     process: ['', Validators.required]
   });
 
-  listRisk : Risk[] = [];
-  listCause : Cause[] = [];
-  listProcess : Process[] = [];
+  listRisk: Risk[] = [];
+  listCause: Cause[] = [];
+  listProcess: Process[] = [];
 
   errorMessage = signal('');
+  hasTeam = true;
+  listTeams: string[] = [];
 
-  constructor(private incidentService: IncidentService, private riskService: RiskService, 
-    private causeService: CauseService, private processService: ProcessService) {
-    this.riskService.getAll().subscribe( (resp: any) => {
+  constructor(private incidentService: IncidentService, private riskService: RiskService,
+    private causeService: CauseService, private processService: ProcessService, private equipeService: EquipeService) {
+    this.riskService.getAll().subscribe((resp: any) => {
       this.listRisk = resp;
     });
-    this.causeService.getAll().subscribe( (resp: any) => {
+    this.causeService.getAll().subscribe((resp: any) => {
       this.listCause = resp;
     });
-    this.processService.getAll().subscribe( (resp: any) => {
+    this.processService.getAll().subscribe((resp: any) => {
       this.listProcess = resp;
     });
   }
 
-  changeUser(event: any){
+  ngOnInit(): void {
+    const team = this.getUserTeamFromToken();
+    if (team) {
+      this.hasTeam = true;
+      this.incidentForm1.get('equipeName')?.setValue(team);
+    } else {
+      this.hasTeam = false;
+      this.fetchTeams();
+    }
+  }
+
+  fetchTeams(): void {
+    this.equipeService.getAllEquipes().subscribe({
+      next: (teams: any[]) => {
+        this.listTeams = teams.map(t => t.name);
+      },
+      error: err => {
+        console.error("Erreur lors du chargement des équipes", err);
+      }
+    });
+  }
+
+  getUserTeamFromToken(): string | null {
+    const token = sessionStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const base64Payload = token.split('.')[1];
+      const jsonPayload = new TextDecoder().decode(
+        Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
+      );
+      const payload = JSON.parse(jsonPayload);
+      return payload.team || null;
+    } catch (e) {
+      console.error("Erreur lors du décodage du token :", e);
+      return null;
+    }
+  }
+
+  changeUser(event: any) {
     this.incidentForm3.get('userMail')!.setValue(event.email);
   }
 
@@ -104,6 +149,7 @@ export class CreateComponent {
       location: this.incidentForm1.value.location,
       commentaire: this.incidentForm1.value.commentaire,
       cause: this.incidentForm1.value.cause,
+      equipeName: this.incidentForm1.value.equipeName,
       declaredAt: this.parseDate(this.incidentForm2.value.dateDeDeclaration),
       survenueAt: this.parseDate(this.incidentForm2.value.dateDeSurvenance),
       detectedAt: this.parseDate(this.incidentForm2.value.dateDeDetection),
@@ -113,14 +159,14 @@ export class CreateComponent {
       userMail: this.incidentForm3.value.userMail,
       files: this.incidentForm3.value.files,
       process: this.incidentForm3.value.process
-    
+
     };
     this.incidentService.saveIncident(incident).subscribe(
       {
-        next : resp => {
+        next: resp => {
           this.afterCreation(resp);
-        }, 
-        error : err => {
+        },
+        error: err => {
           console.error("Erreur lors de la création de l'incident", err);
         }
       },
@@ -128,35 +174,35 @@ export class CreateComponent {
   }
 
   afterCreation(incidentId: string) {
-      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-        width: '400px',
-        data: {
-          title: 'Création réussie',
-          message: 'Allez vers la consultation ?'
-        }
-      });
-    
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.router.navigate(['incident', incidentId])
-        }
-        else{
-          this.router.navigate(['incident'])
-        }
-      });
-    } 
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Création réussie',
+        message: 'Allez vers la consultation ?'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.router.navigate(['incident', incidentId])
+      }
+      else {
+        this.router.navigate(['incident'])
+      }
+    });
+  }
 
   parseDate(date: string | null | undefined): string | null {
     return date ? new Date(date).toISOString() : null;
   }
 
-  onFilesChange(event: any){
+  onFilesChange(event: any) {
     this.incidentForm3.get('files')!.setValue(event);
   }
 
-  getSubRisk() : any{
-    let risk : any = this.incidentForm3.get('risk')!.value;
-    if(this.incidentForm3.get('risk')!.value != ''){
+  getSubRisk(): any {
+    let risk: any = this.incidentForm3.get('risk')!.value;
+    if (this.incidentForm3.get('risk')!.value != '') {
       return risk.subRisks
     }
     return risk;
