@@ -43,6 +43,7 @@ export class ViewComponent {
     const id = this.route.snapshot.params['id'];
 
     this.incidentService.getIncidentById(id).subscribe((incident) => {
+      console.log(incident)
       this.incident = incident;
       this.prevCommentaire = this.incident.comments || ''
     });

@@ -17,7 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class CreateImpactPopUpComponent implements OnInit{
 
-  impact : Impact = new Impact('', 0, '', '', '', new Date())
+  impact : Impact = new Impact('', 0, '', '', '', new Date(), null)
   selectedEntite : EntiteResponsable | undefined
   processes : Process[] = []
   entites : EntiteResponsable[] = []

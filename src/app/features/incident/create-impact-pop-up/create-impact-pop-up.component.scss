@@ -53,7 +53,7 @@ mat-slide-toggle{
 form{
     display: flex;
     flex-direction: column;
-    >:nth-child(2), >:nth-child(3){
+    >:nth-child(2), >:nth-child(3), >:nth-child(4) {
         margin-top: 20px;
     }
 }
