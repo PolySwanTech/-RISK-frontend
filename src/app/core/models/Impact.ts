@@ -5,6 +5,7 @@ export class Impact{
     entityName : string;
     type : string;
     createdAt : Date;
+    comptabilisationDate : Date | null;
 
     entityId : string = ''
     incidentId : string = ''
@@ -16,6 +17,7 @@ export class Impact{
         entityName : string,
         type : string,
         createdAt : Date,
+        comptabilisationDate : Date | null
     ){
         this.id = id
         this.montant = montant
@@ -23,5 +25,6 @@ export class Impact{
         this.entityName = entityName
         this.type = type
         this.createdAt = createdAt
+        this.comptabilisationDate = comptabilisationDate
     }
 }
