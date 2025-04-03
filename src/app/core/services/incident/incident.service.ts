@@ -84,4 +84,8 @@ export class IncidentService {
   close(id: string) {
     return this.http.put(this.baseUrl + `/incidents/${id}/close`, null)
   }
+
+  getIncidentHistory(incidentId: string) {
+    return this.http.get<any[]>(`${this.baseUrl}/incidents/${incidentId}/history`);
+  }  
 }

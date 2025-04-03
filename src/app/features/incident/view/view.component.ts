@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
 import { TeamMemberService } from '../../../core/services/team/team-member.service';
+import { Router } from '@angular/router';
 
 
 
@@ -38,7 +39,8 @@ export class ViewComponent {
   constructor(
     private incidentService: IncidentService,
     private dialog: MatDialog,
-    private route: ActivatedRoute, private teamMemberService: TeamMemberService) {
+    private route: ActivatedRoute, private teamMemberService: TeamMemberService,
+    private router: Router,) {
   }
 
   ngOnInit(): void {
@@ -155,6 +157,13 @@ export class ViewComponent {
           }
         }
       });
+    }
+  }
+
+  goToHistory() {
+    const id = this.incident?.id;
+    if (id) {
+      this.router.navigate(['/incident', id, 'history']);
     }
   }
 
