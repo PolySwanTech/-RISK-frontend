@@ -12,5 +12,7 @@ mat-form-field{
 }
 
 .plan-action{
-    height : 150px;
+  textarea{
+    min-height: 140px;
+  }
 }
