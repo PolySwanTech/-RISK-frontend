@@ -135,9 +135,12 @@ export class ViewComponent {
 
   updateCommentaire() {
     if (this.incident) {
-      this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
-        _ => alert("commentaire mis à jour")
-      )
+      const message = prompt("Entrez un message pour cette modification :", "Mise à jour du commentaire");
+      if (message) {
+        this.incidentService.updateCommentaire(this.incident.id, this.incident.comments, message).subscribe(
+          _ => alert("commentaire mis à jour")
+        );
+      }
     }
   }
 
