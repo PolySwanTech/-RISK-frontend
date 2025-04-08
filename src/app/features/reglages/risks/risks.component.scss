@@ -1,8 +1,4 @@
-.add-button {
-    display: block;
- 
-    margin-bottom: 20px;
-}
+
 
 h2{
     text-align: center;
@@ -10,7 +6,8 @@ h2{
 
 .filters-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: baseline;
     gap: 20px;
     flex-wrap: wrap;
     margin: 5% 100px;
@@ -20,8 +17,9 @@ mat-form-field {
     width: 250px;
 }
 
+
 .table-container{
-    width: 75%;
+  width: 100%;
 }
 
 table {
@@ -69,8 +67,6 @@ table {
   }
 
   td mat-icon{
-    color: var(--mat-sys-error) !important;
+    color: var(--mat-sys-surface-tint) !important;
   }
 
-  
-  

@@ -11,8 +11,13 @@
       <input matInput type="text" [(ngModel)]="impact.type" name="type" required />
     </div>
 
+    <div>
+      <mat-label>Date de comptabilisation (facultatif)</mat-label>
+      <input matInput type="date" [(ngModel)]="impact.comptabilisationDate" name="comptabilisationDate" />
+    </div>
+
     <mat-form-field appearance="outline">
-      <mat-label>Entité Responsable</mat-label>
+      <mat-label>Entité impactée</mat-label>
       <mat-select required (selectionChange)="setEntite($event.value);">
         @for(entite of entites; track entite){
         <mat-option [value]="entite">

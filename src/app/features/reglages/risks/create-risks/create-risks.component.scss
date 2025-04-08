@@ -1,0 +1,18 @@
+.form-container{
+    width: 45%;
+}
+
+section{
+    min-height: 100vh;
+    height: auto;
+}
+
+mat-form-field{
+    width: 100%;
+}
+
+.plan-action{
+  textarea{
+    min-height: 140px;
+  }
+}

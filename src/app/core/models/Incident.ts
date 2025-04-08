@@ -8,7 +8,8 @@ import { Cause } from "./Cause";
 export enum State {
     NEW = "Nouveau",
     OPEN = "Ouvert",
-    CLOSED = "Fermé"
+    CLOSED = "Fermé",
+    DRAFT = "Brouillon"
 }
 
 export class Incident {
@@ -29,10 +30,8 @@ export class Incident {
     process: Process;
     cause: Cause;
 
-    state: State = State.OPEN;
-
+    state: State;
     comments: string;
-
     equipeName?: string;
 
     constructor(
@@ -49,7 +48,9 @@ export class Incident {
         cause: Cause,
         impacts: Impact[],
         comments: string,
+        state: State = State.OPEN,
         equipeName?: string
+        
     ) {
         this.id = id;
         this.titre = titre;
@@ -66,10 +67,7 @@ export class Incident {
         this.comments = comments;
         this.equipeName = equipeName;
 
-        if (this.closedAt) {
-            this.state = State.CLOSED;
-        }
-        
+        this.state = closedAt ? State.CLOSED : state;        
     }
 
     

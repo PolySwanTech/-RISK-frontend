@@ -12,7 +12,7 @@ import { UtilisateurProfil } from '../../models/UtilisateurProfil';
 export class UtilisateurService {
 
   private readonly http: HttpClient = inject(HttpClient);
-
+  
   baseUrl = environment.apiUrl;
 
   constructor() { }

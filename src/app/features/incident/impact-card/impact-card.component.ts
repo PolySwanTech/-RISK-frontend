@@ -12,7 +12,7 @@ registerLocaleData(localeFr, 'fr');
 
 @Component({
   selector: 'app-impact-card',
-  imports: [MatCardModule, DatePipe, CurrencyPipe, ],
+  imports: [MatCardModule, DatePipe, CurrencyPipe],
   templateUrl: './impact-card.component.html',
   styleUrl: './impact-card.component.scss', 
   providers : [

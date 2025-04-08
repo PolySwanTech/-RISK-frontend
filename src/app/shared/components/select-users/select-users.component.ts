@@ -19,6 +19,7 @@ import { MatInputModule } from "@angular/material/input";
 export class SelectUsersComponent {
   users: Utilisateur[] = []
 
+  searchQuery: string | Utilisateur | null = null;
   stateCtrl = new FormControl('');
   filteredStates!: Observable<Utilisateur[]>;
   filteredUsers!: Utilisateur[];
@@ -29,7 +30,6 @@ export class SelectUsersComponent {
 
   constructor(
     private userService: UtilisateurService, private authService: AuthService) {
-
   }
 
 
@@ -58,8 +58,9 @@ export class SelectUsersComponent {
   }
 
   onOptionSelected(event: MatAutocompleteSelectedEvent): void {
-    const user = event.option.value; // Stocke l'objet utilisateur
-    this.userSelected.emit(user)
+    const user = event.option.value;
+    this.searchQuery = user;
+    this.userSelected.emit(user);
   }
 
   changeAutocompleteList() {

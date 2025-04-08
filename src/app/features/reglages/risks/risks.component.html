@@ -1,0 +1,45 @@
+<div style="margin: 15px;">
+    <app-go-back previousPageName="Paramétrage Global" currentPageName="Gestion des risques"
+        [redirectUrl]="['reglages']" />
+    <div class="list-container">
+
+        <h2>Gestion des risques</h2>
+
+        <div class="filters-container">
+            <button mat-raised-button (click)="navToCreate()"><mat-icon>add</mat-icon>
+                Ajouter un nouveau risque
+            </button>
+            <div class="table-container">
+                <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+                    @for (column of columns; track column) {
+                    <ng-container [matColumnDef]="column.columnDef">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                            {{column.header}}
+                        </th>
+                        <td mat-cell *matCellDef="let row" [innerHTML]="column.cell(row)">
+
+                        </td>
+                    </ng-container>
+                    }
+                    <!-- Actions -->
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef>Actions</th>
+                        <td mat-cell *matCellDef="let row">
+                            <button mat-icon-button color="warn" (click)="navToRisk(row.id)" matTooltip="Supprimer">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus">
+                    </tr>
+
+                </table>
+                <mat-paginator [length]="dataSource.length" [pageSizeOptions]="[4, 10, 15]"
+                    aria-label="Page selection pour le tableau" showFirstLastButtons></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

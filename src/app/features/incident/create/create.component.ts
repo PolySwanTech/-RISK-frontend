@@ -24,6 +24,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
 import { NgIf, NgFor } from '@angular/common';
+import { State } from '../../../core/models/Incident';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-create',
@@ -49,6 +51,7 @@ export class CreateComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
   private router = inject(Router);
   private dialog = inject(MatDialog);
+  private confirmService = inject(ConfirmService);
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
@@ -67,11 +70,11 @@ export class CreateComponent implements OnInit {
   });
 
   incidentForm3 = this._formBuilder.group({
-    risk: ['', Validators.required],
-    subRisk: ['', Validators.required],
+    risk: [null, Validators.required],
+    subRisk: [null, Validators.required],
     userMail: [''],
     files: [''],
-    process: ['', Validators.required]
+    process: [null, Validators.required]
   });
 
   listRisk: Risk[] = [];
@@ -84,6 +87,7 @@ export class CreateComponent implements OnInit {
 
   constructor(private incidentService: IncidentService, private riskService: RiskService,
     private causeService: CauseService, private processService: ProcessService, private equipeService: EquipeService) {
+
     this.riskService.getAll().subscribe((resp: any) => {
       this.listRisk = resp;
     });
@@ -97,7 +101,7 @@ export class CreateComponent implements OnInit {
 
   ngOnInit(): void {
     const teamName = this.getUserTeamFromToken();
-    if (teamName ) {
+    if (teamName) {
       this.hasTeam = true;
       this.incidentForm1.get('equipeName')?.setValue(teamName);
     } else {
@@ -138,34 +142,13 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('userMail')!.setValue(event.email);
   }
 
-  addIncident() {
-    if (this.incidentForm1.invalid || this.incidentForm2.invalid) {
-      alert("Tous les champs obligatoires ne sont pas remplis");
-      return;
-    }
+  draft() {
+    const incident = this.convertFormToIncident();
 
-    const incident = {
-      title: this.incidentForm1.value.titre,
-      location: this.incidentForm1.value.location,
-      commentaire: this.incidentForm1.value.commentaire,
-      cause: this.incidentForm1.value.cause,
-      equipeId: this.incidentForm1.value.equipeId,
-      equipeName: this.incidentForm1.value.equipeName,
-      declaredAt: this.parseDate(this.incidentForm2.value.dateDeDeclaration),
-      survenueAt: this.parseDate(this.incidentForm2.value.dateDeSurvenance),
-      detectedAt: this.parseDate(this.incidentForm2.value.dateDeDetection),
-      closedAt: this.parseDate(this.incidentForm2.value.dateDeCloture),
-      risk: this.incidentForm3.value.risk,
-      subRisk: this.incidentForm3.value.subRisk,
-      userMail: this.incidentForm3.value.userMail,
-      files: this.incidentForm3.value.files,
-      process: this.incidentForm3.value.process
-
-    };
-    this.incidentService.saveIncident(incident).subscribe(
+    this.incidentService.draftIncident(incident).subscribe(
       {
         next: resp => {
-          this.afterCreation(resp);
+          this.afterCreation("Brouillon enregistré", resp);
         },
         error: err => {
           console.error("Erreur lors de la création de l'incident", err);
@@ -174,23 +157,75 @@ export class CreateComponent implements OnInit {
     );
   }
 
-  afterCreation(incidentId: string) {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
-      data: {
-        title: 'Création réussie',
-        message: 'Allez vers la consultation ?'
-      }
-    });
+  private convertFormToIncident() {
+    const incident = {
+      title: this.incidentForm1.value.titre,
+      location: this.incidentForm1.value.location,
+      commentaire: this.incidentForm1.value.commentaire,
+      cause: this.incidentForm1.value.cause,
+      declaredAt: this.parseDate(this.incidentForm2.value.dateDeDeclaration),
+      survenueAt: this.parseDate(this.incidentForm2.value.dateDeSurvenance),
+      detectedAt: this.parseDate(this.incidentForm2.value.dateDeDetection),
+      closedAt: this.parseDate(this.incidentForm2.value.dateDeCloture),
+      risk: this.incidentForm3.value.risk,
+      subRisk: this.incidentForm3.value.subRisk,
+      userMail: this.incidentForm3.value.userMail,
+      files: this.incidentForm3.value.files,
+      process: this.incidentForm3.value.process,
+      equipeId: this.incidentForm1.value.equipeId,
+      equipeName: this.incidentForm1.value.equipeName,
+    };
+    return incident;
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.router.navigate(['incident', incidentId])
-      }
-      else {
-        this.router.navigate(['incident'])
-      }
-    });
+  addIncident() {
+    if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
+      alert("Tous les champs obligatoires ne sont pas remplis");
+      return;
+    }
+
+    const incident = this.convertFormToIncident();
+
+    this.incidentService.saveIncident(incident).subscribe(
+      {
+        next: resp => {
+          this.afterCreation("Création réussie", resp);
+        },
+        error: err => {
+          console.error("Erreur lors de la création de l'incident", err);
+        }
+      },
+    );
+  }
+
+  afterCreation(title: string, incidentId: string) {
+    if (this.hasTeam) {
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        width: '400px',
+        data: {
+          title,
+          message: 'Allez vers la consultation ?',
+          buttons: true
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.router.navigate(['incident', incidentId]);
+        } else {
+          this.router.navigate(['incident']);
+        }
+      });
+    } else {
+      this.confirmService.openConfirmDialog(title, "Allez vers la consultation ?", true)
+        .subscribe(result => {
+          if (result) {
+            this.router.navigate(['incident', incidentId]);
+          } else {
+            this.router.navigate(['incident']);
+          }
+        });
+    }
   }
 
   parseDate(date: string | null | undefined): string | null {
@@ -203,7 +238,7 @@ export class CreateComponent implements OnInit {
 
   getSubRisk(): any {
     let risk: any = this.incidentForm3.get('risk')!.value;
-    if (this.incidentForm3.get('risk')!.value != '') {
+    if (this.incidentForm3.get('risk')!.value != null) {
       return risk.subRisks
     }
     return risk;

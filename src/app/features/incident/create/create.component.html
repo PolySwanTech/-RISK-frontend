@@ -10,14 +10,12 @@
               <mat-label>Titre</mat-label>
               <input matInput formControlName="titre" placeholder="Titre">
             </mat-form-field>
-
             <ng-container *ngIf="hasTeam; else selectTeam">
               <mat-form-field appearance="outline">
                 <mat-label>Équipe</mat-label>
                 <input matInput [value]="incidentForm1.get('equipeName')?.value" readonly>
               </mat-form-field>
             </ng-container>
-            
             <ng-template #selectTeam>
               <mat-form-field appearance="outline">
                 <mat-label>Choisissez une équipe</mat-label>
@@ -26,7 +24,6 @@
                 </mat-select>
               </mat-form-field>
             </ng-template>                      
-
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Description de l'incident</mat-label>
               <textarea matInput formControlName="commentaire"></textarea>
@@ -47,6 +44,7 @@
             </mat-form-field>
 
             <div>
+              <button class="green" (click)="draft()">Brouillon</button>
               <button [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
@@ -75,6 +73,7 @@
             </mat-form-field>
 
             <div>
+              <button class="green" (click)="draft()">Brouillon</button>
               <button [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
@@ -118,8 +117,9 @@
           </form>
 
           <div class="actions">
-            <button [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
             <button class="red" matStepperPrevious>Retour</button>
+            <button class="green" (click)="draft()">Brouillon</button>
+            <button [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
           </div>
         </mat-step>
       </mat-stepper>

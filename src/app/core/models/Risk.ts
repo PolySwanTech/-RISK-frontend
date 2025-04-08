@@ -1,13 +1,22 @@
+import { EntiteResponsable } from "./EntiteResponsable";
+import { Process } from "./Process";
 import { SubRisk } from "./SubRisk";
 
 export class Risk{
-    id : number
+    id : string
+    titre : string = ""
     taxonomie : string
     balois : string
+
+    description : string = ""
+    actionPlan : string = ""
+    level : string = ""
+    entiteResponsable : EntiteResponsable[] = []
+    processes : Process[] = []
     subRisks : SubRisk[]
     
     constructor(
-        id : number,
+        id : string,
         taxonomie : string,
         balois : string,
         subRisks : SubRisk[]

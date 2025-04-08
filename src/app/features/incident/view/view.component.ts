@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, LOCALE_ID } from '@angular/core';
 import { Incident, State } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -17,31 +17,33 @@ import { GoBackComponent } from "../../../shared/components/go-back/go-back.comp
 import { Impact } from '../../../core/models/Impact';
 import { TeamMemberService } from '../../../core/services/team/team-member.service';
 import { Router } from '@angular/router';
-
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { CurrencyPipe } from '@angular/common';
 
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe,
     MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule, MatInputModule, GoBackComponent],
   templateUrl: './view.component.html',
-  styleUrl: './view.component.scss'
+  styleUrl: './view.component.scss',
+  providers: [
+    { provide: LOCALE_ID, useValue: 'fr' }
+  ]
 })
 export class ViewComponent {
+  private incidentService = inject(IncidentService);
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private confirmService = inject(ConfirmService);
+  private router = inject(Router);
 
   incident: Incident | undefined
   prevCommentaire: string = ''
+  totalAmount = 0;
   userRole: string | undefined;
   userTeam: string | undefined;
   canClose: boolean = false;
-
-
-  constructor(
-    private incidentService: IncidentService,
-    private dialog: MatDialog,
-    private route: ActivatedRoute, private teamMemberService: TeamMemberService,
-    private router: Router,) {
-  }
 
   ngOnInit(): void {
     this.loadIncident();
@@ -50,11 +52,16 @@ export class ViewComponent {
   loadIncident(): void {
     const id = this.route.snapshot.params['id'];
     this.incidentService.getIncidentById(id).subscribe((incident) => {
+      console.log(incident)
       this.incident = incident;
       this.prevCommentaire = incident.comments || '';
       this.extractTokenInfo();
       this.checkCloseAuthorization();
     });
+
+    this.incidentService.sum(id).subscribe(
+      result => this.totalAmount = result
+    )
   }
 
   extractTokenInfo(): void {
@@ -84,6 +91,13 @@ export class ViewComponent {
     return str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() || '';
   }
 
+  getState() {
+    if (this.incident) {
+      return State[this.incident.state.toString() as keyof typeof State]
+    }
+    return "Inconnu"
+  }
+
   formatDate(dateString: any) {
     return dateString ? dateString.toLocaleDateString("fr-FR") : null;
   }
@@ -110,7 +124,7 @@ export class ViewComponent {
           result.incidentId = this.incident.id
           this.incidentService.addImpact(result).subscribe(
             _ => {
-              alert("Impact ajouté");
+              this.confirmService.openConfirmDialog("Impact ajouté", "L'impact a bien été ajouté à l'incident", false);
               this.ngOnInit();
             }
           )
@@ -133,22 +147,23 @@ export class ViewComponent {
     return false
   }
 
-  updateCommentaire() {
+  updateCommentaire(): void {
     if (this.incident) {
       const message = prompt("Entrez un message pour cette modification :", "Mise à jour du commentaire");
       if (message) {
-        this.incidentService.updateCommentaire(this.incident.id, this.incident.comments, message).subscribe(
-          _ => alert("commentaire mis à jour")
-        );
+        this.incidentService.updateCommentaire(this.incident.id, this.incident.comments, message).subscribe(() => {
+          alert("Commentaire mis à jour");
+          this.ngOnInit();
+        });
       }
     }
   }
 
-  close() {
+  close(): void {
     if (this.incident) {
       this.incidentService.close(this.incident.id).subscribe({
         next: () => {
-          alert("Incident clôturé avec succès !")
+          alert("Incident clôturé avec succès !");
           this.ngOnInit();
         },
         error: (err) => {

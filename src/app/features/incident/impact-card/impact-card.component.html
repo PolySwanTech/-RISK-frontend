@@ -10,8 +10,12 @@
             <span> {{ impact.entityName }}</span>
         </div>
         <div>
-            <strong>Date de création :</strong>
-            <span> {{ impact.createdAt | date: 'dd/MM/yyyy à HH:mm' }}</span>
+            <strong>Type :</strong>
+            <span> {{ impact.type }}</span>
+        </div>
+        <div>
+            <strong>Date de comptabilisation :</strong>
+            <span> {{ impact.comptabilisationDate | date: 'dd/MM/yyyy' }}</span>
         </div>
     </mat-card-content>
 </mat-card>

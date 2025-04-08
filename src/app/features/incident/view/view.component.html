@@ -36,17 +36,17 @@
                     <mat-label>Location</mat-label>
                     <input matInput [value]="incident.location" readonly>
                 </mat-form-field>
-    
+
                 <mat-form-field class="full-width">
                     <mat-label>Cause</mat-label>
                     <input matInput [value]="incident.cause.name" readonly>
                 </mat-form-field>
-    
+
                 <mat-form-field class="full-width">
                     <mat-label>Type de risque</mat-label>
                     <input matInput [value]="incident.risk.balois" readonly>
                 </mat-form-field>
-    
+
                 <mat-form-field class="full-width">
                     <mat-label>Sous Catégorie de risque</mat-label>
                     <input matInput [value]="incident.subRisk.balois" readonly>
@@ -57,7 +57,13 @@
 
     <mat-card class="impact-card">
         <mat-card-header>
-            <mat-card-title><span>Impacts</span></mat-card-title>
+            <mat-card-title>
+                <span>Impacts -
+                    <strong>
+                        Total : {{ totalAmount | currency : 'EUR' }}
+                    </strong>
+                </span>
+            </mat-card-title>
         </mat-card-header>
         <mat-card-content>
             @if(isNotClosed()){
@@ -111,12 +117,12 @@
 
     <mat-card class="state-card">
         <mat-card-header>
-            <mat-card-title><span>Commentaires</span></mat-card-title>
+            <mat-card-title><span>Descriptions</span></mat-card-title>
         </mat-card-header>
         <mat-card-content>
             <div class="incident-state">
                 <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Commentaire</mat-label>
+                    <mat-label>Description</mat-label>
                     <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="incident.comments"></textarea>
                 </mat-form-field>
 

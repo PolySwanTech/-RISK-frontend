@@ -1,105 +1,78 @@
-.category-container {
-    max-width: 400px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    text-align: center;
-}
-
-h2 {
-    font-size: 20px;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-button {
-    margin-top: 20px;
+mat-tree {
+    background: #f9f9f9;
+    border-radius: 8px;
     padding: 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.3s;
-
-    &[mat-mini-fab]{
-        padding: 0px 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  
+    mat-tree-node {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      border-radius: 4px;
+      transition: background 0.2s ease-in-out;
+      
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
     }
-
-    mat-icon{
-        display: block;
+  
+    button[mat-icon-button] {
+      color: #555;
+      transition: color 0.2s;
+  
+      &:hover {
+        color: #1e88e5;
+      }
     }
-}
-
-.buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-}
-
-span{
-    pointer-events: auto;
-}
-
-input[type="checkbox"] {
-    transform: scale(1.2);
-    margin-right: 8px;
-}
-
-.category-container {
-    width: 35%; /* Défini à 50% de la page */
-    max-width: 600px; /* Pour éviter qu'il devienne trop large sur grands écrans */
-    padding: 25px;
-    background-color: var(--mat-sys-surface-container-low);
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    border: 1px solid var(--mat-sys-surface-container-high);
-
-    label {
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: var(--mat-sys-secondary);
-      text-align: justify;
+  
+    mat-icon {
+      font-size: 20px;
+    }
+  
+    .mat-tree-node {
+      padding: 6px 8px;
+    }
+  
+    .mat-tree-node[mat-tree-node-toggle] {
+      font-weight: 600;
+    }
   }
 
-  form{
-    margin-block: 20px;
+  section{
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 20px;
+    margin: 15px;
+    width: auto;
+  }
+
+  .entite-container{
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    padding: 2%;
+    width: 90%;
+    gap: 20px;
   }
   
-  button {
 
-    margin-top: 20px;
-    padding: 12px;
+  button.add {
+    padding: 10px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
     transition: 0.3s;
-}
-a {
-  display: block;
-  margin-top: 10px;
-  color: var(--mat-sys-on-primary-container);
-  cursor: pointer;
-  text-decoration: none;
-}
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-a:hover {
-  text-decoration: underline;
-}
-}
+  app-go-back {
+    width: 100%;
+  }
 
-mat-chip-set{
-    margin-top: 20px;
-}
 
-section{
-    height: 80vh;
-}
