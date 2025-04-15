@@ -1,138 +1,3 @@
-// .incident-card,
-// .impact-card,
-// .process-card,
-// .entities-card,
-// .state-card {
-//   margin: 20px 20px;
-//   // padding: 15px;
-// }
-
-// .incident-info,
-// .impact-info,
-// .processus-info,
-// .entity-info {
-//   display: flex;
-//   flex-direction: row;
-//   gap: 5px;
-// }
-
-// .incident-info mat-grid-list {
-//   margin-top: 20px;
-// }
-
-// .incident-detail {
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: space-between;
-//   margin-bottom: 10px;
-// }
-
-// .detail-label {
-//   font-weight: bold;
-//   color: #1976d2;
-// }
-
-// .detail-value {
-//   font-size: 14px;
-//   color: #424242;
-// }
-
-// mat-list-item {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-// }
-
-// .incident-state {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   margin-top: 15px;
-// }
-
-// .impacts-container {
-//   display: flex;
-//   justify-content: left;
-//   row-gap: 20px;
-//   column-gap: 5%;
-//   flex-wrap: wrap;
-
-//   app-impact-card {
-//     min-width: 180px;
-//     width: 21.2%;
-//   }
-// }
-
-// button {
-
-//   padding: 8px 10px;
-//   background-color: var(--mat-sys-primary-container);
-//   color: var(--mat-sys-surface-tint);
-//   border: none;
-//   border-radius: 5px;
-//   cursor: pointer;
-//   font-size: 16px;
-//   transition: 0.3s;
-
-//   &.add {
-//     margin-block: 20px;
-//     display: flex;
-//     align-items: center;
-//     gap: 5px;
-//   }
-
-//   &:hover {
-//     background-color: var(--mat-sys-surface-tint);
-//     color: var(--mat-sys-primary-container);
-//   }
-
-//   &:disabled {
-//     background-color: #ccc;
-//     color: #e0e0e0;
-//     cursor: not-allowed;
-//   }
-// }
-
-// .full-width {
-//   width: 50%;
-// }
-
-// ::ng-deep .mat-mdc-card-header-text {
-//   width: 100%;
-// }
-
-// mat-card-title {
-//   display: flex;
-//   justify-content: space-between;
-// }
-
-// .date-info{
-//   margin-top: 20px;
-//   display: flex;
-//   justify-content: flex-start;
-//   gap: 30px;
-//   align-items: center;
-//   margin-bottom: 15px;
-// }
-
-// mat-form-field {
-//   width: 100%;
-//   margin-bottom: 10px;
-// }
-
-// .full-width {
-//   width: 100%;
-// }
-
-// button {
-//   background-color: #1976d2;
-//   color: white;
-// }
-
-// button:hover {
-//   background-color: #1565c0;
-// }
-
 mat-card {
   margin: 20px 20px;
   border-radius: 8px;
@@ -164,13 +29,23 @@ mat-card {
   margin-top: 20px;
 }
 
-.incident-detail {
+.global-info{
   display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
+  flex-direction: row;
+  gap : 20px;
 }
 
+.info {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
 
+.dates {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
 
 
 mat-list-item {
@@ -193,8 +68,8 @@ mat-list-item {
 .impacts-container {
   display: flex;
   justify-content: flex-start;
-  flex-wrap: wrap;
   gap: 20px;
+  overflow-x: auto;
 }
 
 app-impact-card {
@@ -298,5 +173,17 @@ mat-card-content {
   app-impact-card {
     width: 100%;
     margin-bottom: 20px;
+  }
+}
+
+.info-container{
+  display: flex;
+  min-height: 90vh;
+  mat-card {
+    flex : 1;
+  }
+  >div{
+    flex : 1;
+    min-height: 90vh;
   }
 }
