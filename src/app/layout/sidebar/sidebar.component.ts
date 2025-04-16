@@ -12,12 +12,15 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { IncidentService } from '../../core/services/incident/incident.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HasPermissionDirective } from '../../core/directives/has-permission.directive';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   standalone: true,
-  imports: [MatSidenavModule,
+  imports: [
+    HasPermissionDirective,
+    MatSidenavModule,
     MatListModule,
     MatIconModule,
     MatButtonModule,

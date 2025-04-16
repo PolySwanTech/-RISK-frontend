@@ -59,7 +59,6 @@ export class CreateComponent implements OnInit {
     commentaire: ['', Validators.required],
     cause: ['', Validators.required],
     equipeId: [''],
-    equipeName: ['']
   });
 
   incidentForm2 = this._formBuilder.group({
@@ -103,7 +102,6 @@ export class CreateComponent implements OnInit {
     const teamName = this.getUserTeamFromToken();
     if (teamName) {
       this.hasTeam = true;
-      this.incidentForm1.get('equipeName')?.setValue(teamName);
     } else {
       this.hasTeam = false;
       this.fetchTeams();
@@ -173,7 +171,6 @@ export class CreateComponent implements OnInit {
       files: this.incidentForm3.value.files,
       process: this.incidentForm3.value.process,
       equipeId: this.incidentForm1.value.equipeId,
-      equipeName: this.incidentForm1.value.equipeName,
     };
     return incident;
   }
