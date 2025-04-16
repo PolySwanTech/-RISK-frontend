@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ImpactCardComponent } from '../impact-card/impact-card.component';
@@ -34,7 +34,8 @@ export class ViewComponent {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService)
-
+  private router = inject(Router);
+  
   incident: Incident | undefined
   prevCommentaire: string = ''
   totalAmount = 0
@@ -119,6 +120,10 @@ export class ViewComponent {
         }
       )
     }
+  }
+
+  accessSuivi(){
+    this.router.navigate(['incident', this.incident?.id, 'suivi'])
   }
 
   close() {

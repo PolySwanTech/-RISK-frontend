@@ -4,22 +4,6 @@
         [currentPageName]="`Détails de l'incident - ` + incident.titre"></app-go-back>
 
     <div class="info-container">
-        <!-- <mat-card class="incident-card">
-            <mat-card-header>
-                <mat-card-title>
-                    <span>Détails de l'incident - <strong>{{ incident.titre }}</strong> - Status : <strong>{{
-                            incident.state }}</strong>
-                    </span>
-                    @if(isNotClosed()){
-                    <button (click)="close()">Cloturer</button>
-                    }
-                </mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-                <div class="incident-info">
-                </div>
-            </mat-card-content>
-        </mat-card> -->
         <mat-card class="incident-card">
             <mat-card-header>
                 <mat-card-title>
@@ -84,7 +68,7 @@
         <mat-card class="state-card">
             <mat-card-header>
                 <mat-card-title><span>Suivi</span> <button
-                        (click)="updateCommentaire()">Accéder</button></mat-card-title>
+                        (click)="accessSuivi()">Accéder</button></mat-card-title>
             </mat-card-header>
             <mat-card-content>
 
