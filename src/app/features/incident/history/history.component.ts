@@ -15,8 +15,7 @@ import { SnapshotDialogComponent } from '../snapshot-dialog/snapshot-dialog.comp
     CommonModule,
     MatCardModule,
     MatButtonModule,
-    MatIconModule,
-    SnapshotDialogComponent
+    MatIconModule
   ],
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss']

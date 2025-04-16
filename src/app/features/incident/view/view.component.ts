@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ImpactCardComponent } from '../impact-card/impact-card.component';
@@ -16,7 +16,6 @@ import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
 import { TeamMemberService } from '../../../core/services/team/team-member.service';
-import { Router } from '@angular/router';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CurrencyPipe } from '@angular/common';
 
@@ -157,6 +156,10 @@ export class ViewComponent {
         });
       }
     }
+  }
+
+  accessSuivi(){
+    this.router.navigate(['incident', this.incident?.id, 'suivi'])
   }
 
   close(): void {

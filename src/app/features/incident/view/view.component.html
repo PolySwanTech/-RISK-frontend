@@ -11,51 +11,99 @@
                 @if(canClose && isNotClosed()){
                 <button (click)="close()">Cloturer</button>
                 }
-                <button (click)="goToHistory()">Historique</button>
+                <!-- <button (click)="goToHistory()">Historique</button> -->
             </mat-card-title>
         </mat-card-header>
-        <mat-card-content>
-            <div class="incident-info">
-            </div>
-        </mat-card-content>
     </mat-card>
 
-    <mat-card class="incident-card">
-        <mat-card-header>
-            <mat-card-title>
-                <span>Info globale</span>
-            </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <div class="date-info">
-                <span>Ref : {{ incident.id }}</span>
-            </div>
-            
-            <div class="incident-details">
-                <mat-form-field class="full-width">
-                    <mat-label>Location</mat-label>
-                    <input matInput [value]="incident.location" readonly>
-                </mat-form-field>
+    <div class="info-container">
+        <mat-card class="incident-card">
+            <mat-card-header>
+                <mat-card-title>
+                    <span>Info globale</span>
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div>
+                    <div class="global-info">
+                        <div class="info">
+                            <mat-form-field class="full-width">
+                                <mat-label>Location</mat-label>
+                                <input matInput [value]="incident.location" readonly>
+                            </mat-form-field>
+        
+                            <mat-form-field class="full-width">
+                                <mat-label>Cause</mat-label>
+                                <input matInput [value]="incident.cause.name" readonly>
+                            </mat-form-field>
+        
+                            <mat-form-field class="full-width">
+                                <mat-label>Type de risque</mat-label>
+                                <input matInput [value]="incident.risk.balois" readonly>
+                            </mat-form-field>
+        
+                            <mat-form-field class="full-width">
+                                <mat-label>Sous Catégorie de risque</mat-label>
+                                <input matInput [value]="incident.subRisk.balois" readonly>
+                            </mat-form-field>
+                        </div>
+                        <div class="dates">
+                            <mat-form-field class="full-width">
+                                <mat-label>Date de déclaration</mat-label>
+                                <input matInput [value]="formatDate(incident.declaredAt)" readonly>
+                            </mat-form-field>
+        
+                            <mat-form-field class="full-width">
+                                <mat-label>Date de survenance</mat-label>
+                                <input matInput [value]="formatDate(incident.survenueAt)" readonly>
+                            </mat-form-field>
+        
+                            <mat-form-field class="full-width">
+                                <mat-label>Date de détection</mat-label>
+                                <input matInput [value]="formatDate(incident.detectedAt)" readonly>
+                            </mat-form-field>
+                            @if(incident.closedAt){
+                            <mat-form-field class="full-width">
+                                <mat-label>Date de clôture</mat-label>
+                                <input matInput [value]="formatDate(incident.closedAt)" readonly>
+                            </mat-form-field>
+                            }
+                        </div>
+                    </div>
+                    <mat-form-field>
+                        <mat-label>Description de l'incident</mat-label>
+                        <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="incident.comments"
+                            readonly></textarea>
+                    </mat-form-field>
+                </div>
+            </mat-card-content>
+        </mat-card>
+        <mat-card class="state-card">
+            <mat-card-header>
+                <mat-card-title><span>Suivi</span> <button
+                        (click)="accessSuivi()">Accéder</button></mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
 
-                <mat-form-field class="full-width">
-                    <mat-label>Cause</mat-label>
-                    <input matInput [value]="incident.cause.name" readonly>
-                </mat-form-field>
-
-                <mat-form-field class="full-width">
-                    <mat-label>Type de risque</mat-label>
-                    <input matInput [value]="incident.risk.balois" readonly>
-                </mat-form-field>
-
-                <mat-form-field class="full-width">
-                    <mat-label>Sous Catégorie de risque</mat-label>
-                    <input matInput [value]="incident.subRisk.balois" readonly>
-                </mat-form-field>
-            </div>
-        </mat-card-content>
-    </mat-card>
-
-    <mat-card class="impact-card">
+                <div style="text-align: end;">
+                    <mat-form-field>
+                        <mat-label>Message</mat-label>
+                        <textarea matInput name="incident-com" id="commentaire"></textarea>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Message</mat-label>
+                        <textarea matInput name="incident-com" id="commentaire"></textarea>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Message</mat-label>
+                        <textarea matInput name="incident-com" id="commentaire"></textarea>
+                    </mat-form-field>
+                    <button (click)="updateCommentaire()">Envoyer</button>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <mat-card>
         <mat-card-header>
             <mat-card-title>
                 <span>Impacts -
@@ -63,72 +111,19 @@
                         Total : {{ totalAmount | currency : 'EUR' }}
                     </strong>
                 </span>
-            </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            @if(isNotClosed()){
-            <button class="add" color="primary" (click)="addImpact()">
-                <mat-icon>add</mat-icon>
-                Ajouter
-            </button>
-            }
-            <mat-list class="impacts-list">
-                <div class="impacts-container">
-                    @for(impact of incident.impacts; track impact){
-                    <app-impact-card [impact]="impact"></app-impact-card>
-                    }
-                </div>
-            </mat-list>
-        </mat-card-content>
-    </mat-card>
-
-    <mat-card class="incident-card">
-        <mat-card-header>
-            <mat-card-title>
-                <span>Date
-                </span>
-            </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <div class="date-info">
-                <mat-form-field>
-                    <mat-label>Date de déclaration</mat-label>
-                    <input matInput [value]="formatDate(incident.declaredAt)" readonly>
-                </mat-form-field>
-
-                <mat-form-field>
-                    <mat-label>Date de survenance</mat-label>
-                    <input matInput [value]="formatDate(incident.survenueAt)" readonly>
-                </mat-form-field>
-
-                <mat-form-field>
-                    <mat-label>Date de détection</mat-label>
-                    <input matInput [value]="formatDate(incident.detectedAt)" readonly>
-                </mat-form-field>
-                @if(incident.closedAt){
-                <mat-form-field>
-                    <mat-label>Date de clôture</mat-label>
-                    <input matInput [value]="formatDate(incident.closedAt)" readonly>
-                </mat-form-field>
+                @if(isNotClosed()){
+                <button class="add" color="primary" (click)="addImpact()">
+                    Ajouter
+                    <mat-icon>add</mat-icon>
+                </button>
                 }
-            </div>
-        </mat-card-content>
-    </mat-card>
-
-    <mat-card class="state-card">
-        <mat-card-header>
-            <mat-card-title><span>Descriptions</span></mat-card-title>
+            </mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            <div class="incident-state">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Description</mat-label>
-                    <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="incident.comments"></textarea>
-                </mat-form-field>
-
-            </div>
-            <div style="text-align: end;">
-                <button [disabled]="noChange()" (click)="updateCommentaire()">Mettre à jour</button>
+            <div class="impacts-container">
+                @for(impact of incident.impacts; track impact){
+                <app-impact-card [impact]="impact"></app-impact-card>
+                }
             </div>
         </mat-card-content>
     </mat-card>
