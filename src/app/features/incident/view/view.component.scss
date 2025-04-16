@@ -2,7 +2,6 @@ mat-card {
   margin: 20px 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
   padding: 20px;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
@@ -85,6 +84,8 @@ button {
   cursor: pointer;
   font-size: 16px;
   transition: 0.3s;
+  position: relative;
+  bottom: 5px;
 }
 
 button.add {
@@ -108,7 +109,7 @@ mat-card-title {
   justify-content: space-between;
   align-items: center;
   font-size: 18px;
-  color: #333;
+  color: var(--mat-sys-on-primary-container);
   margin-bottom: 10px;
 }
 
@@ -127,6 +128,8 @@ mat-form-field {
 
 mat-form-field mat-label {
   font-weight: bold;
+  font-size: large;
+  color: var(--mat-sys-on-secondary-container);
 }
 
 mat-form-field input {
@@ -185,5 +188,39 @@ mat-card-content {
   >div{
     flex : 1;
     min-height: 90vh;
+  }
+}
+
+.comment-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--mdc-filled-text-field-container-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    .user-icon {
+      font-size: 1.5rem;
+      color: var(--box-background-color);
+      margin-right: 0.5rem;
+    }
+
+    .username {
+      font-weight: bold;
+      color: var(--mat-sys-on-primary-container);
+      font-size: 1.2rem;
+    }
+  }
+
+  .comment-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    white-space: pre-wrap;
   }
 }

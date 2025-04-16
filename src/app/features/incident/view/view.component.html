@@ -80,20 +80,27 @@
         </mat-card>
         <mat-card class="state-card">
             <mat-card-header>
-                <mat-card-title><span>Suivi</span> <button
-                        (click)="accessSuivi()">Accéder</button></mat-card-title>
+                <mat-card-title><span>Suivi</span> </mat-card-title>
+                <button
+                        (click)="accessSuivi()">Accéder</button>
             </mat-card-header>
             <mat-card-content>
 
-                <div style="text-align: end;">
-                    <mat-form-field>
-                        <mat-label>Message</mat-label>
-                        <textarea matInput name="incident-com" id="commentaire"></textarea>
-                    </mat-form-field>
-                    <mat-form-field>
-                        <mat-label>Message</mat-label>
-                        <textarea matInput name="incident-com" id="commentaire"></textarea>
-                    </mat-form-field>
+                <div>
+                    <div class="comment-card">
+                        <div class="comment-header">
+                          <mat-icon class="user-icon">person</mat-icon>
+                          <span class="username">Username le 12/12/2025</span>
+                        </div>
+                        <p class="comment-text">Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci </p>
+                    </div>
+                    <div class="comment-card">
+                        <div class="comment-header">
+                          <mat-icon class="user-icon">person</mat-icon>
+                          <span class="username">Username le 12/12/2025</span>
+                        </div>
+                        <p class="comment-text">Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci </p>
+                    </div>
                     <mat-form-field>
                         <mat-label>Message</mat-label>
                         <textarea matInput name="incident-com" id="commentaire"></textarea>

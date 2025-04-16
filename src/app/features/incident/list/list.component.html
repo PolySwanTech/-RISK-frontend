@@ -25,9 +25,10 @@
             </mat-select>
         </mat-form-field>
 
-        <div class="table-container">
+        <div>
             <button class="add-button" mat-raised-button (click)="add()"
                 *appHasPermission="'CREATE_INCIDENTS'"><mat-icon>add</mat-icon>Ajouter</button>
+                <div class="table-container">
             <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
                 @for (column of columns; track column) {
@@ -57,7 +58,7 @@
             <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[4, 10, 15]"
                 aria-label="Page selection pour le tableau" showFirstLastButtons>
             </mat-paginator>
-
+        </div>
         </div>
     </div>
 </div>
