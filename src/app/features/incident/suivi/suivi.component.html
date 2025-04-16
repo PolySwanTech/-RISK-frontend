@@ -6,3 +6,41 @@
 
     
 </div>
+
+<div class="timeline-container">
+    <h2>Historique de l'incident</h2>
+
+    <div *ngIf="history.length === 0" class="empty">
+        <mat-icon>history</mat-icon> Aucun historique disponible.
+    </div>
+
+    <div class="timeline">
+        <div class="timeline-item" *ngFor="let entry of history">
+            <div class="timeline-icon" [ngClass]="entry.action.toLowerCase()">
+                <mat-icon>
+                    {{
+                    entry.action === 'CREATION' ? 'add_circle' :
+                    entry.action === 'MODIFICATION' ? 'edit' :
+                    'delete'
+                    }}
+                </mat-icon>
+            </div>
+
+            <div class="timeline-content mat-elevation-z2">
+                <div class="header">
+                    <strong>{{ entry.action | titlecase }}</strong>
+                    <span class="meta">
+                        Par {{ entry.user.username }} le {{ entry.timestamp | date:'dd/MM/yyyy HH:mm' }}
+                    </span>
+                </div>
+
+                <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
+
+                <!-- <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
+                    (click)="openSnapshotDialog(entry)">
+                    <mat-icon>compare</mat-icon> Détails des changements
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>

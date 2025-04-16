@@ -18,6 +18,23 @@
         <input id="password" type="password" formControlName="password" placeholder="Mot de passe">
       </div>
 
+      <div class="form-group">
+        <label for="equipe">Équipe</label>
+        <select id="equipe" formControlName="equipeId">
+          <option *ngFor="let equipe of equipes" [value]="equipe.id">
+            {{ equipe.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Rôle</label>
+        <select id="role" formControlName="role">
+          <option value="MEMBRE">MEMBRE</option>
+          <option value="VALIDATEUR">VALIDATEUR</option>
+        </select>
+      </div>
+
       <button type="submit" [disabled]="userForm.invalid">Créer</button>
     </form>
   </div>

@@ -2,6 +2,19 @@
     @if(incident){
     <app-go-back previousPageName="Liste des incidents"
         [currentPageName]="`Détails de l'incident - ` + incident.titre"></app-go-back>
+    <mat-card class="incident-card">
+        <mat-card-header>
+            <mat-card-title>
+                <span>Détails de l'incident - <strong>{{ incident.titre }}</strong> - Status : <strong>{{
+                        incident.state }}</strong>
+                </span>
+                @if(canClose && isNotClosed()){
+                <button (click)="close()">Cloturer</button>
+                }
+                <!-- <button (click)="goToHistory()">Historique</button> -->
+            </mat-card-title>
+        </mat-card-header>
+    </mat-card>
 
     <div class="info-container">
         <mat-card class="incident-card">

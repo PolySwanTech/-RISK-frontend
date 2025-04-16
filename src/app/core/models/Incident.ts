@@ -30,9 +30,9 @@ export class Incident {
     process: Process;
     cause: Cause;
 
-    state: string;
-
+    state: State;
     comments: string;
+    equipeName?: string;
 
     constructor(
         id: string,
@@ -48,7 +48,9 @@ export class Incident {
         cause: Cause,
         impacts: Impact[],
         comments: string,
-        state : State
+        state: State = State.OPEN,
+        equipeName?: string
+        
     ) {
         this.id = id;
         this.titre = titre;
@@ -63,7 +65,9 @@ export class Incident {
         this.cause = cause;
         this.impacts = impacts;
         this.comments = comments;
-        this.state = state        
+        this.equipeName = equipeName;
+
+        this.state = closedAt ? State.CLOSED : state;        
     }
 
     

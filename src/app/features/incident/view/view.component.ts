@@ -15,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
+import { TeamMemberService } from '../../../core/services/team/team-member.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CurrencyPipe } from '@angular/common';
 
@@ -33,25 +34,60 @@ export class ViewComponent {
   private incidentService = inject(IncidentService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
-  private confirmService = inject(ConfirmService)
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
-  
+
   incident: Incident | undefined
   prevCommentaire: string = ''
-  totalAmount = 0
+  totalAmount = 0;
+  userRole: string | undefined;
+  userTeam: string | undefined;
+  canClose: boolean = false;
 
   ngOnInit(): void {
-    const id = this.route.snapshot.params['id'];
+    this.loadIncident();
+  }
 
+  loadIncident(): void {
+    const id = this.route.snapshot.params['id'];
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       console.log(incident)
       this.incident = incident;
-      this.prevCommentaire = this.incident.comments || ''
+      this.prevCommentaire = incident.comments || '';
+      this.extractTokenInfo();
+      this.checkCloseAuthorization();
     });
 
     this.incidentService.sum(id).subscribe(
       result => this.totalAmount = result
     )
+  }
+
+  extractTokenInfo(): void {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      console.warn("⛔ Aucun token trouvé");
+      return;
+    }
+
+    const base64Payload = token.split('.')[1];
+    const jsonPayload = new TextDecoder().decode(
+      Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
+    );
+    const payload = JSON.parse(jsonPayload);
+    this.userRole = payload.role;
+    this.userTeam = payload.team;
+  }
+
+  checkCloseAuthorization(): void {
+    const normalizedUserTeam = this.normalize(this.userTeam);
+    const normalizedIncidentTeam = this.normalize(this.incident?.equipeName);
+
+    this.canClose = this.userRole === 'VALIDATEUR' && normalizedUserTeam === normalizedIncidentTeam;
+  }
+
+  normalize(str?: string): string {
+    return str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() || '';
   }
 
   getState() {
@@ -110,15 +146,15 @@ export class ViewComponent {
     return false
   }
 
-  updateCommentaire() {
+  updateCommentaire(): void {
     if (this.incident) {
-      this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
-        _ => {
-          this.confirmService.openConfirmDialog("Mise à jour effectuée",
-            "Description mis à jour avec succès", false).subscribe();
+      const message = prompt("Entrez un message pour cette modification :", "Mise à jour du commentaire");
+      if (message) {
+        this.incidentService.updateCommentaire(this.incident.id, this.incident.comments, message).subscribe(() => {
+          alert("Commentaire mis à jour");
           this.ngOnInit();
-        }
-      )
+        });
+      }
     }
   }
 
@@ -126,14 +162,30 @@ export class ViewComponent {
     this.router.navigate(['incident', this.incident?.id, 'suivi'])
   }
 
-  close() {
+  close(): void {
     if (this.incident) {
-      this.incidentService.close(this.incident.id).subscribe(
-        _ => {
-          alert("incident cloturé")
+      this.incidentService.close(this.incident.id).subscribe({
+        next: () => {
+          alert("Incident clôturé avec succès !");
           this.ngOnInit();
+        },
+        error: (err) => {
+          if (err.status === 403) {
+            alert("⛔ Vous n’êtes pas autorisé à valider cet incident.");
+          } else {
+            alert("❌ Une erreur est survenue lors de la clôture de l’incident.");
+            console.error(err);
+          }
         }
-      )
+      });
     }
   }
+
+  goToHistory() {
+    const id = this.incident?.id;
+    if (id) {
+      this.router.navigate(['/incident', id, 'history']);
+    }
+  }
+
 }

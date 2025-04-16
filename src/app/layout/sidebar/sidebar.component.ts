@@ -10,8 +10,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { IncidentService } from '../../core/services/incident/incident.service';
-import { jwtDecode } from 'jwt-decode';
-
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
@@ -22,7 +22,8 @@ import { jwtDecode } from 'jwt-decode';
     MatIconModule,
     MatButtonModule,
     MatToolbarModule,
-    AsyncPipe,
+    AsyncPipe, CommonModule,
+    RouterModule,
     MatMenuModule, RouterLink, MatBadgeModule],
   styleUrls: ['./sidebar.component.scss']
 })

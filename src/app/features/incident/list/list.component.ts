@@ -18,6 +18,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
+import { AuthService } from '../../../core/services/auth/auth.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 
@@ -25,7 +27,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
   selector: 'app-list',
   standalone: true,
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule],
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   providers: [DatePipe]
@@ -67,8 +69,7 @@ export class ListComponent implements OnInit, AfterViewInit {
   <span class="badge ${incident.state.toLowerCase()}">
     ${State[incident.state.toString() as keyof typeof State] || 'Inconnu'}
   </span>
-`
-    }
+`    }
   ];
 
   displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];

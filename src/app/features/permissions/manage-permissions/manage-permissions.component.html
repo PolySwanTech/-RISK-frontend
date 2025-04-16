@@ -1,0 +1,58 @@
+<h2>Gestion des permissions</h2>
+
+<div class="container">
+  <div class="user-list" *ngIf="users && users.length > 0">
+    <mat-form-field class="full-width autocomplete-field">
+      <input
+        type="text"
+        matInput
+        placeholder="Collaborateurs"
+        [matAutocomplete]="auto"
+        [(ngModel)]="searchQuery"
+        (input)="filterBySearch()"
+        (focus)="filterBySearch()"
+        (keydown.enter)="filterBySearch()" />
+
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        [displayWith]="displayFn"
+        (optionSelected)="selectUser($event.option.value)">
+        <mat-option
+          *ngIf="filteredUsers.length === 0"
+          disabled
+          class="no-results">
+          Aucun utilisateur trouvé
+        </mat-option>
+        <mat-option
+          *ngFor="let user of filteredUsers"
+          [value]="user"
+          class="autocomplete-option">
+          {{ user.username }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+
+  <div class="permissions" *ngIf="selectedUser">
+    <mat-card class="permissions-card">
+      <mat-card-title>
+        Permissions de {{ selectedUser.username }}
+      </mat-card-title>
+      <mat-card-content>
+        <div class="permissions-list">
+          <mat-checkbox
+            *ngFor="let permission of permissions"
+            [checked]="hasPermission(permission.name)"
+            (change)="togglePermission(permission)">
+            {{ permission.description }}
+          </mat-checkbox>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="savePermissions()">
+          Valider
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
