@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { SnapshotDialogComponent } from '../snapshot-dialog/snapshot-dialog.component';
+import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
+import { SuiviIncident } from '../../../core/models/SuiviIncident';
 
 @Component({
   selector: 'app-history',
@@ -21,15 +23,13 @@ import { SnapshotDialogComponent } from '../snapshot-dialog/snapshot-dialog.comp
   styleUrls: ['./history.component.scss']
 })
 export class HistoryComponent implements OnInit {
-  history: any[] = [];
+  history: SuiviIncident[] = [];
   incidentId: string = '';
   isLoading: boolean = true;
 
-  constructor(
-    private route: ActivatedRoute,
-    private incidentService: IncidentService,
-    private dialog: MatDialog
-  ) { }
+  private route = inject(ActivatedRoute);
+  private suiviIncidentService = inject(SuiviIncidentService);
+  private dialog = inject(MatDialog)
 
   ngOnInit() {
     this.incidentId = this.route.snapshot.params['id'];
@@ -38,13 +38,9 @@ export class HistoryComponent implements OnInit {
 
   loadHistory() {
     this.isLoading = true;
-    this.incidentService.getIncidentHistory(this.incidentId).subscribe({
-      next: (data) => {
-        this.history = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error("❌ Erreur lors de la récupération de l'historique :", err);
+    this.suiviIncidentService.getSuiviIncidentById(this.incidentId).subscribe({
+      next: (suivi) => {
+        this.history = suivi;
         this.isLoading = false;
       }
     });
