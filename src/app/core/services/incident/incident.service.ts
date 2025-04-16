@@ -13,6 +13,7 @@ import { Process } from '../../models/Process';
   providedIn: 'root'
 })
 export class IncidentService {
+  
 
   baseUrl = environment.apiUrl
 

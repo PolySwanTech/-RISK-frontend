@@ -17,12 +17,14 @@ import { GoBackComponent } from "../../../shared/components/go-back/go-back.comp
 import { Impact } from '../../../core/models/Impact';
 import { TeamMemberService } from '../../../core/services/team/team-member.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
+import { SuiviIncident } from '../../../core/models/SuiviIncident';
 
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe,
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe, DatePipe,
     MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule, MatInputModule, GoBackComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss',
@@ -36,24 +38,26 @@ export class ViewComponent {
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
+  private suiviIncidentService = inject(SuiviIncidentService);
 
   incident: Incident | undefined
-  prevCommentaire: string = ''
   totalAmount = 0;
   userRole: string | undefined;
   userTeam: string | undefined;
   canClose: boolean = false;
+  message : string = "";
+  idIncident: string = "";
+  suivi: SuiviIncident[]  = []
 
   ngOnInit(): void {
-    this.loadIncident();
+    this.idIncident = this.route.snapshot.params['id'];
+    this.loadIncident(this.idIncident);
+    this.loadSuiviIncident(this.idIncident);
   }
 
-  loadIncident(): void {
-    const id = this.route.snapshot.params['id'];
+  loadIncident(id : string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
-      console.log(incident)
       this.incident = incident;
-      this.prevCommentaire = incident.comments || '';
       this.extractTokenInfo();
       this.checkCloseAuthorization();
     });
@@ -63,10 +67,23 @@ export class ViewComponent {
     )
   }
 
+  loadSuiviIncident(id: string): void {
+    this.suiviIncidentService.getSuiviIncidentById(id).subscribe(
+      {
+        next: (suivi) => {
+          this.suivi = suivi.splice(-2);
+        },
+        error: (error) => {
+          console.error("Erreur lors de la récupération des suivis d'incidents :", error);
+        }
+      }
+    ) 
+  }
+
   extractTokenInfo(): void {
     const token = sessionStorage.getItem('token');
     if (!token) {
-      console.warn("⛔ Aucun token trouvé");
+      console.warn("Aucun token trouvé");
       return;
     }
 
@@ -110,7 +127,6 @@ export class ViewComponent {
   }
 
   addImpact() {
-
     // Open the Impact Add dialog
     const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
       width: '400px', // You can adjust the dialog size as needed
@@ -130,13 +146,6 @@ export class ViewComponent {
         }
       }
     });
-  }
-
-  noChange() {
-    if (this.incident && this.incident.comments) {
-      return this.prevCommentaire === this.incident.comments
-    }
-    return true;
   }
 
   isNotClosed() {
@@ -162,29 +171,13 @@ export class ViewComponent {
     this.router.navigate(['incident', this.incident?.id, 'suivi'])
   }
 
-  close(): void {
-    if (this.incident) {
-      this.incidentService.close(this.incident.id).subscribe({
-        next: () => {
-          alert("Incident clôturé avec succès !");
-          this.ngOnInit();
-        },
-        error: (err) => {
-          if (err.status === 403) {
-            alert("⛔ Vous n’êtes pas autorisé à valider cet incident.");
-          } else {
-            alert("❌ Une erreur est survenue lors de la clôture de l’incident.");
-            console.error(err);
-          }
-        }
-      });
-    }
-  }
-
-  goToHistory() {
-    const id = this.incident?.id;
-    if (id) {
-      this.router.navigate(['/incident', id, 'history']);
+  sendMessage(){
+    if(this.incident){
+      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id).subscribe(
+        () => {
+          this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
+          this.loadSuiviIncident(this.idIncident);
+        });
     }
   }
 

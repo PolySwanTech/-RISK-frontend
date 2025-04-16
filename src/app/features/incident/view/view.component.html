@@ -2,20 +2,6 @@
     @if(incident){
     <app-go-back previousPageName="Liste des incidents"
         [currentPageName]="`Détails de l'incident - ` + incident.titre"></app-go-back>
-    <mat-card class="incident-card">
-        <mat-card-header>
-            <mat-card-title>
-                <span>Détails de l'incident - <strong>{{ incident.titre }}</strong> - Status : <strong>{{
-                        incident.state }}</strong>
-                </span>
-                @if(canClose && isNotClosed()){
-                <button (click)="close()">Cloturer</button>
-                }
-                <!-- <button (click)="goToHistory()">Historique</button> -->
-            </mat-card-title>
-        </mat-card-header>
-    </mat-card>
-
     <div class="info-container">
         <mat-card class="incident-card">
             <mat-card-header>
@@ -31,17 +17,17 @@
                                 <mat-label>Location</mat-label>
                                 <input matInput [value]="incident.location" readonly>
                             </mat-form-field>
-        
+
                             <mat-form-field class="full-width">
                                 <mat-label>Cause</mat-label>
                                 <input matInput [value]="incident.cause.name" readonly>
                             </mat-form-field>
-        
+
                             <mat-form-field class="full-width">
                                 <mat-label>Type de risque</mat-label>
                                 <input matInput [value]="incident.risk.balois" readonly>
                             </mat-form-field>
-        
+
                             <mat-form-field class="full-width">
                                 <mat-label>Sous Catégorie de risque</mat-label>
                                 <input matInput [value]="incident.subRisk.balois" readonly>
@@ -52,12 +38,12 @@
                                 <mat-label>Date de déclaration</mat-label>
                                 <input matInput [value]="formatDate(incident.declaredAt)" readonly>
                             </mat-form-field>
-        
+
                             <mat-form-field class="full-width">
                                 <mat-label>Date de survenance</mat-label>
                                 <input matInput [value]="formatDate(incident.survenueAt)" readonly>
                             </mat-form-field>
-        
+
                             <mat-form-field class="full-width">
                                 <mat-label>Date de détection</mat-label>
                                 <input matInput [value]="formatDate(incident.detectedAt)" readonly>
@@ -81,31 +67,25 @@
         <mat-card class="state-card">
             <mat-card-header>
                 <mat-card-title><span>Suivi</span> </mat-card-title>
-                <button
-                        (click)="accessSuivi()">Accéder</button>
+                <button (click)="accessSuivi()">Accéder</button>
             </mat-card-header>
             <mat-card-content>
 
                 <div>
+                    @for(s of suivi; track s.id){
                     <div class="comment-card">
                         <div class="comment-header">
-                          <mat-icon class="user-icon">person</mat-icon>
-                          <span class="username">Username le 12/12/2025</span>
+                            <mat-icon class="user-icon">person</mat-icon>
+                            <span class="username">Username le {{s.date | date : "dd/MM/yyyy"}}</span>
                         </div>
-                        <p class="comment-text">Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci </p>
+                        <p class="comment-text">{{s.content}}</p>
                     </div>
-                    <div class="comment-card">
-                        <div class="comment-header">
-                          <mat-icon class="user-icon">person</mat-icon>
-                          <span class="username">Username le 12/12/2025</span>
-                        </div>
-                        <p class="comment-text">Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci Ceci </p>
-                    </div>
+                    }
                     <mat-form-field>
                         <mat-label>Message</mat-label>
-                        <textarea matInput name="incident-com" id="commentaire"></textarea>
+                        <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
                     </mat-form-field>
-                    <button (click)="updateCommentaire()">Envoyer</button>
+                    <button (click)="sendMessage()">Envoyer</button>
                 </div>
             </mat-card-content>
         </mat-card>
