@@ -9,7 +9,7 @@ import { SuiviComponent } from './suivi/suivi.component';
 
 export const incidentRoute: Routes = [
   { path: '', component:  ListComponent},
-  { path: 'create', component: CreateComponent, canActivate: [PermissionGuard], data: { permission: PermissionEnum.CREATE_INCIDENTS } },
+  { path: 'create', component: CreateComponent, canActivate: [PermissionGuard], data: { permission: PermissionEnum.TEST2 } },
   { path: ':id', component:  ViewComponent},
   { path: ':id/history', component: HistoryComponent },
   { path: ':id/suivi', component:  SuiviComponent},

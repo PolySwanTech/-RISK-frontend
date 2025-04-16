@@ -91,6 +91,7 @@ export class ManagePermissionsComponent implements OnInit {
   }
 
   filterBySearch(): void {
+    console.log(this.searchQuery)
     if (!this.searchQuery) {
       this.filteredUsers = this.users;
     } else {
