@@ -20,57 +20,6 @@ mat-form-field {
     width: 250px;
 }
 
-.table-container{
-    width: 75%;
+table th:first-of-type{
+  width: 200px;
 }
-
-table {
-    min-width: 100%;
-    border-collapse: collapse;
-    background: var(--mat-sys-surface-container);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-
-    * {
-      color: var(--mat-sys-on-surface);
-    }
-
-    th {
-      background-color: var(--mat-sys-surface-tint);
-      color: var(--mat-sys-on-secondary);
-      font-weight: bold;
-      text-align: left;
-    }
-
-    td,
-    th {
-      padding: 12px;
-    }
-
-    tr:hover {
-      background: var(--mat-sys-surface-container-high);
-    }
-
-    .mat-select {
-      width: 100%;
-    }
-  }
-
-  .mat-elevation-z8 {
-    border-top-left-radius:8px ;
-    border-top-right-radius:8px ;
-    overflow: hidden;
-  }
-
-  mat-paginator {
-    background-color: var(--mat-sys-surface-container);
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-  }
-
-  td mat-icon{
-    color: var(--mat-sys-error) !important;
-  }
-
-  
-  
