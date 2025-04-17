@@ -13,7 +13,8 @@
 form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
+    padding-top: 10px;
 }
 
 .form-group {
@@ -21,13 +22,7 @@ form {
     flex-direction: column;
 }
 
-input,
-select {
-    padding: 8px;
-    font-size: 14px;
-}
-
-button {
-    align-self: flex-end;
-    padding: 8px 16px;
+.row-add{
+    display: flex;
+    gap: 7%;
 }

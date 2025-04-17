@@ -29,6 +29,7 @@ export class AuthService {
 
   decryptToken(){
     const token = sessionStorage.getItem('token');
+    console.log(jwtDecode(token ? token : ''))
     return jwtDecode(token ? token : '');
   }
 

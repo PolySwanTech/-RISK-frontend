@@ -23,6 +23,7 @@ import { Equipe, EquipeService } from '../../../../core/services/equipe/equipe.s
     MatDialogModule
   ],
   templateUrl: './update-user-pop-up.component.html',
+  styleUrls: ['./update-user-pop-up.component.scss'],
 })
 export class UpdateUserPopUpComponent implements OnInit {
   private fb = inject(FormBuilder);

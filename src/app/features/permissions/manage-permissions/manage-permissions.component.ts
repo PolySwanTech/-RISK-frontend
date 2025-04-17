@@ -35,7 +35,7 @@ export class ManagePermissionsComponent implements OnInit {
   permissions: Permission[] = [];
   selectedUser: Utilisateur | null = null;
 
-  searchQuery: string | null = null;
+  searchQuery: string | Utilisateur | null = null;
 
   constructor(
     private userService: UtilisateurService,
@@ -91,14 +91,21 @@ export class ManagePermissionsComponent implements OnInit {
   }
 
   filterBySearch(): void {
-    console.log(this.searchQuery)
+    console.log(this.searchQuery);
+  
     if (!this.searchQuery) {
       this.filteredUsers = this.users;
-    } else {
-      const query = this.searchQuery.toLowerCase();
+      return;
+    }
+  
+    if (typeof this.searchQuery === 'string') {
+      const query = this.searchQuery.toLowerCase().trim();
       this.filteredUsers = this.users.filter(user =>
-        user.username.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query)
+        user.username.toLowerCase().includes(query)
+      );
+    } else {
+      this.filteredUsers = this.users.filter(user =>
+        user.username === (this.searchQuery as Utilisateur)?.username ? (this.searchQuery as Utilisateur).username : ''
       );
     }
   }

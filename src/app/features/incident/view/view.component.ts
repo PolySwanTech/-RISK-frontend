@@ -44,6 +44,7 @@ export class ViewComponent {
   totalAmount = 0;
   userRole: string | undefined;
   userTeam: string | undefined;
+  userMail: string | undefined;
   canClose: boolean = false;
   message : string = "";
   idIncident: string = "";
@@ -71,7 +72,8 @@ export class ViewComponent {
     this.suiviIncidentService.getSuiviIncidentById(id).subscribe(
       {
         next: (suivi) => {
-          this.suivi = suivi.splice(-2);
+          this.suivi = suivi;
+          console.log(this.suivi)
         },
         error: (error) => {
           console.error("Erreur lors de la récupération des suivis d'incidents :", error);
@@ -94,6 +96,7 @@ export class ViewComponent {
     const payload = JSON.parse(jsonPayload);
     this.userRole = payload.role;
     this.userTeam = payload.team;
+    this.userMail = payload.sub;
   }
 
   checkCloseAuthorization(): void {
@@ -172,8 +175,8 @@ export class ViewComponent {
   }
 
   sendMessage(){
-    if(this.incident){
-      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id).subscribe(
+    if(this.incident && this.userMail){
+      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.userMail).subscribe(
         () => {
           this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
           this.loadSuiviIncident(this.idIncident);
