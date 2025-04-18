@@ -15,7 +15,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
-import { TeamMemberService } from '../../../core/services/team/team-member.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
@@ -44,7 +43,7 @@ export class ViewComponent {
   totalAmount = 0;
   userRole: string | undefined;
   userTeam: string | undefined;
-  userMail: string | undefined;
+  username: string | undefined;
   canClose: boolean = false;
   message : string = "";
   idIncident: string = "";
@@ -96,7 +95,7 @@ export class ViewComponent {
     const payload = JSON.parse(jsonPayload);
     this.userRole = payload.role;
     this.userTeam = payload.team;
-    this.userMail = payload.sub;
+    this.username = payload.username;
   }
 
   checkCloseAuthorization(): void {
@@ -175,8 +174,8 @@ export class ViewComponent {
   }
 
   sendMessage(){
-    if(this.incident && this.userMail){
-      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.userMail).subscribe(
+    if(this.incident && this.username){
+      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
         () => {
           this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
           this.loadSuiviIncident(this.idIncident);

@@ -3,8 +3,9 @@
     <mat-toolbar color="primary">
       <span>Risk View</span>
     </mat-toolbar>
-    @if(authService.isLogin$ | async){
+   
     <mat-nav-list>
+      @if(authService.isLogin$ | async){
       <ng-container *appHasPermission="'VIEW_DASHBOARD'">
         <a mat-list-item routerLink="/dashboard">
           <mat-icon>dashboard</mat-icon>
@@ -42,12 +43,23 @@
           <span>Gestion des permissions</span>
         </button>
       </mat-menu>
+    }
+      <a mat-list-item [matMenuTriggerFor]="langMenu">
+        <mat-icon>language</mat-icon>
+        <span>{{ 'LANGUAGE' | translate}}</span>
+      </a>
+      <mat-menu #langMenu="matMenu">
+        <button mat-menu-item (click)="changeLang('fr')"><span>🇫🇷 Français</span></button>
+        <button mat-menu-item (click)="changeLang('en')"><span>🇬🇧 English</span></button>
+      </mat-menu>
+      @if(authService.isLogin$ | async){
       <button class="deco" mat-list-item (click)="onLogout()">
         <mat-icon>logout</mat-icon>
         <span>Déconnexion</span>
       </button>
-    </mat-nav-list>
     }
+    </mat-nav-list>
+   
   </mat-drawer>
   <mat-drawer-content>
     <ng-content></ng-content>

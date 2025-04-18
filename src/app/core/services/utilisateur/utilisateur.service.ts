@@ -13,7 +13,7 @@ export class UtilisateurService {
 
   private readonly http: HttpClient = inject(HttpClient);
   
-  baseUrl = environment.apiUrl;
+  baseUrl = environment.apiUserUrl;
 
   constructor() { }
 

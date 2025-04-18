@@ -34,6 +34,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
     GoBackComponent,
     MatButtonModule,
     MatFormFieldModule,
+    MatSelectModule,
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
@@ -41,7 +42,6 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
     MatRadioModule,
     SelectUsersComponent,
     ButtonAddFileComponent,
-    MatSelectModule,
     NgIf, NgFor
   ],
   templateUrl: './create.component.html',
