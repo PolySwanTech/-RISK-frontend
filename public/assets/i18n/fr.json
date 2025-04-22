@@ -1,0 +1,14 @@
+{
+    "LANGUAGE": "Langue",
+    "LOGIN": {
+      "TITLE": "Connexion",
+      "USERNAME": "Nom d'utilisateur",
+      "PASSWORD": "Mot de passe",
+      "LOGIN_BUTTON": "Connexion",
+      "FORGOT_PASSWORD": "Mot de passe oublié ?",
+      "RESET_TITLE": "Réinitialisation du mot de passe",
+      "EMAIL": "Email",
+      "RESET_BUTTON": "Réinitialiser le mot de passe",
+      "CANCEL_BUTTON": "Annuler"
+    }
+  }

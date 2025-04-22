@@ -20,7 +20,7 @@ export class UtilisateurService {
   }    
 
   getUserProfiles(): Observable<UtilisateurProfil[]> {
-    return this.http.get<UtilisateurProfil[]>(this.baseUrl + '/user/profiles');
+    return this.http.get<UtilisateurProfil[]>(this.baseUrl + '/user');
   }  
 
   updateUserPermissions(userId: string, permissionIds: string[]) {

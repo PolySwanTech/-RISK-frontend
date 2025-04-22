@@ -7,11 +7,17 @@ import { Right, Utilisateur } from '../../../../core/models/Utilisateur';
 import { CategorySelectionComponent } from '../../../../shared/components/category-selection/category-selection.component';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { Equipe, EquipeService } from '../../../../core/services/equipe/equipe.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-create-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule],
+  imports: [CommonModule, ReactiveFormsModule, MatDialogModule,
+      MatFormFieldModule,
+      MatInputModule,
+      MatSelectModule],
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss']
 })

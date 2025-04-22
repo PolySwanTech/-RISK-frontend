@@ -20,6 +20,8 @@
     "@angular/platform-browser": "^19.1.0",
     "@angular/platform-browser-dynamic": "^19.1.0",
     "@angular/router": "^19.1.0",
+    "@ngx-translate/core": "^16.0.4",
+    "@ngx-translate/http-loader": "^16.0.1",
     "angular-datatables": "^19.0.0",
     "chart.js": "^3.9.1",
     "datatables.net": "^2.2.2",

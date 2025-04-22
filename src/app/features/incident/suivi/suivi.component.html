@@ -1,14 +1,12 @@
+@if(incident){
 <div style="margin: 15px;">
-    @if(incident){
         <app-go-back previousPageName="Détails de l'incident"
                 [currentPageName]="`Suivi de l'incident - ` + incident.titre"></app-go-back>
-    }
-
-    
+   
 </div>
 
 <div class="timeline-container">
-    <h2>Historique de l'incident</h2>
+    <h2>Historique de l'incident : {{incident.titre}}</h2>
 
     <div *ngIf="history.length === 0" class="empty">
         <mat-icon>history</mat-icon> Aucun historique disponible.
@@ -30,7 +28,7 @@
                 <div class="header">
                     <strong>{{ entry.action | titlecase }}</strong>
                     <span class="meta">
-                        Par {{ entry.user.username }} le {{ entry.timestamp | date:'dd/MM/yyyy HH:mm' }}
+                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
                     </span>
                 </div>
 
@@ -43,4 +41,5 @@
             </div>
         </div>
     </div>
-</div>
+</div> 
+}
