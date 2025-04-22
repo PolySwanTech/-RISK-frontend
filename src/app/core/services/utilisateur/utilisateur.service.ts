@@ -13,13 +13,7 @@ export class UtilisateurService {
 
   private readonly http: HttpClient = inject(HttpClient);
   
-  baseUrl = environment.apiUrl;
-
-  constructor() { }
-
-  getPosts(): Observable<any> {
-    return this.http.get(this.baseUrl + '/posts');
-  }
+  baseUrl = environment.apiUserUrl;
 
   getUsers(): Observable<Utilisateur[]> {
     return this.http.get<Utilisateur[]>(this.baseUrl + '/user');

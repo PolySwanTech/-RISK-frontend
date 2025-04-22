@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -13,15 +13,15 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 })
 export class LoginComponent {
 
+  private authService = inject(AuthService);
+  private fb = inject(FormBuilder);
+
   loginForm: FormGroup;
   resetMdpForm: FormGroup;
   isForgotPassword: boolean = false;
   errorMessage: string = '';
 
-  constructor(
-    private authService: AuthService,
-    private fb: FormBuilder,
-    private router: Router) {
+  constructor() {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
