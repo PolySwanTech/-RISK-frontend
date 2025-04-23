@@ -1,4 +1,4 @@
-<div class="timeline-container">
+<!-- <div class="timeline-container">
     <h2>Historique de l'incident</h2>
 
     <div *ngIf="history.length === 0" class="empty">
@@ -19,14 +19,20 @@
                     </span>
                 </div>
 
+                <div *ngIf="entry.content.includes('Impact ajouté')">
+                    <p class="impact-summary">
+                        {{ getImpactSummary(entry.content) }}
+                    </p>
+                </div>
+
                 <p class="comment">{{ entry.content }}</p>
 
-                <!-- <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
+                <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
                         (click)="openSnapshotDialog(entry)">
                         <mat-icon>compare</mat-icon> Détails des changements
-                    </button> -->
+                    </button>
             </div>
         </div>
         }
     </div>
-</div>
+</div> -->

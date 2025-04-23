@@ -88,14 +88,6 @@ export class IncidentService {
     return this.http.post<string>(`${this.baseUrl}/incidents`, incident);
   }
 
-  updateCommentaire(id: string, commentaire: string, message: string) {
-    console.log(id, commentaire)
-    return this.http.put(this.baseUrl + `/incidents/${id}/commentaire`, {
-      commentaire,
-      message
-    });
-  }
-
   draftIncident(incident: any): Observable<string> {
     return this.http.post<string>(`${this.baseUrl}/incidents/draft`, incident);
   }

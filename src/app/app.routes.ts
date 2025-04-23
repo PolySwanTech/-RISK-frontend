@@ -14,7 +14,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },
-  { path: 'incident', children: incidentRoute, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionEnum.TEST2 } },
+  { path: 'incident', children: incidentRoute, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionEnum.VIEW_INCIDENTS } },
   { path: 'reglages', children: reglagesRoute, canActivate: [AuthGuard] },
   { path: 'permissions', children: permissionRoutes, canActivate: [AuthGuard] },
 

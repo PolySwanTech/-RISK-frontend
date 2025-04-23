@@ -102,6 +102,12 @@ $light-gray: #f5f7fa;
                     color: $text-primary;
                 }
 
+                .impact-summary {
+                    font-style: italic;
+                    color: #666;
+                    margin-bottom: 8px;
+                }
+                
                 button {
                     font-size: 13px;
                     color: $accent-color;

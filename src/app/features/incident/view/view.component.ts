@@ -155,18 +155,6 @@ export class ViewComponent {
     return false
   }
 
-  updateCommentaire(): void {
-    if (this.incident) {
-      const message = prompt("Entrez un message pour cette modification :", "Mise à jour du commentaire");
-      if (message) {
-        this.incidentService.updateCommentaire(this.incident.id, this.incident.comments, message).subscribe(() => {
-          alert("Commentaire mis à jour");
-          this.ngOnInit();
-        });
-      }
-    }
-  }
-
   accessSuivi(){
     this.router.navigate(['incident', this.incident?.id, 'suivi'])
   }

@@ -9,7 +9,7 @@
           <mat-icon>dashboard</mat-icon>
           <span>Tableau de bord</span>
         </a>      
-        <ng-container *appHasPermission="'TEST2'">
+        <ng-container *appHasPermission="'VIEW_INCIDENTS'">
           <a mat-list-item routerLink="/incident">
             <mat-icon>warning</mat-icon>
             <span [matBadge]="unreadIncidents > 0 ? unreadIncidents : null"
