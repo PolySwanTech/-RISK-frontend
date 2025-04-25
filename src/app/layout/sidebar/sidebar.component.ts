@@ -13,6 +13,9 @@ import { IncidentService } from '../../core/services/incident/incident.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HasPermissionDirective } from '../../core/directives/has-permission.directive';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-sidebar',
@@ -26,8 +29,11 @@ import { HasPermissionDirective } from '../../core/directives/has-permission.dir
     MatButtonModule,
     MatToolbarModule,
     AsyncPipe, CommonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+
     RouterModule,
-    MatMenuModule, RouterLink, MatBadgeModule],
+    MatMenuModule, RouterLink, MatBadgeModule, TranslateModule],
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
@@ -38,19 +44,31 @@ export class SidebarComponent implements OnInit {
 
   storageSubscription: any;
 
-  constructor(private router: Router, public authService : AuthService, private incidentService : IncidentService) { }
+  constructor(private router: Router, public authService: AuthService,
+    private incidentService: IncidentService, private translate: TranslateService) {
+    const browserLang = navigator.language.split('-')[0];
+    const supportedLangs = ['en', 'fr'];
+    const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'fr';
+
+    translate.setDefaultLang('fr');
+    translate.use(defaultLang);
+  }
 
   ngOnInit(): void {
     this.updateLoginStatus();
     const token = this.authService.decryptToken();
     setTimeout(() => {
-      if(!this.authService.isTokenExpired(token)){
+      if (!this.authService.isTokenExpired(token)) {
         this.incidentService.countIncidentsNonClotures().subscribe(resp => {
           this.unreadIncidents = resp;
-         })
+        })
       }
     }, 1000)
-    
+
+  }
+
+  changeLang(lang: any) {
+    this.translate.use(lang ? lang : 'fr');
   }
 
   // Method to update login status

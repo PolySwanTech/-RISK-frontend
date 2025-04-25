@@ -19,10 +19,10 @@ export class SuiviIncidentService {
   }
   
 
-  addSuiviIncident(content: string, incidentId: string) {
+  addSuiviIncident(content: string, incidentId: string, username: string) {
     let params = new HttpParams();
     params = params.append('incidentId', incidentId);
-    return this.http.post<SuiviIncident>(this.base, content, {params: params});
+    return this.http.post<SuiviIncident>(this.base, {content : content, username : username}, {params: params});
   }
 
 }

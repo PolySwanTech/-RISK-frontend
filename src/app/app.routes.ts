@@ -11,7 +11,7 @@ import { permissionRoutes } from './features/permissions/permissions.routes';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
-  { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionEnum.VIEW_DASHBOARD } },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },
   { path: 'incident', children: incidentRoute, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionEnum.VIEW_INCIDENTS } },

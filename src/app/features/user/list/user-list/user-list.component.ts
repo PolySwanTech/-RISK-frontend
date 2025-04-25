@@ -10,6 +10,7 @@ import { UtilisateurProfil } from '../../../../core/models/UtilisateurProfil';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateUserPopUpComponent } from '../../update/update-user-pop-up/update-user-pop-up.component';
 import { CreateUserComponent } from '../../create/create-user/create-user.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-user-list',
@@ -19,7 +20,8 @@ import { CreateUserComponent } from '../../create/create-user/create-user.compon
   imports: [
     MatTableModule,
     MatPaginatorModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonModule
   ]
 })
 export class UserListComponent implements OnInit, AfterViewInit {
@@ -39,6 +41,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   loadUsers(): void {
     this.userService.getUserProfiles().subscribe(users => {
       this.dataSource.data = users;
+      console.log(users)
     });
   }
 

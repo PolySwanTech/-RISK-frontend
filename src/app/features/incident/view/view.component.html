@@ -71,12 +71,17 @@
             </mat-card-header>
             <mat-card-content>
 
-                <div>
+                <div class="comment-section">
+                    <div class="comment-header-bar">
+                      <span>Messages les plus récents</span>
+                    </div>
                     @for(s of suivi; track s.id){
                     <div class="comment-card">
                         <div class="comment-header">
                             <mat-icon class="user-icon">person</mat-icon>
-                            <span class="username">Username le {{s.date | date : "dd/MM/yyyy"}}</span>
+                            <span class="username">
+                                {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
+                              </span>
                         </div>
                         <p class="comment-text">{{s.content}}</p>
                     </div>
@@ -90,7 +95,7 @@
             </mat-card-content>
         </mat-card>
     </div>
-    <mat-card>
+    <mat-card class="state-card">
         <mat-card-header>
             <mat-card-title>
                 <span>Impacts -

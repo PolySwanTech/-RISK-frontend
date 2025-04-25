@@ -13,28 +13,22 @@ export class UtilisateurService {
 
   private readonly http: HttpClient = inject(HttpClient);
   
-  baseUrl = environment.apiUrl;
-
-  constructor() { }
-
-  getPosts(): Observable<any> {
-    return this.http.get(this.baseUrl + '/posts');
-  }
+  baseUrl = environment.apiUserUrl + '/user';
 
   getUsers(): Observable<Utilisateur[]> {
-    return this.http.get<Utilisateur[]>(this.baseUrl + '/user');
+    return this.http.get<Utilisateur[]>(this.baseUrl);
   }    
 
   getUserProfiles(): Observable<UtilisateurProfil[]> {
-    return this.http.get<UtilisateurProfil[]>(this.baseUrl + '/user/profiles');
+    return this.http.get<UtilisateurProfil[]>(this.baseUrl);
   }  
 
   updateUserPermissions(userId: string, permissionIds: string[]) {
-    return this.http.put(`${this.baseUrl}/user/${userId}/permissions`, permissionIds);
+    return this.http.put(`${this.baseUrl}/${userId}/permissions`, permissionIds);
   }
 
   updateUser(userId: string, payload: any) {
-    return this.http.put(`${this.baseUrl}/user/${userId}`, payload);
+    return this.http.put(`${this.baseUrl}/${userId}`, payload);
   }  
   
 }

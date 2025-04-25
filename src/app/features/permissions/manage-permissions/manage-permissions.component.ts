@@ -35,12 +35,20 @@ export class ManagePermissionsComponent implements OnInit {
   permissions: Permission[] = [];
   selectedUser: Utilisateur | null = null;
 
-  searchQuery: string | null = null;
+  permissionDescriptions: Map<string, string> = new Map([
+    ['VIEW_INCIDENTS', 'Voir les incidents'],
+    ['CREATE_INCIDENTS', 'Créer des incidents'],
+    ['VIEW_DASHBOARD', 'Accéder au tableau de bord'],
+    ['MANAGE_SETTINGS', 'Gérer les paramètres'],
+    ['MANAGE_USERS', 'Gérer les utilisateurs']
+  ]);
+
+  searchQuery: string | Utilisateur | null = null;
 
   constructor(
     private userService: UtilisateurService,
     private permissionService: PermissionService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -55,35 +63,76 @@ export class ManagePermissionsComponent implements OnInit {
   }
 
   loadPermissions(): void {
-    this.permissionService.getPermissions().subscribe(permissions => {
-      this.permissions = permissions;
+    this.permissionService.getPermissions().subscribe(permissionNames => {
+      this.permissions = permissionNames.map(permName => {
+        const name = typeof permName === 'string' ? permName : permName.name;
+        return {
+          id: name,
+          name: name,
+          description: this.permissionDescriptions.get(name) || name
+        };
+      });
     });
   }
 
   selectUser(user: Utilisateur): void {
     this.selectedUser = user;
+    if (this.selectedUser && this.selectedUser.permissions) {
+      this.selectedUser.permissions = this.selectedUser.permissions.map(perm => {
+        if (typeof perm === 'string') {
+          return {
+            id: perm,
+            name: perm,
+            description: this.permissionDescriptions.get(perm) || perm
+          };
+        }
+        return perm;
+      });
+    }
   }
 
   hasPermission(permissionName: string): boolean {
-    return this.selectedUser?.permissions?.some(p => p.name === permissionName) || false;
+    if (!this.selectedUser || !this.selectedUser.permissions) return false;
+
+    return this.selectedUser.permissions.some(p => {
+      if (typeof p === 'string') {
+        return p === permissionName;
+      }
+      return p.name === permissionName;
+    });
   }
 
   togglePermission(permission: Permission): void {
     if (!this.selectedUser) return;
 
+    if (!this.selectedUser.permissions) {
+      this.selectedUser.permissions = [];
+    }
+
     const alreadyHas = this.hasPermission(permission.name);
 
     if (alreadyHas) {
-      this.selectedUser.permissions = this.selectedUser.permissions.filter(p => p.name !== permission.name);
+      this.selectedUser.permissions = this.selectedUser.permissions.filter(p => {
+        if (typeof p === 'string') {
+          return p !== permission.name;
+        }
+        return p.name !== permission.name;
+      });
     } else {
-      this.selectedUser.permissions.push(permission);
+      this.selectedUser.permissions.push({
+        id: permission.id,
+        name: permission.name,
+        description: permission.description
+      });
     }
   }
 
   savePermissions(): void {
     if (!this.selectedUser) return;
 
-    const permissionIds: string[] = this.selectedUser.permissions.map(p => p.id.toString());
+    const permissionIds: string[] = this.selectedUser.permissions.map(p =>
+      typeof p === 'string' ? p : p.name
+    );
 
     this.userService.updateUserPermissions(this.selectedUser.id, permissionIds).subscribe(() => {
       alert(`Permissions mises à jour pour ${this.selectedUser!.email}`);
@@ -91,19 +140,24 @@ export class ManagePermissionsComponent implements OnInit {
   }
 
   filterBySearch(): void {
-    console.log(this.searchQuery)
     if (!this.searchQuery) {
       this.filteredUsers = this.users;
-    } else {
-      const query = this.searchQuery.toLowerCase();
+      return;
+    }
+
+    if (typeof this.searchQuery === 'string') {
+      const query = this.searchQuery.toLowerCase().trim();
       this.filteredUsers = this.users.filter(user =>
-        user.username.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query)
+        user.username.toLowerCase().includes(query)
+      );
+    } else {
+      this.filteredUsers = this.users.filter(user =>
+        user.username === (this.searchQuery as Utilisateur)?.username ? (this.searchQuery as Utilisateur).username : ''
       );
     }
   }
 
   displayFn(user: Utilisateur): string {
     return user ? user.username : '';
-  }  
+  }
 }

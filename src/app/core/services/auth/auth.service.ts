@@ -11,7 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 })
 export class AuthService {
   
-  base = environment.apiUrl;
+  base = environment.apiUserUrl;
   http = inject(HttpClient);
   router = inject(Router);
   
@@ -29,6 +29,7 @@ export class AuthService {
 
   decryptToken(){
     const token = sessionStorage.getItem('token');
+    console.log(jwtDecode(token ? token : ''))
     return jwtDecode(token ? token : '');
   }
 

@@ -1,18 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatButtonModule } from '@angular/material/button';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
-import { merge } from 'rxjs';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { Risk } from '../../../core/models/Risk';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
-import { Utilisateur } from '../../../core/models/Utilisateur';
 import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
 import { CauseService } from '../../../core/services/cause/cause.service';
@@ -24,7 +21,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
 import { NgIf, NgFor } from '@angular/common';
-import { State } from '../../../core/models/Incident';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
@@ -34,6 +30,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
     GoBackComponent,
     MatButtonModule,
     MatFormFieldModule,
+    MatSelectModule,
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
@@ -41,7 +38,6 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
     MatRadioModule,
     SelectUsersComponent,
     ButtonAddFileComponent,
-    MatSelectModule,
     NgIf, NgFor
   ],
   templateUrl: './create.component.html',
