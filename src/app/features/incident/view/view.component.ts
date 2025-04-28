@@ -52,7 +52,7 @@ export class ViewComponent {
   ngOnInit(): void {
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident);
-    this.loadSuiviIncident(this.idIncident);
+    // this.loadSuiviIncident(this.idIncident);
   }
 
   loadIncident(id : string): void {
@@ -67,19 +67,19 @@ export class ViewComponent {
     )
   }
 
-  loadSuiviIncident(id: string): void {
-    this.suiviIncidentService.getSuiviIncidentById(id).subscribe(
-      {
-        next: (suivi) => {
-          this.suivi = suivi;
-          console.log(this.suivi)
-        },
-        error: (error) => {
-          console.error("Erreur lors de la récupération des suivis d'incidents :", error);
-        }
-      }
-    ) 
-  }
+  // loadSuiviIncident(id: string): void {
+  //   this.suiviIncidentService.getSuiviIncidentById(id).subscribe(
+  //     {
+  //       next: (suivi) => {
+  //         this.suivi = suivi;
+  //         console.log(this.suivi)
+  //       },
+  //       error: (error) => {
+  //         console.error("Erreur lors de la récupération des suivis d'incidents :", error);
+  //       }
+  //     }
+  //   ) 
+  // }
 
   extractTokenInfo(): void {
     const token = sessionStorage.getItem('token');
@@ -166,7 +166,7 @@ export class ViewComponent {
       this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
         () => {
           this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
-          this.loadSuiviIncident(this.idIncident);
+          // this.loadSuiviIncident(this.idIncident);
         });
     }
   }

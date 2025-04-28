@@ -84,13 +84,13 @@ export class IncidentService {
     return this.http.post(this.baseUrl + '/impact', impact)
   }
 
-  saveIncident(incident: any): Observable<string> {
-    return this.http.post<string>(`${this.baseUrl}/incidents`, incident);
+  saveIncident(incident: any): Observable<any> {
+    return this.http.post(this.baseUrl + '/incidents', incident, { responseType: 'text' as 'json' });
   }
-
-  draftIncident(incident: any): Observable<string> {
-    return this.http.post<string>(`${this.baseUrl}/incidents/draft`, incident);
-  }
+  
+  draftIncident(incident: any): Observable<any> {
+    return this.http.post(this.baseUrl + '/incidents/draft', incident, { responseType: 'text' as 'json' });
+  }  
 
   close(id: string) {
     return this.http.put(this.baseUrl + `/incidents/${id}/close`, null)

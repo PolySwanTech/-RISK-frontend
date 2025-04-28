@@ -50,10 +50,10 @@ export class SuiviComponent implements OnInit {
     }
     );
 
-    this.suiviIncidentService.getSuiviIncidentById(id).subscribe((suiviIncident) => {
-      console.log(suiviIncident);
-    }
-    );
+    // this.suiviIncidentService.getSuiviIncidentById(id).subscribe((suiviIncident) => {
+    //   console.log(suiviIncident);
+    // }
+    // );
     this.loadHistory(id);
   }
 
@@ -81,9 +81,9 @@ export class SuiviComponent implements OnInit {
 
   getImpactFromHistory(entry: any): string | null {
     if (!this.incident?.impacts) return null;
-  
+
     const createdAt = entry.timestamp;
-  
+
     // On cherche l’impact le plus proche de la date d’ajout dans l’historique
     const matching = this.incident.impacts
       .map(i => ({
@@ -91,14 +91,14 @@ export class SuiviComponent implements OnInit {
         diff: Math.abs(new Date(i.createdAt).getTime() - new Date(createdAt).getTime())
       }))
       .sort((a, b) => a.diff - b.diff);
-  
+
     if (matching.length > 0) {
       const impact = matching[0];
       return `Impact ${impact.entityName} - ${impact.montant}€ - ${impact.type}`;
     }
-  
+
     return null;
   }
-  
+
 
 }
