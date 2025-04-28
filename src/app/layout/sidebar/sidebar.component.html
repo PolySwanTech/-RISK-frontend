@@ -9,7 +9,7 @@
       <ng-container *appHasPermission="'VIEW_DASHBOARD'">
         <a mat-list-item routerLink="/dashboard">
           <mat-icon>dashboard</mat-icon>
-          <span>Tableau de bord</span>
+          <span>{{ 'MENU.DASHBOARD' | translate }}</span>
         </a>
       </ng-container>
       <ng-container *appHasPermission="'VIEW_INCIDENTS'">
@@ -17,36 +17,32 @@
           <mat-icon>warning</mat-icon>
           <span [matBadge]="unreadIncidents > 0 ? unreadIncidents : null" matBadgeColor="warn"
             matBadgePosition="above after" mat-button>
-            Incidents
+            {{ 'MENU.INCIDENTS' | translate }}
           </span>
         </a>
       </ng-container>
       <a mat-list-item [matMenuTriggerFor]="menu">
         <mat-icon>settings</mat-icon>
-        <span>Administration</span>
+        <span>{{ 'MENU.ADMIN' | translate }}</span>
       </a>
       <mat-menu #menu="matMenu">
         <button routerLink="/reglages" mat-menu-item>
           <mat-icon>settings</mat-icon>
-          <span>Paramétrage global</span>
+          <span>{{ 'MENU.SETTINGS' | translate }}</span>
         </button>
-        <!-- <button mat-menu-item routerLink="/user/create">
-            <mat-icon>group</mat-icon>
-            <span>Ajouter un utilisateur</span>
-          </button> -->
         <button mat-menu-item routerLink="/user/list">
           <mat-icon>group</mat-icon>
-          <span>Gestion des utilisateurs</span>
+          <span>{{ 'MENU.USERS' | translate }}</span>
         </button>
         <button mat-menu-item routerLink="/permissions">
           <mat-icon>lock</mat-icon>
-          <span>Gestion des permissions</span>
+          <span>{{ 'MENU.PERMISSIONS' | translate }}</span>
         </button>
       </mat-menu>
-    }
+      }
       <a mat-list-item [matMenuTriggerFor]="langMenu">
         <mat-icon>language</mat-icon>
-        <span>{{ 'LANGUAGE' | translate}}</span>
+        <span>{{ 'MENU.LANGUAGE' | translate }}</span>
       </a>
       <mat-menu #langMenu="matMenu">
         <button mat-menu-item (click)="changeLang('fr')"><span>🇫🇷 Français</span></button>
@@ -55,9 +51,9 @@
       @if(authService.isLogin$ | async){
       <button class="deco" mat-list-item (click)="onLogout()">
         <mat-icon>logout</mat-icon>
-        <span>Déconnexion</span>
+        <span>{{ 'MENU.LOGOUT' | translate }}</span>
       </button>
-    }
+      }
     </mat-nav-list>
    
   </mat-drawer>

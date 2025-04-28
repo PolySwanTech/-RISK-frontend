@@ -1,5 +1,14 @@
 {
+  "MENU": {
+    "DASHBOARD": "Dashboard",
+    "INCIDENTS": "Incidents",
+    "ADMIN": "Administration",
+    "SETTINGS": "Global Settings",
+    "USERS": "User Management",
+    "PERMISSIONS": "Permission Management",
     "LANGUAGE": "Language",
+    "LOGOUT": "Logout"
+  },
     "LOGIN": {
       "TITLE": "Login",
       "USERNAME": "Username",
