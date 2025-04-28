@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment'
 import { Utilisateur } from '../../models/Utilisateur';
 import { UtilisateurProfil } from '../../models/UtilisateurProfil';
+import { PermissionName } from '../../models/Utilisateur';
 
 
 @Injectable({
@@ -23,7 +24,7 @@ export class UtilisateurService {
     return this.http.get<UtilisateurProfil[]>(this.baseUrl);
   }  
 
-  updateUserPermissions(userId: string, permissionIds: string[]) {
+  updateUserPermissions(userId: string, permissionIds: PermissionName[]) {
     return this.http.put(`${this.baseUrl}/${userId}/permissions`, permissionIds);
   }
 

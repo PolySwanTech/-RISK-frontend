@@ -7,11 +7,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
-
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { PermissionService } from '../../../core/services/permission/permission.service';
-import { Permission } from '../../../core/models/permission';
-import { Utilisateur } from '../../../core/models/Utilisateur';
+import { Utilisateur, permissionLabels, PermissionName } from '../../../core/models/Utilisateur';
 
 @Component({
   selector: 'app-manage-permissions',
@@ -30,18 +28,23 @@ import { Utilisateur } from '../../../core/models/Utilisateur';
   styleUrls: ['./manage-permissions.component.scss']
 })
 export class ManagePermissionsComponent implements OnInit {
+  
   users: Utilisateur[] = [];
   filteredUsers: Utilisateur[] = [];
-  permissions: Permission[] = [];
+  permissions: PermissionName[] = [];
   selectedUser: Utilisateur | null = null;
-
+  
   searchQuery: string | Utilisateur | null = null;
-
+  
   constructor(
     private userService: UtilisateurService,
     private permissionService: PermissionService
-  ) {}
-
+  ) { }
+  
+  formatPermission(p: PermissionName) {
+    return permissionLabels[p] || p;
+  }
+  
   ngOnInit(): void {
     this.loadUsers();
     this.loadPermissions();
@@ -56,6 +59,7 @@ export class ManagePermissionsComponent implements OnInit {
 
   loadPermissions(): void {
     this.permissionService.getPermissions().subscribe(permissions => {
+      console.log(permissions);
       this.permissions = permissions;
     });
   }
@@ -64,17 +68,17 @@ export class ManagePermissionsComponent implements OnInit {
     this.selectedUser = user;
   }
 
-  hasPermission(permissionName: string): boolean {
-    return this.selectedUser?.permissions?.some(p => p.name === permissionName) || false;
+  hasPermission(permissionName: PermissionName): boolean {
+    return this.selectedUser?.permissions?.some(p => p === permissionName) || false;
   }
 
-  togglePermission(permission: Permission): void {
+  togglePermission(permission: PermissionName): void {
     if (!this.selectedUser) return;
 
-    const alreadyHas = this.hasPermission(permission.name);
+    const alreadyHas = this.hasPermission(permission);
 
     if (alreadyHas) {
-      this.selectedUser.permissions = this.selectedUser.permissions.filter(p => p.name !== permission.name);
+      this.selectedUser.permissions = this.selectedUser.permissions.filter(p => p !== permission);
     } else {
       this.selectedUser.permissions.push(permission);
     }
@@ -83,21 +87,19 @@ export class ManagePermissionsComponent implements OnInit {
   savePermissions(): void {
     if (!this.selectedUser) return;
 
-    const permissionIds: string[] = this.selectedUser.permissions.map(p => p.id.toString());
-
-    this.userService.updateUserPermissions(this.selectedUser.id, permissionIds).subscribe(() => {
+    this.userService.updateUserPermissions(this.selectedUser.id, this.selectedUser.permissions).subscribe(() => {
       alert(`Permissions mises à jour pour ${this.selectedUser!.email}`);
     });
   }
 
   filterBySearch(): void {
     console.log(this.searchQuery);
-  
+
     if (!this.searchQuery) {
       this.filteredUsers = this.users;
       return;
     }
-  
+
     if (typeof this.searchQuery === 'string') {
       const query = this.searchQuery.toLowerCase().trim();
       this.filteredUsers = this.users.filter(user =>
@@ -112,5 +114,5 @@ export class ManagePermissionsComponent implements OnInit {
 
   displayFn(user: Utilisateur): string {
     return user ? user.username : '';
-  }  
+  }
 }
