@@ -42,9 +42,9 @@
         <div class="permissions-list">
           <mat-checkbox
             *ngFor="let permission of permissions"
-            [checked]="hasPermission(permission.name)"
+            [checked]="hasPermission(permission)"
             (change)="togglePermission(permission)">
-            {{ permission.description }}
+            {{ formatPermission(permission) }}
           </mat-checkbox>
         </div>
       </mat-card-content>

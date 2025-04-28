@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { Permission } from '../../models/permission'; // chemin à adapter
+import { PermissionName } from '../../models/Utilisateur'; // chemin à adapter
 
 
 @Injectable({ providedIn: 'root' })
@@ -11,7 +11,7 @@ export class PermissionService {
 
   constructor(private http: HttpClient) {}
 
-  getPermissions(): Observable<Permission[]> {
-    return this.http.get<Permission[]>(this.baseUrl);
+  getPermissions(): Observable<PermissionName[]> {
+    return this.http.get<PermissionName[]>(this.baseUrl);
   }
 }
