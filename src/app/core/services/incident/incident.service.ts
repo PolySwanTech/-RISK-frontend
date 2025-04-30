@@ -8,6 +8,7 @@ import { Risk } from '../../models/Risk';
 import { Cause } from '../../models/Cause';
 import { SubRisk } from '../../models/SubRisk';
 import { Process } from '../../models/Process';
+import { saveAs } from 'file-saver';
 
 @Injectable({
   providedIn: 'root'
@@ -99,4 +100,18 @@ export class IncidentService {
   getIncidentHistory(incidentId: string) {
     return this.http.get<any[]>(`${this.baseUrl}/incidents/${incidentId}/history`);
   }
+
+  downloadExport(incidentId: string): void {
+    this.http.get(`${this.baseUrl}/incidents/${incidentId}/export`, {
+      responseType: 'blob'
+    }).subscribe(
+      blob => {
+        saveAs(blob, `incident_${incidentId}.xlsx`);
+      },
+      error => {
+        console.error("Erreur lors du téléchargement de l’export :", error);
+      }
+    );
+  }  
+  
 }

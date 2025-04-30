@@ -19,6 +19,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
 import { SuiviIncident } from '../../../core/models/SuiviIncident';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -38,6 +39,7 @@ export class ViewComponent {
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private suiviIncidentService = inject(SuiviIncidentService);
+  private http = inject(HttpClient);
 
   incident: Incident | undefined
   totalAmount = 0;
@@ -45,9 +47,9 @@ export class ViewComponent {
   userTeam: string | undefined;
   username: string | undefined;
   canClose: boolean = false;
-  message : string = "";
+  message: string = "";
   idIncident: string = "";
-  suivi: SuiviIncident[]  = []
+  suivi: SuiviIncident[] = []
 
   ngOnInit(): void {
     this.idIncident = this.route.snapshot.params['id'];
@@ -55,7 +57,7 @@ export class ViewComponent {
     // this.loadSuiviIncident(this.idIncident);
   }
 
-  loadIncident(id : string): void {
+  loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
       this.extractTokenInfo();
@@ -157,12 +159,12 @@ export class ViewComponent {
     return false
   }
 
-  accessSuivi(){
+  accessSuivi() {
     this.router.navigate(['incident', this.incident?.id, 'suivi'])
   }
 
-  sendMessage(){
-    if(this.incident && this.username){
+  sendMessage() {
+    if (this.incident && this.username) {
       this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
         () => {
           this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
@@ -170,5 +172,11 @@ export class ViewComponent {
         });
     }
   }
+
+  downloadExport(): void {
+    if (!this.incident?.id) return;
+    this.incidentService.downloadExport(this.incident.id);
+  }
+  
 
 }

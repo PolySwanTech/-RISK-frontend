@@ -2,6 +2,11 @@
     @if(incident){
     <app-go-back previousPageName="Liste des incidents"
         [currentPageName]="`Détails de l'incident - ` + incident.titre"></app-go-back>
+    <div style="text-align: right; margin-bottom: 10px;">
+        <button mat-raised-button color="primary" (click)="downloadExport()">
+            <mat-icon>file_download</mat-icon> Exporter
+        </button>
+    </div>
     <div class="info-container">
         <mat-card class="incident-card">
             <mat-card-header>
