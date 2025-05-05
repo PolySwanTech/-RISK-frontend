@@ -16,6 +16,15 @@ export class ProcessService {
     return this.http.get<Process[]>(this.baseUrl + '/processes')
   }
 
+  createProcess(process : Process){ 
+    return this.http.post<Process>(this.baseUrl + '/processes', process).toPromise().then((response) => {
+      return response;
+    }).catch((error) => {
+      console.error('Error creating process:', error);
+      throw error;
+    });
+  }
+
   getAllByEntite(entite : EntiteResponsable){
     let param = new HttpParams();
     param = param.set('idEntite', entite.id);

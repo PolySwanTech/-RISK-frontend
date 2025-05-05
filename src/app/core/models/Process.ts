@@ -1,16 +1,17 @@
 import { EntiteResponsable } from "./EntiteResponsable"
+import { Risk } from "./Risk"
 
 export class Process {
-    id: number
+    id: string = ''
     name: string
-    entiteResponsable: EntiteResponsable
+    buId: string
+
+    risks : Risk[] = []
 
     constructor(
-        id: number,
         name: string,
-        entiteResponsable: EntiteResponsable) {
-        this.id = id
+        bu_id: string) {
         this.name = name
-        this.entiteResponsable = entiteResponsable
+        this.buId = bu_id
     }
 }
