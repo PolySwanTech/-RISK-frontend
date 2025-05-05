@@ -15,7 +15,7 @@ import { Process } from '../../models/Process';
 export class IncidentService {
   
 
-  baseUrl = environment.apiUrl
+  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl)
 
   http = inject(HttpClient);
 

@@ -10,7 +10,7 @@ import { EntiteResponsable } from '../../models/EntiteResponsable';
 export class ProcessService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl
+  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl)
 
   getAll(){
     return this.http.get<Process[]>(this.baseUrl + '/processes')

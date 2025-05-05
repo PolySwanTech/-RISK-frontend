@@ -79,7 +79,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
 
   openCreateUserDialog(): void {
     const dialogRef = this.dialog.open(CreateUserComponent, {
-      width: '500px'
+      width: '700px'
     });
   
     dialogRef.afterClosed().subscribe(result => {

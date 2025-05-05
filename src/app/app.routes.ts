@@ -1,3 +1,4 @@
+import { organigrammeRoutes } from './features/organigramme/organigramme.routes';
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { authRoutes } from './features/auth/auth.routes';
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'incident', children: incidentRoute, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionEnum.VIEW_INCIDENTS } },
   { path: 'reglages', children: reglagesRoute },
   { path: 'permissions', children: permissionRoutes, canActivate: [AuthGuard] },
+  { path: 'organigramme', children: organigrammeRoutes, canActivate: [AuthGuard] },
 
 ];

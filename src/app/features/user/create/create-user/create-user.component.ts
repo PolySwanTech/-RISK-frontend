@@ -10,14 +10,16 @@ import { Equipe, EquipeService } from '../../../../core/services/equipe/equipe.s
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { OrganigrammeComponent } from "../../../organigramme/organigramme/organigramme.component";
+import { event } from 'jquery';
 
 @Component({
   selector: 'app-create-user',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatDialogModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatSelectModule],
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule, OrganigrammeComponent],
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss']
 })
@@ -30,7 +32,7 @@ export class CreateUserComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     equipeId: [null, Validators.required],
-    role: ['MEMBRE', Validators.required]
+    teamMemberList: [[], Validators.required]
   });
 
   constructor(
@@ -43,9 +45,12 @@ export class CreateUserComponent implements OnInit {
     });
   }
 
-  onSubmit() {
+  getRoles(event: any) {
+    console.log(event);
+    this.userForm.get('teamMemberList')?.setValue(event);
+  }
 
-    console.log(this.userForm)
+  onSubmit() {
 
     if (this.userForm.valid) {
       this.authService.register(this.userForm.value).subscribe({

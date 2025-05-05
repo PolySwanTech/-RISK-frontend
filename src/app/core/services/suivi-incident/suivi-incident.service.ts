@@ -8,7 +8,7 @@ import { SuiviIncident } from '../../models/SuiviIncident';
 })
 export class SuiviIncidentService {
 
-  private base = environment.apiUrl + '/incident/suivi';
+  private base = (environment.log ? environment.apiLogUrl : environment.apiUrl) + '/incident/suivi';
   private http = inject(HttpClient);
 
 
