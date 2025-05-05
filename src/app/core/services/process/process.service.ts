@@ -10,24 +10,20 @@ import { EntiteResponsable } from '../../models/EntiteResponsable';
 export class ProcessService {
 
   http = inject(HttpClient);
-  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl)
+
+  baseUrl = environment.apiProcess
 
   getAll(){
-    return this.http.get<Process[]>(this.baseUrl + '/processes')
+    return this.http.get<Process[]>(this.baseUrl)
   }
 
   createProcess(process : Process){ 
-    return this.http.post<Process>(this.baseUrl + '/processes', process).toPromise().then((response) => {
-      return response;
-    }).catch((error) => {
-      console.error('Error creating process:', error);
-      throw error;
-    });
+    return this.http.post<Process>(this.baseUrl, process);
   }
 
-  getAllByEntite(entite : EntiteResponsable){
+  getAllByEntite(id : string){
     let param = new HttpParams();
-    param = param.set('idEntite', entite.id);
-    return this.http.get<Process[]>(this.baseUrl + '/processes/entite', {params : param})
+    param = param.set('buId', id);
+    return this.http.get<Process[]>(this.baseUrl, {params : param})
   }
 }

@@ -1,1 +1,29 @@
-<p>create-risk works!</p>
+<h2>Créer un risque pour le process {{ data.processName }}</h2>
+
+<form [formGroup]="riskForm" (ngSubmit)="onSubmit()">
+  <label for="name">Titre :</label>
+  <input type="text" formControlName="name" />
+  @if(riskForm.get('name')?.invalid && riskForm.get('name')?.touched) {
+    <div>Le nom est requis.</div>
+  }
+
+  <label for="description">Description :</label>
+  <textarea type="text" formControlName="description">
+  </textarea>
+  @if(riskForm.get('description')?.invalid && riskForm.get('description')?.touched) {
+    <div>La description est requise.</div>
+  }
+
+  <label for="level">level :</label>
+  <select formControlName="level">
+    <option value="LOW">LOW</option>
+    <option value="MEDIUM">MEDIUM</option>
+    <option value="HIGH">HIGH</option>
+    <option value="VERY_HIGH">VERY_HIGH</option>
+  </select>
+  @if(riskForm.get('level')?.invalid && riskForm.get('level')?.touched) {
+    <div>Le niveau est requis.</div>
+  }
+
+  <button type="submit" [disabled]="riskForm.invalid">Créer le risque</button>
+</form>

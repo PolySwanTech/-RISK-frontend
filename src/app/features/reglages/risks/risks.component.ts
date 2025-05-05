@@ -28,7 +28,7 @@ export class RisksComponent implements OnInit {
     {
       columnDef: 'name',
       header: 'Nom',
-      cell: (element: Risk) => `${element.titre}`,
+      cell: (element: Risk) => `${element.title}`,
     },
     {
       columnDef: 'description',

@@ -2,7 +2,6 @@ import { EntiteResponsable } from "./EntiteResponsable";
 import { Impact } from "./Impact";
 import { Process } from "./Process";
 import { Risk } from "./Risk";
-import { SubRisk } from "./SubRisk";
 import { Cause } from "./Cause";
 
 export enum State {
@@ -26,7 +25,6 @@ export class Incident {
     impacts: Impact[];
 
     risk: Risk;
-    subRisk: SubRisk;
     process: Process;
     cause: Cause;
 
@@ -43,7 +41,6 @@ export class Incident {
         detectedAt: Date,
         closedAt: Date | null,
         risk: Risk,
-        subRisk: SubRisk,
         process: Process,
         cause: Cause,
         impacts: Impact[],
@@ -60,7 +57,6 @@ export class Incident {
         this.detectedAt = detectedAt;
         this.closedAt = closedAt;
         this.risk = risk;
-        this.subRisk = subRisk;
         this.process = process;
         this.cause = cause;
         this.impacts = impacts;
