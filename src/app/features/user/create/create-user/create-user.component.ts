@@ -31,8 +31,7 @@ export class CreateUserComponent implements OnInit {
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    equipeId: [null, Validators.required],
-    teamMemberList: [[], Validators.required]
+    teamRoleList: [[], Validators.required]
   });
 
   constructor(
@@ -40,14 +39,11 @@ export class CreateUserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.equipeService.getAllEquipes().subscribe(equipes => {
-      this.equipes = equipes;
-    });
   }
 
   getRoles(event: any) {
     console.log(event);
-    this.userForm.get('teamMemberList')?.setValue(event);
+    this.userForm.get('teamRoleList')?.setValue(event);
   }
 
   onSubmit() {

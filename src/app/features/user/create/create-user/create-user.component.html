@@ -18,13 +18,6 @@
       <mat-label>Mot de passe</mat-label>
       <input matInput type="password" formControlName="password" placeholder="Mot de passe" />
     </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Équipe</mat-label>
-      <mat-select formControlName="equipeId">
-        <mat-option *ngFor="let equipe of equipes" [value]="equipe.id">{{ equipe.name }}</mat-option>
-      </mat-select>
-    </mat-form-field>
   </div>
     <app-organigramme (rolesEvent)="getRoles($event)"></app-organigramme>  
 

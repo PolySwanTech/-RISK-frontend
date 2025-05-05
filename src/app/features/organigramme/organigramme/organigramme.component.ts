@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Optional, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Optional, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
@@ -15,6 +15,7 @@ import { AddEntityDialogComponent } from '../../reglages/add-entity-dialog/add-e
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
+import { Role, RoleService } from '../../../core/services/role/role.service';
 
 @Component({
   selector: 'app-organigramme',
@@ -31,7 +32,9 @@ export class OrganigrammeComponent {
 
   entities: EntiteResponsable[] = [];
   filteredEntities: EntiteResponsable[] = [];
-  roles: string[] = ['Admin', 'Membre', 'Validateur'];
+  roles: Role[] = [];
+
+  private roleService = inject(RoleService);
 
   constructor(
     private entityService: EntitiesService,
@@ -42,6 +45,10 @@ export class OrganigrammeComponent {
 
   ngOnInit(): void {
     this.getEntities();
+    this.roleService.getAllRoles().subscribe((res: any) => {
+      this.roles = res;
+      console.log(this.roles);
+    });
   }
 
   childrenAccessor = (node: EntiteResponsable) => node.children ?? [];
@@ -152,7 +159,6 @@ export class OrganigrammeComponent {
     const traverse = (nodes: any[]) => {
       for (let node of nodes) {
         if ((!node.children || node.children.length === 0) && node.checked && node.role) {
-          node.role = node.role.toUpperCase();
           leaves.push(node);
         } else {
           traverse(node.children);

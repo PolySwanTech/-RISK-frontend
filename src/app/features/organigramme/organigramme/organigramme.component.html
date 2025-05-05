@@ -20,7 +20,7 @@
         @if(node.checked){
           <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="role-select">
             <mat-select (selectionChange)="onRoleChange(node)" [(ngModel)]="node.role" placeholder="Choisir un rôle">
-              <mat-option *ngFor="let role of roles" [value]="role">{{role}}</mat-option>
+              <mat-option *ngFor="let role of roles" [value]="role">{{role.name}}</mat-option>
             </mat-select>
           </mat-form-field>
         }
@@ -40,7 +40,7 @@
         @if(node.checked){
           <mat-form-field (click)="$event.stopPropagation(); resetRole(node)" appearance="outline" class="role-select">
             <mat-select (selectionChange)="onRoleChange(node)" [(ngModel)]="node.role" placeholder="Choisir un rôle">
-              <mat-option *ngFor="let role of roles" [value]="role">{{role}}</mat-option>
+              <mat-option *ngFor="let role of roles" [value]="role">{{role.name}}</mat-option>
             </mat-select>
           </mat-form-field>
         }

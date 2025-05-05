@@ -17,7 +17,7 @@ export class AuthService {
   
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 
-  private permissions: string[] = [];
+  private permissions: { [teamId: string]: string[] } = {};
 
   private utilisateurConnecte!: Utilisateur;
   
@@ -62,19 +62,20 @@ export class AuthService {
     this.router.navigate(['auth', 'login'])
   }
 
-  setPermissions(permissions: string[]): void {
+  setPermissions(permissions: { [teamId: string]: string[] }): void {
     this.permissions = permissions;
   }
   
-  getPermissions(): string[] {
-    if (this.permissions.length > 0) return this.permissions;
+  getPermissions(): { [teamId: string]: string[] } {
+    if (Object.keys(this.permissions).length > 0) return this.permissions;
   
     const token: any = this.decryptToken();
-    return token?.permissions || [];
+    return token?.permissions || {};
   }
   
-  hasPermission(permission: string): boolean {
-    return this.getPermissions().includes(permission);
+  hasPermission(permission: string, teamId: string): boolean {
+    const perms = this.getPermissions();
+    return perms[teamId]?.includes(permission) || false;
   }
 
   setUtilisateur(user: Utilisateur): void {
