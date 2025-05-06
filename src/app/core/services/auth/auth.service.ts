@@ -73,9 +73,16 @@ export class AuthService {
     return token?.permissions || {};
   }
   
-  hasPermission(permission: string, teamId: string): boolean {
-    const perms = this.getPermissions();
-    return perms[teamId]?.includes(permission) || false;
+  hasPermission(permission: string): boolean {
+    const permsByTeam = this.getPermissions();
+  
+    for (const teamId in permsByTeam) {
+      if (permsByTeam[teamId].includes(permission)) {
+        return true;
+      }
+    }
+  
+    return false;
   }
 
   setUtilisateur(user: Utilisateur): void {
