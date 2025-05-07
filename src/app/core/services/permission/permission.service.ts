@@ -7,7 +7,7 @@ import { PermissionName } from '../../models/Utilisateur'; // chemin à adapter
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
-  private baseUrl = (environment.log ? environment.apiLogUserUrl : environment.apiUserUrl) + '/permissions';
+  private baseUrl = '/api/permissions';
 
   constructor(private http: HttpClient) {}
 

@@ -14,7 +14,7 @@ export class UtilisateurService {
 
   http = inject(HttpClient);
   
-  baseUrl = (environment.log ? environment.apiLogUserUrl : environment.apiUserUrl) + '/user';
+  baseUrl = '/api/user';
 
   getUsers(): Observable<Utilisateur[]> {
     return this.http.get<Utilisateur[]>(this.baseUrl);

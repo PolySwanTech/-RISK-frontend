@@ -14,16 +14,16 @@ import { Process } from '../../models/Process';
 export class IncidentService {
   
 
-  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl)
+  baseUrl = '/api/incidents'; 
 
   http = inject(HttpClient);
 
   loadIncidents(): Observable<Incident[]> {
-    return this.http.get<Incident[]>(this.baseUrl + '/incidents');
+    return this.http.get<Incident[]>(this.baseUrl);
   }
 
   countIncidentsNonClotures(): Observable<number> {
-    return this.http.get<number>(this.baseUrl + '/incidents/nb/cloture');
+    return this.http.get<number>(this.baseUrl + '/nb/cloture');
   }
 
   sum(id: string) {
@@ -34,7 +34,7 @@ export class IncidentService {
 
 
   getIncidentById(id: string): Observable<Incident> {
-    return this.http.get<any>(this.baseUrl + '/incidents/' + id).pipe(
+    return this.http.get<any>(this.baseUrl + '/' + id).pipe(
       map((responseData: { id: string; titre: string; location: string; comments: string; cause: Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk: Risk; process: Process; impacts: Impact[]; equipeName?: string; state: string }) => {
         // Constructing an Incident instance using the constructor
         const {
@@ -82,26 +82,26 @@ export class IncidentService {
   }
 
   saveIncident(incident: any): Observable<string> {
-    return this.http.post<string>(`${this.baseUrl}/incidents`, incident);
+    return this.http.post<string>(this.baseUrl, incident);
   }
 
   updateCommentaire(id: string, commentaire: string, message: string) {
     console.log(id, commentaire)
-    return this.http.put(this.baseUrl + `/incidents/${id}/commentaire`, {
+    return this.http.put(this.baseUrl + `/${id}/commentaire`, {
       commentaire,
       message
     });
   }
 
   draftIncident(incident: any): Observable<string> {
-    return this.http.post<string>(`${this.baseUrl}/incidents/draft`, incident);
+    return this.http.post<string>(`${this.baseUrl}/draft`, incident);
   }
 
   close(id: string) {
-    return this.http.put(this.baseUrl + `/incidents/${id}/close`, null)
+    return this.http.put(this.baseUrl + `/${id}/close`, null)
   }
 
   getIncidentHistory(incidentId: string) {
-    return this.http.get<any[]>(`${this.baseUrl}/incidents/${incidentId}/history`);
+    return this.http.get<any[]>(`${this.baseUrl}/${incidentId}/history`);
   }
 }

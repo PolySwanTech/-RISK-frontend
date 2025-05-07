@@ -13,7 +13,7 @@ export interface Equipe {
 })
 export class EquipeService {
   private http = inject(HttpClient);
-  private baseUrl = (environment.log ? environment.apiLogUserUrl : environment.apiUserUrl) + '/equipe';
+  private baseUrl = '/api/equipe';
 
   getAllEquipes(): Observable<Equipe[]> {
     return this.http.get<Equipe[]>(`${this.baseUrl}`);

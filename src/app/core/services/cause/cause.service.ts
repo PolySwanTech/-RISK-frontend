@@ -9,7 +9,7 @@ import { Risk } from '../../models/Risk';
 export class CauseService {
 
   http = inject(HttpClient);
-  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl) + '/cause';
+  baseUrl = '/api/cause';
 
   getAll() {
     return this.http.get<Risk[]>(this.baseUrl)

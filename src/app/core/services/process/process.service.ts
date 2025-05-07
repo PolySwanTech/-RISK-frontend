@@ -11,7 +11,7 @@ export class ProcessService {
 
   http = inject(HttpClient);
 
-  baseUrl = environment.apiProcess
+  baseUrl = '/api/process';
 
   getAll(){
     return this.http.get<Process[]>(this.baseUrl)
