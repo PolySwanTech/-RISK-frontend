@@ -17,17 +17,7 @@ COPY . .
 RUN npm run build --prod
 
 # Étape 2 : Servir l'application avec NGINX + Lua
-FROM openresty/openresty:alpine
-
-# Installer les dépendances nécessaires à Lua + Luarocks
-RUN apk add --no-cache git lua5.1 lua5.1-dev gcc musl-dev openssl-dev make curl \
-    && curl -R -O https://luarocks.org/releases/luarocks-3.9.1.tar.gz \
-    && tar zxpf luarocks-3.9.1.tar.gz \
-    && cd luarocks-3.9.1 \
-    && ./configure --prefix=/usr/local \
-    && make && make install \
-    && luarocks install lua-resty-jwt \
-    && luarocks install lua-resty-http
+FROM zot24/openresty-luarocks
 
 # Copier la configuration NGINX
 COPY default.conf /etc/nginx/nginx.conf
