@@ -89,11 +89,11 @@
               property="newImages" (filesSelected)="onFilesChange($event)">
             </app-button-add-file>
 
-            <mat-radio-group formControlName="risk">
+            <!-- <mat-radio-group formControlName="risk">
               @for(risk of listRisk; track risk){
               <mat-radio-button [value]="risk">{{risk.balois}}</mat-radio-button>
               }
-            </mat-radio-group>
+            </mat-radio-group> -->
 
             @if(getSubRisk() != ''){
             <mat-form-field>

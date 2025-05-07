@@ -19,15 +19,8 @@ export class RiskService {
     return this.http.get<Risk>(this.baseUrl + '/' + id)
   }
 
-  save(title: Risk, description : string, level : string, processId: string) {
-    const body = {
-      name: title,
-      description: description,
-      level: level,
-      processId: processId
-    }
-    console.log(body)
-    return this.http.post<Risk>(this.baseUrl, body);
+  save(risk: Risk) {
+    return this.http.post<Risk>(this.baseUrl, risk);
   }
 
 }

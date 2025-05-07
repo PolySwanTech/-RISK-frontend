@@ -32,7 +32,8 @@ export class CreateRiskComponent {
   onSubmit() {
     if (this.riskForm.valid) {
       const formValues = this.riskForm.value;
-      this.riskService.save(formValues.name, formValues.description, formValues.level, this.processId).subscribe(
+      const r = new Risk("", formValues.name, formValues.description, formValues.level, this.processId);
+      this.riskService.save(r).subscribe(
         resp => {
           this.dialog.open(ConfirmationDialogComponent,
             {
