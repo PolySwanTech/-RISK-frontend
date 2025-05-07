@@ -12,7 +12,7 @@
     <mat-tree #tree [dataSource]="filteredEntities" [childrenAccessor]="childrenAccessor">
       <!-- Nœud feuille -->
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-        <button mat-icon-button disabled></button>
+        <button type="button" mat-icon-button disabled></button>
         <span>{{node.name}}</span>
         <mat-checkbox [(ngModel)]="node.checked" (click)="$event.stopPropagation(); resetRole(node)">
         </mat-checkbox>
@@ -29,7 +29,7 @@
 
       <!-- Nœud avec enfants -->
       <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodeToggle>
-        <button mat-icon-button matTreeNodeToggle>
+        <button type="button" mat-icon-button matTreeNodeToggle>
           <mat-icon>{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
         </button>
         <span>{{node.name}}</span>

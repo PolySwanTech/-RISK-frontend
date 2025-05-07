@@ -16,6 +16,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { Role, RoleService } from '../../../core/services/role/role.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-organigramme',
@@ -29,6 +30,7 @@ export class OrganigrammeComponent {
 
   @Input() settings: boolean = true;
   @Output() rolesEvent = new EventEmitter<any>();
+  @Input() teamRoles: any[] = [];
 
   entities: EntiteResponsable[] = [];
   filteredEntities: EntiteResponsable[] = [];
@@ -44,10 +46,18 @@ export class OrganigrammeComponent {
   ) {}
 
   ngOnInit(): void {
-    this.getEntities();
-    this.roleService.getAllRoles().subscribe((res: any) => {
-      this.roles = res;
-      console.log(this.roles);
+    forkJoin({
+      entities: this.entityService.loadEntitiesTree(),
+      roles: this.roleService.getAllRoles()
+    }).subscribe(({ entities, roles }) => {
+      this.entities = entities;
+      console.log(this.entities);
+      this.filteredEntities = this.entities;
+      this.roles = roles;
+  
+      if (this.teamRoles.length > 0) {
+        this.applyTeamRoles(this.teamRoles);
+      }
     });
   }
 
@@ -55,12 +65,34 @@ export class OrganigrammeComponent {
 
   hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
 
-  getEntities() {
-    this.entityService.loadEntitiesTree().subscribe((res: any) => {
-      this.entities = res;
-      this.filteredEntities = this.entities; // Initialiser avec toutes les entités
-    });
-  }
+  applyTeamRoles(teamRoles: any[]) {
+  const markEntity = (nodes: any[]) => {
+    for (let node of nodes) {
+      const match = teamRoles.find(tr => tr.buId == node.id);
+      if (match) {
+        node.checked = true;
+
+        console.log(match)
+        // Chercher le rôle dans la liste des rôles disponibles
+        const matchingRole = this.roles.find(r => r.id == match.role?.id);
+        console.log(matchingRole);
+        node.role = matchingRole || null;
+
+        this.onParentCheckChange(node, { checked: true });
+        this.propagateRoleToChildren(node, node.role);
+      }
+
+      if (node.children && node.children.length > 0) {
+        markEntity(node.children);
+      }
+    }
+  };
+
+  markEntity(this.filteredEntities);
+
+  // Rafraîchir les feuilles sélectionnées
+  this.getLeafNodes(this.filteredEntities);
+}
 
   openEntityDialog(entite?: EntiteResponsable, event?: Event) {
     if (event) {

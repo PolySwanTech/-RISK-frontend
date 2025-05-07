@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Créer un utilisateur</h2>
+<h2 mat-dialog-title>{{title}} un utilisateur</h2>
 <mat-dialog-content>
   <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
 
@@ -13,14 +13,21 @@
         <input matInput type="email" formControlName="email" placeholder="Email" />
       </mat-form-field>
     </div>
+    @if(!data){
     <div class="row-add">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Mot de passe</mat-label>
-      <input matInput type="password" formControlName="password" placeholder="Mot de passe" />
-    </mat-form-field>
-  </div>
-    <app-organigramme (rolesEvent)="getRoles($event)"></app-organigramme>  
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mot de passe</mat-label>
+        <input matInput type="password" formControlName="password" placeholder="Mot de passe" />
+      </mat-form-field>
+    </div>
+    <app-organigramme (rolesEvent)="getRoles($event)"></app-organigramme>
+    }
+    @else{
+    @if(teamRoles.length > 0){
+    <app-organigramme [teamRoles]="teamRoles" (rolesEvent)="getRoles($event)"></app-organigramme>
+    }
+    }
 
-    <button type="submit" [disabled]="userForm.invalid">Créer</button>
+    <button type="submit" [disabled]="userForm.invalid">{{title}}</button>
   </form>
 </mat-dialog-content>

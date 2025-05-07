@@ -1,0 +1,30 @@
+
+<mat-form-field class="full-width autocomplete-field">
+    <input
+      type="text"
+      matInput
+      [placeholder]="placeholder"	
+      [attr.matAutocomplete]="filteredList.length != 0 ? 'auto' : null"
+      [(ngModel)]="searchQuery"
+      (input)="filteredList.length != 0 ? filterBySearch() : searchQueryEvent()"
+      (focus)="filterBySearch()"
+      (keydown.enter)="filterBySearch()" />
+
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      [displayWith]="displayFn"
+      (optionSelected)="selectUser($event.option.value)">
+      <mat-option
+        *ngIf="filteredList.length === 0"
+        disabled
+        class="no-results">
+        Aucun utilisateur trouvé
+      </mat-option>
+      <mat-option
+        *ngFor="let element of filteredList"
+        [value]="element"
+        class="autocomplete-option">
+        {{ element[property] }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>

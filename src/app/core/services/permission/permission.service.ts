@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.prod';
 import { Observable } from 'rxjs';
-import { PermissionName } from '../../models/Utilisateur'; // chemin à adapter
+import { PermissionName } from '../../enum/permission.enum';
 
 
 @Injectable({ providedIn: 'root' })

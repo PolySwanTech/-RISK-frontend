@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment.prod'
 import { Utilisateur } from '../../models/Utilisateur';
 import { UtilisateurProfil } from '../../models/UtilisateurProfil';
-import { PermissionName } from '../../models/Utilisateur';
+import { TeamRole } from '../../models/TeamMember';
+import { PermissionName } from '../../enum/permission.enum';
 
 
 @Injectable({
@@ -28,8 +29,12 @@ export class UtilisateurService {
     return this.http.put(`${this.baseUrl}/${userId}/permissions`, permissionIds);
   }
 
-  updateUser(userId: string, payload: any) {
-    return this.http.put(`${this.baseUrl}/${userId}`, payload);
+  updateUser(user: Utilisateur) {
+    return this.http.put(`${this.baseUrl}/update`, user);
   }  
+
+  getUserRoles(userId : string): Observable<TeamRole[]> {
+    return this.http.get<TeamRole[]>(`${this.baseUrl}/${userId}/roles`);
+  }    
   
 }

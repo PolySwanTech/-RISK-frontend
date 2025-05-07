@@ -9,7 +9,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { PermissionService } from '../../../core/services/permission/permission.service';
-import { Utilisateur, permissionLabels, PermissionName } from '../../../core/models/Utilisateur';
+import { Utilisateur } from '../../../core/models/Utilisateur';
+import { permissionLabels, PermissionName } from '../../../core/enum/permission.enum';
 
 @Component({
   selector: 'app-manage-permissions',
@@ -22,8 +23,8 @@ import { Utilisateur, permissionLabels, PermissionName } from '../../../core/mod
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatAutocompleteModule
-  ],
+    MatAutocompleteModule,
+],
   templateUrl: './manage-permissions.component.html',
   styleUrls: ['./manage-permissions.component.scss']
 })
@@ -66,6 +67,10 @@ export class ManagePermissionsComponent implements OnInit {
 
   selectUser(user: Utilisateur): void {
     this.selectedUser = user;
+  }
+
+  get(event : any){
+    console.log(event)
   }
 
   hasPermission(permissionName: PermissionName): boolean {
