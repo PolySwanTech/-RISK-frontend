@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "feat-process-risk" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "feat-process-risk" ]
 
 jobs:
   build:
