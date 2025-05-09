@@ -7,10 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
-import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
-import { PermissionService } from '../../../core/services/permission/permission.service';
-import { Utilisateur } from '../../../core/models/Utilisateur';
 import { permissionLabels, PermissionName } from '../../../core/enum/permission.enum';
+import { Role, RoleService } from '../../../core/services/role/role.service';
 
 @Component({
   selector: 'app-manage-permissions',
@@ -30,16 +28,15 @@ import { permissionLabels, PermissionName } from '../../../core/enum/permission.
 })
 export class ManagePermissionsComponent implements OnInit {
   
-  users: Utilisateur[] = [];
-  filteredUsers: Utilisateur[] = [];
+  roles: Role[] = [];
+  filteredRoles: Role[] = [];
   permissions: PermissionName[] = [];
-  selectedUser: Utilisateur | null = null;
+  selectedRole: Role | null = null;
   
-  searchQuery: string | Utilisateur | null = null;
+  searchQuery: string | Role | null = null;
   
   constructor(
-    private userService: UtilisateurService,
-    private permissionService: PermissionService
+    private roleService: RoleService,
   ) { }
   
   formatPermission(p: PermissionName) {
@@ -47,53 +44,47 @@ export class ManagePermissionsComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    this.loadUsers();
-    this.loadPermissions();
+    this.loadRoles();
+    this.getPermissions()
   }
 
-  loadUsers(): void {
-    this.userService.getUsers().subscribe(users => {
-      this.users = users;
-      this.filteredUsers = users;
+  loadRoles(): void {
+    this.roleService.getAllRoles().subscribe(roles => {
+      this.roles = roles;
+      this.filteredRoles = roles;
     });
   }
 
-  loadPermissions(): void {
-    this.permissionService.getPermissions().subscribe(permissions => {
-      console.log(permissions);
-      this.permissions = permissions;
-    });
+  getPermissions() {
+    const permissions = Object.values(PermissionName) 
+    this.permissions = permissions as PermissionName[];
   }
 
-  selectUser(user: Utilisateur): void {
-    this.selectedUser = user;
-  }
-
-  get(event : any){
-    console.log(event)
+  selectUser(user: Role): void {
+    this.selectedRole = user;
   }
 
   hasPermission(permissionName: PermissionName): boolean {
-    return this.selectedUser?.permissions?.some(p => p === permissionName) || false;
+    return this.selectedRole?.permissions?.some(p => p === permissionName) || false;
   }
 
   togglePermission(permission: PermissionName): void {
-    if (!this.selectedUser) return;
+    if (!this.selectedRole) return;
 
     const alreadyHas = this.hasPermission(permission);
 
     if (alreadyHas) {
-      this.selectedUser.permissions = this.selectedUser.permissions.filter(p => p !== permission);
+      this.selectedRole.permissions = this.selectedRole.permissions.filter(p => p !== permission);
     } else {
-      this.selectedUser.permissions.push(permission);
+      this.selectedRole.permissions.push(permission);
     }
   }
 
   savePermissions(): void {
-    if (!this.selectedUser) return;
+    if (!this.selectedRole) return;
 
-    this.userService.updateUserPermissions(this.selectedUser.id, this.selectedUser.permissions).subscribe(() => {
-      alert(`Permissions mises à jour pour ${this.selectedUser!.email}`);
+    this.roleService.updateRolePermissions(this.selectedRole.id, this.selectedRole.permissions).subscribe(() => {
+      alert(`Permissions mises à jour pour ${this.selectedRole!.name}`);
     });
   }
 
@@ -101,23 +92,23 @@ export class ManagePermissionsComponent implements OnInit {
     console.log(this.searchQuery);
 
     if (!this.searchQuery) {
-      this.filteredUsers = this.users;
+      this.filteredRoles = this.roles;
       return;
     }
 
     if (typeof this.searchQuery === 'string') {
       const query = this.searchQuery.toLowerCase().trim();
-      this.filteredUsers = this.users.filter(user =>
-        user.username.toLowerCase().includes(query)
+      this.filteredRoles = this.roles.filter(user =>
+        user.name.toLowerCase().includes(query)
       );
     } else {
-      this.filteredUsers = this.users.filter(user =>
-        user.username === (this.searchQuery as Utilisateur)?.username ? (this.searchQuery as Utilisateur).username : ''
+      this.filteredRoles = this.roles.filter(user =>
+        user.name === (this.searchQuery as Role)?.name ? (this.searchQuery as Role).name : ''
       );
     }
   }
 
-  displayFn(user: Utilisateur): string {
-    return user ? user.username : '';
+  displayFn(role: Role): string {
+    return role ? role.name : '';
   }
 }

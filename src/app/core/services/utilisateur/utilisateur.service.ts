@@ -25,10 +25,6 @@ export class UtilisateurService {
     return this.http.get<UtilisateurProfil[]>(this.baseUrl);
   }  
 
-  updateUserPermissions(userId: string, permissionIds: PermissionName[]) {
-    return this.http.put(`${this.baseUrl}/${userId}/permissions`, permissionIds);
-  }
-
   updateUser(user: Utilisateur) {
     return this.http.put(`${this.baseUrl}/update`, user);
   }  

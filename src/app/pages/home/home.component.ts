@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { UtilisateurService } from '../../core/services/utilisateur/utilisateur.service';
 import { MatCardModule } from '@angular/material/card';
+import { MatrixComponent } from "../../features/risk/matrix/matrix.component";
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule],
+  imports: [MatCardModule, MatrixComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

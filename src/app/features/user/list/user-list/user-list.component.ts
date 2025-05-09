@@ -8,7 +8,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { UtilisateurProfil } from '../../../../core/models/UtilisateurProfil';
 import { MatDialog } from '@angular/material/dialog';
-import { UpdateUserPopUpComponent } from '../../update/update-user-pop-up/update-user-pop-up.component';
 import { CreateUserComponent } from '../../create/create-user/create-user.component';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../../core/services/auth/auth.service';
@@ -32,7 +31,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   private authService = inject(AuthService);
 
   dataSource = new MatTableDataSource<UtilisateurProfil>();
-  displayedColumns = ['username', 'email', 'equipeName', 'role', 'actions'];
+  displayedColumns = ['username', 'email', 'actions'];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -44,6 +43,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   loadUsers(): void {
     this.userService.getUserProfiles().subscribe(users => {
       this.dataSource.data = users;
+      console.log(users)
     });
   }
 
