@@ -102,7 +102,8 @@ export class IncidentService {
   }
 
   downloadExport(incidentId: string): void {
-    this.http.get(`${this.baseUrl}/incidents/${incidentId}/export`, {
+    const url = `${environment.apiReportingUrl}/export/${incidentId}`;
+    this.http.get(url, {
       responseType: 'blob'
     }).subscribe(
       blob => {
