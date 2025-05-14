@@ -8,9 +8,10 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { UtilisateurProfil } from '../../../../core/models/UtilisateurProfil';
 import { MatDialog } from '@angular/material/dialog';
-import { UpdateUserPopUpComponent } from '../../update/update-user-pop-up/update-user-pop-up.component';
 import { CreateUserComponent } from '../../create/create-user/create-user.component';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { Utilisateur } from '../../../../core/models/Utilisateur';
 
 @Component({
   selector: 'app-user-list',
@@ -27,9 +28,10 @@ import { MatButtonModule } from '@angular/material/button';
 export class UserListComponent implements OnInit, AfterViewInit {
   private userService = inject(UtilisateurService);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
 
   dataSource = new MatTableDataSource<UtilisateurProfil>();
-  displayedColumns = ['username', 'email', 'equipeName', 'role', 'actions'];
+  displayedColumns = ['username', 'email', 'actions'];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -45,32 +47,26 @@ export class UserListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  openEditDialog(user: UtilisateurProfil): void {
-    const dialogRef = this.dialog.open(UpdateUserPopUpComponent, {
-      width: '400px',
+  openEditDialog(user: Utilisateur): void {
+    const dialogRef = this.dialog.open(CreateUserComponent, {
+      width: '700px',
       data: user
     });
-  
-    dialogRef.afterClosed().subscribe(updated => {
-      if (updated) {
-        console.log('📌 Données avant modification :', user);
-        console.log('✏️ Données modifiées :', updated);
-  
-        const payload = {
-          username: updated.username,
-          role: updated.role,
-          equipeId: updated.equipeId
-        };
-  
-        this.userService.updateUser(user.id, payload).subscribe({
-          next: () => {
-            console.log('✅ Utilisateur mis à jour avec succès !');
-            this.loadUsers();
-          },
-          error: (err) => {
-            console.error('❌ Erreur lors de la mise à jour', err);
-          }
-        });
+
+    dialogRef.afterClosed().subscribe(u => {
+      if (u) {
+        console.log('📝 Modification de l\'utilisateur :', u);
+          this.userService.updateUser(u).subscribe({
+            next: () => {
+              console.log('✅ Utilisateur mis à jour avec succès !');
+              this.loadUsers();
+            },
+            error: (err) => {
+              console.error('❌ Erreur lors de la mise à jour', err);
+            }
+          });
+        
+
       } else {
         console.log('⛔ Modification annulée.');
       }
@@ -79,18 +75,25 @@ export class UserListComponent implements OnInit, AfterViewInit {
 
   openCreateUserDialog(): void {
     const dialogRef = this.dialog.open(CreateUserComponent, {
-      width: '500px'
+      width: '700px'
     });
-  
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('✅ Nouvel utilisateur créé');
-        this.loadUsers();
+
+    dialogRef.afterClosed().subscribe(u => {
+      if (u) {
+        this.authService.register(u).subscribe({
+          next: () => {
+            alert("✅ Utilisateur créé !");
+            this.loadUsers();
+          },
+          error: () => {
+            alert("❌ Une erreur est survenue");
+          }
+        });
       }
     });
   }
-  
-  
+
+
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;

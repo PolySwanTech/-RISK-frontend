@@ -9,7 +9,7 @@ import { Risk } from '../../models/Risk';
 export class RiskService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/risk';
+  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl) + '/risk';
 
   getAll() {
     return this.http.get<Risk[]>(this.baseUrl)

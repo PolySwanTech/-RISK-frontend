@@ -1,5 +1,6 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { AuthService } from '../services/auth/auth.service';
+import { PermissionNameType } from '../enum/permission.enum';
 
 @Directive({
   selector: '[appHasPermission]',
@@ -12,7 +13,7 @@ export class HasPermissionDirective {
     private authService: AuthService
   ) {}
 
-  @Input() set appHasPermission(permissions: string | string[]) {
+  @Input() set appHasPermission(permissions: PermissionNameType | PermissionNameType[]) {
     if (typeof permissions === 'string') {
       permissions = [permissions];
     }

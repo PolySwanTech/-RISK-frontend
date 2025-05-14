@@ -1,0 +1,17 @@
+<h2>Créer un Processus</h2>
+
+<form [formGroup]="processForm" (ngSubmit)="onSubmit()">
+  <label for="name">Nom du Processus:</label>
+  <input type="text" formControlName="name" />
+  @if(processForm.get('name')?.invalid && processForm.get('name')?.touched) {
+    <div>Le nom est requis.</div>
+  }
+
+  <label for="bu_id">BU ID:</label>
+  <input type="text" formControlName="bu_id" />
+  @if(processForm.get('bu_id')?.invalid && processForm.get('bu_id')?.touched) {
+    <div>Le BU ID est requis.</div>
+  }
+
+  <button type="submit" [disabled]="processForm.invalid">Créer le Process</button>
+</form>

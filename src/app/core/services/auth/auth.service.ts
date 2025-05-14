@@ -11,13 +11,13 @@ import { jwtDecode } from 'jwt-decode';
 })
 export class AuthService {
   
-  base = environment.apiUserUrl;
+  base = (environment.log ? environment.apiLogUserUrl : environment.apiUserUrl);
   http = inject(HttpClient);
   router = inject(Router);
   
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 
-  private permissions: string[] = [];
+  private permissions: { [teamId: string]: string[] } = {};
 
   private utilisateurConnecte!: Utilisateur;
   
@@ -62,19 +62,27 @@ export class AuthService {
     this.router.navigate(['auth', 'login'])
   }
 
-  setPermissions(permissions: string[]): void {
+  setPermissions(permissions: { [teamId: string]: string[] }): void {
     this.permissions = permissions;
   }
   
-  getPermissions(): string[] {
-    if (this.permissions.length > 0) return this.permissions;
+  getPermissions(): { [teamId: string]: string[] } {
+    if (Object.keys(this.permissions).length > 0) return this.permissions;
   
     const token: any = this.decryptToken();
-    return token?.permissions || [];
+    return token?.permissions || {};
   }
   
   hasPermission(permission: string): boolean {
-    return this.getPermissions().includes(permission);
+    const permsByTeam = this.getPermissions();
+  
+    for (const teamId in permsByTeam) {
+      if (permsByTeam[teamId].includes(permission)) {
+        return true;
+      }
+    }
+  
+    return false;
   }
 
   setUtilisateur(user: Utilisateur): void {

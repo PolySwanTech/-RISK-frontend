@@ -1,12 +1,12 @@
 <h2>Gestion des permissions</h2>
 
 <div class="container">
-  <div class="user-list" *ngIf="users && users.length > 0">
+  <div class="user-list" *ngIf="roles && roles.length > 0">
     <mat-form-field class="full-width autocomplete-field">
       <input
         type="text"
         matInput
-        placeholder="Utilisateurs"
+        placeholder="Roles"
         [matAutocomplete]="auto"
         [(ngModel)]="searchQuery"
         (input)="filterBySearch()"
@@ -18,25 +18,25 @@
         [displayWith]="displayFn"
         (optionSelected)="selectUser($event.option.value)">
         <mat-option
-          *ngIf="filteredUsers.length === 0"
+          *ngIf="filteredRoles.length === 0"
           disabled
           class="no-results">
           Aucun utilisateur trouvé
         </mat-option>
         <mat-option
-          *ngFor="let user of filteredUsers"
-          [value]="user"
+          *ngFor="let role of filteredRoles"
+          [value]="role"
           class="autocomplete-option">
-          {{ user.username }}
+          {{ role.name }}
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
   </div>
 
-  <div class="permissions" *ngIf="selectedUser">
+  <div class="permissions" *ngIf="selectedRole">
     <mat-card class="permissions-card">
       <mat-card-title>
-        Permissions de {{ selectedUser.username }}
+        Permissions de {{ selectedRole.name }}
       </mat-card-title>
       <mat-card-content>
         <div class="permissions-list">

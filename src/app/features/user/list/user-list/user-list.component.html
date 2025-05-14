@@ -17,16 +17,6 @@
                 <td mat-cell *matCellDef="let user">{{ user.email }}</td>
             </ng-container>
 
-            <ng-container matColumnDef="equipeName">
-                <th mat-header-cell *matHeaderCellDef>Équipe</th>
-                <td mat-cell *matCellDef="let user">{{ user.equipeName || 'AE' }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="role">
-                <th mat-header-cell *matHeaderCellDef>Rôle</th>
-                <td mat-cell *matCellDef="let user">{{ user.role }}</td>
-            </ng-container>
-
             <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let user">

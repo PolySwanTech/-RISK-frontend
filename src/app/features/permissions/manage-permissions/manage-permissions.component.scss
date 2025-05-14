@@ -54,3 +54,9 @@ h2{
   color: rgb(32, 31, 31) !important;
 }
 
+.mat-mdc-card-content {
+  max-height: 55vh;
+  overflow: auto;
+  margin: 10px 0px;
+}
+
