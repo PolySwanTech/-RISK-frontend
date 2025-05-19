@@ -119,3 +119,17 @@
   .deco{
     margin-top: 20px;
   }
+
+  .lang-select {
+    width: 200px;
+    margin: 1rem 0;
+  
+    mat-select {
+      text-align: start;
+    }
+  
+    mat-option {
+      display: flex;
+      align-items: center;
+    }
+  }

@@ -17,6 +17,7 @@ export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
       {
         error : (error) => {
           if (error.status === 401) {
+            sessionStorage.clear();
             window.location.href = '/auth/login';
           }
         }

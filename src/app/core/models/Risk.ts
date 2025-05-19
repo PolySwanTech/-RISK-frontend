@@ -7,6 +7,7 @@ export class Risk{
     titre : string = ""
     taxonomie : string
     balois : string
+
     description : string = ""
     actionPlan : string = ""
     level : string = ""

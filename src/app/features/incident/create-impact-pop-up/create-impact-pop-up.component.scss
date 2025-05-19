@@ -3,12 +3,6 @@ h2{
     font-weight: bold !important;
 }
 
-/* Form field styling */
-mat-form-field {
-    width: 100%;
-    /* Ensure it stretches full width */
-    margin-bottom: 20px;
-}
 
 /* Button styling */
 button.save-button {
@@ -29,12 +23,7 @@ button.save-button:hover {
     margin-left: 4%;
 }
 
-input {
-    width: 95%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
+
 
 button {
     width: 100%;

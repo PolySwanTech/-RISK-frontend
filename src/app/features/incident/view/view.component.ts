@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ImpactCardComponent } from '../impact-card/impact-card.component';
@@ -16,12 +16,15 @@ import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
+import { SuiviIncident } from '../../../core/models/SuiviIncident';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe,
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe, DatePipe,
     MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule, MatInputModule, GoBackComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss',
@@ -33,24 +36,79 @@ export class ViewComponent {
   private incidentService = inject(IncidentService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
-  private confirmService = inject(ConfirmService)
+  private confirmService = inject(ConfirmService);
+  private router = inject(Router);
+  private suiviIncidentService = inject(SuiviIncidentService);
+  private http = inject(HttpClient);
 
   incident: Incident | undefined
-  prevCommentaire: string = ''
-  totalAmount = 0
+  totalAmount = 0;
+  userRole: string | undefined;
+  userTeam: string | undefined;
+  username: string | undefined;
+  canClose: boolean = false;
+  message: string = "";
+  idIncident: string = "";
+  suivi: SuiviIncident[] = []
 
   ngOnInit(): void {
-    const id = this.route.snapshot.params['id'];
+    this.idIncident = this.route.snapshot.params['id'];
+    this.loadIncident(this.idIncident);
+    // this.loadSuiviIncident(this.idIncident);
+  }
 
+  loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
-      console.log(incident)
       this.incident = incident;
-      this.prevCommentaire = this.incident.comments || ''
+      this.extractTokenInfo();
+      this.checkCloseAuthorization();
     });
 
     this.incidentService.sum(id).subscribe(
       result => this.totalAmount = result
     )
+  }
+
+  // loadSuiviIncident(id: string): void {
+  //   this.suiviIncidentService.getSuiviIncidentById(id).subscribe(
+  //     {
+  //       next: (suivi) => {
+  //         this.suivi = suivi;
+  //         console.log(this.suivi)
+  //       },
+  //       error: (error) => {
+  //         console.error("Erreur lors de la récupération des suivis d'incidents :", error);
+  //       }
+  //     }
+  //   ) 
+  // }
+
+  extractTokenInfo(): void {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      console.warn("Aucun token trouvé");
+      return;
+    }
+
+    const base64Payload = token.split('.')[1];
+    const jsonPayload = new TextDecoder().decode(
+      Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
+    );
+    const payload = JSON.parse(jsonPayload);
+    this.userRole = payload.role;
+    this.userTeam = payload.team;
+    this.username = payload.username;
+  }
+
+  checkCloseAuthorization(): void {
+    const normalizedUserTeam = this.normalize(this.userTeam);
+    const normalizedIncidentTeam = this.normalize(this.incident?.equipeName);
+
+    this.canClose = this.userRole === 'VALIDATEUR' && normalizedUserTeam === normalizedIncidentTeam;
+  }
+
+  normalize(str?: string): string {
+    return str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() || '';
   }
 
   getState() {
@@ -73,7 +131,6 @@ export class ViewComponent {
   }
 
   addImpact() {
-
     // Open the Impact Add dialog
     const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
       width: '400px', // You can adjust the dialog size as needed
@@ -95,13 +152,6 @@ export class ViewComponent {
     });
   }
 
-  noChange() {
-    if (this.incident && this.incident.comments) {
-      return this.prevCommentaire === this.incident.comments
-    }
-    return true;
-  }
-
   isNotClosed() {
     if (this.incident) {
       return this.incident.closedAt == null
@@ -109,26 +159,24 @@ export class ViewComponent {
     return false
   }
 
-  updateCommentaire() {
-    if (this.incident) {
-      this.incidentService.updateCommentaire(this.incident.id, this.incident.comments).subscribe(
-        _ => {
-          this.confirmService.openConfirmDialog("Mise à jour effectuée",
-            "Description mis à jour avec succès", false).subscribe();
-          this.ngOnInit();
-        }
-      )
+  accessSuivi() {
+    this.router.navigate(['incident', this.incident?.id, 'suivi'])
+  }
+
+  sendMessage() {
+    if (this.incident && this.username) {
+      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
+        () => {
+          this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
+          // this.loadSuiviIncident(this.idIncident);
+        });
     }
   }
 
-  close() {
-    if (this.incident) {
-      this.incidentService.close(this.incident.id).subscribe(
-        _ => {
-          alert("incident cloturé")
-          this.ngOnInit();
-        }
-      )
-    }
+  downloadExport(): void {
+    if (!this.incident?.id) return;
+    this.incidentService.downloadExport(this.incident.id);
   }
+  
+
 }

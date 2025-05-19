@@ -10,20 +10,29 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { IncidentService } from '../../core/services/incident/incident.service';
-import { jwtDecode } from 'jwt-decode';
-
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { HasPermissionDirective } from '../../core/directives/has-permission.directive';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   standalone: true,
-  imports: [MatSidenavModule,
+  imports: [
+    HasPermissionDirective,
+    MatSidenavModule,
     MatListModule,
     MatIconModule,
     MatButtonModule,
     MatToolbarModule,
-    AsyncPipe,
-    MatMenuModule, RouterLink, MatBadgeModule],
+    AsyncPipe, CommonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    RouterModule,
+    MatMenuModule, RouterLink, MatBadgeModule, TranslateModule],
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
@@ -34,12 +43,20 @@ export class SidebarComponent implements OnInit {
 
   storageSubscription: any;
 
-  constructor(private router: Router, public authService: AuthService, private incidentService: IncidentService) { }
+  constructor(public authService: AuthService,
+    private incidentService: IncidentService, private translate: TranslateService) {
+    const browserLang = navigator.language.split('-')[0];
+    const supportedLangs = ['en', 'fr'];
+    const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'fr';
+
+    translate.setDefaultLang('fr');
+    translate.use(defaultLang);
+  }
 
   ngOnInit(): void {
     this.updateLoginStatus();
     const token = this.authService.decryptToken() ?? null;
-    if (token) {
+    if(token){
       setTimeout(() => {
         if (!this.authService.isTokenExpired(token)) {
           this.incidentService.countIncidentsNonClotures().subscribe(resp => {
@@ -49,6 +66,10 @@ export class SidebarComponent implements OnInit {
       }, 1000)
     }
 
+  }
+
+  changeLang(lang: any) {
+    this.translate.use(lang ? lang : 'fr');
   }
 
   // Method to update login status

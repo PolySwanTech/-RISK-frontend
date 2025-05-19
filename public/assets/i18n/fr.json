@@ -1,0 +1,23 @@
+{
+  "MENU": {
+    "DASHBOARD": "Tableau de bord",
+    "INCIDENTS": "Incidents",
+    "ADMIN": "Administration",
+    "SETTINGS": "Paramétrage global",
+    "USERS": "Gestion des utilisateurs",
+    "PERMISSIONS": "Gestion des permissions",
+    "LANGUAGE": "Langue",
+    "LOGOUT": "Déconnexion"
+  },
+  "LOGIN": {
+    "TITLE": "Connexion",
+    "USERNAME": "Nom d'utilisateur",
+    "PASSWORD": "Mot de passe",
+    "LOGIN_BUTTON": "Connexion",
+    "FORGOT_PASSWORD": "Mot de passe oublié ?",
+    "RESET_TITLE": "Réinitialisation du mot de passe",
+    "EMAIL": "Email",
+    "RESET_BUTTON": "Réinitialiser le mot de passe",
+    "CANCEL_BUTTON": "Annuler"
+  }
+}

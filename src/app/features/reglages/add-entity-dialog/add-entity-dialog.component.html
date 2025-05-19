@@ -1,19 +1,20 @@
 <h2 mat-dialog-title>{{titlePage}}</h2>
 <mat-dialog-content>
   <form [formGroup]="formGroup">
-    <div class="form-group">
-      <label for="reset-email">Nom :</label>
-      <input formControlName="name" placeholder="Nom" required />
-    </div>
+
+    <mat-form-field class="full-width">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="name" placeholder="Nom" required>
+  </mat-form-field>
 
     <div class="form-group">
       <label>Ligne Métier ?</label>
       <mat-slide-toggle formControlName="isLM" />
     </div>
   </form>
-  <app-select-entities [selectId]="entiteResponsable.parentId ? entiteResponsable.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>
+  <app-select-entities [entiteEnfantId]=" data ? data.id : ''" [selectId]="entiteResponsable.parentId ? entiteResponsable.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>
   <div class="actions">
-    <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
     <button class="red" (click)="goBack()">Retour</button>
+    <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
   </div>
 </mat-dialog-content>

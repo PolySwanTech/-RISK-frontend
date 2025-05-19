@@ -9,10 +9,11 @@ import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { GoBackComponent } from "../../../../shared/components/go-back/go-back.component";
+import { MatStepperModule } from '@angular/material/stepper';
 
 @Component({
   selector: 'app-create-risks',
-  imports: [FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatSelectModule, GoBackComponent],
+  imports: [FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatSelectModule, GoBackComponent,  MatStepperModule,],
   templateUrl: './create-risks.component.html',
   styleUrl: './create-risks.component.scss'
 })
@@ -28,10 +29,15 @@ export class CreateRisksComponent {
     titre: ['', Validators.required],
     taxonomie: ['', Validators.required],
     balois: ['', Validators.required],
+
+  });
+
+  riskForm2 = this._formBuilder.group({
     description: ['', Validators.required],
     plan: ['', Validators.required],
     level: ['', Validators.required]
   });
+
 
   pageTitle = "Création d'un risque"
   responseMessage = { title: 'Création', message: 'création' }
@@ -63,9 +69,9 @@ export class CreateRisksComponent {
         this.riskForm.get('titre')?.setValue(this.risk.titre);
         this.riskForm.get('taxonomie')?.setValue(this.risk.taxonomie);
         this.riskForm.get('balois')?.setValue(this.risk.balois);
-        this.riskForm.get('description')?.setValue(this.risk.description);
-        this.riskForm.get('plan')?.setValue(this.risk.actionPlan);
-        this.riskForm.get('level')?.setValue(this.risk.level);
+        this.riskForm2.get('description')?.setValue(this.risk.description);
+        this.riskForm2.get('plan')?.setValue(this.risk.actionPlan);
+        this.riskForm2.get('level')?.setValue(this.risk.level);
       });
   }
 
@@ -74,9 +80,9 @@ export class CreateRisksComponent {
       this.risk.titre = this.riskForm.get('titre')?.value ?? '';
       this.risk.taxonomie = this.riskForm.get('taxonomie')?.value ?? '';
       this.risk.balois = this.riskForm.get('balois')?.value ?? '';
-      this.risk.description = this.riskForm.get('description')?.value ?? '';
-      this.risk.actionPlan = this.riskForm.get('plan')?.value ?? '';
-      this.risk.level = this.riskForm.get('level')?.value ?? '';
+      this.risk.description = this.riskForm2.get('description')?.value ?? '';
+      this.risk.actionPlan = this.riskForm2.get('plan')?.value ?? '';
+      this.risk.level = this.riskForm2.get('level')?.value ?? '';
 
       console.log(this.risk)
 

@@ -8,12 +8,13 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { SelectEntitiesComponent } from "../../../shared/components/select-entities/select-entities.component";
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-add-entity-dialog',
   standalone: true,
   imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
-    MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent],
+    MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent, MatFormFieldModule, MatInputModule],
   templateUrl: './add-entity-dialog.component.html',
   styleUrls: ['./add-entity-dialog.component.scss']
 })

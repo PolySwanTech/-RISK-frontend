@@ -1,21 +1,35 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment.prod'
 import { Utilisateur } from '../../models/Utilisateur';
-import { environment } from '../../../environments/environment.prod';
+import { UtilisateurProfil } from '../../models/UtilisateurProfil';
+import { TeamRole } from '../../models/TeamMember';
+import { PermissionName } from '../../enum/permission.enum';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilisateurService {
 
-  private readonly http: HttpClient = inject(HttpClient);
+  http = inject(HttpClient);
+  
+  baseUrl = (environment.log ? environment.apiLogUserUrl : environment.apiUserUrl) + '/user';
 
-  private apiUrl = environment.apiUrl + '/user';
+  getUsers(): Observable<Utilisateur[]> {
+    return this.http.get<Utilisateur[]>(this.baseUrl);
+  }    
 
-  constructor() { }
+  getUserProfiles(): Observable<UtilisateurProfil[]> {
+    return this.http.get<UtilisateurProfil[]>(this.baseUrl);
+  }  
 
-  getUsers() {
-    return this.http.get<Utilisateur[]>(this.apiUrl);
+  updateUser(user: Utilisateur) {
+    return this.http.put(`${this.baseUrl}/update`, user);
+  }  
+
+  getUserRoles(userId : string): Observable<TeamRole[]> {
+    return this.http.get<TeamRole[]>(`${this.baseUrl}/${userId}/roles`);
   }
 }

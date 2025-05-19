@@ -1,0 +1,171 @@
+$primary-color: #1976d2;
+$secondary-color: #f4f4f4;
+$background-color: #f9f9f9;
+$hover-color: #f0f0f0;
+$focus-border-color: $primary-color;
+$border-color: #ccc;
+
+// Mixin pour les transitions
+@mixin transition($property) {
+  transition: $property 0.3s ease;
+}
+
+// Table
+table {
+  min-width: auto !important;
+  border-collapse: collapse;
+  margin-block: 20px;
+  background-color: $background-color;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  th,
+  td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid $border-color;
+    font-size: 14px;
+  }
+
+  th {
+    background-color: #2980b9 !important;
+    font-weight: bold;
+  }
+
+  td {
+    cursor: pointer;
+    @include transition(background-color);
+
+    &:hover {
+      background-color: $hover-color;
+    }
+  }
+}
+
+// Inputs de la matrice
+input:not([type="color"]) {
+  width: 100px;
+  padding: 5px;
+  background-color: unset;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #fff;
+  box-sizing: border-box;
+  text-align: center;
+  border: none;
+
+  &:focus {
+    outline: none;
+    border-color: $focus-border-color;
+  }
+}
+
+// Contrôles
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  justify-content: center;
+
+  button {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    @include transition(background-color);
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+
+  label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  select,
+  input[type="color"] {
+    padding: 5px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    font-size: 14px;
+
+    &:focus {
+      outline: none;
+      border-color: $focus-border-color;
+    }
+  }
+}
+
+// Style pour les labels des axes
+.axis-labels input {
+  font-size: 14px;
+  text-align: center;
+  width: 60px;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  margin: 5px;
+}
+
+.axis-labels th {
+  text-align: left;
+}
+
+// Style pour les labels de colonnes en bas
+.ff {
+
+  th,
+  td {
+    background-color: $secondary-color;
+  }
+
+  th {
+    text-align: center !important;
+  }
+
+  input {
+    text-align: center;
+    width: 60px;
+    border: none;
+    color: #000;
+  }
+
+  input:focus {
+    border: none;
+    outline: none;
+    background-color: $hover-color;
+  }
+}
+
+h3 {
+
+  font-weight: bold;
+  color: #34495e;
+  text-align: center;
+}
+
+section{
+  flex-direction: column;
+}
+
+.add-button {
+  font-size: 15px;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  align-items: center;
+  padding: 12px 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: var(--mat-sys-surface-tint);
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  margin-bottom: 1%;
+}

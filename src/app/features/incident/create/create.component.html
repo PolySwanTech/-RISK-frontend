@@ -6,14 +6,29 @@
       <mat-stepper [linear]="false" #stepper>
         <mat-step [stepControl]="incidentForm1" label="Informations de base">
           <form [formGroup]="incidentForm1">
-            <mat-form-field>
+            <mat-form-field >
               <mat-label>Titre</mat-label>
               <input matInput formControlName="titre" placeholder="Titre">
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
+            <ng-container *ngIf="hasTeam; else selectTeam">
+              <mat-form-field >
+                <mat-label>Équipe</mat-label>
+                <input matInput formControlName="equipeName" readonly>
+              </mat-form-field>
+            </ng-container>
+            <ng-template #selectTeam>
+              <mat-form-field>
+                <mat-label>Choisissez une équipe</mat-label>
+                <mat-select formControlName="equipeName">
+                  <mat-option *ngFor="let team of listTeams" [value]="team">{{ team }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ng-template>    
+
+            <mat-form-field class="full-width">
               <mat-label>Description de l'incident</mat-label>
-              <textarea matInput formControlName="commentaire"></textarea>
+              <textarea matInput formControlName="commentaire" placeholder="Description de l'incident"></textarea>
             </mat-form-field>
 
             <mat-form-field>
@@ -30,7 +45,7 @@
               <input matInput formControlName="location" placeholder="Location">
             </mat-form-field>
 
-            <div>
+            <div class="actions">
               <button class="green" (click)="draft()">Brouillon</button>
               <button [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
             </div>
@@ -59,7 +74,8 @@
               <input matInput type="date" formControlName="dateDeCloture">
             </mat-form-field>
 
-            <div>
+            <div class="actions">
+              <button class="red" matStepperPrevious>Retour</button>
               <button class="green" (click)="draft()">Brouillon</button>
               <button [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
             </div>

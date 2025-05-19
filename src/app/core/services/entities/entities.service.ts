@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment.prod';
 export class EntitiesService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/entites'
+  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl) + '/entites'
 
   loadEntities(): Observable<EntiteResponsable[]> {
     return this.http.get<EntiteResponsable[]>(this.baseUrl);

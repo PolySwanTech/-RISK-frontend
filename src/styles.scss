@@ -45,7 +45,7 @@
     --mat-sys-surface-container: #e5e7ea;
     --mat-sys-surface-container-high: #ddd;
     --mat-sys-surface-container-highest: #d9dbdf;
-    --mat-sys-surface-container-low: #f0f2f5;
+    --mat-sys-surface-container-low: #f5f8fb;
     --mat-sys-surface-container-lowest: #ffffff;
     --mat-sys-surface-dim: #d1d3d7;
     --mat-sys-surface-tint: #004aad;
@@ -64,6 +64,7 @@
     --draft-color-hover: #257a09;
     --box-background-color: #345c94;
     --box-background-color-hover: #2b4b7a;
+    --mdc-filled-text-field-container-color : snow;
 }
 
 
@@ -227,7 +228,7 @@ button {
 
     background-color: var(--btn-background);
     color: var(--mat-sys-surface-container-lowest);
-
+    transition: background-color 0.3s ease, color 0.3s ease !important;
 
     &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger, .mat-mdc-icon-button, .mdc-switch) {
         background-color: var(--btn-background-hover);
@@ -298,5 +299,80 @@ tr:last-child{
     
     &.unknown {
       background-color: #6c757d; 
+    }
+  }
+
+  .mat-drawer-container{
+    background-color: aliceblue;
+    // background: radial-gradient(circle at center, aliceblue 30%, #84c0fc);
+}
+
+.table-container{
+    width: 100%;
+    min-width: 700px;
+}
+
+table {
+    min-width: 100% !important;
+    border-collapse: collapse !important;
+    background: var(--mat-sys-surface-bright) !important;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important;
+
+
+    th {
+      background-color: var(--mat-sys-surface-tint) !important;
+      color: var(--mat-sys-on-secondary) !important;
+      font-weight: bold !important;
+      text-align: left !important;
+    }
+
+    td,
+    th {
+      padding: 12px !important;
+    }
+
+    tr:hover {
+      background: var(--mat-sys-surface-container-high) !important;
+    }
+
+    .mat-select {
+      width: 100% !important;
+    }
+  }
+
+  .mat-elevation-z8 {
+    border-top-left-radius:8px !important;
+    border-top-right-radius:8px !important;
+    overflow: hidden !important;
+  }
+
+  mat-paginator {
+    background-color: var(--mat-sys-surface-bright) !important;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  td mat-icon{
+    color: var(--mat-sys-error) !important;
+  }
+
+
+
+  .mat-mdc-dialog-component-host{
+    h2{
+        text-align: center;
+        font-weight: bold !important;
+    }
+
+    button:not(.mdc-switch) {
+        width: 100%;
+        margin-top: 20px;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.3s;
     }
   }

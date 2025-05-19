@@ -22,6 +22,8 @@ export class SelectEntitiesComponent {
   filteredStates!: Observable<EntiteResponsable[]>;
   filteredEntities!: EntiteResponsable[];
 
+  @Input() entiteEnfantId : string = '';
+
   @Input() placeholder: string = 'Entité parent';
   @Input() selectId: string = '';
   selectedEntity: any;
@@ -42,6 +44,9 @@ export class SelectEntitiesComponent {
   loadEntites(): void {
     this.entitiesService.loadEntities().subscribe(resp => {
       this.entities = resp;
+      if(this.entiteEnfantId){
+        this.entities = this.entities.filter(e => e.id != this.entiteEnfantId);
+      }
       if (this.selectId) {
         this.entitiesService.findById(this.selectId).subscribe(entite => {
           this.selectedEntity = entite;

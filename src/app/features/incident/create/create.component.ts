@@ -1,18 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatButtonModule } from '@angular/material/button';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
-import { merge } from 'rxjs';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { Risk } from '../../../core/models/Risk';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
-import { Utilisateur } from '../../../core/models/Utilisateur';
 import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
 import { CauseService } from '../../../core/services/cause/cause.service';
@@ -22,7 +19,8 @@ import { Process } from '../../../core/models/Process';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
-import { State } from '../../../core/models/Incident';
+import { EquipeService } from '../../../core/services/equipe/equipe.service';
+import { NgIf, NgFor } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
@@ -32,6 +30,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
     GoBackComponent,
     MatButtonModule,
     MatFormFieldModule,
+    MatSelectModule,
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
@@ -39,22 +38,24 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
     MatRadioModule,
     SelectUsersComponent,
     ButtonAddFileComponent,
-    MatSelectModule
+    NgIf, NgFor
   ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
-export class CreateComponent {
+export class CreateComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
   private confirmService = inject(ConfirmService);
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
     location: ['', Validators.required],
     commentaire: ['', Validators.required],
-    cause: [null, Validators.required]
-
+    cause: ['', Validators.required],
+    equipeId: [''],
+    equipeName: [''],
   });
 
   incidentForm2 = this._formBuilder.group({
@@ -77,9 +78,12 @@ export class CreateComponent {
   listProcess: Process[] = [];
 
   errorMessage = signal('');
+  hasTeam = true;
+  listTeams: string[] = [];
 
   constructor(private incidentService: IncidentService, private riskService: RiskService,
-    private causeService: CauseService, private processService: ProcessService) {
+    private causeService: CauseService, private processService: ProcessService, private equipeService: EquipeService) {
+
     this.riskService.getAll().subscribe((resp: any) => {
       this.listRisk = resp;
     });
@@ -89,6 +93,45 @@ export class CreateComponent {
     this.processService.getAll().subscribe((resp: any) => {
       this.listProcess = resp;
     });
+  }
+
+  ngOnInit(): void {
+    const teamName = this.getUserTeamFromToken();
+    if (teamName) {
+      this.hasTeam = true;
+      this.incidentForm1.patchValue({ equipeName: teamName });
+    } else {
+      this.hasTeam = false;
+      this.fetchTeams();
+    }
+  }
+
+  fetchTeams(): void {
+    this.equipeService.getAllEquipes().subscribe({
+      next: (teams: any[]) => {
+        this.listTeams = teams.map(t => t.name);
+      },
+      error: err => {
+        console.error("Erreur lors du chargement des équipes", err);
+      }
+    });
+  }
+
+  getUserTeamFromToken(): string | null {
+    const token = sessionStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const base64Payload = token.split('.')[1];
+      const jsonPayload = new TextDecoder().decode(
+        Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
+      );
+      const payload = JSON.parse(jsonPayload);
+      return payload.team || null;
+    } catch (e) {
+      console.error("Erreur lors du décodage du token :", e);
+      return null;
+    }
   }
 
   changeUser(event: any) {
@@ -125,12 +168,13 @@ export class CreateComponent {
       userMail: this.incidentForm3.value.userMail,
       files: this.incidentForm3.value.files,
       process: this.incidentForm3.value.process,
+      equipeName: this.incidentForm1.value.equipeName,
     };
     return incident;
   }
 
   addIncident() {
-    if (this.incidentForm1.invalid || this.incidentForm2.invalid) {
+    if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
       alert("Tous les champs obligatoires ne sont pas remplis");
       return;
     }
@@ -150,15 +194,33 @@ export class CreateComponent {
   }
 
   afterCreation(title: string, incidentId: string) {
-    this.confirmService.openConfirmDialog(title, "Allez vers la consultation ?", true)
-      .subscribe(result => {
-        if (result) {
-          this.router.navigate(['incident', incidentId])
-        }
-        else {
-          this.router.navigate(['incident'])
+    if (this.hasTeam) {
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        width: '400px',
+        data: {
+          title,
+          message: 'Allez vers la consultation ?',
+          buttons: true
         }
       });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.router.navigate(['incident', incidentId]);
+        } else {
+          this.router.navigate(['incident']);
+        }
+      });
+    } else {
+      this.confirmService.openConfirmDialog(title, "Allez vers la consultation ?", true)
+        .subscribe(result => {
+          if (result) {
+            this.router.navigate(['incident', incidentId]);
+          } else {
+            this.router.navigate(['incident']);
+          }
+        });
+    }
   }
 
   parseDate(date: string | null | undefined): string | null {
