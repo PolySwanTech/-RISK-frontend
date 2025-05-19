@@ -13,6 +13,6 @@ export const PermissionGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
     return true;
   }
   
-  router.navigate(['/unauthorized']);
+  router.navigate(['/auth/login']);
   return false;
 };
