@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { PermissionName } from '../../enum/permission.enum';
 
@@ -16,7 +16,7 @@ export interface Role {
 export class RoleService {
 
   private http = inject(HttpClient);
-  private baseUrl = (environment.log ? environment.apiLogUserUrl : environment.apiUserUrl) + '/roles';
+  private baseUrl = environment.apiUrl + '/users/roles';
 
   getAllRoles(): Observable<Role[]> {
     return this.http.get<Role[]>(`${this.baseUrl}`);

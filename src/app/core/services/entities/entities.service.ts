@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { EntiteResponsable } from '../../models/EntiteResponsable';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment.prod';
 export class EntitiesService {
 
   http = inject(HttpClient);
-  baseUrl = (environment.log ? environment.apiLogUrl : environment.apiUrl) + '/entites'
+  baseUrl = environment.apiUrl + '/entites'
 
   loadEntities(): Observable<EntiteResponsable[]> {
     return this.http.get<EntiteResponsable[]>(this.baseUrl);

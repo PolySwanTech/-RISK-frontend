@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { PermissionName } from '../../enum/permission.enum';
 
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
-  private baseUrl = (environment.log ? environment.apiLogUserUrl : environment.apiUserUrl) + '/permissions';
+  private baseUrl = environment.apiUrl + '/users/permissions';
 
   constructor(private http: HttpClient) {}
 
