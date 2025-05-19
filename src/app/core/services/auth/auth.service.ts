@@ -25,7 +25,7 @@ export class AuthService {
 
   decryptToken(){
     const token = sessionStorage.getItem('token');
-    return jwtDecode(token ? token : '');
+    return token ? jwtDecode(token) : null;
   }
 
   isTokenExpired(token: any): boolean {
