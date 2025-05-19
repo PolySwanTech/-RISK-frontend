@@ -9,6 +9,8 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { PermissionGuard } from './core/guards/permission.guard';
 import { permissionRoutes } from './features/permissions/permissions.routes';
 import { PermissionName } from './core/enum/permission.enum';
+import { actionPlanRoutes } from './features/action-plan/action-plan.routes';
+import { controlRoutes } from './features/control/control.routes';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
@@ -19,5 +21,8 @@ export const routes: Routes = [
   { path: 'reglages', children: reglagesRoute },
   { path: 'permissions', children: permissionRoutes, canActivate: [AuthGuard] },
   { path: 'organigramme', children: organigrammeRoutes, canActivate: [AuthGuard] },
+  { path: 'action-plan', children: actionPlanRoutes, canActivate: [AuthGuard] },
+  { path: 'control', children: controlRoutes, canActivate: [AuthGuard] },
+  
 
 ];

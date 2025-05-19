@@ -21,6 +21,19 @@
           </span>
         </a>
       </ng-container>
+      <!-- <ng-container *appHasPermission="'VIEW_ACTION_PLANS'"> -->
+      <ng-container>
+        <a mat-list-item routerLink="/action-plan/chart">
+          <mat-icon>pie_chart</mat-icon>
+          <span>Plans d'action</span>
+        </a>
+      </ng-container>
+      <ng-container>
+        <a mat-list-item routerLink="/control/chart">
+          <mat-icon>bar_chart</mat-icon>
+          <span>Contrôles</span>
+        </a>
+      </ng-container>
       <a mat-list-item [matMenuTriggerFor]="menu">
         <mat-icon>settings</mat-icon>
         <span>{{ 'MENU.ADMIN' | translate }}</span>

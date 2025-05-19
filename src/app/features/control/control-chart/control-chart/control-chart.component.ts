@@ -1,0 +1,81 @@
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartType, ChartOptions } from 'chart.js';
+import { CommonModule } from '@angular/common';
+import { NgChartsModule } from 'ng2-charts';
+import { MatCardModule } from '@angular/material/card';
+import { FormsModule } from '@angular/forms';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+
+@Component({
+  selector: 'app-control-chart',
+  standalone: true,
+  imports: [CommonModule, NgChartsModule, MatCardModule, FormsModule, MatButtonToggleModule],
+  templateUrl: './control-chart.component.html',
+  styleUrls: ['./control-chart.component.scss']
+})
+export class ControlChartComponent implements OnInit {
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+
+  groupByLevel = false;
+  controls: any[] = [];
+
+  pieChartData = {
+    labels: [] as string[],
+    datasets: [{
+      data: [] as number[],
+      backgroundColor: ['#ef5350', '#ffa726', '#66bb6a', '#29b6f6'],
+      borderColor: '#fff',
+      borderWidth: 2
+    }]
+  };
+
+  pieChartOptions: ChartOptions<'pie'> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          font: { size: 13 },
+          color: '#333'
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const label = ctx.label || '';
+            const value = ctx.parsed;
+            return `${label}: ${value}`;
+          }
+        }
+      }
+    }
+  };
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.http.get<any[]>('data-example/controls-fake-data.json').subscribe(data => {
+      this.controls = data;
+      this.updateChart();
+    });
+  }
+
+  updateChart() {
+    const counts: Record<string, number> = {};
+
+    this.controls.forEach(control => {
+      const key = this.groupByLevel
+        ? control.level?.toString().trim()
+        : control.status?.toString().trim();
+
+      if (!key) return;
+      counts[key] = (counts[key] || 0) + 1;
+    });
+
+    this.pieChartData.labels = Object.keys(counts);
+    this.pieChartData.datasets[0].data = Object.values(counts);
+    this.chart?.update();
+  }
+}

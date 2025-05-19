@@ -21,12 +21,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { IncidentChartComponent } from '../incident-chart/incident-chart.component';
 
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
+  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, IncidentChartComponent,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
