@@ -25,7 +25,7 @@ export class CreateProcessComponent {
     if (this.processForm.valid) {
       const formValues = this.processForm.value;
       const newProcess = new Process(formValues.name, formValues.bu_id);
-      this.processService.createProcess(newProcess).then(() => {
+      this.processService.createProcess(newProcess).subscribe(() => {
         alert('Process créé avec succès !');
         this.processForm.reset({ id: 0 });
       });

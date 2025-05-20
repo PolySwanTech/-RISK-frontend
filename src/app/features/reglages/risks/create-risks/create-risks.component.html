@@ -40,9 +40,9 @@
             <mat-form-field>
               <mat-label>Niveau</mat-label>
               <mat-select formControlName="level" placeholder="Choisissez un niveau de risque" required>
-                @for(level of levels; track level){
+                @for(level of riskLevels; track level){
                 <mat-option [value]="level">
-                  {{ level }}
+                  {{ getRiskLevelLabel(level) }}
                 </mat-option>
                 }
               </mat-select>
