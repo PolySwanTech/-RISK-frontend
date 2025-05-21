@@ -20,9 +20,9 @@ export class ProcessService {
     return this.http.post<Process>(this.baseUrl , process)
   }
 
-  getAllByEntite(entite : EntiteResponsable){
+  getAllByEntite(entiteId : string){
     let param = new HttpParams();
-    param = param.set('buId', entite.id);
+    param = param.set('buId', entiteId);
     return this.http.get<Process[]>(this.baseUrl, {params : param})
   }
 }

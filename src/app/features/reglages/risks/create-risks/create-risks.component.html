@@ -23,6 +23,11 @@
               <input matInput formControlName="balois" placeholder="Entrez le balois" />
             </mat-form-field>
 
+            <mat-form-field class="full-width">
+              <mat-label>Processus</mat-label>
+              <input matInput formControlName="process" placeholder="Entrez le processus" />
+            </mat-form-field>
+
             <div class="actions">
               <button [disabled]="riskForm.invalid" matStepperNext>Suivant</button>
             </div>

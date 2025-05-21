@@ -9,7 +9,7 @@
 
     <div class="form-group">
       <label>Ligne Métier ?</label>
-      <mat-slide-toggle formControlName="isLM" />
+      <mat-slide-toggle formControlName="lm" />
     </div>
   </form>
   <app-select-entities [entiteEnfantId]=" data ? data.id : ''" [selectId]="entiteResponsable.parentId ? entiteResponsable.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>

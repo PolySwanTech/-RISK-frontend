@@ -29,7 +29,7 @@ export class CreateRisksComponent {
     titre: ['', Validators.required],
     taxonomie: ['', Validators.required],
     balois: ['', Validators.required],
-
+    process: ['', Validators.required],
   });
 
   riskForm2 = this._formBuilder.group({
@@ -69,9 +69,9 @@ export class CreateRisksComponent {
   loadRiskById(id: string) {
     this.riskService.getById(id).subscribe(rep => {
       this.risk = rep
-      this.pageTitle = "Mise à jour du risque : " + this.risk.titre;
+      this.pageTitle = "Mise à jour du risque : " + this.risk.name;
       this.responseMessage = { title: 'Mise à jour', message: 'mise à jour' }
-      this.riskForm.get('titre')?.setValue(this.risk.titre);
+      this.riskForm.get('titre')?.setValue(this.risk.name);
       this.riskForm.get('taxonomie')?.setValue(this.risk.taxonomie);
       this.riskForm.get('balois')?.setValue(this.risk.balois);
       this.riskForm2.get('description')?.setValue(this.risk.description);
@@ -82,9 +82,10 @@ export class CreateRisksComponent {
 
   createRisk() {
     if (this.risk && this.riskForm.valid) {
-      this.risk.titre = this.riskForm.get('titre')?.value ?? '';
+      this.risk.name = this.riskForm.get('titre')?.value ?? '';
       this.risk.taxonomie = this.riskForm.get('taxonomie')?.value ?? '';
       this.risk.balois = this.riskForm.get('balois')?.value ?? '';
+      this.risk.processId = this.riskForm.get('process')?.value ?? '';
       this.risk.description = this.riskForm2.get('description')?.value ?? '';
       this.risk.actionPlan = this.riskForm2.get('plan')?.value ?? '';
       this.risk.level = this.riskForm2.get('level')?.value ?? '';

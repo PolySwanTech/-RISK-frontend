@@ -34,7 +34,7 @@ export class CategorySelectionComponent implements OnInit {
     @Optional() public dialogRef: MatDialogRef<CategorySelectionComponent>,
     @Optional() public dialogRefModif: MatDialogRef<CategorySelectionComponent>,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getEntities();
@@ -55,17 +55,24 @@ export class CategorySelectionComponent implements OnInit {
     if (event) {
       event.stopPropagation(); // Empêche la propagation du clic
     }
-  
+
     const dialogRef = this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     });
-  
+
     dialogRef.afterClosed().subscribe(entiteResponsable => {
       if (entiteResponsable) {
-        this.entityService.save(entiteResponsable).subscribe(() => {
-          this.ngOnInit(); // Rafraîchir après ajout/modification
-        });
+        if (entiteResponsable.id == null) {
+          this.entityService.save(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
+        else {
+          this.entityService.update(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
       }
     });
   }

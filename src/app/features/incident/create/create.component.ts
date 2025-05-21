@@ -84,7 +84,7 @@ export class CreateComponent implements OnInit {
   constructor(private incidentService: IncidentService, private riskService: RiskService,
     private causeService: CauseService, private processService: ProcessService, private equipeService: EquipeService) {
 
-    this.riskService.getAll().subscribe((resp: any) => {
+    this.riskService.getAllByProcess("test").subscribe((resp: any) => {
       this.listRisk = resp;
     });
     this.causeService.getAll().subscribe((resp: any) => {

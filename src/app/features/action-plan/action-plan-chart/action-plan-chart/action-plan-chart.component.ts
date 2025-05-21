@@ -1,9 +1,11 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
 import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateActionPlanDialogComponent } from '../../create-action-plan-dialog/create-action-plan-dialog.component';
 
 @Component({
   selector: 'app-action-plan-chart',
@@ -13,6 +15,8 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./action-plan-chart.component.scss']
 })
 export class ActionPlanChartComponent implements OnInit {
+
+  dialog = inject(MatDialog);
 
   constructor(private http: HttpClient) {}
 
@@ -57,6 +61,13 @@ export class ActionPlanChartComponent implements OnInit {
       this.doughnutChartDataFull.labels = Object.keys(statusCounts);
       this.doughnutChartDataFull.datasets[0].data = Object.values(statusCounts);
       this.chart?.update();
+    });
+  }
+
+  create(){
+    const dialogRef = this.dialog.open(CreateActionPlanDialogComponent, {
+      width: '600px',
+      height: '400px',
     });
   }
 }

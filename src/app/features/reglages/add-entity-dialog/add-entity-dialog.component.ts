@@ -24,11 +24,9 @@ export class AddEntityDialogComponent {
 
   formGroup: FormGroup = this._formBuilder.group({
     name: ['', Validators.required],
-    isLM: [false],
+    lm: [false],
     parent: [null]
   });
-
-  entitiesList : EntiteResponsable[] = [];
 
   entiteResponsable = new EntiteResponsable("", '', false, [], null);
 
@@ -44,7 +42,7 @@ export class AddEntityDialogComponent {
     if(this.data){
       this.titlePage = "Modification de l'entité responsable : " + this.data.name;
       this.formGroup.get('name')?.setValue(this.data.name);
-      this.formGroup.get('isLM')?.setValue(this.data.isLM);
+      this.formGroup.get('lm')?.setValue(this.data.lm);
       this.formGroup.get('parent')?.setValue(this.data.parent);
     }
     setTimeout(() => {
@@ -53,13 +51,12 @@ export class AddEntityDialogComponent {
   }
 
   entiteChange(event: any) {
-    console.log(event);
     this.formGroup.get('parent')?.setValue(event.id);
   }
 
   onSave(): void {
     this.entiteResponsable.name = this.formGroup.get('name')?.value;
-    this.entiteResponsable.isLM = this.formGroup.get('isLM')?.value;
+    this.entiteResponsable.lm = this.formGroup.get('lm')?.value;
     this.entiteResponsable.parentId = this.formGroup.get('parent')?.value;
     this.dialogRef.close(this.entiteResponsable);
   }

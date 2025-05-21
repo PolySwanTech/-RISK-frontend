@@ -21,8 +21,8 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-organigramme',
   imports: [CommonModule, MatDialogModule, MatIconModule,
-      MatRippleModule, MatChipsModule, MatTreeModule, MatButtonModule, 
-      MatFormFieldModule, MatInputModule, MatCheckboxModule, FormsModule, MatSelectModule],
+    MatRippleModule, MatChipsModule, MatTreeModule, MatButtonModule,
+    MatFormFieldModule, MatInputModule, MatCheckboxModule, FormsModule, MatSelectModule],
   templateUrl: './organigramme.component.html',
   styleUrl: './organigramme.component.scss'
 })
@@ -43,7 +43,7 @@ export class OrganigrammeComponent {
     @Optional() public dialogRef: MatDialogRef<CategorySelectionComponent>,
     @Optional() public dialogRefModif: MatDialogRef<CategorySelectionComponent>,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     forkJoin({
@@ -54,7 +54,7 @@ export class OrganigrammeComponent {
       console.log(this.entities);
       this.filteredEntities = this.entities;
       this.roles = roles;
-  
+
       if (this.teamRoles.length > 0) {
         this.applyTeamRoles(this.teamRoles);
       }
@@ -66,49 +66,57 @@ export class OrganigrammeComponent {
   hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
 
   applyTeamRoles(teamRoles: any[]) {
-  const markEntity = (nodes: any[]) => {
-    for (let node of nodes) {
-      const match = teamRoles.find(tr => tr.buId == node.id);
-      if (match) {
-        node.checked = true;
+    const markEntity = (nodes: any[]) => {
+      for (let node of nodes) {
+        const match = teamRoles.find(tr => tr.buId == node.id);
+        if (match) {
+          node.checked = true;
 
-        console.log(match)
-        // Chercher le rôle dans la liste des rôles disponibles
-        const matchingRole = this.roles.find(r => r.id == match.role?.id);
-        console.log(matchingRole);
-        node.role = matchingRole || null;
+          console.log(match)
+          // Chercher le rôle dans la liste des rôles disponibles
+          const matchingRole = this.roles.find(r => r.id == match.role?.id);
+          console.log(matchingRole);
+          node.role = matchingRole || null;
 
-        this.onParentCheckChange(node, { checked: true });
-        this.propagateRoleToChildren(node, node.role);
+          this.onParentCheckChange(node, { checked: true });
+          this.propagateRoleToChildren(node, node.role);
+        }
+
+        if (node.children && node.children.length > 0) {
+          markEntity(node.children);
+        }
       }
+    };
 
-      if (node.children && node.children.length > 0) {
-        markEntity(node.children);
-      }
-    }
-  };
+    markEntity(this.filteredEntities);
 
-  markEntity(this.filteredEntities);
-
-  // Rafraîchir les feuilles sélectionnées
-  this.getLeafNodes(this.filteredEntities);
-}
+    // Rafraîchir les feuilles sélectionnées
+    this.getLeafNodes(this.filteredEntities);
+  }
 
   openEntityDialog(entite?: EntiteResponsable, event?: Event) {
     if (event) {
       event.stopPropagation(); // Empêche la propagation du clic
     }
-  
+
     const dialogRef = this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     });
-  
+
     dialogRef.afterClosed().subscribe(entiteResponsable => {
       if (entiteResponsable) {
-        this.entityService.save(entiteResponsable).subscribe(() => {
-          this.ngOnInit(); // Rafraîchir après ajout/modification
-        });
+        console.log(entiteResponsable);
+        if(entiteResponsable.id == null){ // creation
+          this.entityService.save(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
+        else{ // update
+          this.entityService.update(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
       }
     });
   }
@@ -144,15 +152,15 @@ export class OrganigrammeComponent {
     node.checked = event.checked;
     this.checkAllDescendants(node, node.checked);
   }
-  
+
   checkAllDescendants(node: any, checked: boolean): void {
     if (node.children && node.children.length > 0) {
-      if(!node.checked){
+      if (!node.checked) {
         node.role = null;
       }
       for (let child of node.children) {
         child.checked = checked;
-        if(!child.checked){
+        if (!child.checked) {
           child.role = null;
         }
         this.checkAllDescendants(child, checked);
@@ -160,8 +168,8 @@ export class OrganigrammeComponent {
     }
   }
 
-  resetRole(node : any){
-    if(!node.checked){
+  resetRole(node: any) {
+    if (!node.checked) {
       node.role = null;
     }
     this.getLeafNodes(this.filteredEntities);
@@ -172,7 +180,7 @@ export class OrganigrammeComponent {
       this.propagateRoleToChildren(node, node.role);
     }
   }
-  
+
   propagateRoleToChildren(node: any, role: string | null): void {
     if (node.children && node.children.length > 0) {
       for (let child of node.children) {
@@ -187,7 +195,7 @@ export class OrganigrammeComponent {
 
   getLeafNodes(tree: any[]) {
     const leaves: any[] = [];
-  
+
     const traverse = (nodes: any[]) => {
       for (let node of nodes) {
         if ((!node.children || node.children.length === 0) && node.checked && node.role) {
@@ -197,7 +205,7 @@ export class OrganigrammeComponent {
         }
       }
     };
-  
+
     traverse(tree);
     console.log(leaves);
     this.rolesEvent.emit(leaves);

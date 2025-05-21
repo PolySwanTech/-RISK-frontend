@@ -13,9 +13,9 @@ export interface Equipe {
 })
 export class EquipeService {
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl + '/risks/equipes';
+  private baseUrl = environment.apiUrl + '/users';
 
   getAllEquipes(): Observable<Equipe[]> {
-    return this.http.get<Equipe[]>(`${this.baseUrl}`);
+    return this.http.get<Equipe[]>(`${this.baseUrl + '/bu'}`);
   }
 }

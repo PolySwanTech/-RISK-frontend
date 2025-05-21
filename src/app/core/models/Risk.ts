@@ -18,7 +18,7 @@ export const RiskLevelLabels: Record<RiskLevel, string> = {
 
 export class Risk{
     id : string
-    titre : string = ""
+    name : string = ""
     taxonomie : string
     balois : string
 
@@ -26,7 +26,7 @@ export class Risk{
     actionPlan : string = ""
     level : string = ""
     entiteResponsable : EntiteResponsable[] = []
-    processes : Process[] = []
+    processId : string = ""
     subRisks : SubRisk[]
     
     constructor(
