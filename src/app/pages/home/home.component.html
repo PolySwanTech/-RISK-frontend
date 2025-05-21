@@ -1,14 +1,9 @@
-<div class="dashboard-container">
-  <div class="row">
-    @for(card of cards; track card){
-      <div class="card col-md-4">
-        <div class="card-body">
-          <h5 class="card-title">{{ card.title }}</h5>
-          <p class="card-text">{{ card.value }}</p>
-        </div>
-      </div>
-    }
-  </div>
+<section class="dashboard-container">
+<h1>Tableau de bord</h1>
+<div class="graphs-container">
+<app-action-plan-chart></app-action-plan-chart>
+<app-control-chart></app-control-chart>
 </div>
+</section>
 
 <app-matrix></app-matrix>

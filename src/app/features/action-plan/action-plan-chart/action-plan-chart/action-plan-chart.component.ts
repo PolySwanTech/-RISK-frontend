@@ -34,12 +34,28 @@ export class ActionPlanChartComponent implements OnInit {
 
   doughnutChartOptions: ChartOptions<'doughnut'> = {
     responsive: true,
+    maintainAspectRatio: false, // permet d'adapter la taille à son conteneur
+    layout: {
+      padding: {
+        top: 30 // 👈 espace sous le graphique
+      }
+    },
     plugins: {
       legend: {
-        position: 'bottom',
+        position: 'left',
         labels: {
-          color: '#333',
-          font: { size: 13 }
+          color: '#333',                 // couleur du texte
+          font: {
+            size: 14,                    // taille du texte
+            weight: 'bold',              // épaisseur (normal, bold, etc.)
+            family: 'Arial, sans-serif' // police de caractères
+          },
+          boxWidth: 20,                  // taille du carré de couleur
+          boxHeight: 15,                 // hauteur du carré de couleur (Chart.js 4+)
+          padding: 20,                   // espacement autour du texte dans la légende
+          usePointStyle: true,          // affiche un rond au lieu d'un carré
+          pointStyle: 'circle',         // 'circle', 'rect', 'star', etc.
+          textAlign: 'left'             // alignement du texte (start, center, end)
         }
       }
     },

@@ -41,3 +41,19 @@ mat-card {
 .col-md-4 {
     padding: 10px;
 }
+
+.graphs-container {
+  display: flex;
+    align-items: center;
+    gap: 30px;
+    justify-content: center;
+    >*{
+        flex: 1;
+    }
+}
+
+.dashboard-container{
+    margin-inline: 30px;
+    display: block;
+    width: auto;
+}

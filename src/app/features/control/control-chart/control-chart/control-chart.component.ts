@@ -33,12 +33,24 @@ export class ControlChartComponent implements OnInit {
 
   pieChartOptions: ChartOptions<'pie'> = {
     responsive: true,
+        maintainAspectRatio: false, // permet d'adapter la taille à son conteneur
+  layout: { padding: 20 },
     plugins: {
       legend: {
-        position: 'bottom',
+        position: 'left',
         labels: {
-          font: { size: 13 },
-          color: '#333'
+          color: '#333',                 // couleur du texte
+          font: {
+            size: 14,                    // taille du texte
+            weight: 'bold',              // épaisseur (normal, bold, etc.)
+            family: 'Arial, sans-serif' // police de caractères
+          },
+          boxWidth: 20,                  // taille du carré de couleur
+          boxHeight: 15,                 // hauteur du carré de couleur (Chart.js 4+)
+          padding: 20,                   // espacement autour du texte dans la légende
+          usePointStyle: true,          // affiche un rond au lieu d'un carré
+          pointStyle: 'circle',         // 'circle', 'rect', 'star', etc.
+          textAlign: 'left'             // alignement du texte (start, center, end)
         }
       },
       tooltip: {

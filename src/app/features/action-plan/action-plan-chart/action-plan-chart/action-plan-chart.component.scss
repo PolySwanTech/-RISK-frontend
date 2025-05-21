@@ -1,5 +1,6 @@
 .chart-container {
-    max-width: 650px;
+
+    height: 460px;
     margin: 40px auto;
     border-radius: 12px;
     padding: 1rem;
@@ -17,6 +18,13 @@
         }
     }
 
+    mat-card-content{
+        display: flex;
+        justify-content: center;
+         align-items: center;
+        height: 100%;
+    }
+
     input[type="file"] {
         margin-bottom: 20px;
         display: block;
@@ -24,8 +32,8 @@
 
     canvas {
         display: block;
-        margin: auto;
         max-height: 300px;
+  
         width: 100% !important;
     }
 }
