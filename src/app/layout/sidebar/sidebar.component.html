@@ -7,7 +7,7 @@
     <mat-nav-list>
       @if(authService.isLogin$ | async){
       <ng-container *appHasPermission="'VIEW_DASHBOARDS'">
-        <a mat-list-item routerLink="/dashboard">
+        <a mat-list-item href="/dashboard" routerLink="/dashboard">
           <mat-icon>dashboard</mat-icon>
           <span>{{ 'MENU.DASHBOARD' | translate }}</span>
         </a>

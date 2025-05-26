@@ -8,5 +8,7 @@
         </canvas>
     </mat-card-content>
 
-    <button (click)="create()">Créer un plan d'action</button>
+    @if(createPlan){
+        <button mat-raised-button class="btn-primary" (click)="create()">Créer un plan d'action</button>
+    }
 </mat-card>

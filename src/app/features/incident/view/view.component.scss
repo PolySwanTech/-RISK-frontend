@@ -77,25 +77,6 @@ app-impact-card {
   max-width: 180px;
 }
 
-button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: 0.3s;
-  position: relative;
-  bottom: 5px;
-}
-
-button.add {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-
-
 .full-width {
   width: 100%;
 }

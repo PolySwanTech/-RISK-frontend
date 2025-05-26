@@ -1,84 +1,95 @@
 <h2>Formulaire de création d'un plan d'action</h2>
 
-<form #actionPlanForm="ngForm" (ngSubmit)="onSubmit()">
-    <div>
-        <label>Nom</label>
-        <input name="name" [(ngModel)]="actionPlan.name" required />
-    </div>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
 
-    <div>
-        <label>Libellé</label>
-        <input name="libelle" [(ngModel)]="actionPlan.libelle" required />
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Libellé</mat-label>
+      <input matInput formControlName="libelle" />
+    </mat-form-field>
+  </div>
 
-    <div>
-        <label>Description</label>
-        <textarea name="description" [(ngModel)]="actionPlan.description" required></textarea>
-    </div>
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
 
-    <div>
-        <label>Échéance</label>
-        <input type="date" name="echeance" [(ngModel)]="actionPlan.echeance" required />
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Échéance</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="echeance" />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+  </div>
 
-    <div>
-        <label>Statut</label>
-        <select name="statut" [(ngModel)]="actionPlan.status">
-            @for(s of statuts; track s){
-            <option [ngValue]="s">{{ s }}</option>
-            }
-        </select>
-    </div>
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Statut</mat-label>
+      <mat-select formControlName="status">
+        @for (s of statuts; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
-    <div>
-        <label>Priorité</label>
-        <select name="priority" [(ngModel)]="actionPlan.priority">
-            @for(p of priorities; track p){
-            <option [ngValue]="p">{{ p }}</option>
-            }
-        </select>
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Priorité</mat-label>
+      <mat-select formControlName="priority">
+        @for (p of priorities; track p) {
+          <mat-option [value]="p">{{ p }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
 
-    <div>
-        <label>Impact</label>
-        <select name="impact" [(ngModel)]="actionPlan.impact">
-            @for(i of impacts; track i){
-            <option [ngValue]="i">{{ i }}</option>
-            }
-        </select>
-    </div>
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Impact</mat-label>
+      <mat-select formControlName="impact">
+        @for (i of impacts; track i) {
+          <mat-option [value]="i">{{ i }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
-    <div>
-        <label>Entité Responsable</label>
-        <select name="entiteResponsable" [(ngModel)]="entiteResponsableId"
-            (ngModelChange)="onEntiteResponsableChange()">
-            @for(bu of entitesResponsables; track bu){
-            <option [ngValue]="bu.id">{{ bu.name }}</option>
-            }
-        </select>
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Entité Responsable</mat-label>
+      <mat-select formControlName="entiteResponsableId" (selectionChange)="onEntiteResponsableChange()">
+        @for (bu of entitesResponsables; track bu.id) {
+          <mat-option [value]="bu.id">{{ bu.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
 
-    @if(entiteResponsableId){
-    <div>
-        <label>Process</label>
-        <select name="process" [(ngModel)]="processId" (ngModelChange)="onProcessChange()">
-            @for(p of processes; track p){
-            <option [ngValue]="p.id">{{ p.name }}</option>
-            }
-        </select>
-    </div>
+  <div class="row-add">
+    @if (form.get('entiteResponsableId')?.value) {
+      <mat-form-field appearance="outline">
+        <mat-label>Process</mat-label>
+        <mat-select formControlName="processId" (selectionChange)="onProcessChange()">
+          @for (p of processes; track p.id) {
+            <mat-option [value]="p.id">{{ p.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     }
 
-    @if(processId){
-    <div>
-        <label>Risk</label>
-        <select name="risk" [(ngModel)]="actionPlan.riskId">
-            @for(r of risks; track r){
-            <option [ngValue]="r.id">{{ r.name }}</option>
-            }
-        </select>
-    </div>
-
+    @if (form.get('processId')?.value) {
+      <mat-form-field appearance="outline">
+        <mat-label>Risk</mat-label>
+        <mat-select formControlName="riskId">
+          @for (r of risks; track r.id) {
+            <mat-option [value]="r.id">{{ r.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     }
-    <button type="submit">Créer</button>
+  </div>
+
+  <button mat-raised-button class="btn-primary" type="submit">Créer</button>
 </form>

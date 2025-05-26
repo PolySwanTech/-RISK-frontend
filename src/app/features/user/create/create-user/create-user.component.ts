@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { OrganigrammeComponent } from "../../../organigramme/organigramme/organigramme.component";
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-create-user',
@@ -17,7 +18,7 @@ import { OrganigrammeComponent } from "../../../organigramme/organigramme/organi
   imports: [CommonModule, ReactiveFormsModule, MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule, OrganigrammeComponent],
+    MatSelectModule, OrganigrammeComponent, MatButtonModule],
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss']
 })

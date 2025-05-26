@@ -33,10 +33,10 @@
                                 <input matInput [value]="incident.risk.balois" readonly>
                             </mat-form-field>
 
-                            <mat-form-field class="full-width">
+                            <!-- <mat-form-field class="full-width">
                                 <mat-label>Sous Catégorie de risque</mat-label>
                                 <input matInput [value]="incident.subRisk.balois" readonly>
-                            </mat-form-field>
+                            </mat-form-field> -->
                         </div>
                         <div class="dates">
                             <mat-form-field class="full-width">
@@ -72,7 +72,7 @@
         <mat-card class="state-card">
             <mat-card-header>
                 <mat-card-title><span>Suivi</span> </mat-card-title>
-                <button (click)="accessSuivi()">Accéder</button>
+                <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
             </mat-card-header>
             <mat-card-content>
 
@@ -95,7 +95,7 @@
                         <mat-label>Message</mat-label>
                         <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
                     </mat-form-field>
-                    <button (click)="sendMessage()">Envoyer</button>
+                    <button mat-raised-button class="btn-primary" (click)="sendMessage()">Envoyer</button>
                 </div>
             </mat-card-content>
         </mat-card>
@@ -109,7 +109,7 @@
                     </strong>
                 </span>
                 @if(isNotClosed()){
-                <button class="add" color="primary" (click)="addImpact()">
+                <button mat-raised-button class="btn-primary" (click)="addImpact()">
                     Ajouter
                     <mat-icon>add</mat-icon>
                 </button>

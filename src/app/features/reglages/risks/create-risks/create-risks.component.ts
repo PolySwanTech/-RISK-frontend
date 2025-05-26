@@ -10,10 +10,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { GoBackComponent } from "../../../../shared/components/go-back/go-back.component";
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-create-risks',
-  imports: [FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatSelectModule, GoBackComponent, MatStepperModule,],
+  imports: [FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule, 
+    MatSelectModule, GoBackComponent, MatStepperModule, MatButtonModule],
   templateUrl: './create-risks.component.html',
   styleUrl: './create-risks.component.scss'
 })

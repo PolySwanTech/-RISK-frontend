@@ -26,7 +26,7 @@
         </mat-form-field>
 
         <div>
-            <button class="add-button" mat-raised-button (click)="add()"
+            <button mat-raised-button class="btn-primary add-button" (click)="add()"
                 *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter</button>
             <div class="table-container">
                 <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">

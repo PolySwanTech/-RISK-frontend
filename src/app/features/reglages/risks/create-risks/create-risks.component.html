@@ -29,7 +29,7 @@
             </mat-form-field>
 
             <div class="actions">
-              <button [disabled]="riskForm.invalid" matStepperNext>Suivant</button>
+              <button mat-raised-button class="btn-primary" [disabled]="riskForm.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
@@ -61,8 +61,8 @@
           </form>
 
           <div class="actions">
-            <button class="red" matStepperPrevious>Retour</button>
-            <button [disabled]="riskForm.invalid || riskForm2.invalid" (click)="createRisk()">Soumettre</button>
+            <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
+            <button mat-raised-button class="btn-primary" [disabled]="riskForm.invalid || riskForm2.invalid" (click)="createRisk()">Soumettre</button>
           </div>
         </mat-step>
       </mat-stepper>

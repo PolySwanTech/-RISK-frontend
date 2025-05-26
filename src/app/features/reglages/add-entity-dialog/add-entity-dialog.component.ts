@@ -9,12 +9,13 @@ import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { SelectEntitiesComponent } from "../../../shared/components/select-entities/select-entities.component";
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-add-entity-dialog',
   standalone: true,
   imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
-    MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent, MatFormFieldModule, MatInputModule],
+    MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: './add-entity-dialog.component.html',
   styleUrls: ['./add-entity-dialog.component.scss']
 })

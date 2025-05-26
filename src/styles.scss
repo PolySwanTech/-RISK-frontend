@@ -281,11 +281,13 @@ tr:last-child{
     text-align: center;
     min-width: 50px;
 
+    background-color: #6c757d; 
+
     &.new {
       background-color: #52e3cb; 
     }
     
-    &.moyen {
+    &.moyen, &.draft {
       background-color: #ffc107; 
     }
     
@@ -296,10 +298,6 @@ tr:last-child{
     &.fort {
         background-color: #e44239; 
       }
-    
-    &.unknown {
-      background-color: #6c757d; 
-    }
   }
 
   .mat-drawer-container{
@@ -376,3 +374,105 @@ table {
         transition: 0.3s;
     }
   }
+
+  .chart-container {
+
+    height: 460px;
+    border-radius: 12px;
+    padding: 1rem;
+    
+
+    mat-card-header {
+        justify-content: center;
+        text-align: center;
+        padding-bottom: 0;
+
+        mat-card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a237e;
+            margin-bottom: 20px;
+        }
+    }
+
+    mat-card-content{
+        display: flex;
+        justify-content: center;
+         align-items: center;
+        height: 100%;
+    }
+
+    input[type="file"] {
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    canvas {
+        display: block;
+        max-height: 300px;
+  
+        width: 100% !important;
+    }
+
+     .toggle-switch {
+      display: flex;
+      justify-content: center;
+      min-height: 40px;
+      margin: 15px auto 0 auto;
+    }
+}
+
+button[mat-raised-button] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    &.btn-primary {
+        background-color: var(--mat-sys-primary);
+        color: var(--mat-sys-on-primary);
+
+        &:hover {
+            background-color: lighten(#004aad, 5%);
+        }
+    }
+
+    &.btn-green {
+        background-color: var(--draft-color);
+        color: var(--mat-sys-on-primary);
+
+        &:hover {
+            background-color: lighten(#29850b, 5%);
+        }
+    }
+
+    &.btn-red {
+        background-color: var(--mat-sys-on-error-container);
+        color: var(--mat-sys-on-primary);
+
+        &:hover {
+            background-color: lighten(#dc3545, 5%);
+        }
+    }
+
+    &:disabled:not(.mat-mdc-icon-button) {
+        background-color: #ccc;
+        color: #e0e0e0;
+        cursor: not-allowed;
+    }
+
+    mat-icon {
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 19px !important;
+    }
+}

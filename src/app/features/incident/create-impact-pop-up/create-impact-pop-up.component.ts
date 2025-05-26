@@ -9,10 +9,11 @@ import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { ImpactTypeEnum } from '../../../core/enum/impactType.enum';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-create-impact-pop-up',
-  imports: [FormsModule, MatDialogModule, MatLabel, MatSelectModule, MatInputModule],
+  imports: [FormsModule, MatDialogModule, MatLabel, MatSelectModule, MatInputModule, MatButtonModule],
   templateUrl: './create-impact-pop-up.component.html',
   styleUrl: './create-impact-pop-up.component.scss'
 })
