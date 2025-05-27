@@ -28,7 +28,6 @@ export class Incident {
     risk: Risk;
     subRisk: SubRisk;
     process: Process;
-    cause: Cause;
 
     state: State;
     comments: string;
@@ -45,7 +44,6 @@ export class Incident {
         risk: Risk,
         subRisk: SubRisk,
         process: Process,
-        cause: Cause,
         impacts: Impact[],
         comments: string,
         state: State = State.OPEN,
@@ -62,7 +60,6 @@ export class Incident {
         this.risk = risk;
         this.subRisk = subRisk;
         this.process = process;
-        this.cause = cause;
         this.impacts = impacts;
         this.comments = comments;
         this.equipeName = equipeName;

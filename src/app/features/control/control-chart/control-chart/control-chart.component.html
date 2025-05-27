@@ -15,5 +15,10 @@
               type="pie">
       </canvas>
     </mat-card-content>
+
+    
+    @if(createControl){
+        <button mat-raised-button class="btn-primary" (click)="create()">Créer un contrôle</button>
+    }
   </mat-card>
   
