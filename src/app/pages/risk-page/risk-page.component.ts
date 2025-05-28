@@ -185,10 +185,7 @@ export class RiskPageComponent {
     }
 
     this.filteredRisks = tempRisks; // Update the array passed to the matrix
-    // Reset selected risk if the current selected risk is no longer in the filtered list
-    if (this.selectedRisk && !this.filteredRisks.some(r => r.id === this.selectedRisk.id)) {
-      this.selectedRisk = this.filteredRisks.length > 0 ? this.filteredRisks[0] : null;
-    } 
+ 
   }
 
   onSelectRisk(selected: any): void {
