@@ -46,7 +46,6 @@ export class CreateActionPlanDialogComponent implements OnInit {
   );
 
   form: FormGroup = this.fb.group({
-    name: ['', Validators.required],
     libelle: ['', Validators.required],
     description: ['', Validators.required],
     echeance: [null, Validators.required],
