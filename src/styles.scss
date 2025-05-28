@@ -476,3 +476,102 @@ button[mat-raised-button] {
         font-size: 19px !important;
     }
 }
+
+.dashboard-container {
+    display: flex;
+    gap: 30px;
+    flex-direction: column;
+    align-items: normal;
+    padding: 20px;
+    width: auto;
+    height: auto;
+}
+
+/* Nouveaux styles pour les mat-cards */
+.dashboard-header-card {
+    .mat-mdc-card-content {
+        padding: 24px 32px !important;
+    }
+}
+
+.dashboard-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+
+    h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--mat-sys-on-surface);
+    }
+}
+
+.header-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+/* Styles pour la mat-card des filtres */
+.filters-card {
+    .mat-mdc-card-content {
+        padding: 24px 32px !important;
+    }
+}
+
+.filters-section {
+    padding: 0;
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+
+    >div {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+
+        mat-icon {
+            color: var(--mat-sys-primary);
+        }
+    }
+}
+
+.filters-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface);
+}
+
+.filters-row {
+    display: flex;
+    gap: 24px;
+    align-items: end;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+
+   ::ng-deep .mat-mdc-form-field-subscript-wrapper{
+        display: none;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper{
+        display: none;
+    }
+}
+
+.filter-field {
+    width: 100%;
+
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+    }
+}

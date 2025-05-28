@@ -27,8 +27,9 @@ import { IncidentChartComponent } from '../incident-chart/incident-chart.compone
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, IncidentChartComponent,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective],
+  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule, MatButtonModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   providers: [DatePipe]
@@ -99,6 +100,16 @@ export class ListComponent implements OnInit, AfterViewInit {
     this.statusFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
   }
 
+   clearFilters(): void {
+  this.dateFilter.setValue('');
+  this.categoryFilter.setValue('');
+  this.statusFilter.setValue('');
+}
+
+  refreshData(){
+    this.ngOnInit();
+  }
+
   // This method will be triggered when a row is clicked
   onRowClick(incident: Incident) {
     this.router.navigate(['incident', incident.id]);
@@ -163,4 +174,6 @@ export class ListComponent implements OnInit, AfterViewInit {
         // delete incidentId
       })
   }
+
+   
 }
