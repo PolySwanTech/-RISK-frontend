@@ -1,14 +1,13 @@
 import { Component, ViewChild, OnInit, Input, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartType, ChartOptions } from 'chart.js';
+import { ChartOptions } from 'chart.js';
 import { CommonModule } from '@angular/common';
 import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateActionPlanDialogComponent } from '../../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
 import { CreateControlComponent } from '../../create-control/create-control.component';
 
 @Component({
@@ -96,14 +95,5 @@ export class ControlChartComponent implements OnInit {
     this.pieChartData.labels = Object.keys(counts);
     this.pieChartData.datasets[0].data = Object.values(counts);
     this.chart?.update();
-  }
-
-  create() {
-    const dialogRef = this.dialog.open(CreateControlComponent, {
-      width: '700px !important',
-      height: '600px',
-      minWidth: '600px',
-      maxWidth: '600px',
-    });
   }
 }

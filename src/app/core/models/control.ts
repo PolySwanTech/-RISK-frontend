@@ -24,27 +24,34 @@ export enum Type {
 export class Control{
 
     id : string;
+    reference: string;
     libelle: string;
     description: string;
-    frequency: string;
-    degree: string;
+    frequency: Recurence;
+    degree: Degree;
+    type: Type;
     riskId: string;
     
+    buName : string = "";
 
     constructor
     (
         id: string,
+        reference: string,
         libelle: string,
         description: string,
-        frequency: string,
-        degree: string,
+        frequency: Recurence,
+        degree: Degree,
+        type: Type,
         riskId: string
     ) {
         this.id = id;
+        this.reference = reference;
         this.libelle = libelle;
         this.description = description;
         this.frequency = frequency;
         this.degree = degree;
+        this.type = type;
         this.riskId = riskId;
     }
 
