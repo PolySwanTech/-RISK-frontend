@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ControlService } from '../../../core/services/control/control.service';
-import { Control } from '../../../core/models/Control';
+import { ControlTemplate } from '../../../core/models/ControlTemplate';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,31 +38,36 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'Référence',
       header: 'Référence',
-      cell: (element: Control) => `${element.reference}`,
+      cell: (element: ControlTemplate) => `${element.reference}`,
     },
     {
       columnDef: 'Business Unit',
       header: 'Business Unit',
-      cell: (element: Control) => `${element.buName}`,
+      cell: (element: ControlTemplate) => `${element.buName}`,
     },
 
     {
       columnDef: 'Fréquence',
       header: 'Fréquence',
-      cell: (element: Control) => `${element.frequency}`,
+      cell: (element: ControlTemplate) => `${element.frequency}`,
     },
     {
       columnDef: 'type',
       header: 'Type de contrôle',
-      cell: (element: Control) => `${element.type}`,
+      cell: (element: ControlTemplate) => `${element.type}`,
+    },
+    {
+      columnDef: 'level',
+      header: 'Niveau du contrôle',
+      cell: (element: ControlTemplate) => `${element.level}`,
     }
   ];
 
   displayedColumns = [...this.columns.map(c => c.columnDef)];
 
-  dataSource = new MatTableDataSource<Control>([]);
+  dataSource = new MatTableDataSource<ControlTemplate>([]);
 
-  controls: Control[] = [];
+  controls: ControlTemplate[] = [];
   controlService = inject(ControlService);
   router = inject(Router);
   dialog = inject(MatDialog);
@@ -79,7 +84,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   }
 
   getAll() {
-    this.controlService.getAll().subscribe(resp => {
+    this.controlService.getAllTemplates().subscribe(resp => {
       this.controls = resp;
       console.log(this.controls);
       this.dataSource.data = resp;
@@ -87,7 +92,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   }
 
   // This method will be triggered when a row is clicked
-  onRowClick(control: Control) {
+  onRowClick(control: ControlTemplate) {
     this.router.navigate(['controls', control.id]);
   }
   

@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateControlComponent } from '../../create-control/create-control.component';
+import { ControlService } from '../../../../core/services/control/control.service';
 
 @Component({
   selector: 'app-control-chart',
@@ -71,13 +72,19 @@ export class ControlChartComponent implements OnInit {
     }
   };
 
-  constructor(private http: HttpClient) { }
+
+  controlService = inject(ControlService);
 
   ngOnInit() {
-    this.http.get<any[]>('data-example/controls-fake-data.json').subscribe(data => {
+    this.controlService.getAllTemplates().subscribe(data => {
       this.controls = data;
-      this.updateChart();
+      this.controlService.getAllExections().subscribe(data => {
+        this.controls = this.controls.concat(data);
+        this.updateChart();
+      });
     });
+
+
   }
 
   updateChart() {

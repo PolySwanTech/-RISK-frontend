@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { Control } from '../../models/Control';
+import { ControlTemplate } from '../../models/ControlTemplate';
+import { ControlExecution } from '../../models/ControlExecution';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +14,15 @@ export class ControlService {
   baseUrl = environment.apiUrl + '/risks/controls';
   
   
-  createControl(control: Control) {
-    return this.http.post<Control>(`${this.baseUrl}/templates`, control);
+  createControl(control: ControlTemplate) {
+    return this.http.post<ControlTemplate>(`${this.baseUrl}/templates`, control);
   }
 
-  getAll(){
-    return this.http.get<Control[]>(`${this.baseUrl}/templates`);
+  getAllTemplates(){
+    return this.http.get<ControlTemplate[]>(`${this.baseUrl}/templates`);
+  }
+
+  getAllExections(){
+    return this.http.get<ControlExecution[]>(`${this.baseUrl}/executions`);
   }
 }

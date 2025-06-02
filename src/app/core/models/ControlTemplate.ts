@@ -21,14 +21,14 @@ export enum Type {
 }
 
 
-export class Control{
+export class ControlTemplate {
 
     id : string;
     reference: string;
     libelle: string;
     description: string;
     frequency: Recurence;
-    degree: Degree;
+    level: Degree;
     type: Type;
     riskId: string;
     
@@ -41,7 +41,7 @@ export class Control{
         libelle: string,
         description: string,
         frequency: Recurence,
-        degree: Degree,
+        level: Degree,
         type: Type,
         riskId: string
     ) {
@@ -50,7 +50,7 @@ export class Control{
         this.libelle = libelle;
         this.description = description;
         this.frequency = frequency;
-        this.degree = degree;
+        this.level = level;
         this.type = type;
         this.riskId = riskId;
     }

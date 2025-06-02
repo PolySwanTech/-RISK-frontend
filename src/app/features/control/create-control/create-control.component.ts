@@ -15,7 +15,7 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
-import { Control, Degree, Recurence, Type } from '../../../core/models/Control';
+import { Control, Degree, Recurence, Type } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
 import { Risk } from '../../../core/models/Risk';
 
