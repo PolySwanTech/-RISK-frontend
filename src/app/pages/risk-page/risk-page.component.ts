@@ -27,8 +27,8 @@ import { EntitiesService } from '../../core/services/entities/entities.service';
 })
 export class RiskPageComponent {
 
-  selectedNiveau: string | null = null;
-  selectedBU: string | null = null;
+  selectedNiveau: string | null = 'all';
+  selectedBU: string | null = 'all';
 
   selectedRisk: any = null;
 
@@ -164,7 +164,7 @@ export class RiskPageComponent {
     let tempRisks = [...this.risks]; // Start with the full list of risks
 
  
-    if (this.selectedBU && this.selectedBU !== 'Tous les BUs') {
+    if (this.selectedBU && this.selectedBU !== 'all') {
       tempRisks = tempRisks.filter(risk => risk.bu_name === this.selectedBU);
       console.log(tempRisks);
     }

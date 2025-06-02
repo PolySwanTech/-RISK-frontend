@@ -25,7 +25,7 @@
             <mat-form-field appearance="outline" class="filter-field">
               <mat-label>Business Unit</mat-label>
               <mat-select [(ngModel)]="selectedBU" (selectionChange)="applyFilters()">
-                <mat-option value="Tous les BUs">Tous les BUs</mat-option>
+                <mat-option value="all">Toutes les BUs</mat-option>
                 @for (bu of buNameList; track bu) {
                 <mat-option [value]="bu">{{ bu }}</mat-option>
                 }
