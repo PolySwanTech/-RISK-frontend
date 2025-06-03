@@ -6,10 +6,10 @@ import { SubRisk } from "./SubRisk";
 import { Cause } from "./Cause";
 
 export enum State {
-    NEW = "Nouveau",
-    OPEN = "Ouvert",
-    CLOSED = "Fermé",
-    DRAFT = "Brouillon"
+    DRAFT = "DRAFT",
+    VALIDATE = "VALIDATE",  
+    PROCESS = "PROCESS", 
+    CLOSED = "CLOSED",
 }
 
 export class Incident {
@@ -48,7 +48,7 @@ export class Incident {
         process: Process,
         impacts: Impact[],
         comments: string,
-        state: State = State.OPEN,
+        state: State = State.DRAFT,
         equipeName?: string,
         reference : string = "" 
     ) {

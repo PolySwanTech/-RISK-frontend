@@ -36,24 +36,31 @@
                         <div class="dates">
                             <mat-form-field class="full-width">
                                 <mat-label>Date de déclaration</mat-label>
-                                <input matInput [value]="formatDate(incident.declaredAt)" readonly>
+                                <input matInput [value]="incident.declaredAt | date:'dd/MM/yyy'"
+                                    [readonly]="incident.declaredAt != null">
                             </mat-form-field>
 
                             <mat-form-field class="full-width">
                                 <mat-label>Date de survenance</mat-label>
-                                <input matInput [value]="formatDate(incident.survenueAt)" readonly>
+                                <input matInput [value]="incident.survenueAt | date : 'dd/MM/yyyy'"
+                                    [readonly]="incident.survenueAt != null">
                             </mat-form-field>
 
                             <mat-form-field class="full-width">
                                 <mat-label>Date de détection</mat-label>
-                                <input matInput [value]="formatDate(incident.detectedAt)" readonly>
+                                <input matInput [value]="incident.detectedAt | date : 'dd/MM/yyyy'"
+                                    [readonly]="incident.detectedAt != null">
                             </mat-form-field>
-                            @if(incident.closedAt){
                             <mat-form-field class="full-width">
                                 <mat-label>Date de clôture</mat-label>
-                                <input matInput [value]="formatDate(incident.closedAt)" readonly>
+                                @if(incident.closedAt){
+                                <input matInput [value]="incident.closedAt | date:'dd/MM/yyyy'"
+                                    [readonly]="incident.closedAt != null">
+                                }
+                                @else{
+                                <input matInput [value]="'Incident non clôturé'" readonly>
+                                }
                             </mat-form-field>
-                            }
                         </div>
                     </div>
                     <mat-form-field>
@@ -73,7 +80,7 @@
 
                 <div class="comment-section">
                     <div class="comment-header-bar">
-                      <span>Messages les plus récents</span>
+                        <span>Messages les plus récents</span>
                     </div>
                     @for(s of suivi; track s.id){
                     <div class="comment-card">
@@ -81,7 +88,7 @@
                             <mat-icon class="user-icon">person</mat-icon>
                             <span class="username">
                                 {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
-                              </span>
+                            </span>
                         </div>
                         <p class="comment-text">{{s.content}}</p>
                     </div>

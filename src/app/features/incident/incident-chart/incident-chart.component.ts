@@ -82,14 +82,18 @@ export class IncidentChartComponent implements OnChanges {
     let countNew = 0;
     let countClosed = 0;
     for (const incident of this.incidents) {
-      const state = incident.state?.toUpperCase?.();
-      if (state === 'NEW') countNew++;
-      else if (state === 'CLOSED') countClosed++;
+      switch (incident.state) {
+        case State.DRAFT:
+          countNew++;
+          break;
+        case State.CLOSED:
+          countClosed++;
+          break;
+        default:
+          // Ignore other states
+          break;
+      }
     }
-
-
-    console.log("États des incidents:", this.incidents.map(i => i.state));
-    console.log("Comptages:", { countNew, countClosed });
 
     this.doughnutChartDataFull = {
       labels: ['Nouveaux', 'Clôturés'],

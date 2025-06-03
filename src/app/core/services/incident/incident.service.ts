@@ -36,49 +36,7 @@ export class IncidentService {
 
 
   getIncidentById(id: string): Observable<Incident> {
-    return this.http.get<any>(this.baseUrl + '/' + id).pipe(
-      map((responseData: { id: string; titre: string; location: string; comments: string; cause: Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk: Risk; subRisk: SubRisk; process: Process; impacts: Impact[]; equipeName?: string; state: string, reference : string }) => {
-        // Constructing an Incident instance using the constructor
-        const {
-          id,
-          titre,
-          location,
-          comments,
-          declaredAt,
-          survenueAt,
-          detectedAt,
-          closedAt,
-          risk,
-          subRisk,
-          process,
-          impacts,
-          equipeName,
-          state,
-          reference
-        } = responseData;
-
-        const parsedState: State = State[state as keyof typeof State];
-
-        // Conversion des dates en objets Date
-        return new Incident(
-          id,
-          titre,
-          location,
-          new Date(declaredAt),
-          new Date(survenueAt),
-          new Date(detectedAt),
-          closedAt ? new Date(closedAt) : null, // Gestion du cas où closedAt est null
-          risk,
-          subRisk,
-          process,
-          impacts,
-          comments,
-          parsedState,
-          equipeName, 
-          reference
-        );
-      })
-    );
+    return this.http.get<any>(this.baseUrl + '/' + id);
   }
 
   addImpact(impact: Impact) {
