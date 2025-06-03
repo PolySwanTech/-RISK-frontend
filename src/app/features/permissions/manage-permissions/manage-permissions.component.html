@@ -1,5 +1,6 @@
 <h2>Gestion des permissions</h2>
 
+<button (click)="create()">Ajouter un rôle</button>
 <div class="container">
   <div class="user-list" *ngIf="roles && roles.length > 0">
     <mat-form-field class="full-width autocomplete-field">
@@ -21,7 +22,7 @@
           *ngIf="filteredRoles.length === 0"
           disabled
           class="no-results">
-          Aucun utilisateur trouvé
+          Aucun rôle trouvé
         </mat-option>
         <mat-option
           *ngFor="let role of filteredRoles"

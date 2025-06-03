@@ -43,6 +43,11 @@ export class ListComponent implements OnInit, AfterViewInit {
 
   columns = [
     {
+      columnDef: 'référence',
+      header: 'Référence',
+      cell: (element: Incident) => `${element.reference}`,
+    },
+    {
       columnDef: 'titre',
       header: 'Titre',
       cell: (element: Incident) => `${element.titre}`,

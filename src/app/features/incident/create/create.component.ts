@@ -51,11 +51,9 @@ export class CreateComponent implements OnInit {
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
-    location: ['', Validators.required],
+    equipeName: ['', Validators.required],
     commentaire: ['', Validators.required],
-    cause: ['', Validators.required],
-    equipeId: [''],
-    equipeName: [''],
+    location: ['', Validators.required],
   });
 
   incidentForm2 = this._formBuilder.group({
@@ -138,27 +136,11 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('userMail')!.setValue(event.email);
   }
 
-  draft() {
-    const incident = this.convertFormToIncident();
-
-    this.incidentService.draftIncident(incident).subscribe(
-      {
-        next: resp => {
-          this.afterCreation("Brouillon enregistré", resp);
-        },
-        error: err => {
-          console.error("Erreur lors de la création de l'incident", err);
-        }
-      },
-    );
-  }
-
   private convertFormToIncident() {
     const incident = {
       title: this.incidentForm1.value.titre,
       location: this.incidentForm1.value.location,
       commentaire: this.incidentForm1.value.commentaire,
-      cause: this.incidentForm1.value.cause,
       declaredAt: this.parseDate(this.incidentForm2.value.dateDeDeclaration),
       survenueAt: this.parseDate(this.incidentForm2.value.dateDeSurvenance),
       detectedAt: this.parseDate(this.incidentForm2.value.dateDeDetection),
@@ -174,10 +156,6 @@ export class CreateComponent implements OnInit {
   }
 
   addIncident() {
-    if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
-      alert("Tous les champs obligatoires ne sont pas remplis");
-      return;
-    }
 
     const incident = this.convertFormToIncident();
 

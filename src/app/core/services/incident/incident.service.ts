@@ -37,7 +37,7 @@ export class IncidentService {
 
   getIncidentById(id: string): Observable<Incident> {
     return this.http.get<any>(this.baseUrl + '/' + id).pipe(
-      map((responseData: { id: string; titre: string; location: string; comments: string; cause: Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk: Risk; subRisk: SubRisk; process: Process; impacts: Impact[]; equipeName?: string; state: string }) => {
+      map((responseData: { id: string; titre: string; location: string; comments: string; cause: Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk: Risk; subRisk: SubRisk; process: Process; impacts: Impact[]; equipeName?: string; state: string, reference : string }) => {
         // Constructing an Incident instance using the constructor
         const {
           id,
@@ -53,7 +53,8 @@ export class IncidentService {
           process,
           impacts,
           equipeName,
-          state
+          state,
+          reference
         } = responseData;
 
         const parsedState: State = State[state as keyof typeof State];
@@ -73,7 +74,8 @@ export class IncidentService {
           impacts,
           comments,
           parsedState,
-          equipeName
+          equipeName, 
+          reference
         );
       })
     );

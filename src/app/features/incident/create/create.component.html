@@ -37,7 +37,7 @@
             </mat-form-field>
 
             <div class="actions">
-              <button mat-raised-button class="btn-green" (click)="draft()">Brouillon</button>
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
               <button mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
@@ -67,7 +67,7 @@
 
             <div class="actions">
               <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
-              <button mat-raised-button class="btn-green" (click)="draft()">Brouillon</button>
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
               <button mat-raised-button class="btn-primary" [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
@@ -112,7 +112,6 @@
 
           <div class="actions">
             <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
-            <button mat-raised-button class="btn-green" (click)="draft()">Brouillon</button>
             <button  mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
           </div>
         </mat-step>

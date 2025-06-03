@@ -33,6 +33,8 @@ export class Incident {
     comments: string;
     equipeName?: string;
 
+    reference : string = ""
+
     constructor(
         id: string,
         titre: string,
@@ -47,8 +49,8 @@ export class Incident {
         impacts: Impact[],
         comments: string,
         state: State = State.OPEN,
-        equipeName?: string
-        
+        equipeName?: string,
+        reference : string = "" 
     ) {
         this.id = id;
         this.titre = titre;
@@ -63,7 +65,7 @@ export class Incident {
         this.impacts = impacts;
         this.comments = comments;
         this.equipeName = equipeName;
-
+        this.reference = reference;
         this.state = closedAt ? State.CLOSED : state;        
     }
 
