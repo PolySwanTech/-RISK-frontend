@@ -197,13 +197,17 @@ export class RiskPageComponent {
     this.selectedRisk = selected;
   }
 
+  navToRisk(id: number) {
+    this.router.navigate(['reglages', 'risks', id])
+  }
+
   goToAddRisk(): void {
     this.router.navigate(
       ['reglages', 'risks', 'create']
     );
   }
 
-  handleModifyRisk(risk: any): void {
-    // this.selectedRisk = risk;
+  handleModifyRisk(id: number): void {
+    this.navToRisk(id);
   }
 }

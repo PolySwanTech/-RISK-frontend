@@ -19,8 +19,8 @@
     <!-- Section des filtres -->
     <mat-card class="filters-card">
         <mat-card-content class="dashboard-header">
-        <div class="filters-section">
-            <!-- <div class="filters-header">
+            <div class="filters-section">
+                <!-- <div class="filters-header">
                 <div>
                     <mat-icon>filter_alt</mat-icon>
                     <span class="filters-title">Filtres</span>
@@ -31,88 +31,85 @@
                 </button>
             </div> -->
 
-            <div class="filters-row">
-                <div class="filter-group">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Date de survenance</mat-label>
-                        <input matInput [matDatepicker]="picker" [formControl]="dateFilter">
-                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                        <mat-datepicker #picker></mat-datepicker>
-                    </mat-form-field>
-                </div>
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Date de survenance</mat-label>
+                            <input matInput [matDatepicker]="picker" [formControl]="dateFilter">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                    </div>
 
-                <div class="filter-group">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Catégorie</mat-label>
-                        <mat-select [formControl]="categoryFilter">
-                            <mat-option value="">Toutes</mat-option>
-                            <mat-option *ngFor="let category of getUniqueCategories()" [value]="category">{{ category
-                                }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
+                    <div class="filter-group">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Catégorie</mat-label>
+                            <mat-select [formControl]="categoryFilter">
+                                <mat-option value="">Toutes</mat-option>
+                                <mat-option *ngFor="let category of getUniqueCategories()" [value]="category">{{
+                                    category
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
 
-                <div class="filter-group">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Statut</mat-label>
-                        <mat-select [formControl]="statusFilter">
-                            <mat-option value="">Tous</mat-option>
-                            <mat-option value="En cours">En cours</mat-option>
-                            <mat-option value="Clôturé">Clôturé</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <div class="filter-group">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Statut</mat-label>
+                            <mat-select [formControl]="statusFilter">
+                                <mat-option value="">Tous</mat-option>
+                                <mat-option value="En cours">En cours</mat-option>
+                                <mat-option value="Clôturé">Clôturé</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
                 </div>
             </div>
-        </div>
-         <div class="header-controls">
-        <button (click)="clearFilters()" mat-raised-button class="btn-red">
-            <mat-icon>clear</mat-icon>
-            Réinitialiser
-          </button>
-        <button mat-raised-button class="btn-primary add-button" (click)="add()"
-            *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter</button>
-      </div>
+            <div class="header-controls">
+                <button (click)="clearFilters()" mat-raised-button class="btn-red">
+                    <mat-icon>clear</mat-icon>
+                    Réinitialiser
+                </button>
+                <button mat-raised-button class="btn-primary add-button" (click)="add()"
+                    *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter</button>
+            </div>
         </mat-card-content>
-        
+
     </mat-card>
 
-    <div>        
-        <mat-card>
-            <div class="table-container">
-                <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <mat-card>
+        <div class="table-container">
+            <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
-                    @for (column of columns; track column) {
-                    <ng-container [matColumnDef]="column.columnDef">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                            {{column.header}}
-                        </th>
-                        <td mat-cell *matCellDef="let row" (click)="onRowClick(row)" [innerHTML]="column.cell(row)">
+                @for (column of columns; track column) {
+                <ng-container [matColumnDef]="column.columnDef">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{column.header}}
+                    </th>
+                    <td mat-cell *matCellDef="let row" (click)="onRowClick(row)" [innerHTML]="column.cell(row)">
 
-                        </td>
-                    </ng-container>
-                    }
-                    <!-- Actions -->
-                    <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef>Actions</th>
-                        <td mat-cell *matCellDef="let row">
-                            <button mat-icon-button color="warn" (click)="onConfirmAction(row.id)"
-                                matTooltip="Supprimer">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </td>
-                    </ng-container>
+                    </td>
+                </ng-container>
+                }
+                <!-- Actions -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let row">
+                        <button mat-icon-button color="warn" (click)="onConfirmAction(row.id)" matTooltip="Supprimer">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus">
-                    </tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus">
+                </tr>
 
-                </table>
-                <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[4, 10, 15]"
-                    aria-label="Page selection pour le tableau" showFirstLastButtons>
-                </mat-paginator>
-            </div>
-        </mat-card>
-    </div>
-
+            </table>
+            <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[4, 10, 15]"
+                aria-label="Page selection pour le tableau" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </mat-card>
 
 </section>

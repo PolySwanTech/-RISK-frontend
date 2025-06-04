@@ -25,7 +25,7 @@ export class RiskDetailsComponent {
   }
 
   onModifyClick(): void {
-    this.onModify.emit(this.riskData);
+    this.onModify.emit(this.riskData.id);
   }
 
   // onActionPlanClick(): void {

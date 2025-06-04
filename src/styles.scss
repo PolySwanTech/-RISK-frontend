@@ -271,34 +271,34 @@ tr:last-child{
   }
 
   
-  .badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    min-width: 50px;
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  min-width: 50px;
 
-    background-color: #6c757d; 
+  background-color: #adb5bd; // gris doux (default)
 
-    &.new {
-      background-color: #52e3cb; 
-    }
-    
-    &.moyen, &.draft {
-      background-color: #ffc107; 
-    }
-    
-    &.closed, &.faible {
-      background-color: #28a745; 
-    }
-
-    &.fort {
-        background-color: #e44239; 
-      }
+  &.new {
+    background-color: #8dd6c0; // turquoise adouci
   }
+
+  &.moyen, &.draft {
+    background-color: #e6c678; // jaune doux
+  }
+
+  &.closed, &.faible {
+    background-color: #9fcf9f; // vert doux
+  }
+
+  &.fort {
+    background-color: #d87c7c; // rouge doux
+  }
+}
 
   .mat-drawer-container{
     background-color: aliceblue !important;
@@ -324,18 +324,49 @@ table {
       text-align: left !important;
     }
 
-    td,
-    th {
-      padding: 12px !important;
+    td {
+    color: var(--mat-sys-on-surface) !important;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    transition: all 0.2s ease;
+    position: relative;
+    
+    &:first-child {
+      font-weight: 500;
     }
+  }
 
-    tr:hover {
+  td {
+    padding: 16px 20px !important;
+    
+    &:first-child {
+      padding-left: 24px !important;
+    }
+    
+    &:last-child {
+      padding-right: 24px !important;
+    }
+  }
+
+  // Effets de survol des lignes
+  tr:not(.mat-mdc-header-row) {
+    transition: all 0.2s ease;
+    
+    &:hover {
       background: var(--mat-sys-surface-container-high) !important;
+      transform: translateX(2px);
+      box-shadow: inset 4px 0 0 var(--mat-sys-primary);
+      
+      td {
+        color: var(--mat-sys-on-surface-variant) !important;
+      }
     }
 
-    .mat-select {
-      width: 100% !important;
+    &:nth-child(even) {
+      background: var(--mat-sys-surface-container-lowest);
     }
+  }
   }
 
   .mat-elevation-z8 {
