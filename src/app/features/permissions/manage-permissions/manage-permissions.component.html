@@ -1,6 +1,6 @@
 <h2>Gestion des permissions</h2>
 
-<button (click)="create()">Ajouter un rôle</button>
+<button mat-raised-button color="btn-primary" (click)="create()">Ajouter un rôle</button>
 <div class="container">
   <div class="user-list" *ngIf="roles && roles.length > 0">
     <mat-form-field class="full-width autocomplete-field">

@@ -1,1 +1,12 @@
-<p>create-role-dialog works!</p>
+<h2>Créer un rôle</h2>
+
+<form (ngSubmit)="submitRole()">
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom du rôle</mat-label>
+      <input matInput [(ngModel)]="roleName" name="roleName" required />
+    </mat-form-field>
+  </div>
+
+  <button mat-raised-button color="btn-primary" type="submit">Ajouter</button>
+</form>
