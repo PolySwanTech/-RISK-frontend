@@ -184,8 +184,12 @@ export class RiskPageComponent {
         });
     }
 
-    this.filteredRisks = tempRisks; // Update the array passed to the matrix
- 
+    if (!tempRisks.some(r => r.id == this.selectedRisk.id)) {
+      this.selectedRisk = null;
+    }
+
+    this.filteredRisks = tempRisks;
+
   }
 
   onSelectRisk(selected: any): void {

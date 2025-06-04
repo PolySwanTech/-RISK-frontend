@@ -43,6 +43,11 @@ export class ListComponent implements OnInit, AfterViewInit {
   private confirmService = inject(ConfirmService)
 
   columns = [
+     {
+      columnDef: 'id',
+      header: 'Ref',
+      cell: (element: Incident) => `${element.id}`,
+    },
     {
       columnDef: 'titre',
       header: 'Titre',
@@ -151,6 +156,7 @@ export class ListComponent implements OnInit, AfterViewInit {
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
       this.incidents = data;
+      console.log('Incidents loaded:', this.incidents);
       this.dataSource.data = data;
     });
   }
