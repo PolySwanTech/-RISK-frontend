@@ -1,12 +1,15 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, Input, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartType, ChartOptions } from 'chart.js';
+import { ChartOptions } from 'chart.js';
 import { CommonModule } from '@angular/common';
 import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateControlComponent } from '../../create-control/create-control.component';
+import { ControlService } from '../../../../core/services/control/control.service';
 
 @Component({
   selector: 'app-control-chart',
@@ -17,6 +20,10 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 })
 export class ControlChartComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+
+  dialog = inject(MatDialog);
+
+  @Input() createControl = false;
 
   groupByLevel = false;
   controls: any[] = [];
@@ -33,8 +40,8 @@ export class ControlChartComponent implements OnInit {
 
   pieChartOptions: ChartOptions<'pie'> = {
     responsive: true,
-        maintainAspectRatio: false, // permet d'adapter la taille à son conteneur
-  layout: { padding: 20 },
+    maintainAspectRatio: false, // permet d'adapter la taille à son conteneur
+    layout: { padding: 20 },
     plugins: {
       legend: {
         position: 'left',
@@ -65,13 +72,19 @@ export class ControlChartComponent implements OnInit {
     }
   };
 
-  constructor(private http: HttpClient) {}
+
+  controlService = inject(ControlService);
 
   ngOnInit() {
-    this.http.get<any[]>('data-example/controls-fake-data.json').subscribe(data => {
+    this.controlService.getAllTemplates().subscribe(data => {
       this.controls = data;
-      this.updateChart();
+      this.controlService.getAllExections().subscribe(data => {
+        this.controls = this.controls.concat(data);
+        this.updateChart();
+      });
     });
+
+
   }
 
   updateChart() {

@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { PermissionName } from '../../enum/permission.enum';
 
 export interface Role {
-  id: string;
   name: string;
   permissions: PermissionName[];
 }
@@ -24,5 +23,9 @@ export class RoleService {
 
   updateRolePermissions(roleId: string, permissionIds: PermissionName[]) {
     return this.http.put(`${this.baseUrl}/${roleId}/permissions`, permissionIds);
+  }
+
+  create(role : Role){
+    return this.http.post<Role>(`${this.baseUrl}`, role);
   }
 }

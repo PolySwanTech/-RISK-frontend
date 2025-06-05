@@ -166,13 +166,21 @@ export class ViewComponent {
     return "Inconnu"
   }
 
-  formatDate(dateString: any) {
-    return dateString ? dateString.toLocaleDateString("fr-FR") : null;
-  }
-
   changeStatus(): void {
     if (this.incident) {
-      this.incident.state = this.incident.state === State.OPEN ? State.CLOSED : State.OPEN;
+      switch( this.incident.state) {
+        case State.DRAFT:
+          this.incident.state = State.VALIDATE;
+          break;
+        case State.VALIDATE:
+          this.incident.state = State.PROCESS;
+          break;
+        case State.PROCESS:
+          this.incident.state = State.CLOSED;
+          break;
+        case State.CLOSED:
+          this.confirmService.openConfirmDialog("Incident déjà clôturé", "L'incident est déjà clôturé, vous ne pouvez pas changer son état.", true);
+      }
     }
   }
 

@@ -34,7 +34,7 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Cause</span>
-                                <span class="info-value">{{ incident.cause.name }}</span>
+                                <!-- <span class="info-value">{{ incident.cause.name }}</span> -->
                             </div>
                         </div>
 
@@ -63,7 +63,7 @@
                                 <div class="timeline-dot declaration"></div>
                                 <div class="timeline-content">
                                     <span class="timeline-label">Déclaration</span>
-                                    <span class="timeline-date">{{ formatDate(incident.declaredAt) }}</span>
+                                    <span class="timeline-date">{{ incident.declaredAt| date : 'dd/MM/yyyy' }}</span>
                                 </div>
                             </div>
 
@@ -72,7 +72,7 @@
                                 <div class="timeline-dot survenance"></div>
                                 <div class="timeline-content">
                                     <span class="timeline-label">Survenance</span>
-                                    <span class="timeline-date">{{ formatDate(incident.survenueAt) }}</span>
+                                    <span class="timeline-date">{{ incident.survenueAt| date : 'dd/MM/yyyy' }}</span>
                                 </div>
                             </div>
 
@@ -81,7 +81,7 @@
                                 <div class="timeline-dot detection"></div>
                                 <div class="timeline-content">
                                     <span class="timeline-label">Détection</span>
-                                    <span class="timeline-date">{{ formatDate(incident.detectedAt) }}</span>
+                                    <span class="timeline-date">{{ incident.detectedAt| date : 'dd/MM/yyyy' }}</span>
                                 </div>
                             </div>
 
@@ -91,7 +91,7 @@
                                 <div class="timeline-dot closure"></div>
                                 <div class="timeline-content">
                                     <span class="timeline-label">Clôture</span>
-                                    <span class="timeline-date">{{ formatDate(incident.closedAt) }}</span>
+                                    <span class="timeline-date">{{ incident.closedAt| date : 'dd/MM/yyyy' }}</span>
                                 </div>
                             </div>
                             }

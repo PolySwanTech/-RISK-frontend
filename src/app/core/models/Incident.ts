@@ -6,10 +6,10 @@ import { SubRisk } from "./SubRisk";
 import { Cause } from "./Cause";
 
 export enum State {
-    NEW = "Nouveau",
-    OPEN = "Ouvert",
-    CLOSED = "Fermé",
-    DRAFT = "Brouillon"
+    DRAFT = "DRAFT",
+    VALIDATE = "VALIDATE",  
+    PROCESS = "PROCESS", 
+    CLOSED = "CLOSED",
 }
 
 export class Incident {
@@ -28,11 +28,12 @@ export class Incident {
     risk: Risk;
     subRisk: SubRisk;
     process: Process;
-    cause: Cause;
 
     state: State;
     comments: string;
     equipeName?: string;
+
+    reference : string = ""
 
     constructor(
         id: string,
@@ -45,12 +46,11 @@ export class Incident {
         risk: Risk,
         subRisk: SubRisk,
         process: Process,
-        cause: Cause,
         impacts: Impact[],
         comments: string,
-        state: State = State.OPEN,
-        equipeName?: string
-        
+        state: State = State.DRAFT,
+        equipeName?: string,
+        reference : string = "" 
     ) {
         this.id = id;
         this.titre = titre;
@@ -62,11 +62,10 @@ export class Incident {
         this.risk = risk;
         this.subRisk = subRisk;
         this.process = process;
-        this.cause = cause;
         this.impacts = impacts;
         this.comments = comments;
         this.equipeName = equipeName;
-
+        this.reference = reference;
         this.state = closedAt ? State.CLOSED : state;        
     }
 
