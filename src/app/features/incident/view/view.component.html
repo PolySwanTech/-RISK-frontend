@@ -2,6 +2,29 @@
     @if(incident){
     <app-go-back previousPageName="Liste des incidents"
         [currentPageName]="`Détails de l'incident - ` + incident.titre"></app-go-back>
+<<<<<<< HEAD
+    <div class="info-container">
+        <mat-card class="incident-card">
+            <mat-card-header>
+                <mat-card-title>
+                    <span>Info globale</span>
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div>
+                    <div class="global-info">
+                        <div class="info">
+                            <mat-form-field class="full-width">
+                                <mat-label>Location</mat-label>
+                                <input matInput [value]="incident.location" readonly>
+                            </mat-form-field>
+
+                            <mat-form-field class="full-width">
+                                <mat-label>Cause</mat-label>
+                                <input matInput [value]="incident.cause.name" readonly>
+                            </mat-form-field>
+
+=======
     <div class="view-container">
         <div class="info-container">
             <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
@@ -25,6 +48,7 @@
                                 <span class="info-label">Localisation</span>
                                 <span class="info-value">{{ incident.location }}</span>
                             </div>
+>>>>>>> 4343f5a3cf2cf536b5a1ed57b21146059b4f8e85
                         </div>
 
                         <!-- Cause -->

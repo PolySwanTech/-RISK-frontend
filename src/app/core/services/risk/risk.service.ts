@@ -16,7 +16,7 @@ export class RiskService {
   }
 
   save(risk: Risk) {
-    return this.http.post<Risk>(this.baseUrl, risk)
+    return this.http.post<Risk>(this.baseUrl, risk);
   }
 
   getAllByProcess(processId: string = "") {

@@ -6,7 +6,6 @@ import { environment } from '../../../environments/environment';
 import { Impact } from '../../models/Impact';
 import { Risk } from '../../models/Risk';
 import { Cause } from '../../models/Cause';
-import { SubRisk } from '../../models/SubRisk';
 import { Process } from '../../models/Process';
 import { saveAs } from 'file-saver';
 

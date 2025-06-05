@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { ReglagesComponent } from './reglages.component';
 import { CategorySelectionComponent } from '../../shared/components/category-selection/category-selection.component';
 import { RisksComponent } from './risks/risks.component';
-import { CreateRisksComponent } from './risks/create-risks/create-risks.component';
 import { CreateProcessComponent } from '../process/create-process/create-process.component';
 
 export const reglagesRoute: Routes = [
@@ -10,6 +9,4 @@ export const reglagesRoute: Routes = [
   { path: 'entites', component: CategorySelectionComponent },
   { path: 'process', component: CreateProcessComponent },
   { path: 'risks', component: RisksComponent },
-  { path: 'risks/:id', component: CreateRisksComponent },
-  { path: 'risks/create', component: CreateRisksComponent },
 ];
