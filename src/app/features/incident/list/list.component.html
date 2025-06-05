@@ -71,7 +71,7 @@
                     Réinitialiser
                 </button>
                 <button mat-raised-button class="btn-primary add-button" (click)="add()"
-                    *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter</button>
+                    *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter un incident</button>
             </div>
         </mat-card-content>
 
@@ -106,7 +106,7 @@
                 </tr>
 
             </table>
-            <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[4, 10, 15]"
+            <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[5, 10, 15]"
                 aria-label="Page selection pour le tableau" showFirstLastButtons>
             </mat-paginator>
         </div>

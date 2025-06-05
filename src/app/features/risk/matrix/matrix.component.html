@@ -10,7 +10,7 @@
       <table class="risk-matrix">
         <tbody>
           <!-- Lignes de la matrice -->
-          <tr *ngFor="let row of matrix; let rowIndex = index">
+          <tr class="matrix-tr" *ngFor="let row of matrix; let rowIndex = index">
             <th class="row-header">
               <input [(ngModel)]="rowLabels[rowIndex]" [placeholder]="'Ligne ' + (rowIndex + 1)" class="row-input" />
             </th>

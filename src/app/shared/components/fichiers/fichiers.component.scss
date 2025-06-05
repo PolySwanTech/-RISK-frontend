@@ -242,67 +242,9 @@ $file-colors: (
 }
 
 .files-search-container {
-  padding-inline: 15px;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 15px;
-}
-
-.files-search-field {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.files-search-field .mat-mdc-form-field-wrapper {
-  padding-bottom: 0;
-}
-
-.files-search-field mat-label {
-  font-size: 14px;
-  font-weight: normal;
-}
-
-
-
-.clear-search-btn mat-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-}
-
-.search-results-count {
-  font-size: 12px;
-  color: #666;
-  font-style: italic;
-  text-align: right;
-  margin-top: -5px;
-}
-
-/* Animation pour l'apparition de la barre de recherche */
-.files-search-container {
-  animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .files-search-container {
-    padding: 0 10px 10px 10px;
-  }
-  
-  .search-results-count {
-    text-align: left;
-    margin-top: 5px;
-  }
+    padding-inline: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
 }
 
 .upload-icon{

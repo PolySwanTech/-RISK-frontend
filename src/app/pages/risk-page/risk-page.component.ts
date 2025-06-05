@@ -184,7 +184,7 @@ export class RiskPageComponent {
         });
     }
 
-    if (!tempRisks.some(r => r.id == this.selectedRisk.id)) {
+    if (this.selectedRisk && !tempRisks.some(r => r.id == this.selectedRisk.id)) {
       this.selectedRisk = null;
     }
 
