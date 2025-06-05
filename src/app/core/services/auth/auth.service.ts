@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Utilisateur } from '../../models/Utilisateur';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
@@ -11,13 +11,13 @@ import { jwtDecode } from 'jwt-decode';
 })
 export class AuthService {
   
-  base = '/api/users';
+  base = environment.apiUrl + '/users';
   http = inject(HttpClient);
   router = inject(Router);
   
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 
-  private permissions: string[] = [];
+  private permissions: { [teamId: string]: string[] } = {};
 
   private utilisateurConnecte!: Utilisateur;
   
@@ -29,8 +29,7 @@ export class AuthService {
 
   decryptToken(){
     const token = sessionStorage.getItem('token');
-    console.log(jwtDecode(token ? token : ''))
-    return jwtDecode(token ? token : '');
+    return token ? jwtDecode(token) : null;
   }
 
   isTokenExpired(token: any): boolean {
@@ -62,19 +61,27 @@ export class AuthService {
     this.router.navigate(['auth', 'login'])
   }
 
-  setPermissions(permissions: string[]): void {
+  setPermissions(permissions: { [teamId: string]: string[] }): void {
     this.permissions = permissions;
   }
   
-  getPermissions(): string[] {
-    if (this.permissions.length > 0) return this.permissions;
+  getPermissions(): { [teamId: string]: string[] } {
+    if (Object.keys(this.permissions).length > 0) return this.permissions;
   
     const token: any = this.decryptToken();
-    return token?.permissions || [];
+    return token?.permissions || {};
   }
   
   hasPermission(permission: string): boolean {
-    return this.getPermissions().includes(permission);
+    const permsByTeam = this.getPermissions();
+  
+    for (const teamId in permsByTeam) {
+      if (permsByTeam[teamId].includes(permission)) {
+        return true;
+      }
+    }
+  
+    return false;
   }
 
   setUtilisateur(user: Utilisateur): void {

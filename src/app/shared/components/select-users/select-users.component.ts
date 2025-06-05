@@ -34,7 +34,7 @@ export class SelectUsersComponent {
 
 
   ngOnInit(): void {
-    this.username = this.authService.decryptToken().sub ?? '';
+    this.username = this.authService.decryptToken()?.sub ?? '';
     this.loadUsers();
   }
 

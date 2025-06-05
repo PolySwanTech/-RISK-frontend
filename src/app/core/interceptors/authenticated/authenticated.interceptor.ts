@@ -11,7 +11,7 @@ export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
       },
     })
     : req;
-
+    
   return next(modifiedReq).pipe(
     tap(
       {

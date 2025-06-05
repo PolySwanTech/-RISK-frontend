@@ -9,6 +9,7 @@ export class Impact{
 
     entityId : string = ''
     incidentId : string = ''
+    message: string = '';
 
     constructor(
         id : string,

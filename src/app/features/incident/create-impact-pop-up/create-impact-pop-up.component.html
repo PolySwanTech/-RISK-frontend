@@ -37,9 +37,9 @@
     </mat-form-field>
 
     <div class="actions">
-      <button mat-button class="red" type="button" (click)="close()">Annuler</button>
+      <button mat-raised-button class="btn-red" type="button" (click)="close()">Annuler</button>
       <button [disabled]="!impact.type || !impact.entityId" mat-button type="submit"
-        color="primary">Ajouter</button>
+        mat-raised-button class="btn-primary" >Ajouter</button>
     </div>
   </form>
 </mat-dialog-content>

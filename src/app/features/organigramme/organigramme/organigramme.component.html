@@ -1,5 +1,5 @@
 <section>
-  <h2>Rôles</h2>
+  <h2>Affectation aux entités et rôles</h2>
 
   <div class="entite-container">
 
@@ -12,7 +12,7 @@
     <mat-tree #tree [dataSource]="filteredEntities" [childrenAccessor]="childrenAccessor">
       <!-- Nœud feuille -->
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-        <button mat-icon-button disabled></button>
+        <button type="button" mat-icon-button disabled></button>
         <span>{{node.name}}</span>
         <mat-checkbox [(ngModel)]="node.checked" (click)="$event.stopPropagation(); resetRole(node)">
         </mat-checkbox>
@@ -20,7 +20,7 @@
         @if(node.checked){
           <mat-form-field (click)="$event.stopPropagation()" appearance="outline" class="role-select">
             <mat-select (selectionChange)="onRoleChange(node)" [(ngModel)]="node.role" placeholder="Choisir un rôle">
-              <mat-option *ngFor="let role of roles" [value]="role">{{role}}</mat-option>
+              <mat-option *ngFor="let role of roles" [value]="role">{{role.name}}</mat-option>
             </mat-select>
           </mat-form-field>
         }
@@ -29,7 +29,7 @@
 
       <!-- Nœud avec enfants -->
       <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodeToggle>
-        <button mat-icon-button matTreeNodeToggle>
+        <button type="button" mat-icon-button matTreeNodeToggle>
           <mat-icon>{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
         </button>
         <span>{{node.name}}</span>
@@ -40,7 +40,7 @@
         @if(node.checked){
           <mat-form-field (click)="$event.stopPropagation(); resetRole(node)" appearance="outline" class="role-select">
             <mat-select (selectionChange)="onRoleChange(node)" [(ngModel)]="node.role" placeholder="Choisir un rôle">
-              <mat-option *ngFor="let role of roles" [value]="role">{{role}}</mat-option>
+              <mat-option *ngFor="let role of roles" [value]="role">{{role.name}}</mat-option>
             </mat-select>
           </mat-form-field>
         }

@@ -1,18 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatButtonModule } from '@angular/material/button';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
-import { merge } from 'rxjs';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { Risk } from '../../../core/models/Risk';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
-import { Utilisateur } from '../../../core/models/Utilisateur';
 import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
 import { CauseService } from '../../../core/services/cause/cause.service';
@@ -24,7 +21,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
 import { NgIf, NgFor } from '@angular/common';
-import { State } from '../../../core/models/Incident';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
@@ -55,10 +51,9 @@ export class CreateComponent implements OnInit {
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
-    location: ['', Validators.required],
+    equipeName: ['', Validators.required],
     commentaire: ['', Validators.required],
-    cause: ['', Validators.required],
-    equipeId: [''],
+    location: ['', Validators.required],
   });
 
   incidentForm2 = this._formBuilder.group({
@@ -87,7 +82,7 @@ export class CreateComponent implements OnInit {
   constructor(private incidentService: IncidentService, private riskService: RiskService,
     private causeService: CauseService, private processService: ProcessService, private equipeService: EquipeService) {
 
-    this.riskService.getAll().subscribe((resp: any) => {
+    this.riskService.getAllByProcess("test").subscribe((resp: any) => {
       this.listRisk = resp;
     });
     this.causeService.getAll().subscribe((resp: any) => {
@@ -102,6 +97,7 @@ export class CreateComponent implements OnInit {
     const teamName = this.getUserTeamFromToken();
     if (teamName) {
       this.hasTeam = true;
+      this.incidentForm1.patchValue({ equipeName: teamName });
     } else {
       this.hasTeam = false;
       this.fetchTeams();
@@ -140,27 +136,11 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('userMail')!.setValue(event.email);
   }
 
-  draft() {
-    const incident = this.convertFormToIncident();
-
-    this.incidentService.draftIncident(incident).subscribe(
-      {
-        next: resp => {
-          this.afterCreation("Brouillon enregistré", resp);
-        },
-        error: err => {
-          console.error("Erreur lors de la création de l'incident", err);
-        }
-      },
-    );
-  }
-
   private convertFormToIncident() {
     const incident = {
       title: this.incidentForm1.value.titre,
       location: this.incidentForm1.value.location,
       commentaire: this.incidentForm1.value.commentaire,
-      cause: this.incidentForm1.value.cause,
       declaredAt: this.parseDate(this.incidentForm2.value.dateDeDeclaration),
       survenueAt: this.parseDate(this.incidentForm2.value.dateDeSurvenance),
       detectedAt: this.parseDate(this.incidentForm2.value.dateDeDetection),
@@ -170,16 +150,12 @@ export class CreateComponent implements OnInit {
       userMail: this.incidentForm3.value.userMail,
       files: this.incidentForm3.value.files,
       process: this.incidentForm3.value.process,
-      equipeId: this.incidentForm1.value.equipeId,
+      equipeName: this.incidentForm1.value.equipeName,
     };
     return incident;
   }
 
   addIncident() {
-    if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
-      alert("Tous les champs obligatoires ne sont pas remplis");
-      return;
-    }
 
     const incident = this.convertFormToIncident();
 

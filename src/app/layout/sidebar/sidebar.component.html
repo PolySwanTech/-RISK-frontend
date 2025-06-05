@@ -6,8 +6,8 @@
    
     <mat-nav-list>
       @if(authService.isLogin$ | async){
-      <ng-container *appHasPermission="'VIEW_DASHBOARD'">
-        <a mat-list-item routerLink="/dashboard">
+      <ng-container *appHasPermission="'VIEW_DASHBOARDS'">
+        <a mat-list-item href="/dashboard" routerLink="/dashboard">
           <mat-icon>dashboard</mat-icon>
           <span>{{ 'MENU.DASHBOARD' | translate }}</span>
         </a>
@@ -19,6 +19,25 @@
             matBadgePosition="above after" mat-button>
             {{ 'MENU.INCIDENTS' | translate }}
           </span>
+        </a>
+      </ng-container>
+      <!-- <ng-container *appHasPermission="'VIEW_ACTION_PLANS'"> -->
+        <ng-container>
+        <a mat-list-item routerLink="/risk">
+          <mat-icon>analytics</mat-icon>
+          <span>Analyse des risques</span>
+        </a>
+      </ng-container>
+      <ng-container>
+        <a mat-list-item routerLink="/action-plan/chart">
+          <mat-icon>pie_chart</mat-icon>
+          <span>Plans d'action</span>
+        </a>
+      </ng-container>
+      <ng-container>
+        <a mat-list-item routerLink="/control/chart">
+          <mat-icon>bar_chart</mat-icon>
+          <span>Contrôles</span>
         </a>
       </ng-container>
       <a mat-list-item [matMenuTriggerFor]="menu">

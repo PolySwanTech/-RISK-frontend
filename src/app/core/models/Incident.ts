@@ -5,10 +5,10 @@ import { Risk } from "./Risk";
 import { Cause } from "./Cause";
 
 export enum State {
-    NEW = "Nouveau",
-    OPEN = "Ouvert",
-    CLOSED = "Fermé",
-    DRAFT = "Brouillon"
+    DRAFT = "DRAFT",
+    VALIDATE = "VALIDATE",  
+    PROCESS = "PROCESS", 
+    CLOSED = "CLOSED",
 }
 
 export class Incident {
@@ -26,11 +26,12 @@ export class Incident {
 
     risk: Risk;
     process: Process;
-    cause: Cause;
 
     state: State;
     comments: string;
     equipeName?: string;
+
+    reference : string = ""
 
     constructor(
         id: string,
@@ -42,12 +43,11 @@ export class Incident {
         closedAt: Date | null,
         risk: Risk,
         process: Process,
-        cause: Cause,
         impacts: Impact[],
         comments: string,
-        state: State = State.OPEN,
-        equipeName?: string
-        
+        state: State = State.DRAFT,
+        equipeName?: string,
+        reference : string = "" 
     ) {
         this.id = id;
         this.titre = titre;
@@ -58,11 +58,10 @@ export class Incident {
         this.closedAt = closedAt;
         this.risk = risk;
         this.process = process;
-        this.cause = cause;
         this.impacts = impacts;
         this.comments = comments;
         this.equipeName = equipeName;
-
+        this.reference = reference;
         this.state = closedAt ? State.CLOSED : state;        
     }
 

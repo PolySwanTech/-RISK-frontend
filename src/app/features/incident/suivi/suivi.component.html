@@ -1,8 +1,7 @@
 @if(incident){
 <div style="margin: 15px;">
-        <app-go-back previousPageName="Détails de l'incident"
-                [currentPageName]="`Suivi de l'incident - ` + incident.titre"></app-go-back>
-   
+    <app-go-back previousPageName="Détails de l'incident"
+        [currentPageName]="`Suivi de l'incident - ` + incident.titre"></app-go-back>
 </div>
 
 <div class="timeline-container">
@@ -26,10 +25,16 @@
 
             <div class="timeline-content mat-elevation-z2">
                 <div class="header">
-                    <strong>{{ entry.action | titlecase }}</strong>
+                    <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
                     <span class="meta">
-                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
+                        Par {{ entry.user.username }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
                     </span>
+                </div>
+
+                <div *ngIf="entry.action === 'IMPACT_ADDED' && getImpactFromHistory(entry)">
+                    <p class="impact-summary">
+                        {{ getImpactFromHistory(entry) }}
+                    </p>
                 </div>
 
                 <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
@@ -41,5 +46,5 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
 }

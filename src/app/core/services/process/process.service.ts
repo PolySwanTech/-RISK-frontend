@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Process } from '../../models/Process';
 import { EntiteResponsable } from '../../models/EntiteResponsable';
@@ -10,20 +10,19 @@ import { EntiteResponsable } from '../../models/EntiteResponsable';
 export class ProcessService {
 
   http = inject(HttpClient);
-
-  baseUrl = '/api/process';
+  baseUrl = environment.apiUrl + '/users/processes'; ;
 
   getAll(){
-    return this.http.get<Process[]>(this.baseUrl)
+    return this.http.get<Process[]>(this.baseUrl )
   }
 
   createProcess(process : Process){ 
-    return this.http.post<Process>(this.baseUrl, process);
+    return this.http.post<Process>(this.baseUrl , process)
   }
 
-  getAllByEntite(id : string){
+  getAllByEntite(entiteId : string){
     let param = new HttpParams();
-    param = param.set('buId', id);
+    param = param.set('buId', entiteId);
     return this.http.get<Process[]>(this.baseUrl, {params : param})
   }
 }

@@ -6,7 +6,7 @@
         <h2>Gestion des risques</h2>
 
         <div class="filters-container">
-            <button mat-raised-button (click)="navToCreate()"><mat-icon>add</mat-icon>
+            <button mat-raised-button class="btn-primary" (click)="navToCreate()"><mat-icon>add</mat-icon>
                 Ajouter un nouveau risque
             </button>
             <div class="table-container">
@@ -35,6 +35,12 @@
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus">
                     </tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center;">
+                        Aucun résultat trouvé.
+                    </td>
+                </tr>
 
                 </table>
                 <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[5, 10, 15]"

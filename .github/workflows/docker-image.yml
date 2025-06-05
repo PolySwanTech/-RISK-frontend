@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "feat-process-risk" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "feat-process-risk" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -26,8 +26,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build . --file Dockerfile --tag ghcr.io/polyswantech/risk-view:latest
+          docker build . --file Dockerfile --tag ghcr.io/polyswantech/frontend:latest
 
       - name: Push Docker image to GHCR
         run: |
-          docker push ghcr.io/polyswantech/risk-view:latest
+          docker push ghcr.io/polyswantech/frontend:latest

@@ -9,12 +9,12 @@
 
     <div class="form-group">
       <label>Ligne Métier ?</label>
-      <mat-slide-toggle formControlName="isLM" />
+      <mat-slide-toggle formControlName="lm" />
     </div>
   </form>
   <app-select-entities [entiteEnfantId]=" data ? data.id : ''" [selectId]="entiteResponsable.parentId ? entiteResponsable.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>
   <div class="actions">
-    <button class="red" (click)="goBack()">Retour</button>
-    <button [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
+    <button mat-raised-button class="btn-red" (click)="goBack()">Retour</button>
+    <button mat-raised-button class="btn-primary" [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
   </div>
 </mat-dialog-content>

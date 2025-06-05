@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 import { SuiviIncident } from '../../models/SuiviIncident';
 
 @Injectable({
@@ -8,7 +8,7 @@ import { SuiviIncident } from '../../models/SuiviIncident';
 })
 export class SuiviIncidentService {
 
-  private base = '/api/incident/suivi';
+  private base = environment.apiUrl +  '/incidents/suivi';
   private http = inject(HttpClient);
 
 

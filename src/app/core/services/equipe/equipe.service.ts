@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
 export interface Equipe {
   id: string;
@@ -13,9 +13,9 @@ export interface Equipe {
 })
 export class EquipeService {
   private http = inject(HttpClient);
-  private baseUrl = '/api/equipe';
+  private baseUrl = environment.apiUrl + '/users';
 
   getAllEquipes(): Observable<Equipe[]> {
-    return this.http.get<Equipe[]>(`${this.baseUrl}`);
+    return this.http.get<Equipe[]>(`${this.baseUrl + '/bu'}`);
   }
 }

@@ -31,36 +31,10 @@ export class CreateProcessComponent {
     if (this.processForm.valid) {
       const formValues = this.processForm.value;
       const newProcess = new Process(formValues.name, formValues.bu_id);
-      this.processService.createProcess(newProcess).subscribe(
-        resp => {
-          this.dialog.open(ConfirmationDialogComponent,
-            {
-              data: {
-                title: 'Process crée',
-                message: 'Voulez-vous associer un risque à ce processus ?',
-                buttons: true
-              }
-            }
-          ).afterClosed().subscribe(result => {
-            if (result) {
-              this.dialog.open(CreateRiskComponent,
-                {
-                  data: {
-                    processId: resp.id, // Pass the process}
-                    processName: resp.name, // Pass the process}
-                  }
-                }
-              )
-              // Logic to navigate to the risk creation page or perform any other action
-              // For example, you can use the router to navigate to the risk creation page
-            };
-            console.log('Process created successfully:', resp);
-            // Optionally, reset the form or navigate to another page
-            this.processForm.reset();
-          }
-          )
-        }
-      );
+      this.processService.createProcess(newProcess).subscribe(() => {
+        alert('Process créé avec succès !');
+        this.processForm.reset({ id: 0 });
+      });
     }
   }
 

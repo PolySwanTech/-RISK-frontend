@@ -31,7 +31,7 @@ export class ModifEntityDialogComponent {
 
   ngOnInit(): void {
     setTimeout(() => {
-      this.entite.isLM = true; // Modification après l'initialisation
+      this.entite.lm = true; // Modification après l'initialisation
       this.cdRef.detectChanges(); // Force la détection des changements
     }, 0);
   }

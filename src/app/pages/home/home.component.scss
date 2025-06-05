@@ -1,43 +1,10 @@
-mat-card {
-    margin-top: 10px;
-}
-
-.dashboard-container {
-    padding: 20px;
-}
-
-.card {
-    border: 1px solid var(--mat-sys-surface-container-high);
-    border-radius: 10px;
-    margin-bottom: 20px;
-    background-color: var(--mat-sys-surface-container-low);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    width: 240px;
-}
-
-.card-body {
-    text-align: center;
-    padding: 20px;
-}
-
-.card-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.card-text {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--mat-sys-primary);
-}
-
-.row {
+.graphs-container {
     display: flex;
-    gap : 20px;
+    align-items: center;
+    gap: 30px;
     justify-content: center;
-    flex-wrap: wrap;
-}
 
-.col-md-4 {
-    padding: 10px;
+    >* {
+        flex: 1;
+    }
 }

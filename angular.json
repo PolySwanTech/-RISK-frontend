@@ -34,7 +34,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/file-saver/dist/FileSaver.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -59,6 +61,9 @@
               "buildTarget": "risk-view:build:development"
             }
           },
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
@@ -82,7 +87,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/file-saver/dist/FileSaver.min.js"
+            ]
           }
         }
       }

@@ -1,0 +1,23 @@
+# frontend/Dockerfile.dev
+
+FROM node:18
+
+WORKDIR /app
+
+# Copier les fichiers nécessaires pour l’installation
+COPY package*.json ./
+
+# Corriger le bug npm : supprimer les deps optionnelles cassantes
+RUN npm install --omit=optional
+
+# Installer les dépendances
+RUN npm install
+
+# Installer Angular CLI globalement (bonne pratique pour ng serve dans CMD)
+RUN npm install -g @angular/cli
+
+# Copier le reste du code
+COPY . .
+
+# Démarrer Angular
+CMD ["npm", "run", "start"]

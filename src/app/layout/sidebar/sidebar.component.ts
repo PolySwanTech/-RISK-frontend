@@ -31,7 +31,6 @@ import { MatSelectModule } from '@angular/material/select';
     AsyncPipe, CommonModule,
     MatFormFieldModule,
     MatSelectModule,
-
     RouterModule,
     MatMenuModule, RouterLink, MatBadgeModule, TranslateModule],
   styleUrls: ['./sidebar.component.scss']
@@ -44,7 +43,7 @@ export class SidebarComponent implements OnInit {
 
   storageSubscription: any;
 
-  constructor(private router: Router, public authService: AuthService,
+  constructor(public authService: AuthService,
     private incidentService: IncidentService, private translate: TranslateService) {
     const browserLang = navigator.language.split('-')[0];
     const supportedLangs = ['en', 'fr'];
@@ -56,14 +55,16 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateLoginStatus();
-    const token = this.authService.decryptToken();
-    setTimeout(() => {
-      if (!this.authService.isTokenExpired(token)) {
-        this.incidentService.countIncidentsNonClotures().subscribe(resp => {
-          this.unreadIncidents = resp;
-        })
-      }
-    }, 1000)
+    const token = this.authService.decryptToken() ?? null;
+    if(token){
+      setTimeout(() => {
+        if (!this.authService.isTokenExpired(token)) {
+          this.incidentService.countIncidentsNonClotures().subscribe(resp => {
+            this.unreadIncidents = resp;
+          })
+        }
+      }, 1000)
+    }
 
   }
 

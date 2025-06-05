@@ -2,11 +2,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Incident, State } from '../../models/Incident';
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 import { Impact } from '../../models/Impact';
 import { Risk } from '../../models/Risk';
 import { Cause } from '../../models/Cause';
 import { Process } from '../../models/Process';
+import { saveAs } from 'file-saver';
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +15,16 @@ import { Process } from '../../models/Process';
 export class IncidentService {
   
 
-  baseUrl = '/api/incidents'; 
+  baseUrl = environment.apiUrl + '/incidents'
 
   http = inject(HttpClient);
 
   loadIncidents(): Observable<Incident[]> {
-    return this.http.get<Incident[]>(this.baseUrl);
+    return this.http.get<Incident[]>(this.baseUrl );
   }
 
   countIncidentsNonClotures(): Observable<number> {
-    return this.http.get<number>(this.baseUrl + '/nb/cloture');
+    return this.http.get<number>(this.baseUrl + '/nb/cloture')
   }
 
   sum(id: string) {
@@ -34,68 +35,20 @@ export class IncidentService {
 
 
   getIncidentById(id: string): Observable<Incident> {
-    return this.http.get<any>(this.baseUrl + '/' + id).pipe(
-      map((responseData: { id: string; titre: string; location: string; comments: string; cause: Cause; declaredAt: Date; survenueAt: Date; detectedAt: Date; closedAt: Date; risk: Risk; process: Process; impacts: Impact[]; equipeName?: string; state: string }) => {
-        // Constructing an Incident instance using the constructor
-        const {
-          id,
-          titre,
-          location,
-          comments,
-          cause,
-          declaredAt,
-          survenueAt,
-          detectedAt,
-          closedAt,
-          risk,
-          process,
-          impacts,
-          equipeName,
-          state
-        } = responseData;
-
-        const parsedState: State = State[state as keyof typeof State];
-
-        // Conversion des dates en objets Date
-        return new Incident(
-          id,
-          titre,
-          location,
-          new Date(declaredAt),
-          new Date(survenueAt),
-          new Date(detectedAt),
-          closedAt ? new Date(closedAt) : null, // Gestion du cas où closedAt est null
-          risk,
-          process,
-          cause,
-          impacts,
-          comments,
-          parsedState,
-          equipeName
-        );
-      })
-    );
+    return this.http.get<any>(this.baseUrl + '/' + id);
   }
 
   addImpact(impact: Impact) {
     return this.http.post(this.baseUrl + '/impact', impact)
   }
 
-  saveIncident(incident: any): Observable<string> {
-    return this.http.post<string>(this.baseUrl, incident);
+  saveIncident(incident: any): Observable<any> {
+    return this.http.post(this.baseUrl, incident, { responseType: 'text' as 'json' });
   }
-
-  updateCommentaire(id: string, commentaire: string, message: string) {
-    console.log(id, commentaire)
-    return this.http.put(this.baseUrl + `/${id}/commentaire`, {
-      commentaire,
-      message
-    });
-  }
-
-  draftIncident(incident: any): Observable<string> {
-    return this.http.post<string>(`${this.baseUrl}/draft`, incident);
-  }
+  
+  draftIncident(incident: any): Observable<any> {
+    return this.http.post(this.baseUrl + '/draft', incident, { responseType: 'text' as 'json' });
+  }  
 
   close(id: string) {
     return this.http.put(this.baseUrl + `/${id}/close`, null)
@@ -104,4 +57,19 @@ export class IncidentService {
   getIncidentHistory(incidentId: string) {
     return this.http.get<any[]>(`${this.baseUrl}/${incidentId}/history`);
   }
+
+  downloadExport(incidentId: string): void {
+    const url = `${environment.apiUrl}/export/${incidentId}`;
+    this.http.get(url, {
+      responseType: 'blob'
+    }).subscribe(
+      blob => {
+        saveAs(blob, `incident_${incidentId}.xlsx`);
+      },
+      error => {
+        console.error("Erreur lors du téléchargement de l’export :", error);
+      }
+    );
+  }  
+  
 }

@@ -34,17 +34,26 @@ export class SuiviComponent implements OnInit {
 
   incident: Incident | undefined
 
+  readonly TITRE_PAR_ACTION: Record<string, string> = {
+    CREATION: 'Création de l’incident',
+    MODIFICATION: 'Modification de l’incident',
+    CLOTURE: 'Clôture de l’incident',
+    IMPACT_ADDED: '➕ Impact ajouté',
+    MESSAGE_ADDED: '💬 Message ajouté'
+  };
+
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
+      console.log("✅ Incident chargé :", this.incident);
     }
     );
 
-    this.suiviIncidentService.getSuiviIncidentById(id).subscribe((suiviIncident) => {
-      console.log(suiviIncident);
-    }
-    );
+    // this.suiviIncidentService.getSuiviIncidentById(id).subscribe((suiviIncident) => {
+    //   console.log(suiviIncident);
+    // }
+    // );
     this.loadHistory(id);
   }
 
@@ -69,5 +78,27 @@ export class SuiviComponent implements OnInit {
       panelClass: 'snapshot-dialog-panel'
     });
   }
+
+  getImpactFromHistory(entry: any): string | null {
+    if (!this.incident?.impacts) return null;
+
+    const createdAt = entry.timestamp;
+
+    // On cherche l’impact le plus proche de la date d’ajout dans l’historique
+    const matching = this.incident.impacts
+      .map(i => ({
+        ...i,
+        diff: Math.abs(new Date(i.createdAt).getTime() - new Date(createdAt).getTime())
+      }))
+      .sort((a, b) => a.diff - b.diff);
+
+    if (matching.length > 0) {
+      const impact = matching[0];
+      return `Impact ${impact.entityName} - ${impact.montant}€ - ${impact.type}`;
+    }
+
+    return null;
+  }
+
 
 }

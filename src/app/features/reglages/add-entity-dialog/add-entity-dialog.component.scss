@@ -4,21 +4,6 @@ mat-dialog-content {
     overflow: hidden;
 }
 
-/* Button styling */
-button.save-button {
-    color: black;
-    background-color: var(--mat-sys-primary-fixed);
-    color: var(--mat-sys-on-secondary);
-    border: 0px;
-    border-radius: 20px;
-    padding: 8px
-}
-
-button.save-button:hover {
-    cursor: pointer;
-    background-color: var(--mat-sys-primary-fixed-dim);
-}
-
 .toggle-container {
     margin-left: 4%;
 }

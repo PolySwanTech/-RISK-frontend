@@ -21,18 +21,20 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { IncidentChartComponent } from '../incident-chart/incident-chart.component';
 
 
 @Component({
   selector: 'app-list',
   standalone: true,
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective],
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule, MatButtonModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   providers: [DatePipe]
 })
-export class ListComponent implements OnInit, AfterViewInit {
+export class ListComponent implements OnInit {
 
   private dialog = inject(MatDialog);
   private incidentService = inject(IncidentService)
@@ -41,6 +43,16 @@ export class ListComponent implements OnInit, AfterViewInit {
   private confirmService = inject(ConfirmService)
 
   columns = [
+     {
+      columnDef: 'id',
+      header: 'Ref',
+      cell: (element: Incident) => `${element.id}`,
+    },
+    {
+      columnDef: 'référence',
+      header: 'Référence',
+      cell: (element: Incident) => `${element.reference}`,
+    },
     {
       columnDef: 'titre',
       header: 'Titre',
@@ -98,6 +110,16 @@ export class ListComponent implements OnInit, AfterViewInit {
     this.statusFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
   }
 
+   clearFilters(): void {
+  this.dateFilter.setValue('');
+  this.categoryFilter.setValue('');
+  this.statusFilter.setValue('');
+}
+
+  refreshData(){
+    this.ngOnInit();
+  }
+
   // This method will be triggered when a row is clicked
   onRowClick(incident: Incident) {
     this.router.navigate(['incident', incident.id]);
@@ -139,6 +161,7 @@ export class ListComponent implements OnInit, AfterViewInit {
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
       this.incidents = data;
+      console.log('Incidents loaded:', this.incidents);
       this.dataSource.data = data;
     });
   }
@@ -162,4 +185,6 @@ export class ListComponent implements OnInit, AfterViewInit {
         // delete incidentId
       })
   }
+
+   
 }

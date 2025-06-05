@@ -14,7 +14,7 @@
             <ng-container *ngIf="hasTeam; else selectTeam">
               <mat-form-field >
                 <mat-label>Équipe</mat-label>
-                <input matInput [value]="incidentForm1.get('equipeName')?.value" readonly>
+                <input matInput formControlName="equipeName" readonly>
               </mat-form-field>
             </ng-container>
             <ng-template #selectTeam>
@@ -32,22 +32,13 @@
             </mat-form-field>
 
             <mat-form-field>
-              <mat-label>Cause</mat-label>
-              <mat-select formControlName="cause" placeholder="Cause de l'incident">
-                @for(cause of listCause; track cause){
-                <mat-option [value]="cause">{{ cause.name }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Location de l'incident</mat-label>
+              <mat-label>Localisation de l'incident</mat-label>
               <input matInput formControlName="location" placeholder="Location">
             </mat-form-field>
 
             <div class="actions">
-              <button class="green" (click)="draft()">Brouillon</button>
-              <button [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
+              <button mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
@@ -75,9 +66,9 @@
             </mat-form-field>
 
             <div class="actions">
-              <button class="red" matStepperPrevious>Retour</button>
-              <button class="green" (click)="draft()">Brouillon</button>
-              <button [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
+              <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
+              <button mat-raised-button class="btn-primary" [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
@@ -120,9 +111,8 @@
           </form>
 
           <div class="actions">
-            <button class="red" matStepperPrevious>Retour</button>
-            <button class="green" (click)="draft()">Brouillon</button>
-            <button [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
+            <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
+            <button  mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
           </div>
         </mat-step>
       </mat-stepper>

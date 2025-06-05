@@ -1,36 +1,35 @@
 import { Component, OnInit } from '@angular/core';
 import { Impact } from '../../../core/models/Impact';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { MatLabel } from '@angular/material/form-field';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
-import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { ImpactTypeEnum } from '../../../core/enum/impactType.enum';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-create-impact-pop-up',
-  imports: [FormsModule, MatDialogModule, MatLabel, MatSelectModule,  MatInputModule],
+  imports: [FormsModule, MatDialogModule, MatLabel, MatSelectModule, MatInputModule, MatButtonModule],
   templateUrl: './create-impact-pop-up.component.html',
   styleUrl: './create-impact-pop-up.component.scss'
 })
-export class CreateImpactPopUpComponent implements OnInit{
+export class CreateImpactPopUpComponent implements OnInit {
 
-  impact : Impact = new Impact('', 0, '', '', '', new Date(), null)
-  selectedEntite : EntiteResponsable | undefined
-  processes : Process[] = []
-  entites : EntiteResponsable[] = []
-  types : ImpactTypeEnum[] = [ImpactTypeEnum.PROVISION, ImpactTypeEnum.RECUPERATION];
+  impact: Impact = new Impact('', 0, '', '', '', new Date(), null)
+  selectedEntite: EntiteResponsable | undefined
+  processes: Process[] = []
+  entites: EntiteResponsable[] = []
+  types: ImpactTypeEnum[] = [ImpactTypeEnum.PROVISION, ImpactTypeEnum.RECUPERATION];
+
 
   constructor(
-    private entiteService : EntitiesService,
+    private entiteService: EntitiesService,
     public dialogRef: MatDialogRef<CreateImpactPopUpComponent>,
-  ){
-    
-  }
+  ) { }
 
   ngOnInit(): void {
     this.entiteService.loadEntities().subscribe(
@@ -38,17 +37,22 @@ export class CreateImpactPopUpComponent implements OnInit{
     )
   }
 
-  setEntite(entite : EntiteResponsable){
+  setEntite(entite: EntiteResponsable) {
     this.impact.entityId = entite.id
   }
 
-  close(){
+  close() {
     this.dialogRef.close();
   }
 
 
   addImpact() {
-    console.log(this.impact)
-    this.dialogRef.close(this.impact)
+    const message = prompt("Pourquoi voulez-vous ajouter cet impact ?");
+    if (message && message.trim().length > 0) {
+      this.impact.message = message;
+      this.dialogRef.close(this.impact);
+    } else {
+      alert("⚠️ Le message est obligatoire pour justifier l’ajout de l’impact.");
+    }
   }
 }

@@ -28,7 +28,7 @@ export class RisksComponent implements OnInit {
     {
       columnDef: 'name',
       header: 'Nom',
-      cell: (element: Risk) => `${element.title}`,
+      cell: (element: Risk) => `${element.name}`,
     },
     {
       columnDef: 'description',
@@ -56,10 +56,9 @@ export class RisksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.riskService.getAll().subscribe(
+    this.riskService.getAllByProcess().subscribe(
       rep => {
         this.dataSource.data = rep
-        console.log(this.dataSource.data)
       }
     );
   }

@@ -1,0 +1,19 @@
+<mat-card class="chart-container mat-elevation-z3">
+    <mat-card-header>
+      <mat-card-title>📊 Répartition des contrôles par état</mat-card-title>
+    </mat-card-header>
+  
+    <mat-button-toggle-group [(ngModel)]="groupByLevel" (change)="updateChart()" class="toggle-switch">
+      <mat-button-toggle [value]="false">Par statut</mat-button-toggle>
+      <mat-button-toggle [value]="true">Par niveau</mat-button-toggle>
+    </mat-button-toggle-group>
+  
+    <mat-card-content>
+      <canvas baseChart
+              [data]="pieChartData"
+              [options]="pieChartOptions"
+              type="pie">
+      </canvas>
+    </mat-card-content>
+  </mat-card>
+  

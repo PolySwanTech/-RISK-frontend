@@ -120,6 +120,12 @@ $light-gray: #f5f7fa;
             color: $text-primary;
             line-height: 1.4;
           }
+
+          .impact-summary {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 8px;
+          }
   
           button {
             font-size: 13px;
