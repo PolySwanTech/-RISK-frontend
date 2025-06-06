@@ -9,7 +9,7 @@ import { Risk } from '../../../core/models/Risk';
   selector: 'app-create-risk',
   imports: [ReactiveFormsModule],
   templateUrl: './create-risk.component.html',
-  styleUrl: './create-risk.component.scss'
+  styleUrls: ['./create-risk.component.scss']
 })
 export class CreateRiskComponent {
 
