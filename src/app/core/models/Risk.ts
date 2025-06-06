@@ -16,8 +16,8 @@ export const RiskImpactTypeLabels: Record<RiskImpactType, string> = {
 export class Risk {
     id: string
     name: string = ""
-    taxonomie: string
-    balois: string
+    taxonomie: string = ""
+    balois: string = ""
 
     description: string = ""
     actionPlan: string = ""
@@ -29,8 +29,10 @@ export class Risk {
 
     constructor(
         id: string,
-        taxonomie: string,
-        balois: string,
+        name : string, 
+        description : string,
+        level : string, 
+        processId : string, 
     ) {
         this.id = id;
         this.name = name;

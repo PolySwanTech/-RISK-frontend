@@ -87,7 +87,7 @@ export class CreateRisksComponent implements OnInit {
     
     console.log(id)
     if (id === 'create') {
-      this.risk = new Risk('', '', '', []);
+      this.risk = new Risk('', '', '', '', '');
     } 
     
     else {
