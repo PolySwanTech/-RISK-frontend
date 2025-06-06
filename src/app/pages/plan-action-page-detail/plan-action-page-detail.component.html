@@ -63,6 +63,7 @@
             <mat-card-header>
                 <mat-card-title>
                     <span>Actions à réaliser</span>
+                    <button mat-raised-button class="btn-primary add-button"><mat-icon>add</mat-icon>Ajouter</button>
                     <div class="progression-section">
                         <label>Progression globale</label>
                         <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
@@ -85,7 +86,7 @@
                         <ng-container *ngIf="!action.completed; else validated">
                             <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
                                 <mat-icon>upload</mat-icon>
-                                Ajouter un fichier
+                                Déposer un justificatif
                             </button>
                             <input style="display: none;" type="file" (change)="validateAction(action, $event)" />
                         </ng-container>
