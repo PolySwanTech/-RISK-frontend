@@ -1,0 +1,105 @@
+<div style="margin: 15px;">
+    @if(actionPlan){
+    <app-go-back previousPageName="Liste des plans d'action"
+        [currentPageName]="`Détails du plan d'action - ` + actionPlan.name"></app-go-back>
+    <div class="plan-detail-container">
+
+
+        <mat-card class="action-plan-card">
+            <mat-card-header>
+                <mat-card-title>
+                    <span>{{ actionPlan.id }} - {{ actionPlan.name }} (Ref incident : {{ actionPlan.creator }} )</span>
+                    <button mat-raised-button class="btn-green">
+                        <mat-icon>file_download</mat-icon> Exporter
+                    </button>
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="plan-info-content">
+
+                <div class="info-grid">
+                    <div class="info-block">
+  <mat-icon>person</mat-icon>
+  <div class="info-text">
+    <label>Responsable</label>
+    <div class="value">{{ actionPlan.responsable }}</div>
+  </div>
+</div>
+
+<div class="info-block">
+  <mat-icon>event</mat-icon>
+  <div class="info-text">
+    <label>Date d’échéance</label>
+    <div class="value">{{ actionPlan.echeance | date: 'dd/MM/yyyy' }}</div>
+  </div>
+</div>
+
+<div class="info-block">
+  <mat-icon>priority_high</mat-icon>
+  <div class="info-text">
+    <label>Priorité</label>
+    <div class="value" [innerHTML]="getPriorityBarHtml(actionPlan.priority)"></div>
+  </div>
+</div>
+
+<div class="info-block">
+  <mat-icon>check_circle</mat-icon>
+  <div class="info-text">
+    <label>Statut</label>
+    <span class="badge status" [ngClass]="actionPlan.status.toLowerCase()">
+      {{ getReadableStatut(actionPlan.status) }}
+    </span>
+  </div>
+</div>
+                </div>
+
+                <mat-card class="description-card">
+                    <label>DESCRIPTION</label>
+                    <p>{{ actionPlan.description }}</p>
+                </mat-card>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="actions-card">
+            <mat-card-header>
+                <mat-card-title>
+                    <span>Actions à réaliser</span>
+                    <div class="progression-section">
+                        <label>Progression globale</label>
+                        <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
+                        <small>
+                            {{ completedActions }} sur {{ totalActions }} actions terminées
+                            ({{ progressionPercent | number: '1.0-0' }}%)
+                        </small>
+                    </div>
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="actions-content">
+                <div *ngFor="let action of actionPlan.actions" class="action-row">
+                    <div class="action-info">
+                        <p class="action-title">
+                            <strong>{{ action.name }}</strong>
+                            <span class="action-date"> ({{ action.date | date: 'dd/MM/yyyy' }})</span>
+                        </p>
+
+
+                        <ng-container *ngIf="!action.completed; else validated">
+                            <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
+                                <mat-icon>upload</mat-icon>
+                                Ajouter un fichier
+                            </button>
+                            <input style="display: none;" type="file" (change)="validateAction(action, $event)" />
+                        </ng-container>
+
+                        <ng-template #validated>
+                            <p class="validated">
+                                ✔ Terminé par <strong>{{ action.completedBy }}</strong>
+                                le {{ action.completedAt | date: 'dd/MM/yyyy' }}
+                            </p>
+                        </ng-template>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    }
+</div>

@@ -61,7 +61,20 @@ export class ViewComponent {
   canClose: boolean = false;
   message: string = "";
   idIncident: string = "";
-  suivi: SuiviIncident[] = []
+  suivi: SuiviIncident[] = [
+      new SuiviIncident(
+        1,
+        'Création de l’incident avec les détails initiaux.',
+        new Date('2025-06-04T10:30:00'),
+        'admin'
+      ),
+      new SuiviIncident(
+        2,
+        'Ajout d’un impact financier de 5000€ pour le système X.',
+        new Date('2025-06-04T11:00:00'),
+        'jdupont'
+      ),
+    ];
   
   // Propriétés pour la gestion des fichiers
   attachedFiles: AttachedFile[] = [];

@@ -29,10 +29,38 @@ export class SuiviComponent implements OnInit {
   private suiviIncidentService = inject(SuiviIncidentService);
   private dialog = inject(MatDialog);
 
-  history: any[] = [];
   isLoading: boolean = true;
 
   incident: Incident | undefined
+
+  
+
+  history = [
+    {
+      action: 'CREATION',
+      timestamp: new Date('2025-06-01T09:00:00'),
+      user: { username: 'admin' },
+      comment: 'Création initiale de l’incident.'
+    },
+    {
+      action: 'IMPACT_ADDED',
+      timestamp: new Date('2025-06-01T10:05:00'),
+      user: { username: 'analyste1' },
+      comment: 'Ajout d’un impact financier.'
+    },
+    {
+      action: 'MODIFICATION',
+      timestamp: new Date('2025-06-02T14:30:00'),
+      user: { username: 'admin' },
+      comment: 'Changement du statut à "En cours".'
+    },
+    {
+      action: 'CLOTURE',
+      timestamp: new Date('2025-06-03T16:00:00'),
+      user: { username: 'manager' },
+      comment: 'Incident clôturé après résolution.'
+    }
+  ];
 
   readonly TITRE_PAR_ACTION: Record<string, string> = {
     CREATION: 'Création de l’incident',
