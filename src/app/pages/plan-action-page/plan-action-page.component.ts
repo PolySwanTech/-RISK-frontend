@@ -192,8 +192,7 @@ export class PlanActionPageComponent {
 
   // This method will be triggered when a row is clicked
   onRowClick(actionPlan: ActionPlan) {
-    console.log('Row clicked:', actionPlan);
-    // this.router.navigate(['incident', incident.id]);
+    this.router.navigate(['action-plan', actionPlan.id]);
   }
 
   formatDate(date: any): string {

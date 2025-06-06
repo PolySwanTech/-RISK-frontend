@@ -5,6 +5,15 @@ import { Process } from "./Process";
 import { Risk } from "./Risk";
 import { Statut } from "./Statut";
 
+export interface Action {
+  name: string;
+  date: string;
+  completed?: boolean;
+  fileName?: string;
+  completedBy?: string;
+  completedAt?: string;
+}
+
 export class ActionPlan {
     id : string;
     name : string;
