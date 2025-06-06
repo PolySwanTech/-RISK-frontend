@@ -2,11 +2,7 @@
     @if(incident){
     <app-go-back previousPageName="Liste des incidents"
         [currentPageName]="`Détails de l'incident - ` + incident.titre"></app-go-back>
-    <div style="text-align: right; margin-bottom: 10px;">
-        <button mat-raised-button color="primary" (click)="downloadExport()">
-            <mat-icon>file_download</mat-icon> Exporter
-        </button>
-    </div>
+<<<<<<< HEAD
     <div class="info-container">
         <mat-card class="incident-card">
             <mat-card-header>
@@ -28,101 +24,224 @@
                                 <input matInput [value]="incident.cause.name" readonly>
                             </mat-form-field>
 
-                            <mat-form-field class="full-width">
-                                <mat-label>Type de risque</mat-label>
-                                <input matInput [value]="incident.risk.balois" readonly>
-                            </mat-form-field>
-
-                            <!-- <mat-form-field class="full-width">
-                                <mat-label>Sous Catégorie de risque</mat-label>
-                                <input matInput [value]="incident.subRisk.balois" readonly>
-                            </mat-form-field> -->
+=======
+    <div class="view-container">
+        <div class="info-container">
+            <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
+                <mat-card-header>
+                    <mat-card-title>
+                        <span>Info globale</span>
+                        <button mat-raised-button class="btn-green" (click)="downloadExport()">
+                            <mat-icon>file_download</mat-icon> Exporter
+                        </button>
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <!-- Informations principales en cartes -->
+                    <div class="info-grid">
+                        <!-- Localisation -->
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <mat-icon>location_on</mat-icon>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Localisation</span>
+                                <span class="info-value">{{ incident.location }}</span>
+                            </div>
+>>>>>>> 4343f5a3cf2cf536b5a1ed57b21146059b4f8e85
                         </div>
-                        <div class="dates">
-                            <mat-form-field class="full-width">
-                                <mat-label>Date de déclaration</mat-label>
-                                <input matInput [value]="formatDate(incident.declaredAt)" readonly>
-                            </mat-form-field>
 
-                            <mat-form-field class="full-width">
-                                <mat-label>Date de survenance</mat-label>
-                                <input matInput [value]="formatDate(incident.survenueAt)" readonly>
-                            </mat-form-field>
+                        <!-- Cause -->
+                        <div class="info-item">
+                            <div class="info-icon cause-icon">
+                                <mat-icon>error_outline</mat-icon>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Cause</span>
+                                <!-- <span class="info-value">{{ incident.cause.name }}</span> -->
+                            </div>
+                        </div>
 
-                            <mat-form-field class="full-width">
-                                <mat-label>Date de détection</mat-label>
-                                <input matInput [value]="formatDate(incident.detectedAt)" readonly>
-                            </mat-form-field>
-                            @if(incident.closedAt){
-                            <mat-form-field class="full-width">
-                                <mat-label>Date de clôture</mat-label>
-                                <input matInput [value]="formatDate(incident.closedAt)" readonly>
-                            </mat-form-field>
+                        <!-- Type de risque -->
+                        <div class="info-item">
+                            <div class="info-icon risk-icon">
+                                <mat-icon>warning</mat-icon>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Type de risque</span>
+                                <span class="info-value">{{ incident.risk.balois }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline des dates -->
+                    <div class="dates-timeline">
+                        <h3 class="timeline-title">
+                            <mat-icon>schedule</mat-icon>
+                            Chronologie
+                        </h3>
+
+                        <div class="timeline-container">
+                            <!-- Date de déclaration -->
+                            <div class="timeline-item">
+                                <div class="timeline-dot declaration"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-label">Déclaration</span>
+                                    <span class="timeline-date">{{ incident.declaredAt| date : 'dd/MM/yyyy' }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Date de survenance -->
+                            <div class="timeline-item">
+                                <div class="timeline-dot survenance"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-label">Survenance</span>
+                                    <span class="timeline-date">{{ incident.survenueAt| date : 'dd/MM/yyyy' }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Date de détection -->
+                            <div class="timeline-item">
+                                <div class="timeline-dot detection"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-label">Détection</span>
+                                    <span class="timeline-date">{{ incident.detectedAt| date : 'dd/MM/yyyy' }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Date de clôture (si existe) -->
+                            @if(incident.closedAt) {
+                            <div class="timeline-item">
+                                <div class="timeline-dot closure"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-label">Clôture</span>
+                                    <span class="timeline-date">{{ incident.closedAt| date : 'dd/MM/yyyy' }}</span>
+                                </div>
+                            </div>
                             }
                         </div>
                     </div>
-                    <mat-form-field>
-                        <mat-label>Description de l'incident</mat-label>
-                        <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="incident.comments"
-                            readonly></textarea>
-                    </mat-form-field>
-                </div>
-            </mat-card-content>
-        </mat-card>
-        <mat-card class="state-card">
-            <mat-card-header>
-                <mat-card-title><span>Suivi</span> </mat-card-title>
-                <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
-            </mat-card-header>
-            <mat-card-content>
 
-                <div class="comment-section">
-                    <div class="comment-header-bar">
-                      <span>Messages les plus récents</span>
-                    </div>
-                    @for(s of suivi; track s.id){
-                    <div class="comment-card">
-                        <div class="comment-header">
-                            <mat-icon class="user-icon">person</mat-icon>
-                            <span class="username">
-                                {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
-                              </span>
+                    <!-- Description -->
+                    <div class="description-section">
+                        <h3 class="description-title">
+                            <mat-icon>description</mat-icon>
+                            Description de l'incident
+                        </h3>
+                        <div class="description-content">
+                            <p>{{ incident.comments }}</p>
                         </div>
-                        <p class="comment-text">{{s.content}}</p>
                     </div>
-                    }
-                    <mat-form-field>
-                        <mat-label>Message</mat-label>
-                        <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
-                    </mat-form-field>
-                    <button mat-raised-button class="btn-primary" (click)="sendMessage()">Envoyer</button>
-                </div>
-            </mat-card-content>
-        </mat-card>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="files-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
+                <mat-card-header>
+                    <mat-card-title>
+                        <span>Pièces jointes</span>
+                        @if(isNotClosed()){
+                        <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
+                            <mat-icon>attach_file</mat-icon>
+                            Ajouter
+                        </button>
+                        }
+                    </mat-card-title>
+                </mat-card-header>
+                <app-fichiers [idIncident]="incident.id" [closed]="isNotClosed()" style="height: 90%;"></app-fichiers>
+            </mat-card>
+            <mat-card class="state-card none">
+                <mat-card-header>
+                    <mat-card-title><span>Suivi</span>
+                        <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
+                    </mat-card-title>
+
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="comment-section">
+                        <div class="comment-header-bar">
+                            <span>Messages les plus récents</span>
+                        </div>
+                        @for(s of suivi; track s.id){
+                        <div class="comment-card">
+                            <div class="comment-header">
+                                <mat-icon class="user-icon">person</mat-icon>
+                                <span class="username">
+                                    {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
+                                </span>
+                            </div>
+                            <p class="comment-text">{{s.content}}</p>
+                        </div>
+                        }
+                        <mat-form-field>
+                            <mat-label>Message</mat-label>
+                            <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
+                        </mat-form-field>
+                        <button mat-raised-button class="btn-primary" (click)="sendMessage()">Envoyer</button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+        </div>
+        <div class="info2-container" style="display: flex; gap: 20px;">
+            <!-- Section Pièces jointes -->
+
+            <mat-card class="state-card display">
+                <mat-card-header>
+                    <mat-card-title><span>Suivi</span>
+                        <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
+                    </mat-card-title>
+
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="comment-section">
+                        <div class="comment-header-bar">
+                            <span>Messages les plus récents</span>
+                        </div>
+                        @for(s of suivi; track s.id){
+                        <div class="comment-card">
+                            <div class="comment-header">
+                                <mat-icon class="user-icon">person</mat-icon>
+                                <span class="username">
+                                    {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
+                                </span>
+                            </div>
+                            <p class="comment-text">{{s.content}}</p>
+                        </div>
+                        }
+                        <mat-form-field>
+                            <mat-label>Message</mat-label>
+                            <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
+                        </mat-form-field>
+                        <button mat-raised-button class="btn-primary" (click)="sendMessage()">Envoyer</button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="state-card">
+                <mat-card-header>
+                    <mat-card-title>
+                        <span>Impacts -
+                            <strong>
+                                Total : {{ totalAmount | currency : 'EUR' }}
+                            </strong>
+                        </span>
+                        @if(isNotClosed()){
+                        <button mat-raised-button class="btn-primary" (click)="addImpact()">
+                            Ajouter
+                            <mat-icon>add</mat-icon>
+                        </button>
+                        }
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="impacts-container">
+                        @for(impact of incident.impacts; track impact){
+                        <app-impact-card [impact]="impact"></app-impact-card>
+                        }
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
     </div>
-    <mat-card class="state-card">
-        <mat-card-header>
-            <mat-card-title>
-                <span>Impacts -
-                    <strong>
-                        Total : {{ totalAmount | currency : 'EUR' }}
-                    </strong>
-                </span>
-                @if(isNotClosed()){
-                <button mat-raised-button class="btn-primary" (click)="addImpact()">
-                    Ajouter
-                    <mat-icon>add</mat-icon>
-                </button>
-                }
-            </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <div class="impacts-container">
-                @for(impact of incident.impacts; track impact){
-                <app-impact-card [impact]="impact"></app-impact-card>
-                }
-            </div>
-        </mat-card-content>
-    </mat-card>
     }
 </div>

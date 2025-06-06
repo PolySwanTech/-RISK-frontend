@@ -3,6 +3,9 @@ import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angula
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { CreateRiskComponent } from '../../risk/create-risk/create-risk.component';
 
 @Component({
   selector: 'app-create-process',
@@ -13,7 +16,10 @@ import { Process } from '../../../core/models/Process';
 export class CreateProcessComponent {
   processForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private processService: ProcessService) {
+  constructor(
+    private dialog: MatDialog,
+    private fb: FormBuilder,
+    private processService: ProcessService) {
     this.processForm = this.fb.group({
       id: [0, Validators.required],
       name: ['', Validators.required],
@@ -31,4 +37,5 @@ export class CreateProcessComponent {
       });
     }
   }
+
 }

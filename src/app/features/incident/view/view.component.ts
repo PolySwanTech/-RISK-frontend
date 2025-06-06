@@ -1,4 +1,4 @@
-import { Component, inject, LOCALE_ID } from '@angular/core';
+import { Component, inject, Input, LOCALE_ID } from '@angular/core';
 import { Incident, State } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -16,16 +16,28 @@ import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact } from '../../../core/models/Impact';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
 import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { HttpClient } from '@angular/common/http';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 
+// Interface pour les fichiers attachés
+interface AttachedFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploadedAt: Date;
+  url?: string;
+}
 
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe, DatePipe,
-    MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule, MatInputModule, GoBackComponent],
+    MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule,
+    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, FichiersComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss',
   providers: [
@@ -50,11 +62,15 @@ export class ViewComponent {
   message: string = "";
   idIncident: string = "";
   suivi: SuiviIncident[] = []
+  
+  // Propriétés pour la gestion des fichiers
+  attachedFiles: AttachedFile[] = [];
+  isDragOver = false;
 
   ngOnInit(): void {
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident);
-    // this.loadSuiviIncident(this.idIncident);
+    this.loadAttachedFiles(this.idIncident);
   }
 
   loadIncident(id: string): void {
@@ -69,19 +85,51 @@ export class ViewComponent {
     )
   }
 
-  // loadSuiviIncident(id: string): void {
-  //   this.suiviIncidentService.getSuiviIncidentById(id).subscribe(
-  //     {
-  //       next: (suivi) => {
-  //         this.suivi = suivi;
-  //         console.log(this.suivi)
-  //       },
-  //       error: (error) => {
-  //         console.error("Erreur lors de la récupération des suivis d'incidents :", error);
-  //       }
-  //     }
-  //   ) 
-  // }
+  loadAttachedFiles(incidentId: string): void {
+    // TODO: Remplacer par votre service de fichiers
+    // this.fileService.getFilesByIncidentId(incidentId).subscribe(files => {
+    //   this.attachedFiles = files;
+    // });
+    
+    // Données de test - à supprimer quand le service sera implémenté
+    this.attachedFiles = [
+      {
+        id: '1',
+        name: 'rapport-incident.pdf',
+        size: 2458624, // 2.4 MB
+        type: 'application/pdf',
+        uploadedAt: new Date('2025-05-24')
+      },
+      {
+        id: '2',
+        name: 'capture-ecran-serveur.png',
+        size: 876544, // 856 KB
+        type: 'image/png',
+        uploadedAt: new Date('2025-05-26')
+      },
+      {
+        id: '3',
+        name: 'capture-ecran-serveur.png',
+        size: 876544, // 856 KB
+        type: 'image/png',
+        uploadedAt: new Date('2025-05-22')
+      },
+      {
+        id: '4',
+        name: 'capture-ecran-serveur.png',
+        size: 876544, // 856 KB
+        type: 'image/png',
+        uploadedAt: new Date('2025-05-30')
+      },
+      {
+        id: '5',
+        name: 'capture-ecran-serveur.png',
+        size: 876544, // 856 KB
+        type: 'image/png',
+        uploadedAt: new Date('2025-05-18')
+      }
+    ];
+  }
 
   extractTokenInfo(): void {
     const token = sessionStorage.getItem('token');
@@ -118,25 +166,29 @@ export class ViewComponent {
     return "Inconnu"
   }
 
-  formatDate(dateString: any) {
-    return dateString ? dateString.toLocaleDateString("fr-FR") : null;
-  }
-
-
   changeStatus(): void {
-    // Logic to change the state of the incident
     if (this.incident) {
-      this.incident.state = this.incident.state === State.OPEN ? State.CLOSED : State.OPEN;
+      switch( this.incident.state) {
+        case State.DRAFT:
+          this.incident.state = State.VALIDATE;
+          break;
+        case State.VALIDATE:
+          this.incident.state = State.PROCESS;
+          break;
+        case State.PROCESS:
+          this.incident.state = State.CLOSED;
+          break;
+        case State.CLOSED:
+          this.confirmService.openConfirmDialog("Incident déjà clôturé", "L'incident est déjà clôturé, vous ne pouvez pas changer son état.", true);
+      }
     }
   }
 
   addImpact() {
-    // Open the Impact Add dialog
     const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
-      width: '400px', // You can adjust the dialog size as needed
+      width: '400px',
     });
 
-    // Wait for the result when the dialog is closed
     dialogRef.afterClosed().subscribe((result: Impact) => {
       if (result) {
         if (this.incident) {
@@ -168,7 +220,6 @@ export class ViewComponent {
       this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
         () => {
           this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
-          // this.loadSuiviIncident(this.idIncident);
         });
     }
   }
@@ -177,6 +228,167 @@ export class ViewComponent {
     if (!this.incident?.id) return;
     this.incidentService.downloadExport(this.incident.id);
   }
-  
+
+  // Méthodes pour la gestion des fichiers
+
+  openFileUpload(): void {
+    // Déclencher le clic sur l'input file caché
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fileInput?.click();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.handleFiles(Array.from(input.files));
+    }
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+    
+    if (event.dataTransfer?.files) {
+      this.handleFiles(Array.from(event.dataTransfer.files));
+    }
+  }
+
+  private handleFiles(files: File[]): void {
+    files.forEach(file => {
+      if (this.isValidFile(file)) {
+        this.uploadFile(file);
+      } else {
+        this.confirmService.openConfirmDialog(
+          "Fichier non supporté", 
+          `Le fichier ${file.name} n'est pas dans un format supporté.`, 
+          false
+        );
+      }
+    });
+  }
+
+  private isValidFile(file: File): boolean {
+    const validTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'text/plain',
+      'text/csv',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    
+    return validTypes.includes(file.type);
+  }
+
+  private uploadFile(file: File): void {
+    if (!this.incident?.id) return;
+
+    // TODO: Implémenter l'upload vers votre API
+    // const formData = new FormData();
+    // formData.append('file', file);
+    // formData.append('incidentId', this.incident.id);
+    
+    // this.fileService.uploadFile(formData).subscribe({
+    //   next: (response) => {
+    //     this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
+    //     this.loadAttachedFiles(this.incident!.id);
+    //   },
+    //   error: (error) => {
+    //     this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'upload de ${file.name}.`, false);
+    //   }
+    // });
+
+    // Simulation d'upload pour la démo
+    const newFile: AttachedFile = {
+      id: Date.now().toString(),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      uploadedAt: new Date()
+    };
+    
+    this.attachedFiles.push(newFile);
+    this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
+  }
+
+  downloadFile(file: AttachedFile): void {
+    // TODO: Implémenter le téléchargement depuis votre API
+    // this.fileService.downloadFile(file.id).subscribe(blob => {
+    //   const url = window.URL.createObjectURL(blob);
+    //   const link = document.createElement('a');
+    //   link.href = url;
+    //   link.download = file.name;
+    //   link.click();
+    //   window.URL.revokeObjectURL(url);
+    // });
+
+    // Simulation pour la démo
+    this.confirmService.openConfirmDialog("Téléchargement", `Téléchargement de ${file.name} en cours...`, false);
+  }
+
+  deleteFile(fileId: string): void {
+    // TODO: Implémenter la suppression via votre API
+    // this.fileService.deleteFile(fileId).subscribe({
+    //   next: () => {
+    //     this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
+    //     this.confirmService.openConfirmDialog("Fichier supprimé", "Le fichier a été supprimé avec succès.", false);
+    //   },
+    //   error: (error) => {
+    //     this.confirmService.openConfirmDialog("Erreur", "Erreur lors de la suppression du fichier.", false);
+    //   }
+    // });
+
+    // Simulation pour la démo
+    const file = this.attachedFiles.find(f => f.id === fileId);
+    this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
+    this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.name} a été supprimé avec succès.`, false);
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  getFileIcon(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    const iconMap: { [key: string]: string } = {
+      'pdf': 'picture_as_pdf',
+      'doc': 'description',
+      'docx': 'description',
+      'png': 'image',
+      'jpg': 'image',
+      'jpeg': 'image',
+      'txt': 'text_snippet',
+      'csv': 'table_chart',
+      'xlsx': 'table_chart',
+      'xls': 'table_chart'
+    };
+    return iconMap[ext || ''] || 'insert_drive_file';
+  }
+
+  getFileIconClass(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    return `file-icon-${ext}`;
+  }
 
 }

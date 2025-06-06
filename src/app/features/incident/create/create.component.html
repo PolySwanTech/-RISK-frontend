@@ -32,21 +32,12 @@
             </mat-form-field>
 
             <mat-form-field>
-              <mat-label>Cause</mat-label>
-              <mat-select formControlName="cause" placeholder="Cause de l'incident">
-                @for(cause of listCause; track cause){
-                <mat-option [value]="cause">{{ cause.name }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Location de l'incident</mat-label>
+              <mat-label>Localisation de l'incident</mat-label>
               <input matInput formControlName="location" placeholder="Location">
             </mat-form-field>
 
             <div class="actions">
-              <button mat-raised-button class="btn-green" (click)="draft()">Brouillon</button>
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
               <button mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
@@ -76,7 +67,7 @@
 
             <div class="actions">
               <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
-              <button mat-raised-button class="btn-green" (click)="draft()">Brouillon</button>
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
               <button mat-raised-button class="btn-primary" [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
             </div>
           </form>
@@ -89,11 +80,11 @@
               property="newImages" (filesSelected)="onFilesChange($event)">
             </app-button-add-file>
 
-            <mat-radio-group formControlName="risk">
+            <!-- <mat-radio-group formControlName="risk">
               @for(risk of listRisk; track risk){
               <mat-radio-button [value]="risk">{{risk.balois}}</mat-radio-button>
               }
-            </mat-radio-group>
+            </mat-radio-group> -->
 
             @if(getSubRisk() != ''){
             <mat-form-field>
@@ -121,7 +112,6 @@
 
           <div class="actions">
             <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
-            <button mat-raised-button class="btn-green" (click)="draft()">Brouillon</button>
             <button  mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
           </div>
         </mat-step>

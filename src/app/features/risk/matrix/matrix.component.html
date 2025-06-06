@@ -1,45 +1,38 @@
 <section id="matrix">
-  <h2>Matrice des risques</h2>
 
   <!-- Container principal avec les axes -->
   <div class="matrix-container">
     <!-- Label IMPACT vertical -->
     <div class="impact-label">IMPACT</div>
-    
+
     <!-- Matrice principale -->
     <div class="matrix-wrapper">
       <table class="risk-matrix">
         <tbody>
           <!-- Lignes de la matrice -->
-          <tr *ngFor="let row of matrix; let rowIndex = index">
+          <tr class="matrix-tr" *ngFor="let row of matrix; let rowIndex = index">
             <th class="row-header">
-              <input 
-                [(ngModel)]="rowLabels[rowIndex]" 
-                [placeholder]="'Ligne ' + (rowIndex + 1)" 
-                class="row-input"
-              />
+              <input [(ngModel)]="rowLabels[rowIndex]" [placeholder]="'Ligne ' + (rowIndex + 1)" class="row-input" />
             </th>
-            <td *ngFor="let cell of row; let colIndex = index"
-                [ngStyle]="getCellStyle(cell)"
-                (click)="modifPlan == true ? setColor(rowIndex, colIndex) : null"
-                class="matrix-cell">
+            <td *ngFor="let cell of row; let colIndex = index" [ngStyle]="getCellStyle(cell)"
+              (click)="modifPlan == true ? setColor(getDisplayRowIndex(rowIndex), colIndex) : null" class="matrix-cell">
+
               <!-- Indicateur de risque si présent -->
-              <div *ngIf="getRiskCode(rowIndex, colIndex)" class="risk-indicator">
-                {{ getRiskCode(rowIndex, colIndex) }}
+              <div *ngIf="getRiskCode(getDisplayRowIndex(rowIndex), colIndex).id != ''"
+                (click)="getRisk(getDisplayRowIndex(rowIndex), colIndex)" class="risk-indicator"
+                [matTooltip]="getRiskCode(getDisplayRowIndex(rowIndex), colIndex).name ? getRiskCode(getDisplayRowIndex(rowIndex), colIndex).name : ''">
+                {{ getRiskCode(getDisplayRowIndex(rowIndex), colIndex).id ? getRiskCode(getDisplayRowIndex(rowIndex),
+                colIndex).id : '' }}
               </div>
+
             </td>
           </tr>
-        
+
           <!-- Ligne des labels de colonnes (PROBABILITÉ) -->
           <tr class="column-labels-row">
             <th class="probability-header">PROBABILITÉ</th>
-            <td *ngFor="let colLabel of colLabels; let i = index; trackBy: trackByFn" 
-                class="column-label-cell">
-              <input 
-                [(ngModel)]="colLabels[i]" 
-                [placeholder]="'Col ' + (i + 1)"
-                class="col-input"
-              />
+            <td *ngFor="let colLabel of colLabels; let i = index; trackBy: trackByFn" class="column-label-cell">
+              <input [(ngModel)]="colLabels[i]" [placeholder]="'Col ' + (i + 1)" class="col-input" />
             </td>
           </tr>
         </tbody>
@@ -49,17 +42,18 @@
 
   <!-- Légende des couleurs -->
   <div class="color-legend">
-    <div *ngFor="let level of colorLevels"
-         [ngClass]="{'legend-item': true, 'modif': modifPlan == true}"
-         [class.selected]="selectedColor === level.color"
-         (click)="modifPlan == true ? selectedColor = level.color : null">
+    <div *ngFor="let level of colorLevels" [ngClass]="{'legend-item': true, 'modif': modifPlan == true}"
+      [class.selected]="selectedColor === level.color" (click)="modifPlan == true ? selectedColor = level.color : null">
       <div class="legend-color" [style.background-color]="level.color"></div>
       <span class="legend-label">{{ level.label }}</span>
     </div>
   </div>
 
   <!-- Bouton de sauvegarde -->
+  @if(modifPlan == true) {
   <button class="save-button" (click)="saveMatrice()">
     Sauvegarder la matrice
   </button>
+  }
+
 </section>

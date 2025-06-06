@@ -1,0 +1,79 @@
+
+    <!-- <div class="risk-header">
+      <h3 class="risk-title">{{ riskData.id + ' - ' + riskData.name }}</h3>
+    </div>
+     -->
+    @if(riskData) {
+    <div style="display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;">
+    <div class="risk-content">
+      <div class="risk-info-grid">
+        
+        <div class="info-row">
+          <span class="label">Sous catégorie:</span>
+          <span class="value">{{ riskData.sub_category }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Processus:</span>
+          <span class="value">{{ riskData.processus }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Business Unit:</span>
+          <span class="value">{{ riskData.bu_name }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Probabilité:</span>
+          <span class="value probability">{{ getProbabilityText() }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Impact:</span>
+          <span class="value impact">{{ getImpactText() }}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Niveau:</span>
+          <span class="value" [ngClass]="getRiskLevelClass()">{{ riskData.level }}</span>
+        </div>
+      </div>
+      
+      <div class="description-section">
+        <h4 class="section-title">Description:</h4>
+        <p class="description-text">{{ riskData.description }}</p>
+      </div>
+      
+      <div class="controls-section">
+        <h4 class="section-title">Contrôles:</h4>
+        <ul class="controls-list">
+          <li *ngFor="let control of riskData.controls">{{ control }}</li>
+        </ul>
+      </div>
+      </div>
+      <div class="action-buttons">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="action-btn"
+          (click)="onModifyClick()">
+          <mat-icon>edit</mat-icon>
+          Modifier
+        </button>
+        <!-- <button 
+          mat-outlined-button 
+          class="action-btn"
+          (click)="onActionPlanClick()">
+          <mat-icon>assignment</mat-icon>
+          Plan d'action
+        </button> -->
+      </div>
+    </div>
+    } @else {
+      <div class="no-risk-selected">
+        Selectionnez un risque pour afficher les détails.
+      </div>
+    }

@@ -74,8 +74,7 @@ export class OrganigrammeComponent {
 
           console.log(match)
           // Chercher le rôle dans la liste des rôles disponibles
-          const matchingRole = this.roles.find(r => r.id == match.role?.id);
-          console.log(matchingRole);
+          const matchingRole = this.roles.find(r => r.name == match.role?.name);
           node.role = matchingRole || null;
 
           this.onParentCheckChange(node, { checked: true });

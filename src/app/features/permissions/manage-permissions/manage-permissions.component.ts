@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -9,6 +9,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { permissionLabels, PermissionName } from '../../../core/enum/permission.enum';
 import { Role, RoleService } from '../../../core/services/role/role.service';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateRoleDialogComponent } from '../role/create-role-dialog/create-role-dialog.component';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-manage-permissions',
@@ -22,27 +25,28 @@ import { Role, RoleService } from '../../../core/services/role/role.service';
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
-],
+  ],
   templateUrl: './manage-permissions.component.html',
   styleUrls: ['./manage-permissions.component.scss']
 })
 export class ManagePermissionsComponent implements OnInit {
-  
+
   roles: Role[] = [];
   filteredRoles: Role[] = [];
   permissions: PermissionName[] = [];
   selectedRole: Role | null = null;
-  
+  dialog = inject(MatDialog);
+  confirmService = inject(ConfirmService);
   searchQuery: string | Role | null = null;
-  
+
   constructor(
     private roleService: RoleService,
   ) { }
-  
+
   formatPermission(p: PermissionName) {
     return permissionLabels[p] || p;
   }
-  
+
   ngOnInit(): void {
     this.loadRoles();
     this.getPermissions()
@@ -56,7 +60,7 @@ export class ManagePermissionsComponent implements OnInit {
   }
 
   getPermissions() {
-    const permissions = Object.values(PermissionName) 
+    const permissions = Object.values(PermissionName)
     this.permissions = permissions as PermissionName[];
   }
 
@@ -83,14 +87,12 @@ export class ManagePermissionsComponent implements OnInit {
   savePermissions(): void {
     if (!this.selectedRole) return;
 
-    this.roleService.updateRolePermissions(this.selectedRole.id, this.selectedRole.permissions).subscribe(() => {
+    this.roleService.updateRolePermissions(this.selectedRole.name, this.selectedRole.permissions).subscribe(() => {
       alert(`Permissions mises à jour pour ${this.selectedRole!.name}`);
     });
   }
 
   filterBySearch(): void {
-    console.log(this.searchQuery);
-
     if (!this.searchQuery) {
       this.filteredRoles = this.roles;
       return;
@@ -107,6 +109,23 @@ export class ManagePermissionsComponent implements OnInit {
       );
     }
   }
+
+  create() {
+    this.dialog.open(CreateRoleDialogComponent)
+      .afterClosed()
+      .subscribe(name => {
+        if (name) {
+          this.roleService.create({ name: name, permissions: [] }).subscribe(role => {
+            this.roles.push(role);
+            this.filteredRoles.push(role);
+            this.selectedRole = role;
+            this.confirmService.openConfirmDialog('Création réussie', `Rôle ${role.name} créé avec succès.`)
+          });
+        }
+      });
+
+  }
+
 
   displayFn(role: Role): string {
     return role ? role.name : '';
