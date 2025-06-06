@@ -68,6 +68,7 @@ export class RisksComponent implements OnInit {
   }
 
   navToCreate() {
-    this.router.navigate(['reglages', 'risks', 'create'])
+    alert("ici")
+    this.router.navigate(['reglages', 'risks', 'create']);
   }
 }

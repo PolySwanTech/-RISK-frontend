@@ -21,7 +21,7 @@ import { Process } from '../../../../core/models/Process';
 @Component({
   selector: 'app-create-risks',
   imports: [
-    CommonModule,FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule,
+    CommonModule, FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule,
     MatSelectModule, GoBackComponent, MatStepperModule, MatButtonModule],
   templateUrl: './create-risks.component.html',
   styleUrl: './create-risks.component.scss'
@@ -41,7 +41,7 @@ export class CreateRisksComponent implements OnInit {
 
 
   riskForm = this._formBuilder.group({
-    titre: ['', Validators.required],    
+    titre: ['', Validators.required],
     balois1: ['', Validators.required],
     balois2: ['', Validators.required],
     process: ['', Validators.required],
@@ -75,41 +75,30 @@ export class CreateRisksComponent implements OnInit {
   risk: Risk | undefined
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id') || "";
     this.baloisCategoriesService.getAll().subscribe(data => {
-    this.categoriesBaloise = data;
-  });
-  this.processService.getAll().subscribe(processes => {
-    this.process = processes
-    console.log(processes)
-  });
-
-    
-    console.log(id)
-    if (id === 'create') {
-      this.risk = new Risk('', '', '', '', '');
-    } 
-    
-    else {
-      this.loadRiskById(id);
-    }
-  }
-
-  loadRiskById(id: string) {
-    this.riskService.getById(id).subscribe(rep => {
-      this.risk = rep
-      this.pageTitle = "Mise à jour du risque : " + this.risk.name;
-      this.responseMessage = { title: 'Mise à jour', message: 'mise à jour' }
-      this.riskForm.get('titre')?.setValue(this.risk.name);
-      this.riskForm.get('balois1')?.setValue(this.risk.taxonomie);
-      this.riskForm.get('balois2')?.setValue(this.risk.balois);
-      this.riskForm.get('process')?.setValue(this.risk.processId);
-      this.riskForm2.get('description')?.setValue(this.risk.description);
-      this.riskForm2.get('level')?.setValue(this.risk.level);
-      this.riskForm2.get('probability')?.setValue(this.risk.probability)
-      this.riskForm2.get('impactType')?.setValue(this.risk.impactType)
+      this.categoriesBaloise = data;
     });
+    this.processService.getAll().subscribe(processes => {
+      this.process = processes
+    });
+    this.risk = new Risk('', '', '', '', '');
   }
+
+  // loadRiskById(id: string) {
+  //   this.riskService.getById(id).subscribe(rep => {
+  //     this.risk = rep
+  //     this.pageTitle = "Mise à jour du risque : " + this.risk.name;
+  //     this.responseMessage = { title: 'Mise à jour', message: 'mise à jour' }
+  //     this.riskForm.get('titre')?.setValue(this.risk.name);
+  //     this.riskForm.get('balois1')?.setValue(this.risk.taxonomie);
+  //     this.riskForm.get('balois2')?.setValue(this.risk.balois);
+  //     this.riskForm.get('process')?.setValue(this.risk.processId);
+  //     this.riskForm2.get('description')?.setValue(this.risk.description);
+  //     this.riskForm2.get('level')?.setValue(this.risk.level);
+  //     this.riskForm2.get('probability')?.setValue(this.risk.probability)
+  //     this.riskForm2.get('impactType')?.setValue(this.risk.impactType)
+  //   });
+  // }
 
   createRisk() {
     if (this.risk && this.riskForm.valid) {

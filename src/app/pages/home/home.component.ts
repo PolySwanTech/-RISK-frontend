@@ -17,7 +17,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatrixComponent, ActionPlanChartComponent, ControlChartComponent, 
+  imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent, 
     BarChartComponent, DoughnutChartComponent, MatIconModule, 
     MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule],
   templateUrl: './home.component.html',
