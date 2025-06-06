@@ -4,14 +4,13 @@ import { Risk } from "./Risk"
 export class Process {
     id: string = ''
     name: string
-    buId: string
-
+    bu: EntiteResponsable
     risks : Risk[] = []
 
     constructor(
         name: string,
-        bu_id: string) {
+        bu: EntiteResponsable) {
         this.name = name
-        this.buId = bu_id
+        this.bu = bu
     }
 }

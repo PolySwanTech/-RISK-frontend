@@ -14,18 +14,30 @@
             </mat-form-field>
 
             <mat-form-field class="full-width">
-              <mat-label>Catégorie baloise</mat-label>
-              <input matInput formControlName="balois" placeholder="Sélectionner une catégorie" />
+              <mat-label>Catégorie Bâloise</mat-label>
+              <mat-select formControlName="balois1">
+                <mat-option *ngFor="let cb of categoriesBaloise" [value]="cb.name">
+                  {{ cb.name }}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
 
             <mat-form-field class="full-width">
-              <mat-label>Sous-catégorie baloise</mat-label>
-              <input matInput formControlName="balois" placeholder="Sélectionner une sous catégorie" />
+              <mat-label>Sous-catégorie Bâloise</mat-label>
+              <mat-select formControlName="balois2">
+                <mat-option *ngFor="let sub of sousCategoriesFiltered" [value]="sub.name">
+                  {{ sub.name }}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
 
-            <mat-form-field class="full-width">
-              <mat-label>Processus</mat-label>
-              <input matInput formControlName="process" placeholder="Entrez le processus" />
+             <mat-form-field class="full-width">
+              <mat-label>Processus </mat-label>
+              <mat-select formControlName="process">
+                <mat-option *ngFor="let p of process" [value]="p.id">
+                  {{ p.name }}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
 
             <div class="actions">
@@ -37,9 +49,15 @@
         <mat-step [stepControl]="riskForm2" label="Autres info">
           <form [formGroup]="riskForm2">
 
-            <mat-form-field class="full-width">
-              <mat-label>Description du risque</mat-label>
-              <textarea matInput formControlName="description" placeholder="Entrez la description du risque"></textarea>
+            <mat-form-field>
+              <mat-label>Type d'Impact</mat-label>
+              <mat-select formControlName="impactType" placeholder="Choisissez un type d'impact" required>
+                @for(impact of impactTypes; track impact){
+                <mat-option [value]="impact">
+                  {{ impactLabels[impact] }}
+                </mat-option>
+                }
+              </mat-select>
             </mat-form-field>
 
             <mat-form-field>
@@ -47,11 +65,29 @@
               <mat-select formControlName="level" placeholder="Choisissez un niveau de risque" required>
                 @for(level of riskLevels; track level){
                 <mat-option [value]="level">
-                  {{ getRiskLevelLabel(level) }}
+                  {{ riskLabels[level] }}
                 </mat-option>
                 }
               </mat-select>
             </mat-form-field>
+
+            <mat-form-field class="full-width">
+            <mat-label>Probabilité que le risque se produise</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="probability"
+              placeholder="Entrez la probabilité que le risque se produise"
+              step="any"  
+              min="0"
+              max="100"
+            >
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+            <mat-label>Description du risque</mat-label>
+            <textarea matInput formControlName="description" placeholder="Entrez la description du risque"></textarea>
+          </mat-form-field>
             
           </form>
 

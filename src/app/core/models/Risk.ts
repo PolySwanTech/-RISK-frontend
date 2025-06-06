@@ -1,13 +1,7 @@
 import { EntiteResponsable } from "./EntiteResponsable";
-import { Process } from "./Process";
+import { RiskLevel } from "../enum/riskLevel.enum";
+import { RiskImpactType } from "../enum/riskImpactType.enum";
 import { SubRisk } from "./SubRisk";
-
-export enum RiskLevel {
-    LOW = "LOW",
-    MEDIUM = "MEDIUM",
-    HIGH = "HIGH",
-    VERY_HIGH = "VERY_HIGH",
-}
 
 export const RiskLevelLabels: Record<RiskLevel, string> = {
     [RiskLevel.LOW]: "Low",
@@ -16,28 +10,35 @@ export const RiskLevelLabels: Record<RiskLevel, string> = {
     [RiskLevel.VERY_HIGH]: "Very High"
 };
 
-export class Risk{
-    id : string
-    name : string = ""
-    taxonomie : string
-    balois : string
+export const RiskImpactTypeLabels: Record<RiskImpactType, string> = {
+    [RiskImpactType.FINANCIER]: "Financier",
+    [RiskImpactType.REPUTATIONEL]: "Réputationel"
+};
+export class Risk {
+    id: string
+    name: string = ""
+    taxonomie: string
+    balois: string
 
-    description : string = ""
-    actionPlan : string = ""
-    level : string = ""
-    entiteResponsable : EntiteResponsable[] = []
-    processId : string = ""
-    subRisks : SubRisk[]
-    
+    description: string = ""
+    actionPlan: string = ""
+    level: string = ""
+    entiteResponsable: EntiteResponsable[] = []
+    processId: string = ""
+    subRisks: SubRisk[]
+    probability: number | null = null
+    impactType: RiskImpactType | null = null
+
     constructor(
-        id : string,
-        taxonomie : string,
-        balois : string,
-        subRisks : SubRisk[]
-    ){
+        id: string,
+        taxonomie: string,
+        balois: string,
+        subRisks: SubRisk[]
+    ) {
         this.id = id;
         this.taxonomie = taxonomie;
         this.balois = balois;
         this.subRisks = subRisks;
     }
+    
 }

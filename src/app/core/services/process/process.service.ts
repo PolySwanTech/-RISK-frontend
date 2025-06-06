@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Process } from '../../models/Process';
 import { EntiteResponsable } from '../../models/EntiteResponsable';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +13,14 @@ export class ProcessService {
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/users/processes'; ;
 
-  getAll(){
-    return this.http.get<Process[]>(this.baseUrl )
+  getAllGroupedByBu() {
+    return this.http.get<{ [key: string]: Process[] }>(this.baseUrl);
   }
+
+  getAll(): Observable<Process[]> {
+  return this.http.get<Process[]>(this.baseUrl);
+}
+
 
   createProcess(process : Process){ 
     return this.http.post<Process>(this.baseUrl , process)
