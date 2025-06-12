@@ -29,6 +29,13 @@ export class EntitiesService {
     return this.http.post(this.baseUrl, entite);
   }
 
+  getByProcess(processId: string): Observable<EntiteResponsable> {
+    return this.http.get<EntiteResponsable>(
+      `${this.baseUrl}/byProcess`,
+      { params: { processId } }
+    );
+  }
+
   update(entite: EntiteResponsable) {
     console.log(entite);
     return this.http.put(this.baseUrl, entite);

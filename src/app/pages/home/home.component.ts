@@ -2,7 +2,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { Component, inject, OnInit } from '@angular/core';
 import { UtilisateurService } from '../../core/services/utilisateur/utilisateur.service';
 import { MatCardModule } from '@angular/material/card';
-import { MatrixComponent } from "../../features/risk/matrix/matrix.component";
 import { ActionPlanChartComponent } from "../../features/action-plan/action-plan-chart/action-plan-chart/action-plan-chart.component";
 import { ControlChartComponent } from "../../features/control/control-chart/control-chart/control-chart.component";
 import { IncidentService } from '../../core/services/incident/incident.service';
@@ -17,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatrixComponent, ActionPlanChartComponent, ControlChartComponent, 
+  imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent, 
     BarChartComponent, DoughnutChartComponent, MatIconModule, 
     MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule],
   templateUrl: './home.component.html',

@@ -1,7 +1,7 @@
 import { EntiteResponsable } from "./EntiteResponsable";
 import { Impact } from "./Impact";
 import { Process } from "./Process";
-import { Risk } from "./Risk";
+import { Risk } from "./RiskTemplate";
 import { Cause } from "./Cause";
 
 export enum State {

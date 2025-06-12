@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { RiskService } from '../../../core/services/risk/risk.service';
-import { Risk } from '../../../core/models/Risk';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSort } from '@angular/material/sort';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
 
 @Component({
   selector: 'app-risks',
@@ -28,19 +28,19 @@ export class RisksComponent implements OnInit {
     {
       columnDef: 'name',
       header: 'Nom',
-      cell: (element: Risk) => `${element.name}`,
+      cell: (element: RiskTemplate) => `${element.name}`,
     },
     {
       columnDef: 'description',
       header: 'Description',
-      cell: (element: Risk) => `${element.description}`,
+      cell: (element: RiskTemplate) => `${element.description}`,
     },
     {
       columnDef: 'level',
       header: 'Niveau',
-      cell: (element: Risk) => `
-  <span class="badge ${element.level.toLowerCase()}">
-    ${element.level.toString() || 'Inconnu'}
+      cell: (element: RiskTemplate) => `
+  <span class="badge ${element.riskBrut}">
+    ${element.riskBrut || 'Inconnu'}
   </span>
 `
     }
@@ -48,7 +48,7 @@ export class RisksComponent implements OnInit {
 
   displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
 
-  dataSource = new MatTableDataSource<Risk>([]);
+  dataSource = new MatTableDataSource<RiskTemplate>([]);
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -56,7 +56,7 @@ export class RisksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.riskService.getAllByProcess().subscribe(
+    this.riskService.getAll().subscribe(
       rep => {
         this.dataSource.data = rep
       }

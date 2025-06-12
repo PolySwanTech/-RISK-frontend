@@ -1,5 +1,5 @@
 import { EntiteResponsable } from "./EntiteResponsable"
-import { Risk } from "./Risk"
+import { Risk } from "./RiskTemplate"
 
 export class Process {
     id: string = ''

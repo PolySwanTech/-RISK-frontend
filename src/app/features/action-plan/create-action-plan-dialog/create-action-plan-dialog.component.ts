@@ -3,7 +3,7 @@ import { ActionPlan } from '../../../core/models/ActionPlan';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { Impact } from '../../../core/models/Impact';
 import { Process } from '../../../core/models/Process';
-import { Risk } from '../../../core/models/Risk';
+import { Risk } from '../../../core/models/RiskTemplate';
 import { Statut } from '../../../core/models/Statut';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';

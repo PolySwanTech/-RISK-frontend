@@ -17,7 +17,7 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplate, Degree, Recurence, Type } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
-import { Risk } from '../../../core/models/Risk';
+import { Risk } from '../../../core/models/RiskTemplate';
 
 @Component({
   selector: 'app-create-control',
