@@ -44,7 +44,7 @@ export class RiskTemplate {
   riskEvaluations?: RiskEvaluation[];
   controlTemplates?: ControlTemplate[];
 
-  /** constructeur pratique pour `Object.assign(new RiskTemplate(), dto)` */
+  /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
     Object.assign(this, init);
   }

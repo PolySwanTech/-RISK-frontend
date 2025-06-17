@@ -1,0 +1,55 @@
+<!-- container global -->
+<section class="eval-wrapper" *ngIf="riskTemplates?.length">
+
+  <h1 class="page-title">{{ pageTitle }}</h1>
+
+  <!-- formulaire principal -->
+  <form class="eval-form" [formGroup]="form" (ngSubmit)="submit()">
+
+    <!-- Sélection du template de risque ----------------------------------- -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Risque à évaluer</mat-label>
+
+      <!-- on stocke ici l’objet complet ; si vous préférez l’id : changez
+           [value]="tpl" → [value]="tpl.id" et adaptez le .ts               -->
+      <mat-select formControlName="riskTemplate">
+        <mat-option *ngFor="let tpl of riskTemplates" [value]="tpl">
+          {{ tpl.id.id }} – {{ tpl.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Sélection du niveau net ------------------------------------------ -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Niveau net</mat-label>
+      <mat-select formControlName="riskNet">
+        <mat-option *ngFor="let lvl of riskLevels" [value]="lvl">
+          {{ riskLabels[lvl] }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- actions ----------------------------------------------------------- -->
+    <div class="actions">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid">
+        Enregistrer
+      </button>
+
+      <button
+        mat-button
+        type="button"
+        routerLink="../">
+        Annuler
+      </button>
+    </div>
+  </form>
+</section>
+
+<!-- loader simple quand la liste n’est pas encore disponible -->
+<section class="loader" *ngIf="!riskTemplates?.length">
+  <mat-spinner diameter="40"></mat-spinner>
+</section>

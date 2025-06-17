@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Process } from '../../models/Process';
-import { EntiteResponsable } from '../../models/EntiteResponsable';
 import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
@@ -18,9 +17,13 @@ export class ProcessService {
   }
 
   getAll(): Observable<Process[]> {
-  return this.http.get<Process[]>(this.baseUrl);
-}
+    return this.http.get<Process[]>(this.baseUrl);
+  }
 
+  /** Récupère un process par son UUID */
+  get(id: string): Observable<Process> {
+    return this.http.get<Process>(`${this.baseUrl}/${id}`);
+  }
 
   createProcess(process : Process){ 
     return this.http.post<Process>(this.baseUrl , process)

@@ -11,12 +11,10 @@ import { permissionRoutes } from './features/permissions/permissions.routes';
 import { PermissionName } from './core/enum/permission.enum';
 import { actionPlanRoutes } from './features/action-plan/action-plan.routes';
 import { controlRoutes } from './features/control/control.routes';
-import { RiskPageComponent } from './pages/risk-page/risk-page.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
-  { path: 'risk', component: RiskPageComponent, canActivate: [AuthGuard] },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },
   { path: 'incident', children: incidentRoute, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_INCIDENTS } },

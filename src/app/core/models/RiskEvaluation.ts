@@ -22,3 +22,13 @@ export interface RiskEvaluation {
   /** Horodatage UTC ISO-8601 */
   createdAt: string;
 }
+
+// -------------  DTO -------------
+export interface RiskEvaluationCreateDto {
+  description: string;
+  evaluator:   string;
+  riskNet:    RiskLevel;
+  probability: number | null;
+  createdAt:  string;
+  riskTemplate: RiskTemplate;
+}

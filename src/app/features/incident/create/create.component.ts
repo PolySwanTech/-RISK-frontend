@@ -8,7 +8,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
-import { Risk } from '../../../core/models/RiskTemplate';
+import {RiskTemplate} from '../../../core/models/RiskTemplate';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
 import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
@@ -71,7 +71,7 @@ export class CreateComponent implements OnInit {
     process: [null, Validators.required]
   });
 
-  listRisk: Risk[] = [];
+  listRisk: RiskTemplate[] = [];
   listCause: Cause[] = [];
   listProcess: Process[] = [];
 

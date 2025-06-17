@@ -4,7 +4,8 @@ import { CategorySelectionComponent } from '../../shared/components/category-sel
 import { RisksComponent } from './risks/risks.component';
 import { CreateProcessComponent } from '../process/create-process/create-process.component';
 import { CreateRisksComponent } from './risks/create-risks/create-risks.component';
-import { createComponent } from '@angular/core';
+import { RiskEvaluationComponent } from './risks/risk-evaluation/risk-evaluation.component';
+import { RiskDetailComponent } from './risks/risk-detail/risk-detail.component';
 
 export const reglagesRoute: Routes = [
   { path: '', component: ReglagesComponent },
@@ -15,6 +16,8 @@ export const reglagesRoute: Routes = [
     children: [
       { path: '',        component: RisksComponent },
       { path: 'create',  component: CreateRisksComponent },
+      { path: 'evaluation',  component: RiskEvaluationComponent },
+      { path: ':id',         component: RiskDetailComponent },
     ]
   }
   
