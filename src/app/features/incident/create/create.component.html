@@ -6,13 +6,13 @@
       <mat-stepper [linear]="false" #stepper>
         <mat-step [stepControl]="incidentForm1" label="Informations de base">
           <form [formGroup]="incidentForm1">
-            <mat-form-field >
+            <mat-form-field>
               <mat-label>Titre</mat-label>
               <input matInput formControlName="titre" placeholder="Titre">
             </mat-form-field>
 
             <ng-container *ngIf="hasTeam; else selectTeam">
-              <mat-form-field >
+              <mat-form-field>
                 <mat-label>Équipe</mat-label>
                 <input matInput formControlName="equipeName" readonly>
               </mat-form-field>
@@ -24,7 +24,7 @@
                   <mat-option *ngFor="let team of listTeams" [value]="team">{{ team }}</mat-option>
                 </mat-select>
               </mat-form-field>
-            </ng-template>    
+            </ng-template>
 
             <mat-form-field class="full-width">
               <mat-label>Description de l'incident</mat-label>
@@ -38,7 +38,8 @@
 
             <div class="actions">
               <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
-              <button mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid" matStepperNext>Suivant</button>
+              <button mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid"
+                matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
@@ -68,7 +69,8 @@
             <div class="actions">
               <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
               <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
-              <button mat-raised-button class="btn-primary" [disabled]="incidentForm2.invalid" matStepperNext>Suivant</button>
+              <button mat-raised-button class="btn-primary" [disabled]="incidentForm2.invalid"
+                matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
@@ -80,13 +82,76 @@
               property="newImages" (filesSelected)="onFilesChange($event)">
             </app-button-add-file>
 
+            <mat-form-field>
+              <mat-label>Catégorie Niveau 1</mat-label>
+              <mat-select (selectionChange)="onLevel1Change($event.value)">
+                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1.id">{{ c1.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Catégorie Niveau 2</mat-label>
+              <mat-select (selectionChange)="onLevel2Change($event.value)">
+                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2.id">{{ c2.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Catégorie Niveau 3 (événement)</mat-label>
+              <mat-select formControlName="categoryId">
+                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3.id">{{ c3.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Cause</mat-label>
+              <mat-select formControlName="causeId">
+                <mat-option *ngFor="let cause of listCauses" [value]="cause.id">{{ cause.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Montant des pertes</mat-label>
+              <input matInput formControlName="lossAmount" type="number" placeholder="Ex: 25000">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Conséquence</mat-label>
+              <mat-select formControlName="consequenceId">
+                <mat-option *ngFor="let cons of listConsequence" [value]="cons.id">{{ cons.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Macro Processus (niveau 1)</mat-label>
+              <mat-select (selectionChange)="onP1Change($event.value)">
+                <mat-option *ngFor="let p1 of listP1" [value]="p1.id">{{ p1.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Processus (niveau 2)</mat-label>
+              <mat-select (selectionChange)="onP2Change($event.value)" [disabled]="listP2.length === 0">
+                <mat-option *ngFor="let p2 of listP2" [value]="p2.id">
+                  {{ p2.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Micro-process</mat-label>
+              <mat-select formControlName="microProcessId">
+                <mat-option *ngFor="let mp of listMicroProcess" [value]="mp.id">{{ mp.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
             <!-- <mat-radio-group formControlName="risk">
               @for(risk of listRisk; track risk){
               <mat-radio-button [value]="risk">{{risk.balois}}</mat-radio-button>
               }
             </mat-radio-group> -->
 
-            @if(getSubRisk() != ''){
+            <!-- @if(getSubRisk() != ''){
             <mat-form-field>
               <mat-label>Sous catégorie du Risque</mat-label>
               <mat-select formControlName="subRisk" placeholder="Sous catégorie du Risque">
@@ -95,16 +160,16 @@
                 }
               </mat-select>
             </mat-form-field>
-            }
+            } -->
 
-            <mat-form-field>
+            <!-- <mat-form-field>
               <mat-label>Processus</mat-label>
               <mat-select formControlName="process" placeholder="Processus">
                 @for(process of listProcess; track process){
                 <mat-option [value]="process">{{ process.name }}</mat-option>
                 }
               </mat-select>
-            </mat-form-field>
+            </mat-form-field> -->
 
             <app-select-users (userSelected)="changeUser($event)" placeholder="Collaborateur pouvant vous aider" />
 
@@ -112,7 +177,9 @@
 
           <div class="actions">
             <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
-            <button  mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid" (click)="addIncident()">Soumettre</button>
+            <button mat-raised-button class="btn-primary"
+              [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid"
+              (click)="addIncident()">Soumettre</button>
           </div>
         </mat-step>
       </mat-stepper>

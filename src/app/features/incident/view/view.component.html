@@ -34,7 +34,7 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Cause</span>
-                                <!-- <span class="info-value">{{ incident.cause.name }}</span> -->
+                                <span class="info-value">{{ incident.causeName }}</span>
                             </div>
                         </div>
 
@@ -45,7 +45,7 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Type de risque</span>
-                                <span class="info-value">{{ incident.risk.balois }}</span>
+                                <span class="info-value">{{ incident.riskType }} - Niveau {{ incident.riskLevel }}</span>
                             </div>
                         </div>
                     </div>

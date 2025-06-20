@@ -2,7 +2,6 @@ import { EntiteResponsable } from "./EntiteResponsable";
 import { Impact } from "./Impact";
 import { Priority } from "./Priority";
 import { Process } from "./Process";
-import { Risk } from "./RiskTemplate";
 import { Statut } from "./Statut";
 
 export class ActionPlan {

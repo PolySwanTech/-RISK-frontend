@@ -34,14 +34,33 @@
                 <div class="filters-row">
                     <div class="filter-group">
                         <mat-form-field appearance="outline">
-                            <mat-label>Date de survenance</mat-label>
-                            <input matInput [matDatepicker]="picker" [formControl]="dateFilter">
-                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-label>Type de date</mat-label>
+                            <mat-select [formControl]="dateTypeFilter">
+                                <mat-option value="survenance">Date de survenance</mat-option>
+                                <mat-option value="declaration">Date de déclaration</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="filter-group date-range-group" style="display: flex; gap: 16px;">
+                        <mat-form-field appearance="outline" class="date-field">
+                            <mat-label>Date de début</mat-label>
+                            <input matInput [matDatepicker]="startPicker" [formControl]="startDateFilter"
+                                placeholder="Date de début">
+                            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                            <mat-datepicker #startPicker></mat-datepicker>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="date-field">
+                            <mat-label>Date de fin</mat-label>
+                            <input matInput [matDatepicker]="endPicker" [formControl]="endDateFilter"
+                                placeholder="Date de fin">
+                            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                            <mat-datepicker #endPicker></mat-datepicker>
                         </mat-form-field>
                     </div>
 
-                    <div class="filter-group">
+
+                    <!-- <div class="filter-group">
                         <mat-form-field appearance="outline">
                             <mat-label>Catégorie</mat-label>
                             <mat-select [formControl]="categoryFilter">
@@ -51,7 +70,7 @@
                                     }}</mat-option>
                             </mat-select>
                         </mat-form-field>
-                    </div>
+                    </div> -->
 
                     <div class="filter-group">
                         <mat-form-field appearance="outline">
@@ -80,6 +99,19 @@
     <mat-card>
         <div class="table-container">
             <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+                <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef class="checkbox-header-cell">
+                        <mat-checkbox aria-label="Tout sélectionner" matTooltip="Tout sélectionner" data-header="true"
+                            [checked]="isAllSelected()" [indeterminate]="isIndeterminate()"
+                            (change)="toggleAllSelection()">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row" class="checkbox-cell">
+                        <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleIncidentSelection(row.id)"
+                            [checked]="isIncidentSelected(row.id)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
 
                 @for (column of columns; track column) {
                 <ng-container [matColumnDef]="column.columnDef">

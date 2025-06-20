@@ -1,13 +1,13 @@
 import { EntiteResponsable } from "./EntiteResponsable";
 import { Impact } from "./Impact";
 import { Process } from "./Process";
-import { Risk } from "./RiskTemplate";
+import { RiskTemplate } from "./RiskTemplate";
 import { Cause } from "./Cause";
 
 export enum State {
     DRAFT = "DRAFT",
-    VALIDATE = "VALIDATE",  
-    PROCESS = "PROCESS", 
+    VALIDATE = "VALIDATE",
+    PROCESS = "PROCESS",
     CLOSED = "CLOSED",
 }
 
@@ -24,14 +24,23 @@ export class Incident {
 
     impacts: Impact[];
 
-    risk: Risk;
+    risk: RiskTemplate;
     process: Process;
-
+    causeName?: string;
+    riskType?: string;
+    riskLevel?: number;
     state: State;
     comments: string;
+    lossAmount?: number;
+    categoryLevel?: string;
+    categoryName?: string;
+    subCategoryName?: string;
+    categoryId?: string;
+    consequenceId?: string;
+    microProcessId?: string;
     equipeName?: string;
 
-    reference : string = ""
+    customId: string = ""
 
     constructor(
         id: string,
@@ -41,13 +50,13 @@ export class Incident {
         survenueAt: Date,
         detectedAt: Date,
         closedAt: Date | null,
-        risk: Risk,
+        risk: RiskTemplate,
         process: Process,
         impacts: Impact[],
         comments: string,
         state: State = State.DRAFT,
         equipeName?: string,
-        reference : string = "" 
+        customId: string = ""
     ) {
         this.id = id;
         this.titre = titre;
@@ -61,9 +70,9 @@ export class Incident {
         this.impacts = impacts;
         this.comments = comments;
         this.equipeName = equipeName;
-        this.reference = reference;
-        this.state = closedAt ? State.CLOSED : state;        
+        this.customId = customId;
+        this.state = closedAt ? State.CLOSED : state;
     }
 
-    
+
 }

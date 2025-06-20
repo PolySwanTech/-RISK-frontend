@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { Risk } from '../../models/RiskTemplate';
+import { Cause } from '../../models/Cause';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +9,9 @@ import { Risk } from '../../models/RiskTemplate';
 export class CauseService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/cause';
+  baseUrl = environment.apiUrl + '/incidents/cause';
 
   getAll() {
-    return this.http.get<Risk[]>(this.baseUrl)
+    return this.http.get<Cause[]>(this.baseUrl)
   }
 }

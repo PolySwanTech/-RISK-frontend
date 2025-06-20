@@ -17,7 +17,7 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplate, Degree, Recurence, Type } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
-import { Risk } from '../../../core/models/RiskTemplate';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
 
 @Component({
   selector: 'app-create-control',
@@ -62,7 +62,7 @@ export class CreateControlComponent {
   levels = Object.values(Degree);
   entitesResponsables: EntiteResponsable[] = [/* à remplir */];
   processes: Process[] = [/* à remplir */];
-  risks: Risk[] = [/* à remplir */];
+  risks: RiskTemplate[] = [/* à remplir */];
   responsables: Utilisateur[] = [/* à remplir */];
 
   recurences = Object.values(Recurence);

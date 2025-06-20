@@ -1,16 +1,20 @@
 import { EntiteResponsable } from "./EntiteResponsable"
-import { Risk } from "./RiskTemplate"
+import { RiskTemplate } from "./RiskTemplate"
 
 export class Process {
     id: string = ''
     name: string
     bu: EntiteResponsable
-    risks : Risk[] = []
+    niveau: number
+    parentId?: string;
+    risks: RiskTemplate[] = []
 
     constructor(
         name: string,
-        bu: EntiteResponsable) {
+        bu: EntiteResponsable, niveau: number, parentId?: string) {
         this.name = name
         this.bu = bu
+        this.niveau = niveau
+        this.parentId = parentId;
     }
 }
