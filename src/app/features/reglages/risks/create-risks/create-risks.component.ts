@@ -65,7 +65,7 @@ export class CreateRisksComponent implements OnInit {
 
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
-  titre   : this.fb.nonNullable.control<string>(''),
+  libelle   : this.fb.nonNullable.control<string>(''),
   balois1 : this.fb.nonNullable.control<string>(''),       // nom L1
   balois2 : this.fb.control<BaloiseCategoryL2 | null>(     // ← OBJET L2
               null, Validators.required
@@ -109,12 +109,12 @@ detailsForm = this.fb.group({
   private loadRiskById(id: string): void {
     this.riskSrv.getById(id).subscribe(r => {
       this.risk        = new RiskTemplate(r);     // instanciation propre
-      this.pageTitle   = `Mise à jour du risque : ${this.risk.name}`;
+      this.pageTitle   = `Mise à jour du risque : ${this.risk.libelle}`;
       this.dialogLabel = { title: 'Mise à jour', message: 'mise à jour' };
 
       /* pré-remplissage des formulaires */
       this.infoForm.patchValue({
-        titre   : this.risk.name,
+        libelle   : this.risk.libelle,
         balois1 : this.risk.categoryL2?.categoryL1?.name ?? '',
         balois2 : this.risk.categoryL2 ?? null,
         process : this.risk.processId
@@ -123,7 +123,6 @@ detailsForm = this.fb.group({
       this.detailsForm.patchValue({
         description: this.risk.description,
         level      : this.risk.riskBrut,
-        probability: this.risk.probability ?? null,
         impactType : this.risk.impactTypes[0] ?? null   // simple sélection
       });
     });
@@ -148,11 +147,10 @@ detailsForm = this.fb.group({
     }
 
     const payload: RiskTemplateCreateDto = {
-      name: this.infoForm.get('titre')!.value!,
+      libelle: this.infoForm.get('libelle')!.value!,
       description: this.detailsForm.get('description')!.value!,
       processId: this.infoForm.get('process')!.value!,
       riskBrut: riskLevel,
-      probability: this.detailsForm.get('probability')!.value ?? null,
       categoryL2: category,
       impactTypes: [impactType]
     };

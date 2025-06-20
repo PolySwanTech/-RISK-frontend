@@ -11,7 +11,7 @@ import { RiskLevel } from '../../../enum/riskLevel.enum';
 export class RiskEvaluationService {
 
   private readonly http     = inject(HttpClient);
-  private readonly baseUrl  = `${environment.apiUrl}/evaluations`;
+  private readonly baseUrl  = environment.apiUrl + '/risks/evaluations';
 
   /* ------------------------------------------------------------------ */
   /*  GET – détail d’une évaluation par son UUID                        */
@@ -35,11 +35,6 @@ export class RiskEvaluationService {
     return this.http.post<RiskEvaluation>(this.baseUrl, payload);
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  PUT – changement de niveau net d’une évaluation donnée            */
-  /*       (le contrôleur Spring attend l’id dans l’URL et le niveau    */
-  /*        dans le corps : RiskLevel)                                  */
-  /* ------------------------------------------------------------------ */
   updateLevel(
     evaluationId: string,
     newLevel:     RiskLevel

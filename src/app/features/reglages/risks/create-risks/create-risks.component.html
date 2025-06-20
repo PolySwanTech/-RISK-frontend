@@ -19,7 +19,7 @@
                 <mat-label>Titre du risque</mat-label>
                 <input
                   matInput
-                  formControlName="titre"
+                  formControlName="libelle"
                   placeholder="Entrez le titre du risque"
                 />
               </mat-form-field>
@@ -107,20 +107,6 @@
                     {{ riskLabels[level] }}
                   </mat-option>
                 </mat-select>
-              </mat-form-field>
-
-              <!-- Probabilité --------------------------------------------------- -->
-              <mat-form-field class="full-width">
-                <mat-label>Probabilité que le risque se produise</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  formControlName="probability"
-                  placeholder="Entrez la probabilité"
-                  step="any"
-                  min="0"
-                  max="100"
-                />
               </mat-form-field>
 
               <!-- Description --------------------------------------------------- -->

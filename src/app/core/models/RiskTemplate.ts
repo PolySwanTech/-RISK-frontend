@@ -21,7 +21,7 @@ export class RiskTemplate {
   /** Identifiant composite (UUID + version) */
   id!: RiskId;
 
-  name = '';
+  libelle = '';
   description = '';
 
   /** Enum à iso avec le back */
@@ -30,7 +30,7 @@ export class RiskTemplate {
   /** UUID du process concerné */
   processId = '';
 
-  probability?: number;
+  reference = '';
 
   categoryL2?: BaloiseCategoryL2;
 
@@ -44,6 +44,8 @@ export class RiskTemplate {
   riskEvaluations?: RiskEvaluation[];
   controlTemplates?: ControlTemplate[];
 
+  creator?: string; // UUID de l'utilisateur qui a créé le risque
+
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
     Object.assign(this, init);
@@ -52,11 +54,10 @@ export class RiskTemplate {
 
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
-  name:        string;
+  libelle:        string;
   description: string;
   processId:   string;                 // UUID
   riskBrut:    RiskLevel;
-  probability: number | null;
   categoryL2:  BaloiseCategoryL2;      // objet complet (cf. back)
   impactTypes: RiskImpactType[];       // tableau → Set côté Java
 }

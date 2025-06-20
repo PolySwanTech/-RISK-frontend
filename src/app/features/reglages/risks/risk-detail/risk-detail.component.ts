@@ -40,10 +40,8 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (risk) => {
           this.risk = risk;
-          console.log('Risque récupéré:', this.risk);
-          // côté back on renvoie déjà les evaluations triées desc
           if (risk.riskEvaluations?.length) {
-            this.lastEvaluation = risk.riskEvaluations[0];
+            this.lastEvaluation = risk.riskEvaluations[risk.riskEvaluations.length - 1];
           }
           this.loading = false;
         },
@@ -65,7 +63,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
   
-  activeTab = 'controls';     // ⬅️ onglet par défaut
+  activeTab = 'controls';
 
   selectTab(tab: 'controls' | 'evaluations' | 'impacts') {
     this.activeTab = tab;

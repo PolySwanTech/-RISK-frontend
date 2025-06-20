@@ -29,9 +29,14 @@ export class RisksComponent implements OnInit {
 
   columns = [
     {
+      columnDef: 'refence',
+      header: 'Référence',
+      cell: (element: RiskTemplate) => `${element.reference}`,
+    },
+    {
       columnDef: 'name',
-      header: 'Nom',
-      cell: (element: RiskTemplate) => `${element.name}`,
+      header: 'Libellé',
+      cell: (element: RiskTemplate) => `${element.libelle}`,
     },
     {
       columnDef: 'description',
@@ -92,8 +97,8 @@ export class RisksComponent implements OnInit {
     });
   }
 
-  navToRisk(id: number) {
-    this.router.navigate(['reglages', 'risks', id])
+  navToRisk(risk: RiskTemplate) {
+    this.router.navigate(['reglages', 'risks', risk.id.id]);
   }
 
   navToCreate() {

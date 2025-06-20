@@ -1,34 +1,23 @@
 import { RiskLevel } from "../enum/riskLevel.enum";
 import { RiskTemplate, RiskId } from './RiskTemplate';
+/* ----------------------------------------- */
+/*  models/RiskEvaluation.ts                 */
+/* ----------------------------------------- */
 
-export interface RiskEvaluation {
-
-  /** Identifiant unique */
-  id: string;                // UUID
-
-  /** Valeur du risque net */
-  riskNet: RiskLevel;
-
-  /** Identifiant (UUID) de l’évaluateur */
-  evaluator: string;
-
-  /**
-   * Référence au template évalué.
-   * Si le back renvoie l’objet complet → laisser `RiskTemplate | null`.
-   * Si le back ne renvoie que les clés → remplacer par `RiskId`.
-   */
-  riskTemplate: RiskTemplate | null;
-
-  /** Horodatage UTC ISO-8601 */
-  createdAt: string;
+/** --- DTO envoyé au back lors de la création --- */
+export interface RiskEvaluationCreateDto {
+  riskNet      : RiskLevel;
+  probability ?: number | null;           // facultatif
+  /** On n’envoie que l’identifiant composite */
+  taxonomie : string;
 }
 
-// -------------  DTO -------------
-export interface RiskEvaluationCreateDto {
-  description: string;
-  evaluator:   string;
-  riskNet:    RiskLevel;
-  probability: number | null;
-  createdAt:  string;
-  riskTemplate: RiskTemplate;
+/** --- objet retourné par l’API --- */
+export interface RiskEvaluation {
+  id           : string;      // UUID
+  riskNet      : RiskLevel;
+  evaluator    : string;      // UUID de l’évaluateur
+  probability ?: number;
+  createdAt    : string;      // ISO
+  taxonomie : { id: RiskId };
 }

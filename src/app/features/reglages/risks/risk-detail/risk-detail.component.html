@@ -4,10 +4,10 @@
 
     <!-- ---------------- HEADER ------------------- -->
     <div class="header">
-      <div class="risk-id">{{ risk.id.id| slice:0:8 | uppercase }}</div>
-      <h1 class="risk-title">{{ risk.name }}</h1>
+      <div class="risk-id">{{ risk.reference| uppercase }}</div>
+      <h1 class="risk-title">{{ risk.libelle }}</h1>
       <div class="risk-category">
-        {{ risk.categoryL2?.name || 'Catégorie inconnue' }}
+        {{ "B2: " + risk.categoryL2?.name || 'Catégorie inconnue' }}
       </div>
     </div>
 
@@ -24,7 +24,11 @@
           <!-- Mini métriques : adaptables à tes données -->
           <div class="metrics">
             <div class="metric">
-              <div class="metric-value">{{ risk.probability ?? '—' }}%</div>
+              <div class="metric-value">
+                {{ lastEvaluation?.probability != null
+                    ? (lastEvaluation?.probability ?? 0) * 10
+                    : '—' }}%
+              </div>
               <div class="metric-label">Probabilité</div>
             </div>
             <div class="metric">
@@ -102,6 +106,7 @@
             <div *ngFor="let eval of risk.riskEvaluations" class="incident">
               <div class="incident-date">{{ eval.createdAt | date:'short' }}</div>
               <div class="incident-title">Score net : {{ eval.riskNet }}</div>
+              <div class="evaluateur">Evaluateur : {{ eval.evaluator }}</div>
             </div>
           </div>
         </div>

@@ -15,96 +15,112 @@ import { MatStepperModule }    from '@angular/material/stepper';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RiskLevel, RiskLevelLabels } from '../../../../../core/enum/riskLevel.enum';
 import { RiskEvaluationCreateDto } from '../../../../../core/models/RiskEvaluation';
-import { RiskTemplate } from '../../../../../core/models/RiskTemplate';
+import { RiskId, RiskTemplate } from '../../../../../core/models/RiskTemplate';
 import { ConfirmService } from '../../../../../core/services/confirm/confirm.service';
 import { RiskEvaluationService } from '../../../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 import { RiskService } from '../../../../../core/services/risk/risk.service';
+import { Observable } from 'rxjs';
+import { EntiteResponsable } from '../../../../../core/models/EntiteResponsable';
+import { Process } from '../../../../../core/models/Process';
+import { EntitiesService } from '../../../../../core/services/entities/entities.service';
+import { ProcessService } from '../../../../../core/services/process/process.service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
+// src/app/reglages/risks/risk-evaluation/risk-evaluation.component.ts
 @Component({
-  selector   : 'app-create-risks-evaluations',
+  selector   : 'app-risk-evaluation',
   standalone : true,
-  imports    : [
+    imports     : [
     CommonModule, ReactiveFormsModule,
-    MatFormFieldModule, MatSelectModule, MatInputModule,
-    MatButtonModule, MatStepperModule, CommonModule,
-    MatProgressSpinnerModule,
+    MatFormFieldModule, MatInputModule,
+    MatSelectModule, MatDatepickerModule,
+    MatNativeDateModule, MatButtonModule
   ],
   templateUrl: './create-risks-evaluations.component.html',
-  styleUrl   : './create-risks-evaluations.component.scss'
+  styleUrls  : ['./create-risks-evaluations.component.scss'],
 })
 export class CreateRisksEvaluationsComponent implements OnInit {
+ /* ==============  services  ============== */
+  private fb              = inject(FormBuilder);
+  private evaluationSrv   = inject(RiskEvaluationService);
+  private entiteSrv       = inject(EntitiesService);
+  private processSrv      = inject(ProcessService);
+  private riskSrv         = inject(RiskService);
+  private router          = inject(Router);
 
-  /* ---------------- services ---------------- */
-  private readonly router     = inject(Router);
-  private readonly route      = inject(ActivatedRoute);
-  private readonly fb         = inject(FormBuilder);
+  /* ==============  données de sélection (select)  ============== */
+  entites:  EntiteResponsable[] = [];
+  processes: Process[]          = [];
+  risks:     RiskTemplate[]     = [];
+  riskLevels   = Object.values(RiskLevel);
+  riskLabels   = RiskLevelLabels;
 
-  private readonly riskSrv    = inject(RiskService);
-  private readonly evalSrv    = inject(RiskEvaluationService);
-  private readonly confirmSrv = inject(ConfirmService);
-
-  /* ---------------- données ----------------- */
-  riskTemplates : RiskTemplate[] = [];
-  riskLevels    = Object.values(RiskLevel);
-  riskLabels    = RiskLevelLabels;
-
-  pageTitle = 'Nouvelle évaluation de risque';
-
-  /* ----------------- formulaire ------------- */
+  /* ==============  FormGroup  ============== */
   form = this.fb.group({
-    riskTemplate: [null as RiskTemplate | null, Validators.required],  // id (ou l’objet selon votre choix)
-    riskNet     : ['', Validators.required]   // RiskLevel
+    /* 1.  composantes chiffrées  */
+    probability : [null as number | null, Validators.required],  // 1-10
+    riskNet     : [null as RiskLevel | null, Validators.required],
+
+    /* 2.  contexte (filtre BU → Process → Risk) */
+    entiteId : ['', Validators.required],
+    processId: ['', Validators.required],
+    riskId   : ['', Validators.required],
+
+    /* (optionnel) commentaire libre */
+    comment  : ['']
   });
 
-  /* ========================================================= */
-  /*                       CYCLE DE VIE                        */
-  /* ========================================================= */
+  /* ============================================================= */
   ngOnInit(): void {
+    /* charge la liste des entités pour le 1er select */
+    this.entiteSrv.loadEntities()
+      .subscribe(list => this.entites = list);
 
-    /* on peut recevoir un pré-sélection via l’URL :
-       /evaluations/create/:templateId                                */
-    const preSelectId = this.route.snapshot.paramMap.get('templateId');
+    /* réagit au changement d’entité → charge les process */
+    this.form.get('entiteId')!.valueChanges
+      .subscribe(entiteId => {
+        this.processes = [];
+        this.risks     = [];
+        this.form.patchValue({ processId: '', riskId: '' }, { emitEvent:false });
 
-    /* on charge tous les templates pour le select ------------------ */
-    this.riskSrv.getAll().subscribe(list => {
-      this.riskTemplates = list;
-
-      if (preSelectId) {
-        /* si l’id passé existe dans la liste on pré-sélectionne       */
-        const tpl = this.riskTemplates.find(t => t.id.id === preSelectId);
-        if (tpl) {
-          this.form.get('riskTemplate')?.setValue(tpl);
+        if (entiteId) {
+          this.processSrv.getAllByEntite(entiteId)
+              .subscribe(list => this.processes = list);
         }
-      }
-    });
+      });
+
+    /* réagit au changement de process → charge les risques */
+    this.form.get('processId')!.valueChanges
+      .subscribe(procId => {
+        this.risks = [];
+        this.form.patchValue({ riskId: '' }, { emitEvent:false });
+
+        if (procId) {
+          this.riskSrv.getAllByProcess(procId)
+              .subscribe(list => this.risks = list);
+        }
+      });
   }
 
-  /* ========================================================= */
-  /*                          SUBMIT                           */
-  /* ========================================================= */
+  /* ============================================================= */
   submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-    if (this.form.invalid) { return; }
-
-    /* constitution du payload DTO --------------------------------- */
-    const dto: RiskEvaluationCreateDto = {
-        riskNet: this.form.get('riskNet')!.value as RiskLevel,
-        riskTemplate: this.form.get('riskTemplate')!.value as RiskTemplate
-        // `evaluator` est renseigné côté back à partir de l’utilisateur connecté
-        ,
-        description: '',
-        evaluator: '',
-        probability: null,
-        createdAt: ''
+    /* construction propre du payload */
+    const payload: RiskEvaluationCreateDto = {
+      riskNet      : this.form.value.riskNet!,
+      probability  : this.form.value.probability!,
+      taxonomie : this.form.value.riskId!,
     };
 
-    /* appel service ------------------------------------------------ */
-    this.evalSrv.save(dto).subscribe(() => {
-      this.confirmSrv.openConfirmDialog(
-        'Création', 'L’évaluation a bien été enregistrée', false
-      );
-      this.router.navigate(['risks', 'evaluations']);   // ► page liste
+    this.evaluationSrv.save(payload).subscribe({
+      next : () => this.router.navigate(['/reglages/risks', this.form.value.riskId]),
+      error: err => console.error('Erreur création évaluation', err)
     });
   }
 }
