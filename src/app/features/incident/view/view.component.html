@@ -6,11 +6,17 @@
         <div class="info-container">
             <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
                 <mat-card-header>
-                    <mat-card-title>
+                    <mat-card-title class="header-with-buttons">
                         <span>Info globale</span>
-                        <button mat-raised-button class="btn-green" (click)="downloadExport()">
-                            <mat-icon>file_download</mat-icon> Exporter
-                        </button>
+                        <span class="buttons-header">
+                            <button mat-raised-button class="btn-primary">
+                                <mat-icon>playlist_add_check</mat-icon>
+                                Plan d'action
+                            </button>
+                            <button mat-raised-button class="btn-green" (click)="downloadExport()">
+                                <mat-icon>file_download</mat-icon> Exporter
+                            </button>
+                        </span>
                     </mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
@@ -45,9 +51,33 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Type de risque</span>
-                                <span class="info-value">{{ incident.riskType }} - Niveau {{ incident.riskLevel }}</span>
+                                <span class="info-value">{{ incident.riskType }} - Niveau {{ incident.riskLevel
+                                    }}</span>
                             </div>
                         </div>
+
+                        <!-- Référence -->
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <mat-icon>confirmation_number</mat-icon>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Référence</span>
+                                <span class="info-value">{{ incident.customId }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Titre -->
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <mat-icon>title</mat-icon>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Titre</span>
+                                <span class="info-value">{{ incident.titre }}</span>
+                            </div>
+                        </div>
+
                     </div>
 
                     <!-- Timeline des dates -->

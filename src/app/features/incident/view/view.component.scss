@@ -154,6 +154,19 @@ mat-card-content {
   padding-top: 10px;
 }
 
+.header-with-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.buttons-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+
 @media (max-width: 768px) {
   .impacts-container {
     flex-direction: column;
