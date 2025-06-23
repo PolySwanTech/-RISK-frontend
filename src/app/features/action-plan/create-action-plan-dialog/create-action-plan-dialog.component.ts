@@ -24,7 +24,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 @Component({
   selector: 'app-create-action-plan-dialog',
   imports: [
-    FormsModule, 
+    FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -43,8 +43,18 @@ export class CreateActionPlanDialogComponent implements OnInit {
   actionPlanService = inject(ActionPlanService);
   private fb = inject(FormBuilder);
 
-  actionPlan: ActionPlan = new ActionPlan(
-    '', '', '', '', null!, null!, '', null!, new Date(), null!, null!, null!
+  actionPlan = new ActionPlan(
+    '',
+    new Date(),
+    '',
+    '',
+    Statut.IN_PROGRESS,
+    Priority.MEDIUM,
+    '',
+    '',
+    '',
+    '',
+    new Date()
   );
 
   form: FormGroup = this.fb.group({
@@ -83,40 +93,40 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   onSubmit() {
     if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
-  }
-
-  const actionPlan: ActionPlan = {
-    ...this.form.value,
-    echeance: new Date(this.form.value.echeance),
-  };
-
-  this.actionPlanService.createActionPlan(actionPlan).subscribe(
-    response => {
-      console.log('Action Plan créé avec succès', response);
-    },
-    error => {
-      console.error('Erreur lors de la création de l\'Action Plan', error);
+      this.form.markAllAsTouched();
+      return;
     }
-  );
+
+    const actionPlan: ActionPlan = {
+      ...this.form.value,
+      echeance: new Date(this.form.value.echeance),
+    };
+
+    this.actionPlanService.createActionPlan(actionPlan).subscribe(
+      response => {
+        console.log('Action Plan créé avec succès', response);
+      },
+      error => {
+        console.error('Erreur lors de la création de l\'Action Plan', error);
+      }
+    );
   }
 
   onEntiteResponsableChange() {
-  const entiteResponsableId = this.form.get('entiteResponsableId')?.value;
-  if (entiteResponsableId) {
-    this.processService.getAllByEntite(entiteResponsableId).subscribe(processes => {
-      this.processes = processes;
-    });
+    const entiteResponsableId = this.form.get('entiteResponsableId')?.value;
+    if (entiteResponsableId) {
+      this.processService.getAllByEntite(entiteResponsableId).subscribe(processes => {
+        this.processes = processes;
+      });
+    }
   }
-}
 
-onProcessChange() {
-  const processId = this.form.get('processId')?.value;
-  if (processId) {
-    this.riskService.getAllByProcess(processId).subscribe(risks => {
-      this.risks = risks;
-    });
+  onProcessChange() {
+    const processId = this.form.get('processId')?.value;
+    if (processId) {
+      this.riskService.getAllByProcess(processId).subscribe(risks => {
+        this.risks = risks;
+      });
+    }
   }
-}
 }

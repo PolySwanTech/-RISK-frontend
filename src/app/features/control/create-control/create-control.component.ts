@@ -42,10 +42,6 @@ export class CreateControlComponent {
   controlService = inject(ControlService);
   private fb = inject(FormBuilder);
 
-  actionPlan: ActionPlan = new ActionPlan(
-    '', '', '', '', null!, null!, '', null!, new Date(), null!, null!, null!
-  );
-
   form: FormGroup = this.fb.group({
     libelle: ['', Validators.required],
     description: ['', Validators.required],

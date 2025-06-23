@@ -62,13 +62,13 @@ export class PlanActionPageDetailComponent {
   }
 
   validateAction(action: Action, event: Event) {
+    // TODO : envoyer le file au back + valide action
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
       const file = input.files[0];
-      action.completed = true;
       action.fileName = file.name;
-      action.completedBy = this.authService.decryptToken()?.sub;
-      action.completedAt = new Date().toISOString();
+      action.performedBy = this.authService.decryptToken()?.sub || "";
+      action.performedAt = new Date().toISOString();
 
       // 🔁 Recalculer les valeurs après validation
       if (this.actionPlan?.actions) {
@@ -80,7 +80,7 @@ export class PlanActionPageDetailComponent {
   }
 
   getCompletedCount(actions: Action[]): number {
-    return actions.filter(a => a.completedAt).length;
+    return actions.filter(a => a.performedAt).length;
   }
 
   getCompletionRate(actions: Action[]): number {

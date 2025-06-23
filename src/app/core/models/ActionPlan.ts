@@ -1,60 +1,72 @@
-import { EntiteResponsable } from "./EntiteResponsable";
-import { Impact } from "./Impact";
 import { Priority } from "./Priority";
-import { Process } from "./Process";
-import { Risk } from "./Risk";
 import { Statut } from "./Statut";
 
-export interface Action {
-  name: string;
-  date: string;
-  completed?: boolean;
-  fileName?: string;
-  completedBy?: string;
-  completedAt?: string;
-}
-
-export class ActionPlan {
-    id : string;
-    name : string;
-    libelle : string;
-    description : string;
-    riskId : string;
-    impact : Impact;
-
-    responsable : string;
-    userInCharge : string;
-    echeance : Date;
-    status : Statut;
-    priority : Priority;
-
-    creator = "f3c2a595-5d8f-4a5f-8c50-bad30930ab9c"
+export class Action {
+    id: string;
+    name: string;
+    createdAt: Date;
+    performedBy: string;
+    performedAt: string;
+    fileName: string;
 
     constructor(
         id: string,
         name: string,
-        libelle: string,
-        description: string,
-        riskId: string,
-        impact: Impact,
-        responsable: string,
-        userInCharge: string,
-        echeance: Date,
-        status: Statut,
-        priority: Priority,
-        process: Process
-    ) {
+        createdAt: Date,
+        performedBy: string,
+        performedAt: string,
+        fileName: string
+    )
+    {
         this.id = id;
         this.name = name;
+        this.createdAt = createdAt;
+        this.performedBy = performedBy;
+        this.performedAt = performedAt;
+        this.fileName = fileName;
+    }
+}
+
+export class ActionPlan {
+    id: string;
+    version: Date;
+    libelle: string;
+    description: string;
+    statut: Statut;
+    priority: Priority;
+    creator: string;
+    userInCharge: string;
+
+    riskTemplateId: string;
+    incidentId: string;
+    echeance: Date;
+
+    actions: Action[] = [];
+
+    constructor(
+        id: string,
+        version: Date,
+        libelle: string,
+        description: string,
+        statut: Statut,
+        priority: Priority,
+        creator: string,
+        userInCharge: string,
+        riskTemplateId: string,
+        incidentId: string,
+        echeance: Date
+    ) {
+        this.id = id;
+        this.version = version;
         this.libelle = libelle;
         this.description = description;
-        this.riskId = riskId;
-        this.impact = impact;
-        this.responsable = responsable;
-        this.userInCharge = userInCharge;
-        this.echeance = echeance;
-        this.status = status;
+        this.statut = statut;
         this.priority = priority;
+        this.creator = creator;
+        this.userInCharge = userInCharge;
+        this.riskTemplateId = riskTemplateId;
+        this.incidentId = incidentId;
+        this.echeance = echeance;
     }
-    
+
 }

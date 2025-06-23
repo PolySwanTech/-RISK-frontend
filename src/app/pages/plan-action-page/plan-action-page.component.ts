@@ -53,7 +53,7 @@ export class PlanActionPageComponent {
     {
       columnDef: 'titre',
       header: 'Titre',
-      cell: (element: ActionPlan) => `${element.name}`,
+      cell: (element: ActionPlan) => `${element.libelle}`,
     },
     {
       columnDef: 'description',
@@ -63,7 +63,7 @@ export class PlanActionPageComponent {
     {
       columnDef: 'responsable',
       header: 'Responsable',
-      cell: (element: ActionPlan) => `${element.responsable}`,
+      cell: (element: ActionPlan) => `${element.userInCharge}`,
     },
     {
       columnDef: 'dateEcheance',
@@ -79,8 +79,8 @@ export class PlanActionPageComponent {
       columnDef: 'statut',
       header: 'Statut',
       cell: (element: ActionPlan) => `
-  <span class="badge ${element.status.toLowerCase()}">
-      ${this.getReadableStatut(element.status)}
+  <span class="badge ${element.statut.toLowerCase()}">
+      ${this.getReadableStatut(element.statut)}
     </span>
 `    }
   ];
