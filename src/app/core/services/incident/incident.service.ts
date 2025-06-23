@@ -42,11 +42,11 @@ export class IncidentService {
   }
 
   saveIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl, incident, { responseType: 'text' as 'json' });
+    return this.http.post(this.baseUrl, incident);
   }
   
   draftIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl + '/draft', incident, { responseType: 'text' as 'json' });
+    return this.http.post(this.baseUrl + '/draft', incident);
   }  
 
   close(id: string) {
