@@ -42,7 +42,7 @@ export class PlanActionPageComponent {
     {
       columnDef: 'id',
       header: 'Ref',
-      cell: (element: ActionPlan) => `${element.id}`,
+      cell: (element: ActionPlan) => `${element.actionPlanId.id}`,
     },
     {
       columnDef: 'creator',
@@ -191,7 +191,7 @@ export class PlanActionPageComponent {
 
   // This method will be triggered when a row is clicked
   onRowClick(actionPlan: ActionPlan) {
-    this.router.navigate(['action-plan', actionPlan.id]);
+    this.router.navigate(['action-plan', actionPlan.actionPlanId.id]);
   }
 
   formatDate(date: any): string {
@@ -280,6 +280,10 @@ export class PlanActionPageComponent {
 
   getReadableStatut(status: Status): string {
     switch (status) {
+      case Status.NOT_STARTED:
+        return 'Non commencé';
+      case Status.CANCELLED:
+        return 'Annulé';
       case Status.IN_PROGRESS:
         return 'En cours';
       case Status.ACHIEVED:
@@ -302,12 +306,10 @@ export class PlanActionPageComponent {
   }
 
   onConfirmAction(incidentId: number) {
-    alert(incidentId);
-    this.router.navigate(['action-plan', incidentId]);
-    // this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
-    //   .subscribe(res => {
-    //     // delete incidentId
-    //   })
+    this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
+      .subscribe(res => {
+        // delete incidentId
+      })
   }
 
 

@@ -106,6 +106,10 @@ export class PlanActionPageDetailComponent {
 
   getReadableStatut(status: Status): string {
   switch (status) {
+    case Status.NOT_STARTED:
+      return 'Non commencé';
+    case Status.NOT_ACHIEVED:
+      return 'Non réalisé';
     case Status.IN_PROGRESS:
       return 'En cours';
     case Status.ACHIEVED:

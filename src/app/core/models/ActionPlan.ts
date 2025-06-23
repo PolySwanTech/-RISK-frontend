@@ -16,8 +16,7 @@ export class Action {
         performedBy: string,
         performedAt: string,
         fileName: string
-    )
-    {
+    ) {
         this.id = id;
         this.name = name;
         this.createdAt = createdAt;
@@ -27,9 +26,13 @@ export class Action {
     }
 }
 
-export class ActionPlan {
+export interface ActionPlanId{
     id: string;
     version: Date;
+}
+
+export class ActionPlan {
+    actionPlanId: ActionPlanId;
     libelle: string;
     description: string;
     status: Status;
@@ -56,8 +59,7 @@ export class ActionPlan {
         incidentId: string,
         echeance: Date
     ) {
-        this.id = id;
-        this.version = version;
+        this.actionPlanId = { id, version };
         this.libelle = libelle;
         this.description = description;
         this.status = status;

@@ -8,7 +8,11 @@
         <mat-card class="action-plan-card">
             <mat-card-header>
                 <mat-card-title>
-                    <span>{{ actionPlan.id }} - {{ actionPlan.libelle }} (Ref incident : {{ actionPlan.creator }} )</span>
+                    <span>{{ actionPlan.actionPlanId.id }} - {{ actionPlan.libelle }} 
+                        @if(actionPlan.incidentId){
+                            (Ref incident : {{ actionPlan.incidentId }} )
+                        }
+                    </span>
                     <button mat-raised-button class="btn-green">
                         <mat-icon>file_download</mat-icon> Exporter
                     </button>
