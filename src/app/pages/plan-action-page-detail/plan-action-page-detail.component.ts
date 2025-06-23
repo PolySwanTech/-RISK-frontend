@@ -80,7 +80,7 @@ export class PlanActionPageDetailComponent {
   }
 
   getCompletedCount(actions: Action[]): number {
-    return actions.filter(a => a.completed).length;
+    return actions.filter(a => a.completedAt).length;
   }
 
   getCompletionRate(actions: Action[]): number {

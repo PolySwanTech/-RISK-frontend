@@ -20,9 +20,12 @@ export class ActionPlanService {
   getActionPlan(id: string) {
     const allPlans = this.getActionsPlan();
     return allPlans.find(plan => plan.id === id);
+
+    // return this.http.get<ActionPlan>(`${this.base}/${id}`);
   }
 
   getActionsPlan() {
+    // return this.http.get<ActionPlan[]>(this.base);
     return [
       {
         id: '1',
@@ -37,7 +40,6 @@ export class ActionPlanService {
           {
             name: 'Analyser les délais actuels',
             date: '2025-05-10',
-            completed: true,
             fileName: 'attestation-formation.pdf',
             completedBy: 'Thomas Leroy',
             completedAt: '2025-05-21T10:30:00Z'
@@ -45,7 +47,6 @@ export class ActionPlanService {
           {
             name: 'Proposer une nouvelle procédure',
             date: '2025-05-15',
-            completed: true,
             fileName: 'attestation-formation.pdf',
             completedBy: 'Thomas Leroy',
             completedAt: '2025-05-21T10:30:00Z'
@@ -73,7 +74,6 @@ export class ActionPlanService {
           {
             name: 'Élaborer les nouvelles procédures',
             date: '2025-05-13',
-            completed: true,
             fileName: 'attestation-formation.pdf',
             completedBy: 'Thomas Leroy',
             completedAt: '2025-05-21T10:30:00Z'
@@ -121,7 +121,6 @@ export class ActionPlanService {
           {
             name: 'Préparer le contenu de la formation',
             date: '2025-05-07',
-            completed: true,
             fileName: 'attestation-formation.pdf',
             completedBy: 'Thomas Leroy',
             completedAt: '2025-05-21T10:30:00Z'
@@ -129,7 +128,6 @@ export class ActionPlanService {
           {
             name: 'Planifier les sessions',
             date: '2025-05-14',
-            completed: true,
             fileName: 'attestation-formation.pdf',
             completedBy: 'Thomas Leroy',
             completedAt: '2025-05-21T10:30:00Z'
@@ -137,7 +135,6 @@ export class ActionPlanService {
           {
             name: 'Former les équipes',
             date: '2025-05-21',
-            completed: true,
             fileName: 'attestation-formation.pdf',
             completedBy: 'Thomas Leroy',
             completedAt: '2025-05-21T10:30:00Z'

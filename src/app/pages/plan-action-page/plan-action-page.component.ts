@@ -268,6 +268,9 @@ export class PlanActionPageComponent {
 
 
   loadActionPlans() {
+    // this.actionPlanService.getActionsPlan().subscribe((data: ActionPlan[]) => {
+    //   this.dataSource.data = data;
+    // });
     this.actionPlans = this.actionPlanService.getActionsPlan();
     this.dataSource.data = this.actionPlans;
   }
