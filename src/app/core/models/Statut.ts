@@ -1,5 +1,0 @@
-export enum Statut {
-    ACHIEVED = 'ACHIEVED',
-    IN_PROGRESS = 'IN_PROGRESS',
-    NOT_ACHIEVED = 'NOT_ACHIEVED'
-}

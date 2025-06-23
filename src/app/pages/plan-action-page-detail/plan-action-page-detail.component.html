@@ -8,7 +8,7 @@
         <mat-card class="action-plan-card">
             <mat-card-header>
                 <mat-card-title>
-                    <span>{{ actionPlan.id }} - {{ actionPlan.name }} (Ref incident : {{ actionPlan.creator }} )</span>
+                    <span>{{ actionPlan.id }} - {{ actionPlan.libelle }} (Ref incident : {{ actionPlan.creator }} )</span>
                     <button mat-raised-button class="btn-green">
                         <mat-icon>file_download</mat-icon> Exporter
                     </button>
@@ -21,7 +21,7 @@
                         <mat-icon>person</mat-icon>
                         <div class="info-text">
                             <label>Responsable</label>
-                            <div class="value">{{ actionPlan.responsable }}</div>
+                            <div class="value">{{ actionPlan.userInCharge }}</div>
                         </div>
                     </div>
 

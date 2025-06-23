@@ -1,6 +1,5 @@
 import { ActionPlanService } from './../../core/services/action-plan/action-plan.service';
-import { ActionPlanChartComponent } from "../../features/action-plan/action-plan-chart/action-plan-chart/action-plan-chart.component";
-import { AfterViewInit, Component, inject, OnInit, resource, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -19,15 +18,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
-import { Statut } from "../../core/models/Statut";
 import { Priority } from "../../core/models/Priority";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
+import { Status } from '../../core/models/ControlExecution';
 
 @Component({
   selector: 'app-plan-action-page',
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, FormsModule,
-    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, MatSelectModule, MatFormFieldModule, MatButtonModule ],
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, MatSelectModule, MatFormFieldModule, MatButtonModule],
   providers: [DatePipe],
   templateUrl: './plan-action-page.component.html',
   styleUrl: './plan-action-page.component.scss'
@@ -70,17 +69,17 @@ export class PlanActionPageComponent {
       header: 'Date d\'échéance',
       cell: (element: ActionPlan) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
     },
-     { 
-      columnDef: 'priority', 
-      header: 'Priorité', 
+    {
+      columnDef: 'priority',
+      header: 'Priorité',
       cell: (element: ActionPlan) => this.getPriorityBarHtml(element.priority)
     },
     {
       columnDef: 'statut',
       header: 'Statut',
       cell: (element: ActionPlan) => `
-  <span class="badge ${element.statut.toLowerCase()}">
-      ${this.getReadableStatut(element.statut)}
+  <span class="badge ${element.status.toLowerCase()}">
+      ${this.getReadableStatut(element.status)}
     </span>
 `    }
   ];
@@ -108,26 +107,26 @@ export class PlanActionPageComponent {
     this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
 
-  getPriorityBarHtml(priority: 'elevee' | 'moyen' | 'faible'): string {
+  getPriorityBarHtml(priority: Priority): string {
     const priorityConfig = {
-      elevee: { 
-        label: 'Élevée', 
+      [Priority.MAXIMUM]: {
+        label: 'Maximale',
         class: 'elevee',
         ariaLabel: 'Priorité élevée - Niveau 3 sur 3'
       },
-      moyen: { 
-        label: 'Moyen', 
+      [Priority.MEDIUM]: {
+        label: 'Moyenne',
         class: 'moyen',
         ariaLabel: 'Priorité moyenne - Niveau 2 sur 3'
       },
-      faible: { 
-        label: 'Faible', 
+      [Priority.MINIMAL]: {
+        label: 'Minimale',
         class: 'faible',
         ariaLabel: 'Priorité faible - Niveau 1 sur 3'
       }
     };
 
-    const config = priorityConfig[priority] || priorityConfig.moyen;
+    const config = priorityConfig[priority] || priorityConfig[Priority.MEDIUM];
 
     return `
       <div class="priority-container">
@@ -142,13 +141,13 @@ export class PlanActionPageComponent {
   }
 
   getPriorityBadge(priority: string) {
-  const badges: { [key: string]: string } = {
-    'elevee': '<span class="priority-badge priority-elevee">Élevée</span>',
-    'moyen': '<span class="priority-badge priority-moyen">Moyen</span>',
-    'faible': '<span class="priority-badge priority-faible">Faible</span>'
-  };
-  return badges[priority] || badges['moyen'];
-}
+    const badges: { [key: string]: string } = {
+      'elevee': '<span class="priority-badge priority-elevee">Élevée</span>',
+      'moyen': '<span class="priority-badge priority-moyen">Moyen</span>',
+      'faible': '<span class="priority-badge priority-faible">Faible</span>'
+    };
+    return badges[priority] || badges['moyen'];
+  }
 
   getPriorityColor(priority: 'elevee' | 'moyen' | 'faible'): string {
     const colors = {
@@ -203,61 +202,61 @@ export class PlanActionPageComponent {
   }
 
   applyAllFilters(): void {
-  let filteredData = [...this.actionPlans];
+    let filteredData = [...this.actionPlans];
 
-  // 1. Filtre par date
-  if (this.dateFilter.value) {
-    const formattedDate = this.formatDate(this.dateFilter.value);
-    filteredData = filteredData.filter(incident =>
-      incident.echeance && new Date(incident.echeance).toISOString().split('T')[0] === formattedDate
-    );
-  }
-
-  // 2. Filtre par priorité
-  if (this.priorityFilter.value) {
-    filteredData = filteredData.filter(incident =>
-      incident.priority === this.priorityFilter.value
-    );
-  }
-
-  // 3. Filtre par statut
-  if (this.statusFilter.value) {
-    filteredData = filteredData.filter(incident =>
-      incident.status === this.statusFilter.value
-    );
-  }
-
-  // 4. Recherche textuelle
-  if (this.searchQuery && this.searchQuery.trim() != '') {
-    const query = this.searchQuery.toLowerCase();
-
-    filteredData = filteredData.filter(file => {
-      const idMatches = file.id?.toString().toLowerCase().includes(query);
-      const creatorMatches = file.creator?.toLowerCase().includes(query);
-      const nameMatches = file.name?.toLowerCase().includes(query);
-      const descriptionMatches = file.description?.toLowerCase().includes(query);
-      const responsableMatches = file.responsable?.toLowerCase().includes(query);
-      const priorityMatches = file.priority?.toLowerCase().includes(query);
-
-      const date = file.uploadedAt instanceof Date ? file.uploadedAt : new Date(file.uploadedAt);
-      const formattedDate = date.toLocaleDateString('fr-FR');
-      const dateMatches = formattedDate.includes(query);
-
-      return (
-        idMatches ||
-        creatorMatches ||
-        nameMatches ||
-        descriptionMatches ||
-        responsableMatches ||
-        priorityMatches ||
-        dateMatches
+    // 1. Filtre par date
+    if (this.dateFilter.value) {
+      const formattedDate = this.formatDate(this.dateFilter.value);
+      filteredData = filteredData.filter(incident =>
+        incident.echeance && new Date(incident.echeance).toISOString().split('T')[0] === formattedDate
       );
-    });
-  }
+    }
 
-  // Mise à jour de la data
-  this.dataSource.data = filteredData;
-}
+    // 2. Filtre par priorité
+    if (this.priorityFilter.value) {
+      filteredData = filteredData.filter(incident =>
+        incident.priority === this.priorityFilter.value
+      );
+    }
+
+    // 3. Filtre par statut
+    if (this.statusFilter.value) {
+      filteredData = filteredData.filter(incident =>
+        incident.status === this.statusFilter.value
+      );
+    }
+
+    // 4. Recherche textuelle
+    if (this.searchQuery && this.searchQuery.trim() != '') {
+      const query = this.searchQuery.toLowerCase();
+
+      filteredData = filteredData.filter(file => {
+        const idMatches = file.id?.toString().toLowerCase().includes(query);
+        const creatorMatches = file.creator?.toLowerCase().includes(query);
+        const nameMatches = file.name?.toLowerCase().includes(query);
+        const descriptionMatches = file.description?.toLowerCase().includes(query);
+        const responsableMatches = file.responsable?.toLowerCase().includes(query);
+        const priorityMatches = file.priority?.toLowerCase().includes(query);
+
+        const date = file.uploadedAt instanceof Date ? file.uploadedAt : new Date(file.uploadedAt);
+        const formattedDate = date.toLocaleDateString('fr-FR');
+        const dateMatches = formattedDate.includes(query);
+
+        return (
+          idMatches ||
+          creatorMatches ||
+          nameMatches ||
+          descriptionMatches ||
+          responsableMatches ||
+          priorityMatches ||
+          dateMatches
+        );
+      });
+    }
+
+    // Mise à jour de la data
+    this.dataSource.data = filteredData;
+  }
 
   customFilterPredicate(data: ActionPlan, filter: string): boolean {
     // Convert the entire object (including nested objects) to a string and check if it contains the filter term
@@ -268,29 +267,29 @@ export class PlanActionPageComponent {
 
 
   loadActionPlans() {
-    // this.actionPlanService.getActionsPlan().subscribe((data: ActionPlan[]) => {
-    //   this.dataSource.data = data;
-    // });
-    this.actionPlans = this.actionPlanService.getActionsPlan();
-    this.dataSource.data = this.actionPlans;
+    this.actionPlanService.getActionsPlan().subscribe((data: ActionPlan[]) => {
+      this.dataSource.data = data;
+    });
+    // this.actionPlans = this.actionPlanService.getActionsPlan();
+    // this.dataSource.data = this.actionPlans;
   }
 
   getUniquePriorities(): string[] {
     return [Priority.MINIMAL, Priority.MEDIUM, Priority.MAXIMUM];
   }
 
-  getReadableStatut(status: Statut): string {
-  switch (status) {
-    case Statut.IN_PROGRESS:
-      return 'En cours';
-    case Statut.ACHIEVED:
-      return 'Clôturé';
-    case Statut.NOT_ACHIEVED:
-      return 'Non réalisé';
-    default:
-      return 'Inconnu';
+  getReadableStatut(status: Status): string {
+    switch (status) {
+      case Status.IN_PROGRESS:
+        return 'En cours';
+      case Status.ACHIEVED:
+        return 'Clôturé';
+      case Status.NOT_ACHIEVED:
+        return 'Non réalisé';
+      default:
+        return 'Inconnu';
+    }
   }
-}
 
 
   add() {
@@ -303,19 +302,20 @@ export class PlanActionPageComponent {
   }
 
   onConfirmAction(incidentId: number) {
-
-    this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
-      .subscribe(res => {
-        // delete incidentId
-      })
+    alert(incidentId);
+    this.router.navigate(['action-plan', incidentId]);
+    // this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
+    //   .subscribe(res => {
+    //     // delete incidentId
+    //   })
   }
 
-  
+
   searchQuery: string = '';
   onSearchFiles(event: any): void {
-  this.searchQuery = event.target.value.trim();
-this.applyAllFilters();
-}
+    this.searchQuery = event.target.value.trim();
+    this.applyAllFilters();
+  }
 
   clearSearch() {
     this.searchQuery = '';

@@ -1,5 +1,5 @@
+import { Status } from "./ControlExecution";
 import { Priority } from "./Priority";
-import { Statut } from "./Statut";
 
 export class Action {
     id: string;
@@ -32,7 +32,7 @@ export class ActionPlan {
     version: Date;
     libelle: string;
     description: string;
-    statut: Statut;
+    status: Status;
     priority: Priority;
     creator: string;
     userInCharge: string;
@@ -48,7 +48,7 @@ export class ActionPlan {
         version: Date,
         libelle: string,
         description: string,
-        statut: Statut,
+        status: Status,
         priority: Priority,
         creator: string,
         userInCharge: string,
@@ -60,7 +60,7 @@ export class ActionPlan {
         this.version = version;
         this.libelle = libelle;
         this.description = description;
-        this.statut = statut;
+        this.status = status;
         this.priority = priority;
         this.creator = creator;
         this.userInCharge = userInCharge;

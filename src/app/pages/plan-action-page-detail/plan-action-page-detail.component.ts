@@ -19,7 +19,7 @@ import { FichiersComponent } from '../../shared/components/fichiers/fichiers.com
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { Statut } from '../../core/models/Statut';
+import { Status } from '../../core/models/ControlExecution';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -49,16 +49,18 @@ export class PlanActionPageDetailComponent {
   }
 
   getActionPlan(id: string) {
-    this.actionPlan = this.actionPlanService.getActionPlan(id);
-
-    if (this.actionPlan?.actions?.length) {
-      this.totalActions = this.actionPlan.actions.length;
-      this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-      this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-      this.updateStatus();
-    }
-
-    console.log(this.actionPlan);
+    this.actionPlanService.getActionPlan(id).subscribe(
+      resp  => {
+        console.log(resp)
+        this.actionPlan = resp;
+        if (this.actionPlan?.actions?.length) {
+          this.totalActions = this.actionPlan.actions.length;
+          this.completedActions = this.getCompletedCount(this.actionPlan.actions);
+          this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
+          this.updateStatus();
+        }
+      }
+    )
   }
 
   validateAction(action: Action, event: Event) {
@@ -92,23 +94,23 @@ export class PlanActionPageDetailComponent {
     const total = this.totalActions;
 
     if (total === 0) {
-      this.actionPlan.status = Statut.NOT_ACHIEVED;
+      this.actionPlan.status = Status.NOT_ACHIEVED;
     } else if (completed === 0) {
-      this.actionPlan.status = Statut.NOT_ACHIEVED;
+      this.actionPlan.status = Status.NOT_ACHIEVED;
     } else if (completed === total) {
-      this.actionPlan.status = Statut.ACHIEVED;
+      this.actionPlan.status = Status.ACHIEVED;
     } else {
-      this.actionPlan.status = Statut.IN_PROGRESS;
+      this.actionPlan.status = Status.IN_PROGRESS;
     }
   }
 
-  getReadableStatut(status: Statut): string {
+  getReadableStatut(status: Status): string {
   switch (status) {
-    case Statut.IN_PROGRESS:
+    case Status.IN_PROGRESS:
       return 'En cours';
-    case Statut.ACHIEVED:
+    case Status.ACHIEVED:
       return 'Clôturé';
-    case Statut.NOT_ACHIEVED:
+    case Status.NOT_ACHIEVED:
       return 'Non réalisé';
     default:
       return 'Inconnu';
