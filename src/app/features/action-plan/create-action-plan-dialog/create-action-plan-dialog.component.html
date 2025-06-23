@@ -31,28 +31,20 @@
     <div class="actions-container">
       <label for="actions">Actions à effectuer</label>
       <div class="actions-list">
-        @for(action of actionPlan.actions; track action) {
+        @for(action of actions; track action; let index = $index) {
           <div class="add-action">
             <input 
               [(ngModel)]="action.name"
+              [ngModelOptions]="{standalone: true}"
               placeholder="Entrez une action"
-              name="actionName{{action.id}}"
-              (keyup.enter)="addAction()"
               class="action-input"
             />
-            <button type="button" (click)="removeAction(action.id)" class="remove-btn">X</button>
+            <button type="button" (click)="removeAction(index)" class="remove-btn">X</button>
           </div>
         }
 
         <!-- Champ d'ajout d'action -->
         <div class="add-action">
-          <input 
-            [(ngModel)]="newAction.name"
-            placeholder="Entrez une action"
-            name="newActionName"
-            (keyup.enter)="addAction()"
-            class="action-input"
-          />
           <button type="button" (click)="addAction()" class="add-btn">+</button>
         </div>
       </div>

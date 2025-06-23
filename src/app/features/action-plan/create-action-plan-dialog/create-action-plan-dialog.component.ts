@@ -37,7 +37,8 @@ export class CreateActionPlanDialogComponent implements OnInit {
     '', new Date(), '', '', Status.NOT_STARTED, Priority.MAXIMUM,
     '', '', '', '', new Date()
   );
-  newAction: Action = new Action('', '', new Date(), '', '', '');
+
+  actions : Action[] = []
 
   ngOnInit(): void {
 
@@ -49,22 +50,28 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Ajouter une action à la liste
   addAction() {
-    if (this.newAction.name.trim()) {
-      this.actionPlan.actions.push({ ...this.newAction });
-      this.newAction = new Action('', '', new Date(), '', '', ''); // Réinitialiser le champ
-    }
+    this.actions.push(new Action('', '', new Date(), '', '', ''));
+  }
+
+  updateAction(index: number, action: Action) {
+    console.log(action)
+    // Mettre à jour l'action à l'index spécifié
+    this.actions[index] = action;
   }
 
   // Supprimer une action de la liste
-  removeAction(index: string) {
-    this.actionPlan.actions = this.actionPlan.actions.filter(a => a.id !== index);
+  removeAction(index: number) {
+    this.actions.splice(index, 1);
   }
 
   // Soumettre le plan d'action
   submitActionPlan() {
     this.actionPlan.riskTemplateId = '3d4c05a3-f2f8-44e6-bc7b-0efea5a66505'
     this.actionPlanService.createActionPlan(this.actionPlan)
-      .subscribe(_ => {
+      .subscribe(id => {
+        console.log(this.actions)
+        this.actionPlanService.addActions(this.actions, id).subscribe(() => {
+        });
         this.dialogRef.close();
         this.confirmService.openConfirmDialog(
           "Création avec succès", "Le plan d'action a été créé avec succès.")
