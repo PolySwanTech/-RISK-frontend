@@ -42,7 +42,7 @@ export class PlanActionPageComponent {
     {
       columnDef: 'id',
       header: 'Ref',
-      cell: (element: ActionPlan) => `${element.actionPlanId.id}`,
+      cell: (element: ActionPlan) => `${element.reference}`,
     },
     {
       columnDef: 'creator',

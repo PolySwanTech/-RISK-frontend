@@ -46,6 +46,8 @@ export class ActionPlan {
 
     actions: Action[] = [];
 
+    reference : string = "";
+
     constructor(
         id: string,
         version: Date,
