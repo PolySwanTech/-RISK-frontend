@@ -17,9 +17,9 @@ import { ImpactCardComponent } from '../../features/incident/impact-card/impact-
 import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { FichiersComponent } from '../../shared/components/fichiers/fichiers.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Action } from '../../core/models/ActionPlan';
+import { Action, ActionPlan } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { Status } from '../../core/models/ControlExecution';
+import { Priority, Status } from '../../core/models/ControlExecution';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -35,7 +35,7 @@ export class PlanActionPageDetailComponent {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
 
-  actionPlan: any;
+  actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
 
   progressionPercent: number = 0;
@@ -50,15 +50,20 @@ export class PlanActionPageDetailComponent {
 
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(
-      resp  => {
-        console.log(resp)
-        this.actionPlan = resp;
-        if (this.actionPlan?.actions?.length) {
-          this.totalActions = this.actionPlan.actions.length;
-          this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-          this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-          this.updateStatus();
-        }
+      resp => {
+        this.authService.getUserById(resp.userInCharge).subscribe(
+          user => {
+            this.actionPlan = resp;
+            this.actionPlan.userInCharge = user.username;
+            if (this.actionPlan?.actions?.length) {
+              this.totalActions = this.actionPlan.actions.length;
+              this.completedActions = this.getCompletedCount(this.actionPlan.actions);
+              this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
+              this.updateStatus();
+            }
+          }
+        );
+
       }
     )
   }
@@ -94,59 +99,59 @@ export class PlanActionPageDetailComponent {
     const total = this.totalActions;
 
     if (total === 0) {
-      this.actionPlan.status = Status.NOT_ACHIEVED;
+      this.actionPlan!.status = Status.NOT_ACHIEVED;
     } else if (completed === 0) {
-      this.actionPlan.status = Status.NOT_ACHIEVED;
+      this.actionPlan!.status = Status.NOT_ACHIEVED;
     } else if (completed === total) {
-      this.actionPlan.status = Status.ACHIEVED;
+      this.actionPlan!.status = Status.ACHIEVED;
     } else {
-      this.actionPlan.status = Status.IN_PROGRESS;
+      this.actionPlan!.status = Status.IN_PROGRESS;
     }
   }
 
   getReadableStatut(status: Status): string {
-  switch (status) {
-    case Status.NOT_STARTED:
-      return 'Non commencé';
-    case Status.NOT_ACHIEVED:
-      return 'Non réalisé';
-    case Status.IN_PROGRESS:
-      return 'En cours';
-    case Status.ACHIEVED:
-      return 'Clôturé';
-    case Status.NOT_ACHIEVED:
-      return 'Non réalisé';
-    default:
-      return 'Inconnu';
+    switch (status) {
+      case Status.NOT_STARTED:
+        return 'Non commencé';
+      case Status.NOT_ACHIEVED:
+        return 'Non réalisé';
+      case Status.IN_PROGRESS:
+        return 'En cours';
+      case Status.ACHIEVED:
+        return 'Clôturé';
+      case Status.NOT_ACHIEVED:
+        return 'Non réalisé';
+      default:
+        return 'Inconnu';
+    }
   }
-}
 
-    openFileUpload(): void {
+  openFileUpload(): void {
     // Déclencher le clic sur l'input file caché
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fileInput?.click();
   }
 
-  getPriorityBarHtml(priority: 'elevee' | 'moyen' | 'faible'): string {
+  getPriorityBarHtml(priority: Priority): string {
     const priorityConfig = {
-      elevee: { 
-        label: 'Élevée', 
+      [Priority.MAXIMUM]: {
+        label: 'Élevée',
         class: 'elevee',
         ariaLabel: 'Priorité élevée - Niveau 3 sur 3'
       },
-      moyen: { 
-        label: 'Moyen', 
+      [Priority.MEDIUM]: {
+        label: 'Moyen',
         class: 'moyen',
         ariaLabel: 'Priorité moyenne - Niveau 2 sur 3'
       },
-      faible: { 
-        label: 'Faible', 
+      [Priority.MINIMAL]: {
+        label: 'Faible',
         class: 'faible',
         ariaLabel: 'Priorité faible - Niveau 1 sur 3'
       }
     };
 
-    const config = priorityConfig[priority] || priorityConfig.moyen;
+    const config = priorityConfig[priority] || priorityConfig[Priority.MEDIUM];
 
     return `
       <div class="priority-container">

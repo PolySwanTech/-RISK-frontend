@@ -1,7 +1,7 @@
 <div style="margin: 15px;">
     @if(actionPlan){
     <app-go-back previousPageName="Liste des plans d'action"
-        [currentPageName]="`Détails du plan d'action - ` + actionPlan.name"></app-go-back>
+        [currentPageName]="`Détails du plan d'action - ` + actionPlan.libelle"></app-go-back>
     <div class="plan-detail-container">
 
 
@@ -83,11 +83,11 @@
                     <div class="action-info">
                         <p class="action-title">
                             <strong>{{ action.name }}</strong>
-                            <span class="action-date"> ({{ action.date | date: 'dd/MM/yyyy' }})</span>
+                            <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy' }})</span>
                         </p>
 
 
-                        @if(!action.completedAt){
+                        @if(!action.performedAt){
                         <ng-container>
                             <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
                                 <mat-icon>upload</mat-icon>
@@ -99,8 +99,8 @@
                         @else {
                         <ng-container>
                             <p class="validated">
-                                ✔ Terminé par <strong>{{ action.completedBy }}</strong>
-                                le {{ action.completedAt | date: 'dd/MM/yyyy' }}
+                                ✔ Terminé par <strong>{{ action.performedBy }}</strong>
+                                le {{ action.performedAt | date: 'dd/MM/yyyy' }}
                             </p>
                         </ng-container>
                         }

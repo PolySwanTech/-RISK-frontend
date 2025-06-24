@@ -92,5 +92,7 @@ export class AuthService {
     return this.utilisateurConnecte;
   }
 
-
+  getUserById(id: string) {
+    return this.http.get<Utilisateur>(`${this.base}/${id}`)
+  }
 }
