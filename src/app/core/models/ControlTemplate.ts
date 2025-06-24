@@ -1,3 +1,5 @@
+import { RiskTemplate } from "./RiskTemplate";
+
 export enum Recurence {
     DAILY = 'DAILY',
     WEEKLY = 'WEEKLY',
@@ -5,6 +7,12 @@ export enum Recurence {
     QUARTERLY = 'QUARTERLY',
     SEMESTERLY = 'SEMESTERLY',
     YEARLY = 'YEARLY'
+}
+
+export enum Priority {
+    MINIMAL = 'MINIMAL',
+    MEDIUM = 'MEDIUM',
+    MAXIMUM = 'MAXIMUM',
 }
 
 export enum Degree {
@@ -29,8 +37,9 @@ export class ControlTemplate {
     description: string;
     frequency: Recurence;
     level: Degree;
-    type: Type;
-    riskId: string;
+    controlType: Type;
+    priority: Priority;
+    taxonomie: RiskTemplate;
     
     buName : string = "";
 
@@ -42,8 +51,9 @@ export class ControlTemplate {
         description: string,
         frequency: Recurence,
         level: Degree,
-        type: Type,
-        riskId: string
+        controlType: Type,
+        priority: Priority,
+        taxonomie: RiskTemplate
     ) {
         this.id = id;
         this.reference = reference;
@@ -51,8 +61,20 @@ export class ControlTemplate {
         this.description = description;
         this.frequency = frequency;
         this.level = level;
-        this.type = type;
-        this.riskId = riskId;
+        this.controlType = controlType;
+        this.priority = priority;
+        this.taxonomie = taxonomie;
     }
 
+}
+
+// control-template.create.dto.ts
+export interface ControlTemplateCreateDto {
+        libelle: string,
+        description: string,
+        frequency: Recurence,
+        level: Degree,
+        controlType: Type,
+        priority: Priority,
+        taxonomie: RiskTemplate
 }

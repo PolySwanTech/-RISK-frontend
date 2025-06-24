@@ -20,8 +20,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
 import { Statut } from "../../core/models/Statut";
-import { Priority } from "../../core/models/Priority";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
+import { Priority } from '../../core/models/Priority';
 
 @Component({
   selector: 'app-plan-action-page',

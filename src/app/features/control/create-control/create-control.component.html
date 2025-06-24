@@ -1,12 +1,6 @@
 <h2>Formulaire de création d'un contrôle</h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Référence du contrôle</mat-label>
-      <input matInput formControlName="libelle" value="Générer automatiquement" />
-    </mat-form-field>
-  </div>
 
   <div class="row-add">
     <mat-form-field appearance="outline">
@@ -49,7 +43,17 @@
         }
       </mat-select>
     </mat-form-field>
-  </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Priorité</mat-label>
+      <mat-select formControlName="priority">
+        @for (t of priorities; track t) {
+        <mat-option [value]="t">{{ t }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    </div>
+
 
   <div class="row-add">
     <mat-form-field appearance="outline">
@@ -79,9 +83,9 @@
     @if (form.get('processId')?.value) {
     <mat-form-field appearance="outline">
       <mat-label>Risk</mat-label>
-      <mat-select formControlName="riskId">
+      <mat-select formControlName="taxonomie">
         @for (r of risks; track r.id) {
-        <mat-option [value]="r.id">{{ r.libelle }}</mat-option>
+        <mat-option [value]="r">{{ r.libelle }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

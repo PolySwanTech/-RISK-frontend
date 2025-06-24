@@ -1,0 +1,68 @@
+<section id="matrix">
+
+  <!-- ========= Matrice & axes ========= -->
+  <div class="matrix-container">
+
+    <!-- Axe vertical IMPACT -->
+    <div class="impact-label">IMPACT</div>
+
+    <div class="matrix-wrapper">
+      <table class="risk-matrix">
+        <tbody>
+
+          <!-- Lignes de la matrice (impact 5→1) -->
+          <tr *ngFor="let row of reversedMatrixLevels;
+                      let rIdx = index; trackBy: trackByIdx">
+
+            <!-- label de ligne -->
+            <th class="row-header">
+              <input class="row-input"
+                     [(ngModel)]="rowLabels[rIdx]"
+                     [placeholder]="'Ligne '+(rIdx+1)" />
+            </th>
+
+            <!-- cellules -->
+            <td *ngFor="let lvl of row;
+                        let cIdx = index; trackBy: trackByIdx"
+                [ngStyle]="cellStyle(lvl)"
+                (click)="setColor(displayRowIdx(rIdx), cIdx)">
+
+              <!-- badge risque s’il y en a -->
+              <div class="risk-indicator"
+                   *ngIf="cellRiskInfo(displayRowIdx(rIdx),cIdx).id"
+                   (click)="onRiskClick(displayRowIdx(rIdx),cIdx)"
+                   [matTooltip]="cellRiskInfo(displayRowIdx(rIdx),cIdx).name">
+                {{ cellRiskInfo(displayRowIdx(rIdx),cIdx).id }}
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- ========== ligne d’en-tête PROBABILITÉ ========== -->
+          <tr class="column-labels-row">
+            <th class="probability-header">PROBABILITÉ</th>
+            <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx">
+              <input class="col-input"
+                     [(ngModel)]="colLabels[i]"
+                     [placeholder]="'Col '+(i+1)" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========= légende des couleurs ========= -->
+  <div class="color-legend">
+    <div *ngFor="let l of colorLevels"
+         class="legend-item"
+         [class.modif]="modifPlan"
+         [class.selected]="selectedColor===l.color"
+         (click)="modifPlan ? selectedColor=l.color : null">
+      <div class="legend-color" [style.backgroundColor]="l.color"></div>
+      <span class="legend-label">{{ l.label }}</span>
+    </div>
+  </div>
+
+  <!-- ========= bouton sauvegarde ========= -->
+</section>
