@@ -2,7 +2,7 @@ import { AfterViewInit, Component, inject, OnInit, resource, ViewChild } from '@
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Incident, State } from '../../../core/models/Incident';
+import { Incident } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -22,6 +22,7 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { IncidentChartComponent } from '../incident-chart/incident-chart.component';
+import { State } from '../../../core/enum/state.enum';
 
 
 @Component({

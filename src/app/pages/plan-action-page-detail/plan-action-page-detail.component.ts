@@ -1,27 +1,23 @@
-import { Component, inject, Input, LOCALE_ID } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActionPlanService } from '../../core/services/action-plan/action-plan.service';
-import { ImpactCardComponent } from '../../features/incident/impact-card/impact-card.component';
 import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
-import { FichiersComponent } from '../../shared/components/fichiers/fichiers.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { Status } from '../../core/models/ControlExecution';
 import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { Priority } from '../../core/enum/Priority';
+import { Status } from '../../core/enum/status.enum';
 
 @Component({
   selector: 'app-plan-action-page-detail',

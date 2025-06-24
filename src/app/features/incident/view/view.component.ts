@@ -1,5 +1,5 @@
 import { Component, inject, Input, LOCALE_ID } from '@angular/core';
-import { Incident, State } from '../../../core/models/Incident';
+import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,6 +22,7 @@ import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
+import { State } from '../../../core/enum/state.enum';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {

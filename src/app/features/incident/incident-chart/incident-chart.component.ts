@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
-import { Incident, State } from '../../../core/models/Incident';
+import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
+import { State } from '../../../core/enum/state.enum';
 
 @Component({
   selector: 'app-incident-chart',

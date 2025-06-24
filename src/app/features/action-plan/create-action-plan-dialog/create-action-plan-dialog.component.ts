@@ -9,12 +9,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
-import { Status } from '../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Status } from '../../../core/enum/status.enum';
 
 @Component({
   selector: 'app-create-action-plan-dialog',

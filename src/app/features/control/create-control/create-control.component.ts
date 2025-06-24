@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Type } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -14,9 +14,12 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
-import { ControlTemplate, ControlTemplateCreateDto, Degree, Priority, Recurence, Type } from '../../../core/models/ControlTemplate';
+import { ControlTemplate, ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { Degree } from '../../../core/enum/degree.enum';
+import { Priority } from '../../../core/enum/Priority';
+import { Recurence } from '../../../core/enum/recurence.enum';
 
 @Component({
   selector: 'app-create-control',

@@ -18,16 +18,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
-<<<<<<< HEAD
-import { Priority, priorityLabels } from "../../core/enum/Priority";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
-import { Status, statusLabels } from '../../core/models/ControlExecution';
-import { Action } from 'rxjs/internal/scheduler/Action';
-=======
-import { Statut } from "../../core/models/Statut";
-import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
-import { Priority } from '../../core/models/Priority';
->>>>>>> 7fdffc6e16c0e3c71c42c9b7e3a158e6923f98c0
+import { Priority, priorityLabels } from '../../core/enum/Priority';
+import { Status, statusLabels } from '../../core/enum/status.enum';
 
 @Component({
   selector: 'app-plan-action-page',

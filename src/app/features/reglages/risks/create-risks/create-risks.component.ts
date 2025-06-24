@@ -107,6 +107,9 @@ detailsForm = this.fb.group({
   /*                   CHARGEMENT D’UN RISQUE                  */
   /* ========================================================= */
   private loadRiskById(id: string): void {
+
+    alert("ici")
+
     this.riskSrv.getById(id).subscribe(r => {
       this.risk        = new RiskTemplate(r);     // instanciation propre
       this.pageTitle   = `Mise à jour du risque : ${this.risk.libelle}`;
