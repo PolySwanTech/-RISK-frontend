@@ -54,7 +54,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'type',
       header: 'Type de contrôle',
-      cell: (element: ControlTemplate) => `${element.type}`,
+      cell: (element: ControlTemplate) => `${element.controlType}`,
     },
     {
       columnDef: 'level',
