@@ -26,12 +26,6 @@ import { BaloiseCategoryL1, BaloiseCategoryL2 }    from '../../../../core/models
 import { Process }              from '../../../../core/models/Process';
 
 @Component({
-<<<<<<< HEAD
-  selector: 'app-create-risks',
-  imports: [
-    CommonModule, FormsModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule,
-    MatSelectModule, GoBackComponent, MatStepperModule, MatButtonModule],
-=======
   selector   : 'app-create-risks',
   standalone : true,
   imports    : [
@@ -39,7 +33,6 @@ import { Process }              from '../../../../core/models/Process';
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatStepperModule, MatButtonModule, GoBackComponent
   ],
->>>>>>> 7fdffc6e16c0e3c71c42c9b7e3a158e6923f98c0
   templateUrl: './create-risks.component.html',
   styleUrl   : './create-risks.component.scss'
 })
@@ -59,17 +52,8 @@ export class CreateRisksComponent implements OnInit {
   categoriesBaloise : BaloiseCategoryL1[] = [];
   processes         : Process[]          = [];
 
-<<<<<<< HEAD
-  riskForm = this._formBuilder.group({
-    titre: ['', Validators.required],
-    balois1: ['', Validators.required],
-    balois2: ['', Validators.required],
-    process: ['', Validators.required],
-  });
-=======
   pageTitle   = 'Création d\'un risque';
   dialogLabel = { title: 'Création', message: 'création' };
->>>>>>> 7fdffc6e16c0e3c71c42c9b7e3a158e6923f98c0
 
   riskLevels   = Object.values(RiskLevel);
   impactTypes  = Object.values(RiskImpactType);
@@ -107,10 +91,6 @@ detailsForm = this.fb.group({
   /*                       CYCLE DE VIE                        */
   /* ========================================================= */
   ngOnInit(): void {
-<<<<<<< HEAD
-    this.baloisCategoriesService.getAll().subscribe(data => {
-      this.categoriesBaloise = data;
-=======
 
     /* --- chargements parallèles --- */
     this.catSrv.getAll().subscribe(list => this.categoriesBaloise = list);
@@ -145,51 +125,9 @@ detailsForm = this.fb.group({
         level      : this.risk.riskBrut,
         impactType : this.risk.impactTypes[0] ?? null   // simple sélection
       });
->>>>>>> 7fdffc6e16c0e3c71c42c9b7e3a158e6923f98c0
     });
-    this.processService.getAll().subscribe(processes => {
-      this.process = processes
-    });
-    this.risk = new Risk('', '', '', '', '');
   }
 
-<<<<<<< HEAD
-  // loadRiskById(id: string) {
-  //   this.riskService.getById(id).subscribe(rep => {
-  //     this.risk = rep
-  //     this.pageTitle = "Mise à jour du risque : " + this.risk.name;
-  //     this.responseMessage = { title: 'Mise à jour', message: 'mise à jour' }
-  //     this.riskForm.get('titre')?.setValue(this.risk.name);
-  //     this.riskForm.get('balois1')?.setValue(this.risk.taxonomie);
-  //     this.riskForm.get('balois2')?.setValue(this.risk.balois);
-  //     this.riskForm.get('process')?.setValue(this.risk.processId);
-  //     this.riskForm2.get('description')?.setValue(this.risk.description);
-  //     this.riskForm2.get('level')?.setValue(this.risk.level);
-  //     this.riskForm2.get('probability')?.setValue(this.risk.probability)
-  //     this.riskForm2.get('impactType')?.setValue(this.risk.impactType)
-  //   });
-  // }
-
-  createRisk() {
-    if (this.risk && this.riskForm.valid) {
-      this.risk.name = this.riskForm.get('titre')?.value ?? '';
-      this.risk.taxonomie = this.riskForm.get('balois1')?.value ?? '';
-      this.risk.balois = this.riskForm.get('balois2')?.value ?? '';
-      this.risk.processId = this.riskForm.get('process')?.value ?? '';
-      this.risk.description = this.riskForm2.get('description')?.value ?? '';
-      this.risk.level = this.riskForm2.get('level')?.value ?? '';
-      this.risk.probability = this.riskForm2.get('probability')?.value ?? null;
-      this.risk.impactType = this.riskForm2.get('impactType')?.value ?? null;
-
-      console.log(this.risk)
-
-      this.riskService.save(this.risk).subscribe(
-        risk => {
-          this.confirmService.openConfirmDialog(this.responseMessage.title, "La " + this.responseMessage.message + " du risque a été réalisé avec succès", false)
-          this.router.navigate(['reglages', 'risks'])
-        }
-      )
-=======
   /* ========================================================= */
   /*                     CRÉATION / MÀJ                       */
   /* ========================================================= */
@@ -197,7 +135,6 @@ detailsForm = this.fb.group({
     if (this.infoForm.invalid || this.detailsForm.invalid) { 
       console.error('Formulaire invalide:', this.infoForm.errors, this.detailsForm.errors);
       return; 
->>>>>>> 7fdffc6e16c0e3c71c42c9b7e3a158e6923f98c0
     }
 
     const riskLevel = this.detailsForm.get('level')?.value;

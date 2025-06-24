@@ -1,5 +1,5 @@
 import { RiskLevel } from "../enum/riskLevel.enum";
-import { RiskTemplate, RiskId } from './RiskTemplate';
+import { RiskId } from './RiskTemplate';
 /* ----------------------------------------- */
 /*  models/RiskEvaluation.ts                 */
 /* ----------------------------------------- */

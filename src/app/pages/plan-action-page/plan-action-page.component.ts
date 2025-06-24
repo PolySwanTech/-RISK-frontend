@@ -19,7 +19,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
 <<<<<<< HEAD
-import { Priority, priorityLabels } from "../../core/models/Priority";
+import { Priority, priorityLabels } from "../../core/enum/Priority";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
 import { Status, statusLabels } from '../../core/models/ControlExecution';
 import { Action } from 'rxjs/internal/scheduler/Action';

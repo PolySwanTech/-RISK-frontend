@@ -3,7 +3,7 @@ import { Action, ActionPlan } from '../../../core/models/ActionPlan';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { Priority, priorityLabels } from '../../../core/models/Priority';
+import { Priority, priorityLabels } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';

@@ -1,15 +1,7 @@
-import { EntiteResponsable } from "./EntiteResponsable";
+import { State } from "../enum/state.enum";
 import { Impact } from "./Impact";
 import { Process } from "./Process";
 import { RiskTemplate } from "./RiskTemplate";
-import { Cause } from "./Cause";
-
-export enum State {
-    DRAFT = "DRAFT",
-    VALIDATE = "VALIDATE",  
-    PROCESS = "PROCESS", 
-    CLOSED = "CLOSED",
-}
 
 export class Incident {
     id: string;

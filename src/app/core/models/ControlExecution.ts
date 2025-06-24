@@ -1,31 +1,6 @@
-import { State } from "./Incident";
-import { Priority } from "./Priority";
-
-export enum Status {
-    ACHIEVED = 'ACHIEVED',
-    IN_PROGRESS = 'IN_PROGRESS',
-    NOT_ACHIEVED = 'NOT_ACHIEVED',
-    NOT_STARTED = 'NOT_STARTED',
-    CANCELLED = 'CANCELLED',
-}
-
-type StatusLabelsType = Record<Status, string>;
-
-export const statusLabels: StatusLabelsType = {
-    [Status.ACHIEVED]: 'Clôturé',
-    [Status.IN_PROGRESS]: 'En cours',
-    [Status.NOT_ACHIEVED]: 'Non Clôturé',
-    [Status.NOT_STARTED]: 'Non Démarré',
-    [Status.CANCELLED]: 'Annulé',
-}
-
-export enum Evaluation {
-    VERY_LOW = 'VERY_LOW',
-    LOW = 'LOW',
-    MEDIUM = 'MEDIUM',
-    HIGH = 'HIGH',
-    VERY_HIGH = 'VERY_HIGH' 
-}
+import { Evaluation } from "../enum/evaluation.enum";
+import { Priority } from "../enum/Priority";
+import { Status } from "../enum/status.enum";
 
 export class ControlExecution {
 

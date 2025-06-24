@@ -1,33 +1,8 @@
+import { Type } from "../enum/controltype.enum";
+import { Degree } from "../enum/degree.enum";
+import { Priority } from "../enum/Priority";
+import { Recurence } from "../enum/recurence.enum";
 import { RiskTemplate } from "./RiskTemplate";
-
-export enum Recurence {
-    DAILY = 'DAILY',
-    WEEKLY = 'WEEKLY',
-    MONTHLY = 'MONTHLY',
-    QUARTERLY = 'QUARTERLY',
-    SEMESTERLY = 'SEMESTERLY',
-    YEARLY = 'YEARLY'
-}
-
-export enum Priority {
-    MINIMAL = 'MINIMAL',
-    MEDIUM = 'MEDIUM',
-    MAXIMUM = 'MAXIMUM',
-}
-
-export enum Degree {
-    LEVEL_1 = 'LEVEL_1',
-    LEVEL_2 = 'LEVEL_2',
-}
-
-export enum Type {
-    PREVENTIVE = 'PREVENTIVE',
-    DETECTIVE = 'DETECTIVE', 
-    CORRECTIVE = 'CORRECTIVE', 
-    AUTOMATIC = 'AUTOMATIC', 
-    MANUAL = 'MANUAL'
-}
-
 
 export class ControlTemplate {
 

@@ -1,5 +1,5 @@
-import { Status } from "./ControlExecution";
-import { Priority } from "./Priority";
+import { Priority } from "../enum/Priority";
+import { Status } from "../enum/status.enum";
 
 export class Action {
     id: string;

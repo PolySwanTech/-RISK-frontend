@@ -19,8 +19,9 @@ import { FichiersComponent } from '../../shared/components/fichiers/fichiers.com
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { Priority, Status } from '../../core/models/ControlExecution';
+import { Status } from '../../core/models/ControlExecution';
 import { EquipeService } from '../../core/services/equipe/equipe.service';
+import { Priority } from '../../core/enum/Priority';
 
 @Component({
   selector: 'app-plan-action-page-detail',
