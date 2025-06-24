@@ -40,7 +40,7 @@ export class ActionPlan {
     creator: string;
     userInCharge: string;
 
-    riskTemplateId: string;
+    taxonomieId: string;
     incidentId: string;
     echeance: Date;
 
@@ -57,7 +57,7 @@ export class ActionPlan {
         priority: Priority,
         creator: string,
         userInCharge: string,
-        riskTemplateId: string,
+        taxonomieId: string,
         incidentId: string,
         echeance: Date
     ) {
@@ -68,7 +68,7 @@ export class ActionPlan {
         this.priority = priority;
         this.creator = creator;
         this.userInCharge = userInCharge;
-        this.riskTemplateId = riskTemplateId;
+        this.taxonomieId = taxonomieId;
         this.incidentId = incidentId;
         this.echeance = echeance;
     }
