@@ -20,6 +20,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { Priority, Status } from '../../core/models/ControlExecution';
+import { EquipeService } from '../../core/services/equipe/equipe.service';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -34,6 +35,7 @@ export class PlanActionPageDetailComponent {
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  private equipeService = inject(EquipeService);
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -51,10 +53,10 @@ export class PlanActionPageDetailComponent {
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(
       resp => {
-        this.authService.getUserById(resp.userInCharge).subscribe(
-          user => {
+        this.equipeService.getById(resp.userInCharge).subscribe(
+          team => {
             this.actionPlan = resp;
-            this.actionPlan.userInCharge = user.username;
+            this.actionPlan.userInCharge = team.name;
             if (this.actionPlan?.actions?.length) {
               this.totalActions = this.actionPlan.actions.length;
               this.completedActions = this.getCompletedCount(this.actionPlan.actions);

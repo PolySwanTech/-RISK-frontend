@@ -12,10 +12,15 @@ export interface Equipe {
   providedIn: 'root',
 })
 export class EquipeService {
+  
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl + '/users';
+  private baseUrl = environment.apiUrl + '/users/bu';
 
   getAllEquipes(): Observable<Equipe[]> {
-    return this.http.get<Equipe[]>(`${this.baseUrl + '/bu'}`);
+    return this.http.get<Equipe[]>(`${this.baseUrl}`);
+  }
+
+  getById(userInCharge: string) {
+    return this.http.get<Equipe>(`${this.baseUrl}/${userInCharge}`);
   }
 }

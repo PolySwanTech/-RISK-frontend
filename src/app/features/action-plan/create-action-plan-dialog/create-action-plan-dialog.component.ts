@@ -14,6 +14,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -35,6 +36,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
   private confirmService = inject(ConfirmService);
   private equipeService = inject(EquipeService);
+  private router = inject(Router);
   priorities = Object.values(Priority);
 
   listTeams: Equipe[] = [];
@@ -86,16 +88,16 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Soumettre le plan d'action
   submitActionPlan() {
-    console.log(this.actionPlan)
     this.actionPlan.riskTemplateId = '3d4c05a3-f2f8-44e6-bc7b-0efea5a66505'
     this.actionPlanService.createActionPlan(this.actionPlan)
       .subscribe(id => {
-        console.log(this.actions)
         this.actionPlanService.addActions(this.actions, id).subscribe(() => {
         });
         this.dialogRef.close();
         this.confirmService.openConfirmDialog(
-          "Création avec succès", "Le plan d'action a été créé avec succès.")
+          "Création avec succès", "Aller à la consultation ?").subscribe((value) => {
+            value ? this.router.navigate(['/action-plan', id]) : this.ngOnInit();
+          })
       });
   }
 }
