@@ -5,7 +5,6 @@ import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
-import { CreateRiskComponent } from '../../risk/create-risk/create-risk.component';
 
 @Component({
   selector: 'app-create-process',

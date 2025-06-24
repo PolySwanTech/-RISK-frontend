@@ -1,0 +1,142 @@
+<ng-container *ngIf="!loading && risk; else spinner">
+  <!-- =============== CONTAINER =================== -->
+  <div class="container">
+
+    <!-- ---------------- HEADER ------------------- -->
+    <div class="header">
+      <div class="risk-id">{{ risk.reference| uppercase }}</div>
+      <h1 class="risk-title">{{ risk.libelle }}</h1>
+      <div class="risk-category">
+        {{ "B2: " + risk.categoryL2?.name || 'Catégorie inconnue' }}
+      </div>
+    </div>
+
+    <!-- ---------------- CONTENT ------------------ -->
+    <div class="content">
+      <div class="grid">
+        <!-- ----- DESCRIPTION CARD ------------- -->
+        <div class="card">
+          <h2 class="card-title">Description du Risque</h2>
+          <p class="risk-description">
+            {{ risk.description || '—' }}
+          </p>
+
+          <!-- Mini métriques : adaptables à tes données -->
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-value">
+                {{ lastEvaluation?.probability != null
+                    ? (lastEvaluation?.probability ?? 0) * 10
+                    : '—' }}%
+              </div>
+              <div class="metric-label">Probabilité</div>
+            </div>
+            <div class="metric">
+              <div class="metric-value">{{ risk.impactTypes.length }}</div>
+              <div class="metric-label">Types d'impact</div>
+            </div>
+            <div class="metric">
+              <div class="metric-value">{{ risk.id.version | date:'short' }}</div>
+              <div class="metric-label">Version</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ----- ÉVALUATION CARD -------------- -->
+        <div class="card">
+          <h2 class="card-title">Évaluation du Risque</h2>
+
+          <div class="risk-level">
+            <span class="risk-badge"
+                  [ngClass]="risk.riskBrut.toLowerCase()">
+              {{ risk.riskBrut | lowercase }}
+            </span>
+            <span class="score">
+              {{ lastEvaluation?.riskNet ?? '—' }}
+            </span>
+          </div>
+
+          <div class="last-review" *ngIf="lastEvaluation">
+            <strong>Dernière évaluation :</strong><br />
+            <span>{{ lastEvaluation.createdAt | date:'medium' }}</span>
+          </div>
+          <div class="last-review no-eval" *ngIf="!lastEvaluation">
+            Aucune évaluation pour le moment
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------------- TABS ------------------- -->
+      <div class="tabs">
+        <div class="tab-nav">
+          <button class="tab-btn"
+                  [class.active]="activeTab==='controls'"
+                  (click)="selectTab('controls')">
+            Contrôles
+          </button>
+          <button class="tab-btn"
+                  [class.active]="activeTab==='evaluations'"
+                  (click)="selectTab('evaluations')">
+            Évaluations
+          </button>
+          <button class="tab-btn"
+                  [class.active]="activeTab==='impacts'"
+                  (click)="selectTab('impacts')">
+            Impacts
+          </button>
+        </div>
+
+        <!-- ----- Tab « Contrôles » -->
+        <div id="controls"
+             class="tab-content"
+             [class.active]="activeTab==='controls'">
+          <div class="card full-width">
+            <h3 class="card-title">Contrôles en place</h3>
+            <!-- À remplacer par *ngFor sur risk.controlTemplates -->
+            <p>Aucun contrôle enregistré.</p>
+          </div>
+        </div>
+
+        <!-- ----- Tab « Évaluations » -->
+        <div id="evaluations"
+             class="tab-content"
+             [class.active]="activeTab==='evaluations'">
+          <div class="card full-width">
+            <h3 class="card-title">Historique des évaluations</h3>
+            <div *ngFor="let eval of risk.riskEvaluations" class="incident">
+              <div class="incident-date">{{ eval.createdAt | date:'short' }}</div>
+              <div class="incident-title">Score net : {{ eval.riskNet }}</div>
+              <div class="evaluateur">Evaluateur : {{ eval.evaluator }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ----- Tab « Impacts » -->
+        <div id="impacts"
+             class="tab-content"
+             [class.active]="activeTab==='impacts'">
+          <div class="card full-width">
+            <h3 class="card-title">Types d'impact</h3>
+            <p *ngFor="let impact of risk.impactTypes">{{ impact }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- --------------- ACTIONS ----------------- -->
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" (click)="onEvaluate()">
+          Évaluer ce risque
+        </button>
+        <button mat-stroked-button color="accent">
+          Générer Rapport
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #spinner>
+  <div class="spinner-container">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-template>

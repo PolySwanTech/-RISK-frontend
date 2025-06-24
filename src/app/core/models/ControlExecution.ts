@@ -1,10 +1,5 @@
 import { State } from "./Incident";
-
-export enum Priority {
-    MINIMAL = 'MINIMAL',
-    MEDIUM = 'MEDIUM',
-    MAXIMUM = 'MAXIMUM',
-}
+import { Priority } from "./Priority";
 
 export enum Status {
     ACHIEVED = 'ACHIEVED',

@@ -89,7 +89,7 @@
             <mat-select [value]="selectedRisk" (selectionChange)="onSelectRisk($event.value)">
               @for (option of filteredRisks; track option) {
               <mat-option [value]="option">
-                {{ option.id + ' - ' + option.name }}
+                {{ option.reference + ' - ' + option.libelle }}
               </mat-option>
               }
             </mat-select>
@@ -97,9 +97,10 @@
         </div>
         }
         </div>
-        <app-risk-details style="border-top: 1px solid var(--mat-sys-outline-variant);
-    padding-top: 24px; height: 100%;" [riskData]="selectedRisk" (onModify)="handleModifyRisk($event)">
-        </app-risk-details>
+        <app-risk-matrix style="border-top: 1px solid var(--mat-sys-outline-variant);
+    padding-top: 24px; height: 100%;" [riskData]="selectedRisk" [processMap]="processMap"
+ (onModify)="handleModifyRisk($event)">
+        </app-risk-matrix>
 
       </mat-card-content>
     </mat-card>

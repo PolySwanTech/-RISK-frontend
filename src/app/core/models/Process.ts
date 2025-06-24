@@ -1,11 +1,11 @@
 import { EntiteResponsable } from "./EntiteResponsable"
-import { Risk } from "./Risk"
+import { RiskTemplate } from "./RiskTemplate"
 
 export class Process {
     id: string = ''
     name: string
     bu: EntiteResponsable
-    risks : Risk[] = []
+    risks : RiskTemplate[] = []
 
     constructor(
         name: string,

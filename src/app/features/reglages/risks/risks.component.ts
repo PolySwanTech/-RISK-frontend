@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { RiskService } from '../../../core/services/risk/risk.service';
-import { Risk } from '../../../core/models/Risk';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSort } from '@angular/material/sort';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { ProcessService } from '../../../core/services/process/process.service';
 
 @Component({
   selector: 'app-risks',
@@ -20,27 +21,55 @@ export class RisksComponent implements OnInit {
 
   private router = inject(Router);
   private riskService = inject(RiskService);
+  private processService = inject(ProcessService);
+  private processNameMap: Record<string, string> = {};
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   columns = [
     {
+      columnDef: 'refence',
+      header: 'Référence',
+      cell: (element: RiskTemplate) => `${element.reference}`,
+    },
+    {
       columnDef: 'name',
-      header: 'Nom',
-      cell: (element: Risk) => `${element.name}`,
+      header: 'Libellé',
+      cell: (element: RiskTemplate) => `${element.libelle}`,
     },
     {
       columnDef: 'description',
       header: 'Description',
-      cell: (element: Risk) => `${element.description}`,
+      cell: (element: RiskTemplate) => `${element.description}`,
+    },
+    {
+      columnDef: 'balois1',
+      header: 'balois1',
+      cell: (element: RiskTemplate) => `${element.categoryL2?.categoryL1?.name || 'Inconnu'}`,
+    },
+    {
+      columnDef: 'balois2',
+      header: 'balois2',
+      cell: (element: RiskTemplate) => `${element.categoryL2?.name || 'Inconnu'}`,
+    },
+    {
+      columnDef: 'process',
+      header   : 'Processus',
+      cell     : (row: RiskTemplate) =>
+        this.processNameMap[row.processId] ?? 'Inconnu'
+    },
+    {
+      columnDef: 'impactTypes',
+      header: 'Types d\'impact',
+      cell: (element: RiskTemplate) => `${element.impactTypes.map(type => type).join(', ') || 'Inconnu'}`,
     },
     {
       columnDef: 'level',
       header: 'Niveau',
-      cell: (element: Risk) => `
-  <span class="badge ${element.level.toLowerCase()}">
-    ${element.level.toString() || 'Inconnu'}
+      cell: (element: RiskTemplate) => `
+  <span class="badge ${element.riskBrut}">
+    ${element.riskBrut || 'Inconnu'}
   </span>
 `
     }
@@ -48,7 +77,7 @@ export class RisksComponent implements OnInit {
 
   displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
 
-  dataSource = new MatTableDataSource<Risk>([]);
+  dataSource = new MatTableDataSource<RiskTemplate>([]);
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -56,15 +85,20 @@ export class RisksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.riskService.getAllByProcess().subscribe(
-      rep => {
-        this.dataSource.data = rep
-      }
-    );
+    this.processService.getAll().subscribe(procList => {
+      this.processNameMap = procList.reduce<Record<string,string>>(
+        (acc, p) => ({ ...acc, [p.id]: p.name }),
+        {}
+      );
+
+      this.riskService.getAll().subscribe(risks => {
+        this.dataSource.data = risks;
+      });
+    });
   }
 
-  navToRisk(id: number) {
-    this.router.navigate(['reglages', 'risks', id])
+  navToRisk(risk: RiskTemplate) {
+    this.router.navigate(['reglages', 'risks', risk.id.id]);
   }
 
   navToCreate() {

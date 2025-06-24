@@ -19,6 +19,10 @@ export class UtilisateurService {
     return this.http.get<Utilisateur[]>(this.baseUrl);
   }    
 
+  getUser(id: string): Observable<Utilisateur[]> {
+    return this.http.get<Utilisateur[]>(this.baseUrl + '/' + id);
+  }    
+
   getUserProfiles(): Observable<UtilisateurProfil[]> {
     return this.http.get<UtilisateurProfil[]>(this.baseUrl);
   }  

@@ -1,0 +1,71 @@
+<h2>Nouvelle évaluation de risque</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <!-- ───────── ligne 1 : choix BU / Process / Risk ────────── -->
+  <div class="row-add">
+
+    <!-- Entité (BU) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Entité responsable</mat-label>
+      <mat-select formControlName="entiteId">
+        <mat-option *ngFor="let bu of entites" [value]="bu.id">
+          {{ bu.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Process (dépend de la BU) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Process</mat-label>
+      <mat-select formControlName="processId">
+        <mat-option *ngFor="let p of processes" [value]="p.id">
+          {{ p.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Risque (dépend du process) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Risque</mat-label>
+      <mat-select formControlName="riskId">
+        <mat-option *ngFor="let r of risks" [value]="r.id.id">
+          {{ r.libelle }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- ───────── ligne 2 : probabilité + niveau net ────────── -->
+  <div class="row-add">
+
+    <!-- Probabilité (1-10) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Probabilité (1-10)</mat-label>
+      <input matInput type="number" formControlName="probability"
+             min="1" max="10">
+    </mat-form-field>
+
+    <!-- Niveau de risque net -->
+    <mat-form-field appearance="outline">
+      <mat-label>Niveau net</mat-label>
+      <mat-select formControlName="riskNet">
+        <mat-option *ngFor="let lvl of riskLevels" [value]="lvl">
+          {{ riskLabels[lvl] }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Commentaire libre -->
+  <div class="row-add">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Commentaire</mat-label>
+      <textarea matInput formControlName="comment" rows="3"></textarea>
+    </mat-form-field>
+  </div>
+
+  <button mat-raised-button color="primary" type="submit">
+    Enregistrer
+  </button>
+</form>

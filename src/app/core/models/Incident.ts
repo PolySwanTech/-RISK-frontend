@@ -1,7 +1,7 @@
 import { EntiteResponsable } from "./EntiteResponsable";
 import { Impact } from "./Impact";
 import { Process } from "./Process";
-import { Risk } from "./Risk";
+import { RiskTemplate } from "./RiskTemplate";
 import { Cause } from "./Cause";
 
 export enum State {
@@ -24,7 +24,7 @@ export class Incident {
 
     impacts: Impact[];
 
-    risk: Risk;
+    risk: RiskTemplate;
     process: Process;
 
     state: State;
@@ -41,7 +41,7 @@ export class Incident {
         survenueAt: Date,
         detectedAt: Date,
         closedAt: Date | null,
-        risk: Risk,
+        risk: RiskTemplate,
         process: Process,
         impacts: Impact[],
         comments: string,
