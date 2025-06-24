@@ -12,10 +12,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { Status } from '../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
   imports: [
+    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -31,18 +34,35 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private actionPlanService = inject(ActionPlanService);
   private dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
   private confirmService = inject(ConfirmService);
+  private equipeService = inject(EquipeService);
   priorities = Object.values(Priority);
+
+  listTeams: Equipe[] = [];
 
   actionPlan: ActionPlan = new ActionPlan(
     '', new Date(), '', '', Status.NOT_STARTED, Priority.MAXIMUM,
     '', '', '', '', new Date()
   );
 
-  actions : Action[] = []
+  actions: Action[] = []
 
   ngOnInit(): void {
-
+    this.fetchTeams();
   }
+
+
+  fetchTeams(): void {
+    this.equipeService.getAllEquipes().subscribe({
+      next: teams => {
+        console.log(teams)
+        this.listTeams = teams;
+      },
+      error: err => {
+        console.error("Erreur lors du chargement des équipes", err);
+      }
+    });
+  }
+
 
   formatPriority(p: Priority): string {
     return priorityLabels[p] || p;
@@ -66,6 +86,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Soumettre le plan d'action
   submitActionPlan() {
+    console.log(this.actionPlan)
     this.actionPlan.riskTemplateId = '3d4c05a3-f2f8-44e6-bc7b-0efea5a66505'
     this.actionPlanService.createActionPlan(this.actionPlan)
       .subscribe(id => {
@@ -77,5 +98,4 @@ export class CreateActionPlanDialogComponent implements OnInit {
           "Création avec succès", "Le plan d'action a été créé avec succès.")
       });
   }
-
 }

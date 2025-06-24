@@ -15,9 +15,9 @@
 
     <div>
       <label for="priority">Priorité</label>
-      <select id="priority" [(ngModel)]="actionPlan.priority" name="priority"> 
+      <select id="priority" [(ngModel)]="actionPlan.priority" name="priority">
         @for(priority of priorities; track priority) {
-          <option [value]="priority">{{ formatPriority(priority) }}</option>
+        <option [value]="priority">{{ formatPriority(priority) }}</option>
         }
       </select>
     </div>
@@ -27,20 +27,27 @@
       <input id="echeance" type="date" [(ngModel)]="actionPlan.echeance" name="echeance" required>
     </div>
 
+
+    <mat-form-field>
+      <mat-label>Choisissez une équipe</mat-label>
+      <mat-select [(ngModel)]="actionPlan.userInCharge" [ngModelOptions]="{standalone: true}">
+        <mat-option *ngFor="let team of listTeams" [value]="team.id">
+          {{ team.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+
     <!-- Liste des actions -->
     <div class="actions-container">
       <label for="actions">Actions à effectuer</label>
       <div class="actions-list">
         @for(action of actions; track action; let index = $index) {
-          <div class="add-action">
-            <input 
-              [(ngModel)]="action.name"
-              [ngModelOptions]="{standalone: true}"
-              placeholder="Entrez une action"
-              class="action-input"
-            />
-            <button type="button" (click)="removeAction(index)" class="remove-btn">X</button>
-          </div>
+        <div class="add-action">
+          <input [(ngModel)]="action.name" [ngModelOptions]="{standalone: true}" placeholder="Entrez une action"
+            class="action-input" />
+          <button type="button" (click)="removeAction(index)" class="remove-btn">X</button>
+        </div>
         }
 
         <!-- Champ d'ajout d'action -->
