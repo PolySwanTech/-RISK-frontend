@@ -14,6 +14,16 @@ export enum Status {
     CANCELLED = 'CANCELLED',
 }
 
+type StatusLabelsType = Record<Status, string>;
+
+export const statusLabels: StatusLabelsType = {
+    [Status.ACHIEVED]: 'Clôturé',
+    [Status.IN_PROGRESS]: 'En cours',
+    [Status.NOT_ACHIEVED]: 'Non Clôturé',
+    [Status.NOT_STARTED]: 'Non Démarré',
+    [Status.CANCELLED]: 'Annulé',
+}
+
 export enum Evaluation {
     VERY_LOW = 'VERY_LOW',
     LOW = 'LOW',

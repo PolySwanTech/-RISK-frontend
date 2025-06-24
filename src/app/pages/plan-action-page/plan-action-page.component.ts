@@ -18,9 +18,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
-import { Priority } from "../../core/models/Priority";
+import { Priority, priorityLabels } from "../../core/models/Priority";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
-import { Status } from '../../core/models/ControlExecution';
+import { Status, statusLabels } from '../../core/models/ControlExecution';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Component({
   selector: 'app-plan-action-page',
@@ -40,32 +41,22 @@ export class PlanActionPageComponent {
 
   columns = [
     {
-      columnDef: 'id',
+      columnDef: 'reference',
       header: 'Ref',
       cell: (element: ActionPlan) => `${element.reference}`,
     },
     {
-      columnDef: 'creator',
-      header: 'Incident lié',
-      cell: (element: ActionPlan) => `${element.creator}`,
-    },
-    {
-      columnDef: 'titre',
+      columnDef: 'libelle',
       header: 'Titre',
       cell: (element: ActionPlan) => `${element.libelle}`,
     },
     {
-      columnDef: 'description',
-      header: 'Description',
-      cell: (element: ActionPlan) => `${element.description}`,
-    },
-    {
-      columnDef: 'responsable',
+      columnDef: 'userInCharge',
       header: 'Responsable',
       cell: (element: ActionPlan) => `${element.userInCharge}`,
     },
     {
-      columnDef: 'dateEcheance',
+      columnDef: 'echeance',
       header: 'Date d\'échéance',
       cell: (element: ActionPlan) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
     },
@@ -84,13 +75,14 @@ export class PlanActionPageComponent {
 `    }
   ];
 
-  displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
+  displayedColumns = [...this.columns.map(c => c.columnDef)];
 
   dataSource = new MatTableDataSource<any>([]);
 
-  selectedIncident: ActionPlan | null = null;
+  actionPlans: ActionPlan[] = [];
 
-  actionPlans: any[] = [];
+  priorities = Object.values(Priority);
+  statuses = Object.values(Status);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -105,6 +97,20 @@ export class PlanActionPageComponent {
     this.dataSource.sort = this.sort;
 
     this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'priority':
+          return item.priority;
+        case 'statut':
+          return this.getReadableStatut(item.status);
+        case 'dateEcheance':
+          return new Date(item.echeance);
+        case 'id':
+          return item.reference; // ou item.id
+        default:
+          return (item as any)[property];
+      }
+    }
   }
 
   getPriorityBarHtml(priority: Priority): string {
@@ -138,6 +144,10 @@ export class PlanActionPageComponent {
         <span class="priority-label ${config.class}">${config.label}</span>
       </div>
     `;
+  }
+
+  formatPriority(p: Priority): string {
+    return priorityLabels[p] || p;
   }
 
   getPriorityBadge(priority: string) {
@@ -194,22 +204,17 @@ export class PlanActionPageComponent {
     this.router.navigate(['action-plan', actionPlan.actionPlanId.id]);
   }
 
-  formatDate(date: any): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Les mois commencent à 0
-    const year = date.getFullYear();
-    return `${year}-${month}-${day}`;
-  }
-
   applyAllFilters(): void {
-    let filteredData = [...this.actionPlans];
+
+    let filteredData = this.actionPlans.slice(); // Copie de la liste d'origine
 
     // 1. Filtre par date
     if (this.dateFilter.value) {
-      const formattedDate = this.formatDate(this.dateFilter.value);
-      filteredData = filteredData.filter(incident =>
-        incident.echeance && new Date(incident.echeance).toISOString().split('T')[0] === formattedDate
-      );
+      filteredData = filteredData.filter(incident => {
+        console.log('Incident Echeance:', incident.echeance);
+        const formattedDate = new Date(this.dateFilter.value!).toISOString().replace('Z', '+00:00');
+        return incident.echeance && new Date(incident.echeance) < new Date(formattedDate);
+      });
     }
 
     // 2. Filtre par priorité
@@ -229,16 +234,15 @@ export class PlanActionPageComponent {
     // 4. Recherche textuelle
     if (this.searchQuery && this.searchQuery.trim() != '') {
       const query = this.searchQuery.toLowerCase();
+      filteredData = filteredData.filter(actionPlan => {
+        const idMatches = actionPlan.reference?.toString().toLowerCase().includes(query);
+        const creatorMatches = actionPlan.creator?.toLowerCase().includes(query);
+        const nameMatches = actionPlan.libelle?.toLowerCase().includes(query);
+        const descriptionMatches = actionPlan.description?.toLowerCase().includes(query);
+        const responsableMatches = actionPlan.userInCharge?.toLowerCase().includes(query);
+        const priorityMatches = actionPlan.priority?.toLowerCase().includes(query);
 
-      filteredData = filteredData.filter(file => {
-        const idMatches = file.id?.toString().toLowerCase().includes(query);
-        const creatorMatches = file.creator?.toLowerCase().includes(query);
-        const nameMatches = file.name?.toLowerCase().includes(query);
-        const descriptionMatches = file.description?.toLowerCase().includes(query);
-        const responsableMatches = file.responsable?.toLowerCase().includes(query);
-        const priorityMatches = file.priority?.toLowerCase().includes(query);
-
-        const date = file.uploadedAt instanceof Date ? file.uploadedAt : new Date(file.uploadedAt);
+        const date = actionPlan.echeance instanceof Date ? actionPlan.echeance : new Date(actionPlan.echeance);
         const formattedDate = date.toLocaleDateString('fr-FR');
         const dateMatches = formattedDate.includes(query);
 
@@ -269,30 +273,12 @@ export class PlanActionPageComponent {
   loadActionPlans() {
     this.actionPlanService.getActionsPlan().subscribe((data: ActionPlan[]) => {
       this.dataSource.data = data;
+      this.actionPlans = data;
     });
-    // this.actionPlans = this.actionPlanService.getActionsPlan();
-    // this.dataSource.data = this.actionPlans;
-  }
-
-  getUniquePriorities(): string[] {
-    return [Priority.MINIMAL, Priority.MEDIUM, Priority.MAXIMUM];
   }
 
   getReadableStatut(status: Status): string {
-    switch (status) {
-      case Status.NOT_STARTED:
-        return 'Non commencé';
-      case Status.CANCELLED:
-        return 'Annulé';
-      case Status.IN_PROGRESS:
-        return 'En cours';
-      case Status.ACHIEVED:
-        return 'Clôturé';
-      case Status.NOT_ACHIEVED:
-        return 'Non réalisé';
-      default:
-        return 'Inconnu';
-    }
+    return statusLabels[status] || status;
   }
 
 
