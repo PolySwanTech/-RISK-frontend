@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { Incident, State } from '../../models/Incident';
+import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
 import { Impact } from '../../models/Impact';
 import { RiskTemplate } from '../../models/RiskTemplate';
