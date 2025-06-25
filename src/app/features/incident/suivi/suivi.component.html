@@ -5,7 +5,7 @@
 </div>
 
 <div class="timeline-container">
-    <h2>Historique de l'incident : {{incident.titre}}</h2>
+    <h2>Suivi de l’incident - {{incident.titre}}</h2>
 
     <div *ngIf="history.length === 0" class="empty">
         <mat-icon>history</mat-icon> Aucun historique disponible.
@@ -18,6 +18,7 @@
                     {{
                     entry.action === 'CREATION' ? 'add_circle' :
                     entry.action === 'MODIFICATION' ? 'edit' :
+                    entry.action === 'IMPACT_ADDED' ? 'track_changes' :
                     'delete'
                     }}
                 </mat-icon>
@@ -27,7 +28,7 @@
                 <div class="header">
                     <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
                     <span class="meta">
-                        Par {{ entry.user.username }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
+                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
                     </span>
                 </div>
 
@@ -44,7 +45,21 @@
                     <mat-icon>compare</mat-icon> Détails des changements
                 </button> -->
             </div>
+
+        </div>
+        <div class="timeline-item" *ngFor="let msg of messages">
+            <div class="timeline-icon message">
+                <mat-icon>chat</mat-icon>
+            </div>
+            <div class="timeline-content mat-elevation-z2">
+                <div class="header">
+                    <strong>💬 Message ajouté</strong>
+                    <span class="meta">Par {{ msg.writter }} le {{ msg.date | date:'dd/MM/yyyy à HH:mm' }}</span>
+                </div>
+                <p class="comment">{{ msg.content }}</p>
+            </div>
         </div>
     </div>
+
 </div>
 }

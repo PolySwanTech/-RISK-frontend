@@ -10,6 +10,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import { SuiviIncident } from '../../../core/models/SuiviIncident';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 
 
 @Component({
@@ -28,9 +31,13 @@ export class SuiviComponent implements OnInit {
   private incidentService = inject(IncidentService);
   private suiviIncidentService = inject(SuiviIncidentService);
   private dialog = inject(MatDialog);
+  private entitiesService = inject(EntitiesService);
+
+  businessUnits: EntiteResponsable[] = [];
 
   history: any[] = [];
   isLoading: boolean = true;
+  messages: SuiviIncident[] = [];
 
   incident: Incident | undefined
 
@@ -44,22 +51,28 @@ export class SuiviComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
+    this.entitiesService.loadEntities().subscribe(units => {
+      this.businessUnits = units;
+      console.log("🏢 Business units chargées :", this.businessUnits);
+    });
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
       console.log("✅ Incident chargé :", this.incident);
     }
     );
 
-    // this.suiviIncidentService.getSuiviIncidentById(id).subscribe((suiviIncident) => {
-    //   console.log(suiviIncident);
-    // }
-    // );
+    this.suiviIncidentService.getSuiviIncidentById(id).subscribe((suiviIncident) => {
+      this.messages = suiviIncident;
+      console.log("💬 Messages reçus :", this.messages);
+    });
+
+
     this.loadHistory(id);
   }
 
   loadHistory(id: string) {
     this.isLoading = true;
-    this.incidentService.getIncidentHistory(id).subscribe({
+    this.suiviIncidentService.getIncidentHistory(id).subscribe({
       next: (data) => {
         this.history = data;
         this.isLoading = false;
@@ -94,11 +107,15 @@ export class SuiviComponent implements OnInit {
 
     if (matching.length > 0) {
       const impact = matching[0];
-      return `Impact ${impact.entityName} - ${impact.montant}€ - ${impact.type}`;
+      return `Impact ${this.getEntityName(impact.entityId)} - ${impact.montant}€ - ${impact.type}`;
     }
 
     return null;
   }
+  getEntityName(id: string): string {
+    return this.businessUnits.find(e => e.id === id)?.name || 'Inconnu';
+  }
+
 
 
 }

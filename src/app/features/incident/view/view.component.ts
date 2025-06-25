@@ -23,6 +23,8 @@ import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
+import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {
@@ -54,6 +56,8 @@ export class ViewComponent {
   private suiviIncidentService = inject(SuiviIncidentService);
   private http = inject(HttpClient);
   private riskCategoryService = inject(RiskCategoryService);
+  private entitiesService = inject(EntitiesService);
+
 
 
   incident: Incident | undefined
@@ -70,16 +74,30 @@ export class ViewComponent {
   attachedFiles: AttachedFile[] = [];
   isDragOver = false;
 
+  businessUnits: EntiteResponsable[] = [];
+
   ngOnInit(): void {
+    this.entitiesService.loadEntities().subscribe(entities => {
+      this.businessUnits = entities;
+    });
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident);
     this.loadAttachedFiles(this.idIncident);
+    this.suiviIncidentService.getSuiviIncidentById(this.idIncident).subscribe(
+      (res) => {
+        this.suivi = res;
+        console.log("📬 Messages de suivi :", this.suivi);
+      },
+      (err) => {
+        console.error("Erreur récupération des messages de suivi", err);
+      }
+    );
   }
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
-
+      console.log("🧾 Incident complet :", incident);
       console.log("categoryId", incident.categoryId); // ✅ ajoute ça
 
       if (incident.categoryId) {
@@ -160,16 +178,15 @@ export class ViewComponent {
       Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
     );
     const payload = JSON.parse(jsonPayload);
-    this.userRole = payload.role;
-    this.userTeam = payload.team;
+    this.userRole = payload.roles?.[0]?.role_name;
+    // this.userTeam = payload.roles?.[0]?.team_id;
     this.username = payload.username;
+
+    console.log("👤 Role:", this.userRole, "| Team:", this.userTeam);
   }
 
   checkCloseAuthorization(): void {
-    const normalizedUserTeam = this.normalize(this.userTeam);
-    const normalizedIncidentTeam = this.normalize(this.incident?.equipeName);
-
-    this.canClose = this.userRole === 'VALIDATEUR' && normalizedUserTeam === normalizedIncidentTeam;
+    this.canClose = this.userRole === 'VALIDATEUR';
   }
 
   normalize(str?: string): string {
@@ -406,6 +423,15 @@ export class ViewComponent {
   getFileIconClass(filename: string): string {
     const ext = filename.split('.').pop()?.toLowerCase();
     return `file-icon-${ext}`;
+  }
+
+  closeIncident(): void {
+    if (!this.incident?.id) return;
+
+    this.incidentService.close(this.incident.id).subscribe(() => {
+      this.confirmService.openConfirmDialog("Clôturé", "L'incident a été clôturé.", false);
+      this.ngOnInit();
+    });
   }
 
 }

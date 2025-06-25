@@ -8,82 +8,83 @@
 // import { MatCardModule } from '@angular/material/card';
 // import { SnapshotDialogComponent } from '../snapshot-dialog/snapshot-dialog.component';
 // import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
-// import { SuiviIncident } from '../../../core/models/SuiviIncident';
 // import { Impact } from '../../../core/models/Impact';
+// import { IncidentHistory } from '../../../core/models/IncidentHistory';
 
 // @Component({
-//   selector: 'app-history',
-//   standalone: true,
-//   imports: [
-//     CommonModule,
-//     MatCardModule,
-//     MatButtonModule,
-//     MatIconModule
-//   ],
-//   templateUrl: './history.component.html',
-//   styleUrls: ['./history.component.scss']
+//     selector: 'app-history',
+//     standalone: true,
+//     imports: [
+//         CommonModule,
+//         MatCardModule,
+//         MatButtonModule,
+//         MatIconModule
+//     ],
+//     templateUrl: './history.component.html',
+//     styleUrls: ['./history.component.scss']
 // })
 // export class HistoryComponent implements OnInit {
-//   history: SuiviIncident[] = [];
-//   incidentId: string = '';
-//   isLoading: boolean = true;
+//     history: IncidentHistory[] = [];
+//     incidentId: string = '';
+//     isLoading: boolean = true;
 
-//   private route = inject(ActivatedRoute);
-//   private suiviIncidentService = inject(SuiviIncidentService);
-//   private dialog = inject(MatDialog)
-//   private incidentService = inject(IncidentService);
-//   impacts: Impact[] = [];
+//     private route = inject(ActivatedRoute);
+//     private suiviIncidentService = inject(SuiviIncidentService);
+//     private dialog = inject(MatDialog)
+//     private incidentService = inject(IncidentService);
+//     impacts: Impact[] = [];
 
 
-//   ngOnInit() {
-//     this.incidentId = this.route.snapshot.params['id'];
-//     this.loadHistory();
-//   }
-
-//   loadHistory() {
-//     this.isLoading = true;
-//     this.suiviIncidentService.getSuiviIncidentById(this.incidentId).subscribe({
-//       next: (suivi) => {
-//         this.history = suivi;
-//         this.isLoading = false;
-//       }
-//     });
-//     this.incidentService.getIncidentById(this.incidentId).subscribe({
-//       next: (incident) => {
-//         this.impacts = incident.impacts;
-//         console.log("Impacts reçus :", this.impacts);
-//       },
-//       error: (error) => {
-//         console.error("Erreur lors de la récupération des impacts :", error);
-//       }
-//     });    
-//   }
-
-//   openSnapshotDialog(entry: any) {
-//     this.dialog.open(SnapshotDialogComponent, {
-//       width: '800px',
-//       data: entry,
-//       panelClass: 'snapshot-dialog-panel'
-//     });
-//   }
-
-//   getImpactSummary(message: string): string | null {
-//     const normalizedMessage = message.trim().toLowerCase();
-  
-//     const matching = this.impacts
-//       .filter(i => i.message?.trim().toLowerCase() === normalizedMessage)
-//       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  
-//     console.log('Recherche du résumé d’impact pour message :', normalizedMessage);
-//     console.log('Matching impacts :', matching);
-  
-//     if (matching.length > 0) {
-//       const impact = matching[0];
-//       return `Impact ${impact.entityName} - ${impact.montant}€ - ${impact.type}`;
+//     ngOnInit() {
+//         this.incidentId = this.route.snapshot.params['id'];
+//         this.loadHistory();
 //     }
-  
-//     return null;
-//   }
-  
-  
+
+//     loadHistory() {
+//         this.isLoading = true;
+//         this.suiviIncidentService.getIncidentHistory(this.incidentId).subscribe({
+//             next: (history) => {
+//                 this.history = history;
+//                 console.log("Historique reçu :", history);
+//                 this.isLoading = false;
+//             }
+//         });
+//         this.incidentService.getIncidentById(this.incidentId).subscribe({
+//             next: (incident) => {
+//                 this.impacts = incident.impactIncidents;
+//                 console.log("Impacts reçus :", this.impacts);
+//             },
+//             error: (error) => {
+//                 console.error("Erreur lors de la récupération des impacts :", error);
+//             }
+//         });
+//     }
+
+//     openSnapshotDialog(entry: any) {
+//         this.dialog.open(SnapshotDialogComponent, {
+//             width: '800px',
+//             data: entry,
+//             panelClass: 'snapshot-dialog-panel'
+//         });
+//     }
+
+//     getImpactSummary(message: string): string | null {
+//         const normalizedMessage = message.trim().toLowerCase();
+
+//         const matching = this.impacts
+//             .filter(i => i.message?.trim().toLowerCase() === normalizedMessage)
+//             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+//         console.log('Recherche du résumé d’impact pour message :', normalizedMessage);
+//         console.log('Matching impacts :', matching);
+
+//         if (matching.length > 0) {
+//             const impact = matching[0];
+//             return `Impact ${impact.entityName} - ${impact.montant}€ - ${impact.type}`;
+//         }
+
+//         return null;
+//     }
+
+
 // }

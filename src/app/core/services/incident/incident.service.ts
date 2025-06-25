@@ -42,6 +42,7 @@ export class IncidentService {
   }
 
   saveIncident(incident: any): Observable<any> {
+    console.log("📤 Données envoyées au backend :", incident);
     return this.http.post(this.baseUrl, incident);
   }
   
@@ -53,12 +54,8 @@ export class IncidentService {
     return this.http.put(this.baseUrl + `/${id}/close`, null)
   }
 
-  getIncidentHistory(incidentId: string) {
-    return this.http.get<any[]>(`${this.baseUrl}/${incidentId}/history`);
-  }
-
   downloadExport(incidentId: string): void {
-    const url = `${environment.apiUrl}/export/${incidentId}`;
+    const url = `${environment.apiUrl}/incidents/${incidentId}/export`;
     this.http.get(url, {
       responseType: 'blob'
     }).subscribe(

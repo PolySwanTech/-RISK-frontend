@@ -97,8 +97,8 @@
             </mat-form-field>
 
             <mat-form-field *ngIf="listCatLvl3.length > 0">
-              <mat-label>Catégorie Niveau 3 (événement)</mat-label>
-              <mat-select formControlName="categoryId">
+              <mat-label>Catégorie Niveau 3</mat-label>
+              <mat-select (selectionChange)="onLevel3Change($event.value)">
                 <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3.id">{{ c3.name }}</mat-option>
               </mat-select>
             </mat-form-field>
@@ -131,19 +131,18 @@
 
             <mat-form-field *ngIf="listP2.length > 0">
               <mat-label>Processus (niveau 2)</mat-label>
-              <mat-select (selectionChange)="onP2Change($event.value)" [disabled]="listP2.length === 0">
-                <mat-option *ngFor="let p2 of listP2" [value]="p2.id">
-                  {{ p2.name }}
-                </mat-option>
+              <mat-select (selectionChange)="onP2Change($event.value)">
+                <mat-option *ngFor="let p2 of listP2" [value]="p2.id">{{ p2.name }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field *ngIf="listMicroProcess.length > 0">
-              <mat-label>Micro-process</mat-label>
-              <mat-select formControlName="microProcessId">
+              <mat-label>Micro-processus</mat-label>
+              <mat-select (selectionChange)="onP3Change($event.value)">
                 <mat-option *ngFor="let mp of listMicroProcess" [value]="mp.id">{{ mp.name }}</mat-option>
               </mat-select>
             </mat-form-field>
+
 
             <!-- <mat-radio-group formControlName="risk">
               @for(risk of listRisk; track risk){

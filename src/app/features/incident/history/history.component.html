@@ -15,17 +15,17 @@
             <div class="timeline-content mat-elevation-z2">
                 <div class="header">
                     <span class="meta">
-                        Par {{ "" }} le {{ entry.date | date:'dd/MM/yyyy HH:mm' }}
+                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy HH:mm' }}
                     </span>
                 </div>
 
-                <div *ngIf="entry.content.includes('Impact ajouté')">
+                <div *ngIf="entry.comment && entry.comment.includes('Impact ajouté')">
                     <p class="impact-summary">
-                        {{ getImpactSummary(entry.content) }}
+                        {{ getImpactSummary(entry.comment) }}
                     </p>
                 </div>
 
-                <p class="comment">{{ entry.content }}</p>
+                <p class="comment">{{ entry.comment }}</p>
 
                 <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
                         (click)="openSnapshotDialog(entry)">

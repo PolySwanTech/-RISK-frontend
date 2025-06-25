@@ -16,6 +16,12 @@
                             <button mat-raised-button class="btn-green" (click)="downloadExport()">
                                 <mat-icon>file_download</mat-icon> Exporter
                             </button>
+
+                            <button *ngIf="canClose && isNotClosed()" mat-raised-button class="btn-red"
+                                (click)="closeIncident()">
+                                <mat-icon>lock</mat-icon> Clôturer
+                            </button>
+
                         </span>
                     </mat-card-title>
                 </mat-card-header>
@@ -73,7 +79,7 @@
                                 <mat-icon>title</mat-icon>
                             </div>
                             <div class="info-content">
-                                <span class="info-label">Titre</span>
+                                <span class="info-label">Libellé</span>
                                 <span class="info-value">{{ incident.titre }}</span>
                             </div>
                         </div>
@@ -218,7 +224,8 @@
                             <mat-label>Message</mat-label>
                             <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
                         </mat-form-field>
-                        <button mat-raised-button class="btn-primary" (click)="sendMessage()">Envoyer</button>
+                        <button *ngIf="isNotClosed()" mat-raised-button class="btn-primary"
+                            (click)="sendMessage()">Envoyer</button>
                     </div>
                 </mat-card-content>
             </mat-card>
@@ -241,8 +248,8 @@
                 </mat-card-header>
                 <mat-card-content>
                     <div class="impacts-container">
-                        @for(impact of incident.impacts; track impact){
-                        <app-impact-card [impact]="impact"></app-impact-card>
+                        @for(impact of incident.impacts; track impact.id){
+                        <app-impact-card [impact]="impact" [businessUnits]="businessUnits"></app-impact-card>
                         }
                     </div>
                 </mat-card-content>

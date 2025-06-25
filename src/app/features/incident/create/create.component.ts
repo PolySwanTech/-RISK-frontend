@@ -86,7 +86,7 @@ export class CreateComponent implements OnInit {
     lossAmount: [null, Validators.required],
     causeId: [null, Validators.required],
     consequenceId: [null, Validators.required],
-    microProcessId: [null, Validators.required],
+    processId: this._formBuilder.control<string | null>(null, Validators.required),
     categoryId: ['', Validators.required],
   });
 
@@ -164,7 +164,8 @@ export class CreateComponent implements OnInit {
     });
     this.causeService.getAll().subscribe(data => {
       console.log("🧪 Causes récupérées :", data);
-     this.listCauses = data });
+      this.listCauses = data
+    });
   }
 
   fetchTeams(): void {
@@ -218,7 +219,7 @@ export class CreateComponent implements OnInit {
       lossAmount: this.incidentForm3.value.lossAmount,
       causeId: this.incidentForm3.value.causeId,
       consequenceId: this.incidentForm3.value.consequenceId,
-      microProcessId: this.incidentForm3.value.microProcessId,
+      processId: this.incidentForm3.value.processId,
     };
     return incident;
   }
@@ -290,18 +291,31 @@ export class CreateComponent implements OnInit {
   }
 
   onLevel1Change(l1Id: string) {
-    this.riskCategoryService.getByParent(l1Id).subscribe(data => this.listCatLvl2 = data);
-    this.listCatLvl3 = []; // reset
+    this.riskCategoryService.getByParent(l1Id).subscribe(data => {
+      this.listCatLvl2 = data;
+      this.listCatLvl3 = [];
+      this.incidentForm3.get('categoryId')!.setValue(l1Id);
+    });
   }
 
   onLevel2Change(l2Id: string) {
-    this.riskCategoryService.getByParent(l2Id).subscribe(data => this.listCatLvl3 = data);
+    this.riskCategoryService.getByParent(l2Id).subscribe(data => {
+      this.listCatLvl3 = data;
+      this.incidentForm3.get('categoryId')!.setValue(l2Id);
+    });
   }
+
+  onLevel3Change(l3Id: string) {
+    this.incidentForm3.get('categoryId')!.setValue(l3Id);
+  }
+
 
   onP1Change(p1Id: string) {
     this.processService.getAll().subscribe(data => {
       this.listP2 = data.filter(p => p.parentId === p1Id && p.niveau === 2);
-      console.log("🧪 Processus P2 chargés pour", p1Id, this.listP2);
+      this.listP3 = [];
+      this.listMicroProcess = [];
+      this.incidentForm3.get('processId')!.setValue(p1Id); // sélection niveau 1
     });
   }
 
@@ -309,7 +323,12 @@ export class CreateComponent implements OnInit {
     this.processService.getAll().subscribe(data => {
       this.listP3 = data.filter(p => p.parentId === p2Id && p.niveau === 3);
       this.listMicroProcess = this.listP3;
+      this.incidentForm3.get('processId')!.setValue(p2Id); // sélection niveau 2
     });
+  }
+
+  onP3Change(p3Id: string) {
+    this.incidentForm3.get('processId')!.setValue(p3Id); // sélection niveau 3
   }
 
 }
