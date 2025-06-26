@@ -4,9 +4,6 @@ import { map, Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
 import { Impact } from '../../models/Impact';
-import { RiskTemplate } from '../../models/RiskTemplate';
-import { Cause } from '../../models/Cause';
-import { Process } from '../../models/Process';
 import { saveAs } from 'file-saver';
 
 @Injectable({
@@ -43,23 +40,20 @@ export class IncidentService {
   }
 
   saveIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl, incident, { responseType: 'text' as 'json' });
+    console.log("📤 Données envoyées au backend :", incident);
+    return this.http.post(this.baseUrl, incident);
   }
   
   draftIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl + '/draft', incident, { responseType: 'text' as 'json' });
+    return this.http.post(this.baseUrl + '/draft', incident);
   }  
 
   close(id: string) {
     return this.http.put(this.baseUrl + `/${id}/close`, null)
   }
 
-  getIncidentHistory(incidentId: string) {
-    return this.http.get<any[]>(`${this.baseUrl}/${incidentId}/history`);
-  }
-
   downloadExport(incidentId: string): void {
-    const url = `${environment.apiUrl}/export/${incidentId}`;
+    const url = `${environment.apiUrl}/incidents/${incidentId}/export`;
     this.http.get(url, {
       responseType: 'blob'
     }).subscribe(

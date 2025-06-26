@@ -18,12 +18,21 @@ export class Incident {
 
     risk: RiskTemplate;
     process: Process;
-
+    causeName?: string;
+    riskType?: string;
+    riskLevel?: number;
     state: State;
     comments: string;
+    lossAmount?: number;
+    categoryLevel?: string;
+    categoryName?: string;
+    subCategoryName?: string;
+    categoryId?: string;
+    consequenceId?: string;
+    microProcessId?: string;
     equipeName?: string;
 
-    reference : string = ""
+    customId: string = ""
 
     constructor(
         id: string,
@@ -39,7 +48,7 @@ export class Incident {
         comments: string,
         state: State = State.DRAFT,
         equipeName?: string,
-        reference : string = "" 
+        customId: string = ""
     ) {
         this.id = id;
         this.titre = titre;
@@ -53,9 +62,9 @@ export class Incident {
         this.impacts = impacts;
         this.comments = comments;
         this.equipeName = equipeName;
-        this.reference = reference;
-        this.state = closedAt ? State.CLOSED : state;        
+        this.customId = customId;
+        this.state = closedAt ? State.CLOSED : state;
     }
 
-    
+
 }

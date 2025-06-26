@@ -23,6 +23,9 @@ import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { State } from '../../../core/enum/state.enum';
+import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
+import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {
@@ -53,6 +56,10 @@ export class ViewComponent {
   private router = inject(Router);
   private suiviIncidentService = inject(SuiviIncidentService);
   private http = inject(HttpClient);
+  private riskCategoryService = inject(RiskCategoryService);
+  private entitiesService = inject(EntitiesService);
+
+
 
   incident: Incident | undefined
   totalAmount = 0;
@@ -62,37 +69,52 @@ export class ViewComponent {
   canClose: boolean = false;
   message: string = "";
   idIncident: string = "";
-  suivi: SuiviIncident[] = [
-      new SuiviIncident(
-        1,
-        'Création de l’incident avec les détails initiaux.',
-        new Date('2025-06-04T10:30:00'),
-        'admin'
-      ),
-      new SuiviIncident(
-        2,
-        'Ajout d’un impact financier de 5000€ pour le système X.',
-        new Date('2025-06-04T11:00:00'),
-        'jdupont'
-      ),
-    ];
-  
+  suivi: SuiviIncident[] = []
+
   // Propriétés pour la gestion des fichiers
   attachedFiles: AttachedFile[] = [];
   isDragOver = false;
 
+  businessUnits: EntiteResponsable[] = [];
+
   ngOnInit(): void {
+    this.entitiesService.loadEntities().subscribe(entities => {
+      this.businessUnits = entities;
+    });
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident);
     this.loadAttachedFiles(this.idIncident);
+    this.suiviIncidentService.getSuiviIncidentById(this.idIncident).subscribe(
+      (res) => {
+        this.suivi = res;
+        console.log("📬 Messages de suivi :", this.suivi);
+      },
+      (err) => {
+        console.error("Erreur récupération des messages de suivi", err);
+      }
+    );
   }
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
+      console.log("🧾 Incident complet :", incident);
+      console.log("categoryId", incident.categoryId); // ✅ ajoute ça
+
+      if (incident.categoryId) {
+        this.riskCategoryService.getCategoryInfo(incident.categoryId as string).subscribe(info => {
+          console.log("📦 Info catégorie :", info);
+          if (this.incident) {
+            this.incident.riskType = info?.type ?? "-";
+            this.incident.riskLevel = info?.niveau ?? null;
+          }
+        });
+      }
+
       this.extractTokenInfo();
       this.checkCloseAuthorization();
     });
+
 
     this.incidentService.sum(id).subscribe(
       result => this.totalAmount = result
@@ -104,7 +126,7 @@ export class ViewComponent {
     // this.fileService.getFilesByIncidentId(incidentId).subscribe(files => {
     //   this.attachedFiles = files;
     // });
-    
+
     // Données de test - à supprimer quand le service sera implémenté
     this.attachedFiles = [
       {
@@ -157,16 +179,15 @@ export class ViewComponent {
       Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
     );
     const payload = JSON.parse(jsonPayload);
-    this.userRole = payload.role;
-    this.userTeam = payload.team;
+    this.userRole = payload.roles?.[0]?.role_name;
+    // this.userTeam = payload.roles?.[0]?.team_id;
     this.username = payload.username;
+
+    console.log("👤 Role:", this.userRole, "| Team:", this.userTeam);
   }
 
   checkCloseAuthorization(): void {
-    const normalizedUserTeam = this.normalize(this.userTeam);
-    const normalizedIncidentTeam = this.normalize(this.incident?.equipeName);
-
-    this.canClose = this.userRole === 'VALIDATEUR' && normalizedUserTeam === normalizedIncidentTeam;
+    this.canClose = this.userRole === 'VALIDATEUR';
   }
 
   normalize(str?: string): string {
@@ -182,7 +203,7 @@ export class ViewComponent {
 
   changeStatus(): void {
     if (this.incident) {
-      switch( this.incident.state) {
+      switch (this.incident.state) {
         case State.DRAFT:
           this.incident.state = State.VALIDATE;
           break;
@@ -274,7 +295,7 @@ export class ViewComponent {
     event.preventDefault();
     event.stopPropagation();
     this.isDragOver = false;
-    
+
     if (event.dataTransfer?.files) {
       this.handleFiles(Array.from(event.dataTransfer.files));
     }
@@ -286,8 +307,8 @@ export class ViewComponent {
         this.uploadFile(file);
       } else {
         this.confirmService.openConfirmDialog(
-          "Fichier non supporté", 
-          `Le fichier ${file.name} n'est pas dans un format supporté.`, 
+          "Fichier non supporté",
+          `Le fichier ${file.name} n'est pas dans un format supporté.`,
           false
         );
       }
@@ -307,7 +328,7 @@ export class ViewComponent {
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ];
-    
+
     return validTypes.includes(file.type);
   }
 
@@ -318,7 +339,7 @@ export class ViewComponent {
     // const formData = new FormData();
     // formData.append('file', file);
     // formData.append('incidentId', this.incident.id);
-    
+
     // this.fileService.uploadFile(formData).subscribe({
     //   next: (response) => {
     //     this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
@@ -337,7 +358,7 @@ export class ViewComponent {
       type: file.type,
       uploadedAt: new Date()
     };
-    
+
     this.attachedFiles.push(newFile);
     this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
   }
@@ -403,6 +424,15 @@ export class ViewComponent {
   getFileIconClass(filename: string): string {
     const ext = filename.split('.').pop()?.toLowerCase();
     return `file-icon-${ext}`;
+  }
+
+  closeIncident(): void {
+    if (!this.incident?.id) return;
+
+    this.incidentService.close(this.incident.id).subscribe(() => {
+      this.confirmService.openConfirmDialog("Clôturé", "L'incident a été clôturé.", false);
+      this.ngOnInit();
+    });
   }
 
 }

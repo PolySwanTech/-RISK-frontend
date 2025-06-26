@@ -19,22 +19,22 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
-import { AuthService } from '../../../core/services/auth/auth.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { IncidentChartComponent } from '../incident-chart/incident-chart.component';
 import { State } from '../../../core/enum/state.enum';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 @Component({
   selector: 'app-list',
   standalone: true,
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, 
-    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule, MatButtonModule],
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule,
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule, MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule, MatButtonModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   providers: [DatePipe]
 })
+
 export class ListComponent implements OnInit {
 
   private dialog = inject(MatDialog);
@@ -44,19 +44,19 @@ export class ListComponent implements OnInit {
   private confirmService = inject(ConfirmService)
 
   columns = [
-     {
-      columnDef: 'id',
-      header: 'Ref',
-      cell: (element: Incident) => `${element.id}`,
-    },
+    // {
+    //   columnDef: 'id',
+    //   header: 'Ref',
+    //   cell: (element: Incident) => `${element.id}`,
+    // },
     {
       columnDef: 'référence',
       header: 'Référence',
-      cell: (element: Incident) => `${element.reference}`,
+      cell: (element: Incident) => `${element.customId}`,
     },
     {
       columnDef: 'titre',
-      header: 'Titre',
+      header: 'Libellé',
       cell: (element: Incident) => `${element.titre}`,
     },
     {
@@ -80,18 +80,19 @@ export class ListComponent implements OnInit {
 `    }
   ];
 
-  displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
-
+  displayedColumns = ['select', ...this.columns.map(c => c.columnDef), 'actions'];
   dataSource = new MatTableDataSource<Incident>([]);
-
   selectedIncident: Incident | null = null;
-
   incidents: Incident[] = [];
+
+  selectedIncidents = new Set<string>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  dateFilter = new FormControl('');
+  dateTypeFilter = new FormControl('survenance');
+  startDateFilter = new FormControl('');
+  endDateFilter = new FormControl('');
   categoryFilter = new FormControl('');
   statusFilter = new FormControl('');
 
@@ -106,18 +107,22 @@ export class ListComponent implements OnInit {
   ngOnInit(): void {
     this.loadIncidents();
 
-    this.dateFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
+    this.dateTypeFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
+    this.startDateFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
+    this.endDateFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
     this.categoryFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
     this.statusFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
   }
 
-   clearFilters(): void {
-  this.dateFilter.setValue('');
-  this.categoryFilter.setValue('');
-  this.statusFilter.setValue('');
-}
+  clearFilters(): void {
+    this.dateTypeFilter.setValue('survenance');
+    this.startDateFilter.setValue('');
+    this.endDateFilter.setValue('');
+    this.categoryFilter.setValue('');
+    this.statusFilter.setValue('');
+  }
 
-  refreshData(){
+  refreshData() {
     this.ngOnInit();
   }
 
@@ -136,12 +141,32 @@ export class ListComponent implements OnInit {
   applyAdvancedFilters() {
     let filteredData = [...this.incidents];
 
-    if (this.dateFilter.value) {
-      const formattedDate = this.formatDate(this.dateFilter.value);
-      filteredData = filteredData.filter(incident =>
-        incident.survenueAt && new Date(incident.survenueAt).toISOString().split('T')[0] === formattedDate
-      );
+    if (this.startDateFilter.value || this.endDateFilter.value) {
+      filteredData = filteredData.filter(incident => {
+        const dateToCheck = this.dateTypeFilter.value === 'declaration'
+          ? incident.declaredAt
+          : incident.survenueAt;
+
+        if (!dateToCheck) return false;
+
+        const incidentDate = new Date(dateToCheck);
+        let isValid = true;
+
+        if (this.startDateFilter.value) {
+          const startDate = new Date(this.startDateFilter.value);
+          startDate.setHours(0, 0, 0, 0);
+          isValid = isValid && (incidentDate >= startDate);
+        }
+
+        if (this.endDateFilter.value) {
+          const endDate = new Date(this.endDateFilter.value);
+          endDate.setHours(23, 59, 59, 999);
+          isValid = isValid && (incidentDate <= endDate);
+        }
+        return isValid;
+      });
     }
+
     if (this.statusFilter.value) {
       filteredData = filteredData.filter(incident =>
         this.statusFilter.value === 'Clôturé' ? incident.closedAt !== null : incident.closedAt === null
@@ -167,10 +192,10 @@ export class ListComponent implements OnInit {
     });
   }
 
-  getUniqueCategories(): string[] {
-    return []
-    // return [...new Set(this.incidents.map(incident => incident.riskPrincipal?.taxonomie || 'Autre'))];
-  }
+  // getUniqueCategories(): string[] {
+  //   return []
+  //   // return [...new Set(this.incidents.map(incident => incident.riskPrincipal?.taxonomie || 'Autre'))];
+  // }
 
 
   add() {
@@ -186,6 +211,33 @@ export class ListComponent implements OnInit {
         // delete incidentId
       })
   }
+  toggleIncidentSelection(incidentId: string) {
+    if (this.selectedIncidents.has(incidentId)) {
+      this.selectedIncidents.delete(incidentId);
+    } else {
+      this.selectedIncidents.add(incidentId);
+    }
+  }
 
-   
+  isIncidentSelected(incidentId: string): boolean {
+    return this.selectedIncidents.has(incidentId);
+  }
+
+  toggleAllSelection(): void {
+    if (this.isAllSelected()) {
+      this.selectedIncidents.clear();
+    } else {
+      this.dataSource.data.forEach(incident => {
+        this.selectedIncidents.add(incident.id);
+      });
+    }
+  }
+
+  isAllSelected(): boolean {
+    return this.selectedIncidents.size === this.dataSource.data.length && this.dataSource.data.length > 0;
+  }
+
+  isIndeterminate(): boolean {
+    return this.selectedIncidents.size > 0 && this.selectedIncidents.size < this.dataSource.data.length;
+  }
 }

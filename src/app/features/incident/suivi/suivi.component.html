@@ -1,26 +1,35 @@
-    @if(incident){
-    <div style="margin: 15px;">
-        <app-go-back previousPageName="Détails de l'incident"
-            [currentPageName]="`Suivi de l'incident - ` + incident.titre"></app-go-back>
+@if(incident){
+<div style="margin: 15px;">
+    <app-go-back previousPageName="Détails de l'incident"
+        [currentPageName]="`Suivi de l'incident - ` + incident.titre"></app-go-back>
+</div>
+
+<div class="timeline-container">
+    <h2>Suivi de l’incident - {{incident.titre}}</h2>
+
+    <div *ngIf="history.length === 0" class="empty">
+        <mat-icon>history</mat-icon> Aucun historique disponible.
     </div>
 
-    <div class="timeline-container">
-        <h2>Historique de l'incident : {{incident.titre}}</h2>
+    <div class="timeline">
+        <div class="timeline-item" *ngFor="let entry of history">
+            <div class="timeline-icon" [ngClass]="entry.action.toLowerCase()">
+                <mat-icon>
+                    {{
+                    entry.action === 'CREATION' ? 'add_circle' :
+                    entry.action === 'MODIFICATION' ? 'edit' :
+                    entry.action === 'IMPACT_ADDED' ? 'track_changes' :
+                    'delete'
+                    }}
+                </mat-icon>
+            </div>
 
-        <div *ngIf="history.length === 0" class="empty">
-            <mat-icon>history</mat-icon> Aucun historique disponible.
-        </div>
-
-        <div class="timeline">
-            <div class="timeline-item" *ngFor="let entry of history">
-                <div class="timeline-icon" [ngClass]="entry.action.toLowerCase()">
-                    <mat-icon>
-                        {{
-                        entry.action === 'CREATION' || entry.action === 'IMPACT_ADDED' ? 'add_circle' :
-                        entry.action === 'MODIFICATION' ? 'edit' :
-                        'delete'
-                        }}
-                    </mat-icon>
+            <div class="timeline-content mat-elevation-z2">
+                <div class="header">
+                    <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
+                    <span class="meta">
+                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
+                    </span>
                 </div>
 
                 <div class="timeline-content mat-elevation-z2">
@@ -45,6 +54,25 @@
                     </button> -->
                 </div>
             </div>
+
+        </div>
+        <div class="timeline-item" *ngFor="let msg of messages">
+            <div class="timeline-icon message">
+                <mat-icon>chat</mat-icon>
+            </div>
+            <div class="timeline-content mat-elevation-z2">
+                <div class="header">
+                    <strong>💬 Message ajouté</strong>
+                    <span class="meta">Par {{ msg.writter }} le {{ msg.date | date:'dd/MM/yyyy à HH:mm' }}</span>
+                </div>
+                <p class="comment">{{ msg.content }}</p>
+            </div>
         </div>
     </div>
+<<<<<<< HEAD
     }
+=======
+
+</div>
+}
+>>>>>>> 79fe664ab18b6d1e468866f5189e700b1e961324

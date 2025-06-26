@@ -5,12 +5,16 @@ export class Process {
     id: string = ''
     name: string
     bu: EntiteResponsable
-    risks : RiskTemplate[] = []
+    niveau: number
+    parentId?: string;
+    risks: RiskTemplate[] = []
 
     constructor(
         name: string,
-        bu: EntiteResponsable) {
+        bu: EntiteResponsable, niveau: number, parentId?: string) {
         this.name = name
         this.bu = bu
+        this.niveau = niveau
+        this.parentId = parentId;
     }
 }

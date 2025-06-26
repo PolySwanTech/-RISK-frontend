@@ -8,12 +8,12 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
-import {RiskTemplate} from '../../../core/models/RiskTemplate';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
 import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
-import { CauseService } from '../../../core/services/cause/cause.service';
-import { Cause } from '../../../core/models/Cause';
+// import { CauseService } from '../../../core/services/cause/cause.service';
+// import { Cause } from '../../../core/models/Cause';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { Router } from '@angular/router';
@@ -22,6 +22,17 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
 import { NgIf, NgFor } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { BaloiseCategoryL1 } from '../../../core/models/BaloiseCategory';
+import { BaloisCategoriesService } from '../../../core/services/balois-categories/balois-categories.service';
+import { ConsequenceService } from '../../../core/services/consequence/consequence.service';
+// import { MicroProcessService } from '../../../core/services/micro_process/micro-process.service';
+import { Consequence } from '../../../core/models/Consequence';
+import { MicroProcess } from '../../../core/models/MicroProcess';
+import { RiskCategory } from '../../../core/models/RiskCategory';
+import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
+import { Cause } from '../../../core/models/Cause';
+import { CauseService } from '../../../core/services/cause/cause.service';
+
 
 @Component({
   selector: 'app-create',
@@ -64,30 +75,55 @@ export class CreateComponent implements OnInit {
   });
 
   incidentForm3 = this._formBuilder.group({
-    risk: [null, Validators.required],
-    subRisk: [null, Validators.required],
+    risk: [null],
+    subRisk: [null],
     userMail: [''],
     files: [''],
-    process: [null, Validators.required]
+    // process: [null, Validators.required],
+    // categoryLevel: ['LEVEL_1', Validators.required],
+    // categoryName: ['', Validators.required],
+    // subCategoryName: ['', Validators.required],
+    lossAmount: [null, Validators.required],
+    causeId: [null, Validators.required],
+    consequenceId: [null, Validators.required],
+    processId: this._formBuilder.control<string | null>(null, Validators.required),
+    categoryId: ['', Validators.required],
   });
 
   listRisk: RiskTemplate[] = [];
-  listCause: Cause[] = [];
   listProcess: Process[] = [];
 
   errorMessage = signal('');
   hasTeam = true;
   listTeams: string[] = [];
 
-  constructor(private incidentService: IncidentService, private riskService: RiskService,
-    private causeService: CauseService, private processService: ProcessService, private equipeService: EquipeService) {
+  // listBaloiseL1: BaloiseCategoryL1[] = [];
+  listConsequence: Consequence[] = [];
+  listMicroProcess: Process[] = [];
+
+  listCatLvl1: RiskCategory[] = [];
+  listCatLvl2: RiskCategory[] = [];
+  listCatLvl3: RiskCategory[] = [];
+
+  listP1: Process[] = [];
+  listP2: Process[] = [];
+  listP3: Process[] = [];
+
+  listCauses: Cause[] = [];
+
+  selectedCategoryLevel = 1;
+
+
+  constructor(private incidentService: IncidentService, private riskService: RiskService, private processService: ProcessService, private equipeService: EquipeService,
+    private baloiseService: BaloisCategoriesService, private consequenceService: ConsequenceService, private riskCategoryService: RiskCategoryService,
+    private causeService: CauseService) {
 
     this.riskService.getAllByProcess("test").subscribe((resp: any) => {
       this.listRisk = resp;
     });
-    this.causeService.getAll().subscribe((resp: any) => {
-      this.listCause = resp;
-    });
+    // this.causeService.getAll().subscribe((resp: any) => {
+    //   this.listCause = resp;
+    // });
     this.processService.getAll().subscribe((resp: any) => {
       this.listProcess = resp;
     });
@@ -102,6 +138,33 @@ export class CreateComponent implements OnInit {
       this.hasTeam = false;
       this.fetchTeams();
     }
+    this.consequenceService.getAll().subscribe({
+      next: data => {
+        console.log("✅ Données conséquences : ", data);
+        this.listConsequence = data;
+      },
+      error: err => {
+        console.error("❌ Erreur de récupération des conséquences :", err);
+      }
+    });
+
+    // this.baloiseService.getAll().subscribe(data => this.listBaloiseL1 = data);
+    this.consequenceService.getAll().subscribe(data => this.listConsequence = data);
+    // this.microProcessService.getAll().subscribe(data => this.listMicroProcess = data);
+    this.loadLevel1Categories();
+    this.processService.getAll().subscribe(data => {
+      console.log("🔍 Données brutes des processus :", data);
+      this.listP1 = data.filter(p => p.niveau === 1 && !p.parentId);
+      console.log("✅ Macro Processus (niveau 1) :", this.listP1);
+      this.processService.getAll().subscribe(data => {
+        console.log("🧪 Données brutes JSON :", JSON.stringify(data, null, 2));
+      });
+
+    });
+    this.causeService.getAll().subscribe(data => {
+      console.log("🧪 Causes récupérées :", data);
+      this.listCauses = data
+    });
   }
 
   fetchTeams(): void {
@@ -149,8 +212,13 @@ export class CreateComponent implements OnInit {
       subRisk: this.incidentForm3.value.subRisk,
       userMail: this.incidentForm3.value.userMail,
       files: this.incidentForm3.value.files,
-      process: this.incidentForm3.value.process,
+      // process: this.incidentForm3.value.process,
       equipeName: this.incidentForm1.value.equipeName,
+      categoryId: this.incidentForm3.value.categoryId,
+      lossAmount: this.incidentForm3.value.lossAmount,
+      causeId: this.incidentForm3.value.causeId,
+      consequenceId: this.incidentForm3.value.consequenceId,
+      processId: this.incidentForm3.value.processId,
     };
     return incident;
   }
@@ -216,4 +284,50 @@ export class CreateComponent implements OnInit {
     }
     return risk;
   }
+
+  loadLevel1Categories() {
+    this.riskCategoryService.getByLevel(1).subscribe(data => this.listCatLvl1 = data);
+  }
+
+  onLevel1Change(l1Id: string) {
+    this.riskCategoryService.getByParent(l1Id).subscribe(data => {
+      this.listCatLvl2 = data;
+      this.listCatLvl3 = [];
+      this.incidentForm3.get('categoryId')!.setValue(l1Id);
+    });
+  }
+
+  onLevel2Change(l2Id: string) {
+    this.riskCategoryService.getByParent(l2Id).subscribe(data => {
+      this.listCatLvl3 = data;
+      this.incidentForm3.get('categoryId')!.setValue(l2Id);
+    });
+  }
+
+  onLevel3Change(l3Id: string) {
+    this.incidentForm3.get('categoryId')!.setValue(l3Id);
+  }
+
+
+  onP1Change(p1Id: string) {
+    this.processService.getAll().subscribe(data => {
+      this.listP2 = data.filter(p => p.parentId === p1Id && p.niveau === 2);
+      this.listP3 = [];
+      this.listMicroProcess = [];
+      this.incidentForm3.get('processId')!.setValue(p1Id); // sélection niveau 1
+    });
+  }
+
+  onP2Change(p2Id: string) {
+    this.processService.getAll().subscribe(data => {
+      this.listP3 = data.filter(p => p.parentId === p2Id && p.niveau === 3);
+      this.listMicroProcess = this.listP3;
+      this.incidentForm3.get('processId')!.setValue(p2Id); // sélection niveau 2
+    });
+  }
+
+  onP3Change(p3Id: string) {
+    this.incidentForm3.get('processId')!.setValue(p3Id); // sélection niveau 3
+  }
+
 }
