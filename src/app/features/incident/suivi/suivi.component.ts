@@ -13,6 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { IncidentHistory } from '../../../core/models/IncidentHistory';
 
 
 @Component({
@@ -40,34 +41,7 @@ export class SuiviComponent implements OnInit {
 
   incident: Incident | undefined
 
-  
-
-  history = [
-    {
-      action: 'CREATION',
-      timestamp: new Date('2025-06-01T09:00:00'),
-      user: { username: 'admin' },
-      comment: 'Création initiale de l’incident.'
-    },
-    {
-      action: 'IMPACT_ADDED',
-      timestamp: new Date('2025-06-01T10:05:00'),
-      user: { username: 'analyste1' },
-      comment: 'Ajout d’un impact financier.'
-    },
-    {
-      action: 'MODIFICATION',
-      timestamp: new Date('2025-06-02T14:30:00'),
-      user: { username: 'admin' },
-      comment: 'Changement du statut à "En cours".'
-    },
-    {
-      action: 'CLOTURE',
-      timestamp: new Date('2025-06-03T16:00:00'),
-      user: { username: 'manager' },
-      comment: 'Incident clôturé après résolution.'
-    }
-  ];
+  history : IncidentHistory[] = [];
 
   readonly TITRE_PAR_ACTION: Record<string, string> = {
     CREATION: 'Création de l’incident',

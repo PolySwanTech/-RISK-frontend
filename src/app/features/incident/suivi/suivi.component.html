@@ -36,7 +36,7 @@
                     <div class="header">
                         <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
                         <span class="meta">
-                            Par {{ entry.user.username }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
+                            Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
                         </span>
                     </div>
 
@@ -69,10 +69,5 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD
-    }
-=======
-
 </div>
 }
->>>>>>> 79fe664ab18b6d1e468866f5189e700b1e961324
