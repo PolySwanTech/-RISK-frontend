@@ -1,69 +1,64 @@
 import { State } from "../enum/state.enum";
+import { Cause } from "./Cause";
 import { Impact } from "./Impact";
 import { Process } from "./Process";
 import { RiskTemplate } from "./RiskTemplate";
 
 export class Incident {
     id: string;
+    reference: string = ""
 
-    titre: string;
+    title: string;
     location: string;
+    commentaire : string
 
     declaredAt: Date;
-    survenueAt: Date;
-    detectedAt: Date;
-    closedAt: Date | null;
+    survenueAt: Date ;
+    detectedAt: Date ;
+    closedAt: Date | null ;
+
+    risk: string;
+    cause : Cause;
+    process: Process ;
+    equipeId?: string;
 
     impacts: Impact[];
 
-    risk: RiskTemplate;
-    process: Process;
-    causeName?: string;
-    riskType?: string;
-    riskLevel?: number;
     state: State;
-    comments: string;
-    lossAmount?: number;
-    categoryLevel?: string;
-    categoryName?: string;
-    subCategoryName?: string;
-    categoryId?: string;
     consequenceId?: string;
-    microProcessId?: string;
-    equipeName?: string;
-
-    customId: string = ""
 
     constructor(
         id: string,
-        titre: string,
+        title: string,
         location: string,
+        commentaire: string,
         declaredAt: Date,
         survenueAt: Date,
         detectedAt: Date,
         closedAt: Date | null,
-        risk: RiskTemplate,
+        risk: string,
+        cause: Cause,
         process: Process,
-        impacts: Impact[],
-        comments: string,
+        equipeId?: string,
+        impacts: Impact[] = [],
         state: State = State.DRAFT,
-        equipeName?: string,
-        customId: string = ""
-    ) {
+        consequenceId?: string
+    ){
         this.id = id;
-        this.titre = titre;
+        this.title = title;
         this.location = location;
+        this.commentaire = commentaire;
         this.declaredAt = declaredAt;
         this.survenueAt = survenueAt;
         this.detectedAt = detectedAt;
         this.closedAt = closedAt;
         this.risk = risk;
+        this.cause = cause;
         this.process = process;
+        this.equipeId = equipeId;
         this.impacts = impacts;
-        this.comments = comments;
-        this.equipeName = equipeName;
-        this.customId = customId;
-        this.state = closedAt ? State.CLOSED : state;
+        this.state = state;
+        this.consequenceId = consequenceId;
     }
 
 

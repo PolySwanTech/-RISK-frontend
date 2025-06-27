@@ -98,19 +98,7 @@ export class ViewComponent {
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
-      console.log("🧾 Incident complet :", incident);
-      console.log("categoryId", incident.categoryId); // ✅ ajoute ça
-
-      if (incident.categoryId) {
-        this.riskCategoryService.getCategoryInfo(incident.categoryId as string).subscribe(info => {
-          console.log("📦 Info catégorie :", info);
-          if (this.incident) {
-            this.incident.riskType = info?.type ?? "-";
-            this.incident.riskLevel = info?.niveau ?? null;
-          }
-        });
-      }
-
+      
       this.extractTokenInfo();
       this.checkCloseAuthorization();
     });
@@ -433,6 +421,13 @@ export class ViewComponent {
       this.confirmService.openConfirmDialog("Clôturé", "L'incident a été clôturé.", false);
       this.ngOnInit();
     });
+  }
+
+  addActionPlan() {
+    if(this.incident == null) {
+      return;
+    }
+    this.router.navigate(['action-plan', 'create', this.incident?.id]);
   }
 
 }

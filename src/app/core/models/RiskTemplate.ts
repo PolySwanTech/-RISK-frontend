@@ -1,6 +1,6 @@
 import { RiskImpactType } from "../enum/riskImpactType.enum";
 import { RiskLevel } from "../enum/riskLevel.enum";
-import { BaloiseCategoryL2 } from "./BaloiseCategory";
+import { BaloiseCategory } from "./BaloiseCategory";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
 
@@ -32,7 +32,7 @@ export class RiskTemplate {
 
   reference = '';
 
-  categoryL2?: BaloiseCategoryL2;
+  category?: BaloiseCategory;
 
   /** Set côté back → tableau côté front  */
   impactTypes: RiskImpactType[] = [];
@@ -58,6 +58,6 @@ export interface RiskTemplateCreateDto {
   description: string;
   processId:   string;                 // UUID
   riskBrut:    RiskLevel;
-  categoryL2:  BaloiseCategoryL2;      // objet complet (cf. back)
+  category:  BaloiseCategory;      // objet complet (cf. back)
   impactTypes: RiskImpactType[];       // tableau → Set côté Java
 }

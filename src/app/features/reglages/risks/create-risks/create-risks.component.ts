@@ -1,63 +1,69 @@
 /* ------------------------------------------------------------------ */
 /*  create-risks.component.ts                                          */
 /* ------------------------------------------------------------------ */
-import { Component, inject, OnInit }          from '@angular/core';
-import { ActivatedRoute, Router }             from '@angular/router';
-import { CommonModule }                       from '@angular/common';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators }    from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { MatFormFieldModule }  from '@angular/material/form-field';
-import { MatInputModule }      from '@angular/material/input';
-import { MatOption, MatSelectModule }     from '@angular/material/select';
-import { MatStepperModule }    from '@angular/material/stepper';
-import { MatButtonModule }     from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatOption, MatSelectModule } from '@angular/material/select';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatButtonModule } from '@angular/material/button';
 
-import { GoBackComponent }      from '../../../../shared/components/go-back/go-back.component';
-import { ConfirmService }       from '../../../../core/services/confirm/confirm.service';
-import { RiskService }          from '../../../../core/services/risk/risk.service';
-import { ProcessService }       from '../../../../core/services/process/process.service';
-import { BaloisCategoriesService }from '../../../../core/services/balois-categories/balois-categories.service';
+import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
+import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
+import { RiskService } from '../../../../core/services/risk/risk.service';
+import { ProcessService } from '../../../../core/services/process/process.service';
+import { BaloisCategoriesService } from '../../../../core/services/balois-categories/balois-categories.service';
 
 import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
-import { RiskLevel, RiskLevelLabels }            from '../../../../core/enum/riskLevel.enum';
-import { RiskImpactType, RiskImpactTypeLabels }       from '../../../../core/enum/riskImpactType.enum';
+import { RiskLevel, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
+import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
-import { BaloiseCategoryL1, BaloiseCategoryL2 }    from '../../../../core/models/BaloiseCategory';
-import { Process }              from '../../../../core/models/Process';
+import { Process } from '../../../../core/models/Process';
+import { BaloiseCategory } from '../../../../core/models/BaloiseCategory';
+import { RiskCategoryService } from '../../../../core/services/risk/risk-category.service';
 
 @Component({
-  selector   : 'app-create-risks',
-  standalone : true,
-  imports    : [
+  selector: 'app-create-risks',
+  standalone: true,
+  imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatStepperModule, MatButtonModule, GoBackComponent
   ],
   templateUrl: './create-risks.component.html',
-  styleUrl   : './create-risks.component.scss'
+  styleUrl: './create-risks.component.scss'
 })
 export class CreateRisksComponent implements OnInit {
 
   /* ---------------- services ---------------- */
-  private readonly route     = inject(ActivatedRoute);
-  private readonly router    = inject(Router);
-  private readonly fb        = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
 
-  private readonly riskSrv   = inject(RiskService);
-  private readonly confirm   = inject(ConfirmService);
-  private readonly catSrv    = inject(BaloisCategoriesService);
-  private readonly procSrv   = inject(ProcessService);
+  private readonly riskSrv = inject(RiskService);
+  private readonly confirm = inject(ConfirmService);
+  private readonly riskCategoryService = inject(RiskCategoryService);
+  private readonly procSrv = inject(ProcessService);
 
   /* ---------------- données ----------------- */
-  categoriesBaloise : BaloiseCategoryL1[] = [];
-  processes         : Process[]          = [];
+  bal1: BaloiseCategory[] = [];
+  bal2: BaloiseCategory[] = [];
+  bal3: BaloiseCategory[] = [];
 
-  pageTitle   = 'Création d\'un risque';
+  process1: Process[] = [];
+  process2: Process[] = [];
+  process3: Process[] = [];
+
+  pageTitle = 'Création d\'un risque';
   dialogLabel = { title: 'Création', message: 'création' };
 
-  riskLevels   = Object.values(RiskLevel);
-  impactTypes  = Object.values(RiskImpactType);
-  riskLabels   = RiskLevelLabels;
+  riskLevels = Object.values(RiskLevel);
+  impactTypes = Object.values(RiskImpactType);
+  riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
 
   /** instance courante (vide ou chargée) */
@@ -65,26 +71,38 @@ export class CreateRisksComponent implements OnInit {
 
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
-  libelle   : this.fb.nonNullable.control<string>(''),
-  balois1 : this.fb.nonNullable.control<string>(''),       // nom L1
-  balois2 : this.fb.control<BaloiseCategoryL2 | null>(     // ← OBJET L2
-              null, Validators.required
-            ),
-  process : this.fb.nonNullable.control<string>('', Validators.required)
-});
+    libelle: this.fb.nonNullable.control<string>(''),
+    balois1: this.fb.control<BaloiseCategory | null>(null, Validators.required),
+    balois2: this.fb.control<BaloiseCategory | null>(null),
+    balois3: this.fb.control<BaloiseCategory | null>(null),
+    process1: this.fb.nonNullable.control<string>('', Validators.required),
+    process2: this.fb.control<Process | null>(null),
+    process3: this.fb.control<Process | null>(null)
+  });
 
-detailsForm = this.fb.group({
-  description: this.fb.nonNullable.control<string>(''),
-  level      : this.fb.nonNullable.control<RiskLevel>(RiskLevel.LOW),
-  probability: this.fb.control<number | null>(null, Validators.pattern(/^\d+(\.\d+)?$/)),
-  impactType : this.fb.control<RiskImpactType | null>(null)
-});
+  detailsForm = this.fb.group({
+    description: this.fb.nonNullable.control<string>(''),
+    level: this.fb.nonNullable.control<RiskLevel>(RiskLevel.LOW),
+    probability: this.fb.control<number | null>(null, Validators.pattern(/^\d+(\.\d+)?$/)),
+    impactType: this.fb.control<RiskImpactType | null>(null)
+  });
 
-  /* Sous-catégories adaptées à la catégorie L1 choisie */
-  get sousCategoriesFiltered(): BaloiseCategoryL2[] {
-    const catName = this.infoForm.get('balois1')!.value!;
-    const catL1   = this.categoriesBaloise.find(c => c.name === catName);
-    return catL1?.categoriesL2 ?? [];
+  onCategoryChange(baloise : BaloiseCategory, level: number): void {
+    if(level === 1){
+      this.bal2 = baloise.enfants ?? [];
+    }
+    if(level === 2){
+      this.bal3 = baloise.enfants ?? [];
+    }
+  }
+
+  onProcessChange(process : Process, level: number): void {
+    if(level === 1){
+      this.process2 = process.enfants ?? [];
+    }
+    if(level === 2){
+      this.process3 = process.enfants ?? [];
+    }
   }
 
   /* ========================================================= */
@@ -93,8 +111,14 @@ detailsForm = this.fb.group({
   ngOnInit(): void {
 
     /* --- chargements parallèles --- */
-    this.catSrv.getAll().subscribe(list => this.categoriesBaloise = list);
-    this.procSrv.getAll().subscribe(list => this.processes         = list);
+
+    this.riskCategoryService.getAll().subscribe(
+      data => {
+        this.bal1 = data;
+      }
+    )
+
+    this.procSrv.getAll().subscribe(list => this.process1 = list);
 
     /* --- id dans l’URL ?  => édition  ---------------------- */
     const id = this.route.snapshot.paramMap.get('id');   // id OU 'create'
@@ -108,25 +132,25 @@ detailsForm = this.fb.group({
   /* ========================================================= */
   private loadRiskById(id: string): void {
 
-    alert("ici")
-
     this.riskSrv.getById(id).subscribe(r => {
-      this.risk        = new RiskTemplate(r);     // instanciation propre
-      this.pageTitle   = `Mise à jour du risque : ${this.risk.libelle}`;
+      this.risk = new RiskTemplate(r);     // instanciation propre
+      this.pageTitle = `Mise à jour du risque : ${this.risk.libelle}`;
       this.dialogLabel = { title: 'Mise à jour', message: 'mise à jour' };
 
       /* pré-remplissage des formulaires */
       this.infoForm.patchValue({
-        libelle   : this.risk.libelle,
-        balois1 : this.risk.categoryL2?.categoryL1?.name ?? '',
-        balois2 : this.risk.categoryL2 ?? null,
-        process : this.risk.processId
+        libelle: this.risk.libelle,
+        balois1: this.risk.category ?? null,
+        balois2: this.risk.category ?? null,
+        balois3: this.risk.category ?? null,
+        process1: this.risk.processId,
+        
       });
 
       this.detailsForm.patchValue({
         description: this.risk.description,
-        level      : this.risk.riskBrut,
-        impactType : this.risk.impactTypes[0] ?? null   // simple sélection
+        level: this.risk.riskBrut,
+        impactType: this.risk.impactTypes[0] ?? null   // simple sélection
       });
     });
   }
@@ -135,9 +159,9 @@ detailsForm = this.fb.group({
   /*                     CRÉATION / MÀJ                       */
   /* ========================================================= */
   submit(): void {
-    if (this.infoForm.invalid || this.detailsForm.invalid) { 
+    if (this.infoForm.invalid || this.detailsForm.invalid) {
       console.error('Formulaire invalide:', this.infoForm.errors, this.detailsForm.errors);
-      return; 
+      return;
     }
 
     const riskLevel = this.detailsForm.get('level')?.value;
@@ -152,9 +176,9 @@ detailsForm = this.fb.group({
     const payload: RiskTemplateCreateDto = {
       libelle: this.infoForm.get('libelle')!.value!,
       description: this.detailsForm.get('description')!.value!,
-      processId: this.infoForm.get('process')!.value!,
+      processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,
-      categoryL2: category,
+      category: category,
       impactTypes: [impactType]
     };
 
@@ -162,13 +186,13 @@ detailsForm = this.fb.group({
     console.log('Payload à envoyer:', payload);
 
     this.riskSrv.save(payload).subscribe(() => {
-    this.confirm.openConfirmDialog(
-      this.dialogLabel.title,
-      `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
-      false
-    );
-    this.router.navigate(['reglages','risks']);
-    console.log('Risque créé avec succès', payload);
-  });
+      this.confirm.openConfirmDialog(
+        this.dialogLabel.title,
+        `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
+        false
+      );
+      this.router.navigate(['reglages', 'risks']);
+      console.log('Risque créé avec succès', payload);
+    });
   }
 }

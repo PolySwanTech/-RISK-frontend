@@ -52,12 +52,12 @@ export class ListComponent implements OnInit {
     {
       columnDef: 'référence',
       header: 'Référence',
-      cell: (element: Incident) => `${element.customId}`,
+      cell: (element: Incident) => `${element.reference}`,
     },
     {
       columnDef: 'titre',
       header: 'Libellé',
-      cell: (element: Incident) => `${element.titre}`,
+      cell: (element: Incident) => `${element.title}`,
     },
     {
       columnDef: 'dateDeclaration',

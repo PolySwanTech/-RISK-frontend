@@ -27,21 +27,21 @@
               <!-- Catégorie L1 -------------------------------------------------- -->
               <mat-form-field class="full-width">
                 <mat-label>Catégorie&nbsp;Bâloise</mat-label>
-                <mat-select formControlName="balois1">
-                  <mat-option *ngFor="let cat of categoriesBaloise" [value]="cat.name">
+                <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
+                  <mat-option *ngFor="let cat of bal1" [value]="cat">
                     {{ cat.name }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
 
               <!-- Sous-catégorie L2 -------------------------------------------- -->
-              <mat-form-field class="full-width">
+              <mat-form-field class="full-width" *ngIf="bal2.length > 0">
                 <mat-label>Sous-catégorie&nbsp;Bâloise</mat-label>
-                <mat-select formControlName="balois2">
+                <mat-select formControlName="balois2" (selectionChange)="onCategoryChange($event.value, 2)">
                   <!-- on envoie ici l’OBJET L2 complet,
                        car risk.categoryL2 est de type BaloiseCategoryL2 -->
                   <mat-option
-                    *ngFor="let sub of sousCategoriesFiltered"
+                    *ngFor="let sub of bal2"
                     [value] = "sub"
                   >
                     {{ sub.name }}
@@ -52,12 +52,27 @@
               <!-- Processus ----------------------------------------------------- -->
               <mat-form-field class="full-width">
                 <mat-label>Processus</mat-label>
-                <mat-select formControlName="process">
+                <mat-select formControlName="process1" (selectionChange)="onProcessChange($event.value, 1)">
                   <mat-option
-                    *ngFor="let p of processes"
-                    [value]="p.id"
+                    *ngFor="let p of process1"
+                    [value]="p"
                   >
                     {{ p.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Sous-processus L2 -------------------------------------------- -->
+              <mat-form-field class="full-width" *ngIf="process2.length > 0">
+                <mat-label>Sous-process&nbsp;</mat-label>
+                <mat-select formControlName="process2" (selectionChange)="onProcessChange($event.value, 2)">
+                  <!-- on envoie ici l’OBJET L2 complet,
+                       car risk.categoryL2 est de type BaloiseCategoryL2 -->
+                  <mat-option
+                    *ngFor="let sub of process2"
+                    [value] = "sub"
+                  >
+                    {{ sub.name }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>

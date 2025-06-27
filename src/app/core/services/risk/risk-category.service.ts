@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { RiskCategory } from '../../models/RiskCategory';
+import { BaloiseCategory } from '../../models/BaloiseCategory';
 
 @Injectable({
   providedIn: 'root'
@@ -12,16 +12,12 @@ export class RiskCategoryService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/risks/categories`;
 
-  getAll(): Observable<RiskCategory[]> {
-    return this.http.get<RiskCategory[]>(this.baseUrl);
+  getAll(): Observable<BaloiseCategory[]> {
+    return this.http.get<BaloiseCategory[]>(this.baseUrl);
   }
 
-  getByParent(parentId: string): Observable<RiskCategory[]> {
-    return this.http.get<RiskCategory[]>(`${this.baseUrl}/by-parent/${parentId}`);
-  }
-
-  getByLevel(level: number): Observable<RiskCategory[]> {
-    return this.http.get<RiskCategory[]>(`${this.baseUrl}/level/${level}`);
+  getByParent(parentId: string): Observable<BaloiseCategory[]> {
+    return this.http.get<BaloiseCategory[]>(`${this.baseUrl}/by-parent/${parentId}`);
   }
 
   getCategoryInfo(id: string): Observable<{ type: string, niveau: number }> {

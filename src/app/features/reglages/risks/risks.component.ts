@@ -43,15 +43,15 @@ export class RisksComponent implements OnInit {
       header: 'Description',
       cell: (element: RiskTemplate) => `${element.description}`,
     },
-    {
-      columnDef: 'balois1',
-      header: 'balois1',
-      cell: (element: RiskTemplate) => `${element.categoryL2?.categoryL1?.name || 'Inconnu'}`,
-    },
+    // {
+    //   columnDef: 'balois1',
+    //   header: 'balois1',
+    //   cell: (element: RiskTemplate) => `${element.category?.category?.name || 'Inconnu'}`,
+    // },
     {
       columnDef: 'balois2',
       header: 'balois2',
-      cell: (element: RiskTemplate) => `${element.categoryL2?.name || 'Inconnu'}`,
+      cell: (element: RiskTemplate) => `${element.category?.name || 'Inconnu'}`,
     },
     {
       columnDef: 'process',

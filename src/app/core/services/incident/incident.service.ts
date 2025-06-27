@@ -10,7 +10,6 @@ import { saveAs } from 'file-saver';
   providedIn: 'root'
 })
 export class IncidentService {
-  
 
   baseUrl = environment.apiUrl + '/incidents'
 
@@ -39,8 +38,7 @@ export class IncidentService {
     return this.http.post(this.baseUrl + '/impact', impact)
   }
 
-  saveIncident(incident: any): Observable<any> {
-    console.log("📤 Données envoyées au backend :", incident);
+  saveIncident(incident: Incident): Observable<any> {
     return this.http.post(this.baseUrl, incident);
   }
   

@@ -1,7 +1,7 @@
 <div style="margin: 15px;">
     @if(incident){
     <app-go-back previousPageName="Liste des incidents"
-        [currentPageName]="`Détails de l'incident - ` + incident.titre"></app-go-back>
+        [currentPageName]="`Détails de l'incident - ` + incident.title"></app-go-back>
     <div class="view-container">
         <div class="info-container">
             <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
@@ -9,7 +9,7 @@
                     <mat-card-title class="header-with-buttons">
                         <span>Info globale</span>
                         <span class="buttons-header">
-                            <button mat-raised-button class="btn-primary">
+                            <button mat-raised-button class="btn-primary" (click)="addActionPlan()">
                                 <mat-icon>playlist_add_check</mat-icon>
                                 Plan d'action
                             </button>
@@ -46,7 +46,7 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Cause</span>
-                                <span class="info-value">{{ incident.causeName }}</span>
+                                <span class="info-value">{{ incident.cause.name }}</span>
                             </div>
                         </div>
 
@@ -57,8 +57,9 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Type de risque</span>
-                                <span class="info-value">{{ incident.riskType }} - Niveau {{ incident.riskLevel
-                                    }}</span>
+                                <span class="info-value">{{ incident.risk.libelle }} 
+                                    <!-- - Niveau {{ incident.risk.level }} -->
+                                </span>
                             </div>
                         </div>
 
@@ -69,7 +70,7 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Référence</span>
-                                <span class="info-value">{{ incident.customId }}</span>
+                                <span class="info-value">{{ incident.reference }}</span>
                             </div>
                         </div>
 
@@ -80,7 +81,7 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Libellé</span>
-                                <span class="info-value">{{ incident.titre }}</span>
+                                <span class="info-value">{{ incident.title }}</span>
                             </div>
                         </div>
 
@@ -141,7 +142,7 @@
                             Description de l'incident
                         </h3>
                         <div class="description-content">
-                            <p>{{ incident.comments }}</p>
+                            <p>{{ incident.commentaire }}</p>
                         </div>
                     </div>
                 </mat-card-content>

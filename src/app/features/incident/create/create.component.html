@@ -84,29 +84,29 @@
 
             <mat-form-field>
               <mat-label>Catégorie Niveau 1</mat-label>
-              <mat-select (selectionChange)="onLevel1Change($event.value)">
-                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1.id">{{ c1.name }}</mat-option>
+              <mat-select (selectionChange)="onBaloisChange($event.value, 1)">
+                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1">{{ c1.name }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field *ngIf="listCatLvl2.length > 0">
               <mat-label>Catégorie Niveau 2</mat-label>
-              <mat-select (selectionChange)="onLevel2Change($event.value)">
-                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2.id">{{ c2.name }}</mat-option>
+              <mat-select (selectionChange)="onBaloisChange($event.value, 2)">
+                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2">{{ c2.name }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field *ngIf="listCatLvl3.length > 0">
               <mat-label>Catégorie Niveau 3</mat-label>
-              <mat-select (selectionChange)="onLevel3Change($event.value)">
-                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3.id">{{ c3.name }}</mat-option>
+              <mat-select (selectionChange)="onBaloisChange($event.value, 3)">
+                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3">{{ c3.name }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field>
               <mat-label>Cause</mat-label>
-              <mat-select formControlName="causeId">
-                <mat-option *ngFor="let cause of listCauses" [value]="cause.id">{{ cause.name }}</mat-option>
+              <mat-select formControlName="cause">
+                <mat-option *ngFor="let cause of listCauses" [value]="cause">{{ cause.name }}</mat-option>
               </mat-select>
             </mat-form-field>
 
@@ -124,54 +124,25 @@
 
             <mat-form-field>
               <mat-label>Macro Processus (niveau 1)</mat-label>
-              <mat-select (selectionChange)="onP1Change($event.value)">
-                <mat-option *ngFor="let p1 of listP1" [value]="p1.id">{{ p1.name }}</mat-option>
+              <mat-select (selectionChange)="onProcessChange($event.value, 1)">
+                <mat-option *ngFor="let p1 of listP1" [value]="p1">{{ p1.name }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field *ngIf="listP2.length > 0">
               <mat-label>Processus (niveau 2)</mat-label>
-              <mat-select (selectionChange)="onP2Change($event.value)">
-                <mat-option *ngFor="let p2 of listP2" [value]="p2.id">{{ p2.name }}</mat-option>
+              <mat-select (selectionChange)="onProcessChange($event.value, 2)">
+                <mat-option *ngFor="let p2 of listP2" [value]="p2">{{ p2.name }}</mat-option>
               </mat-select>
             </mat-form-field>
 
-            <mat-form-field *ngIf="listMicroProcess.length > 0">
+            <mat-form-field *ngIf="listP3.length > 0">
               <mat-label>Micro-processus</mat-label>
-              <mat-select (selectionChange)="onP3Change($event.value)">
-                <mat-option *ngFor="let mp of listMicroProcess" [value]="mp.id">{{ mp.name }}</mat-option>
+              <mat-select (selectionChange)="onProcessChange($event.value, 3)">
+                <mat-option *ngFor="let mp of listP3" [value]="mp">{{ mp.name }}</mat-option>
               </mat-select>
             </mat-form-field>
-
-
-            <!-- <mat-radio-group formControlName="risk">
-              @for(risk of listRisk; track risk){
-              <mat-radio-button [value]="risk">{{risk.balois}}</mat-radio-button>
-              }
-            </mat-radio-group> -->
-
-            <!-- @if(getSubRisk() != ''){
-            <mat-form-field>
-              <mat-label>Sous catégorie du Risque</mat-label>
-              <mat-select formControlName="subRisk" placeholder="Sous catégorie du Risque">
-                @for(subRisk of getSubRisk(); track subRisk){
-                <mat-option [value]="subRisk">{{ subRisk.balois }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            } -->
-
-            <!-- <mat-form-field>
-              <mat-label>Processus</mat-label>
-              <mat-select formControlName="process" placeholder="Processus">
-                @for(process of listProcess; track process){
-                <mat-option [value]="process">{{ process.name }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field> -->
-
             <app-select-users (userSelected)="changeUser($event)" placeholder="Collaborateur pouvant vous aider" />
-
           </form>
 
           <div class="actions">

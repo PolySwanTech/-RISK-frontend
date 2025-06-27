@@ -4,5 +4,7 @@ import { PlanActionPageDetailComponent } from '../../pages/plan-action-page-deta
 
 export const actionPlanRoutes: Routes = [
   { path: 'list', component: PlanActionPageComponent },
+  { path: 'create', component: PlanActionPageComponent },
+  { path: 'create/:incidentId', component: PlanActionPageComponent },
   { path: ':id', component:  PlanActionPageDetailComponent},
 ];
