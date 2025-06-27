@@ -20,6 +20,8 @@ import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { Degree } from '../../../core/enum/degree.enum';
 import { Priority } from '../../../core/enum/Priority';
 import { Recurence } from '../../../core/enum/recurence.enum';
+import { MatDialogRef } from '@angular/material/dialog';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-create-control',
@@ -42,6 +44,8 @@ export class CreateControlComponent {
   processService = inject(ProcessService);
   userService = inject(UtilisateurService);
   controlService = inject(ControlService);
+  dialogRef = inject(MatDialogRef<CreateControlComponent>);
+  confirmService = inject(ConfirmService);
   private fb = inject(FormBuilder);
 
   form: FormGroup = this.fb.group({
@@ -96,7 +100,10 @@ export class CreateControlComponent {
     console.log('Création du contrôle avec les données :', payload);
 
     this.controlService.createControl(payload).subscribe({
-      next : ()  => console.log('Contrôle créé !'),
+      next : ()  => {
+        this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);
+        this.dialogRef.close();
+      },
       error: err => console.error('Erreur création', err)
     });
   }
