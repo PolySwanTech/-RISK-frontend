@@ -38,7 +38,7 @@ export class IncidentService {
     return this.http.post(this.baseUrl + '/impact', impact)
   }
 
-  saveIncident(incident: Incident): Observable<any> {
+  saveIncident(incident: any): Observable<any> {
     return this.http.post(this.baseUrl, incident);
   }
   

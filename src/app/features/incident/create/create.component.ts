@@ -187,23 +187,18 @@ export class CreateComponent implements OnInit {
   }
 
   private convertFormToIncident() {
-    return new Incident(
-      "", // ID généré côté backend
-      this.incidentForm1.value.titre!,
-      this.incidentForm1.value.location!,
-      this.incidentForm1.value.commentaire!,
-      new Date(this.incidentForm2.value.dateDeDeclaration!),
-      new Date(this.incidentForm2.value.dateDeSurvenance!),
-      new Date(this.incidentForm2.value.dateDeDetection!),
-      this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
-      this.incidentForm3.value.risk!,
-      this.incidentForm3.value.cause!,
-      this.incidentForm3.value.process as Process,
-      this.hasTeam ? this.incidentForm1.value.equipeName! : undefined,
-      [], // impacts (optionnel)
-      State.DRAFT,
-      this.incidentForm3.value.consequenceId!
-    );
+    return {
+      title: this.incidentForm1.value.titre!,
+      location: this.incidentForm1.value.location!,
+      commentaire: this.incidentForm1.value.commentaire!,
+      declaredAt: new Date(this.incidentForm2.value.dateDeDeclaration!),
+      survenueAt: new Date(this.incidentForm2.value.dateDeSurvenance!),
+      detectedAt: new Date(this.incidentForm2.value.dateDeDetection!),
+      closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
+      risk: this.incidentForm3.value.risk!,
+      processId: (this.incidentForm3.value.process as Process).id,
+      cause: this.incidentForm3.value.cause!
+    };
   }
 
   addIncident() {
@@ -250,7 +245,7 @@ export class CreateComponent implements OnInit {
   }
 
   onBaloisChange(cat: BaloiseCategory, level: number) {
-    this.incidentForm3.get('risk')!.setValue(cat.name);
+    this.incidentForm3.get('risk')!.setValue(cat.id);
     if (level === 1) {
       this.listCatLvl2 = cat.enfants || [];
     }
@@ -269,5 +264,9 @@ export class CreateComponent implements OnInit {
       this.incidentForm3.get('process')!.setValue(process); // sélection niveau 2
       this.listP3 = process.enfants || [];
     }
+  }
+
+  onCauseChange(cause :Cause) {
+    console.log("Cause sélectionnée :", cause);
   }
 }
