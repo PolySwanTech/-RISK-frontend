@@ -1,4 +1,4 @@
-import { Component, inject, Type } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -20,6 +20,7 @@ import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { Degree } from '../../../core/enum/degree.enum';
 import { Priority } from '../../../core/enum/Priority';
 import { Recurence } from '../../../core/enum/recurence.enum';
+import { Type } from '../../../core/enum/controltype.enum';
 
 @Component({
   selector: 'app-create-control',
@@ -90,7 +91,9 @@ export class CreateControlComponent {
       level: this.form.value.level,
       controlType: this.form.value.type,
       priority: this.form.value.priority,
-      taxonomie: this.form.value.taxonomie,
+      taxonomieId: this.form.value.taxonomie.id.id,
+      taxonomieVersion: this.form.value.taxonomie.id.version,
+
     };
 
     console.log('Création du contrôle avec les données :', payload);

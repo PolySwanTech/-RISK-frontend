@@ -51,5 +51,6 @@ export interface ControlTemplateCreateDto {
         level: Degree,
         controlType: Type,
         priority: Priority,
-        taxonomie: RiskTemplate
+        taxonomieId: string
+        taxonomieVersion: String
 }

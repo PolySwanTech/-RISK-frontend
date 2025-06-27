@@ -1,11 +1,11 @@
 @if(incident){
 <div style="margin: 15px;">
     <app-go-back previousPageName="Détails de l'incident"
-        [currentPageName]="`Suivi de l'incident - ` + incident.titre"></app-go-back>
+        [currentPageName]="`Suivi de l'incident - ` + incident.title"></app-go-back>
 </div>
 
 <div class="timeline-container">
-    <h2>Suivi de l’incident - {{incident.titre}}</h2>
+    <h2>Suivi de l’incident - {{incident.title}}</h2>
 
     <div *ngIf="history.length === 0" class="empty">
         <mat-icon>history</mat-icon> Aucun historique disponible.
