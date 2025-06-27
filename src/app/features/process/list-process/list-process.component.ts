@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { Process } from '../../../core/models/Process';
 
 @Component({
   selector: 'app-list-process',
@@ -17,7 +18,7 @@ import { GoBackComponent } from '../../../shared/components/go-back/go-back.comp
 export class ListProcessComponent {
   processService = inject(ProcessService);
   router = inject(Router);
-  processes: any[] = [];
+  processes: Process[] = [];
   displayedColumns: string[] = ['name', 'niveau', 'buName', 'parentName'];
 
   ngOnInit(): void {
@@ -25,7 +26,7 @@ export class ListProcessComponent {
   }
 
   fetchProcesses(): void {
-    this.processService.getAll().subscribe((data: any[]) => {
+    this.processService.getAll().subscribe((data: Process[]) => {
       this.processes = data;
     });
   }
