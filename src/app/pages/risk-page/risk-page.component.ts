@@ -36,7 +36,7 @@ import { RiskLevelScores, RiskLevel } from '../../core/enum/riskLevel.enum';
 export class RiskPageComponent implements OnInit {
 
   /* -------------------------- filtres -------------------------- */
-  selectedNiveau: 'all' | 'low' | 'medium' | 'high' = 'all';
+  selectedNiveau = RiskLevel.LOW
   selectedBU    : string | 'all' = 'all';
 
   /* ------------------------- données --------------------------- */
@@ -46,6 +46,8 @@ export class RiskPageComponent implements OnInit {
 
   selectedRisk  : RiskTemplate   | null = null;
   processMap: Record<string,Process> = {};
+
+  levels = Object.values(RiskLevel);
 
   /* ------------------ services / navigation -------------------- */
   private riskService   = inject(RiskService);
@@ -71,6 +73,7 @@ export class RiskPageComponent implements OnInit {
       bus   : this.entitiesSrv.loadEntities()
     }).subscribe({
       next: ({ risks, bus }) => {
+        console.log(risks);
         /* ---------------- Pré-traitement ---------------- */
         this.risks = risks.map(risk => {
           const lastEval = risk.riskEvaluations?.at(-1);
@@ -100,7 +103,7 @@ export class RiskPageComponent implements OnInit {
 
   clearFilters(): void {
     this.selectedBU     = 'all';
-    this.selectedNiveau = 'all';
+    this.selectedNiveau = RiskLevel.LOW;
     this.applyFilters();
   }
 
@@ -111,20 +114,15 @@ export class RiskPageComponent implements OnInit {
 
     /* --- BU --- */
     if (this.selectedBU !== 'all') {
-      list = list.filter(r => r.libelle === this.selectedBU);
+      list.forEach(r => {
+        r.buName = this.processMap[r.processId].buName
+      })
+      list = list.filter(r => r.buName === this.selectedBU);
     }
 
     /* --- niveau --- */
-    if (this.selectedNiveau !== 'all') {
-      list = list.filter(r => {
-        const lvl = r.riskBrut?.toLowerCase();
-        switch (this.selectedNiveau) {
-          case 'low'   : return lvl === 'faible' || lvl === 'très faible';
-          case 'medium': return lvl === 'moyen';
-          case 'high'  : return lvl === 'élevé' || lvl === 'critique';
-          default      : return true;
-        }
-      });
+    if(this.selectedNiveau){
+      list = list.filter(r => r.riskEvaluations?.at(-1)?.riskNet == this.selectedNiveau);
     }
 
     /* --- synchro sélection courante --- */
