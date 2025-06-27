@@ -36,7 +36,7 @@ import { RiskLevelScores, RiskLevel } from '../../core/enum/riskLevel.enum';
 export class RiskPageComponent implements OnInit {
 
   /* -------------------------- filtres -------------------------- */
-  selectedNiveau = RiskLevel.LOW
+  selectedNiveau : RiskLevel | null = null
   selectedBU    : string | 'all' = 'all';
 
   /* ------------------------- données --------------------------- */
