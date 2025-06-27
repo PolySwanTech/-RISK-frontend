@@ -213,9 +213,4 @@ export class ListProcessComponent implements OnInit {
   navToEdit(id: string): void {
     this.router.navigate(['reglages', 'process', id]);
   }
-
-  openFilters(): void {
-    // TODO: Implémenter la modal de filtres
-    console.log('Ouverture des filtres');
-  }
 }
