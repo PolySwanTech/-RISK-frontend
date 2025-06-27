@@ -6,7 +6,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { ActionPlan } from '../../../core/models/ActionPlan';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { Process } from '../../../core/models/Process';
 import { Utilisateur } from '../../../core/models/Utilisateur';
@@ -14,12 +13,14 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
-import { ControlTemplate, ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
+import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { Degree } from '../../../core/enum/degree.enum';
 import { Priority } from '../../../core/enum/Priority';
 import { Recurence } from '../../../core/enum/recurence.enum';
+import { MatDialogRef } from '@angular/material/dialog';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Type } from '../../../core/enum/controltype.enum';
 
 @Component({
@@ -43,6 +44,8 @@ export class CreateControlComponent {
   processService = inject(ProcessService);
   userService = inject(UtilisateurService);
   controlService = inject(ControlService);
+  dialogRef = inject(MatDialogRef<CreateControlComponent>);
+  confirmService = inject(ConfirmService);
   private fb = inject(FormBuilder);
 
   form: FormGroup = this.fb.group({
@@ -99,7 +102,10 @@ export class CreateControlComponent {
     console.log('Création du contrôle avec les données :', payload);
 
     this.controlService.createControl(payload).subscribe({
-      next : ()  => console.log('Contrôle créé !'),
+      next : ()  => {
+        this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);
+        this.dialogRef.close();
+      },
       error: err => console.error('Erreur création', err)
     });
   }

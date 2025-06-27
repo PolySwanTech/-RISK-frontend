@@ -102,7 +102,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       height: '600px',
       minWidth: '600px',
       maxWidth: '600px',
-    });
+    }).afterClosed().subscribe(_ => this.ngOnInit());
   }
 
 

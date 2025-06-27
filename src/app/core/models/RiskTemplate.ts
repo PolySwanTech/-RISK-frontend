@@ -46,6 +46,8 @@ export class RiskTemplate {
 
   creator?: string; // UUID de l'utilisateur qui a créé le risque
 
+  buName : string = ''
+
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
     Object.assign(this, init);

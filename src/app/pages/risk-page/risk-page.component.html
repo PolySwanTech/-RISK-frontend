@@ -37,10 +37,8 @@
             <mat-form-field appearance="outline" class="filter-field">
               <mat-label>Niveau de risque</mat-label>
               <mat-select [(ngModel)]="selectedNiveau" (selectionChange)="applyFilters()">
-                <mat-option value="all">Tous les niveaux</mat-option>
-                <mat-option value="low">Faible</mat-option>
-                <mat-option value="medium">Moyen</mat-option>
-                <mat-option value="high">Élevé</mat-option>
+                <mat-option [value]="null" selected>TOUS</mat-option>
+                <mat-option *ngFor="let lev of levels" [value]="lev">{{ lev }}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -48,9 +46,9 @@
       </div>
       <div class="header-controls">
         <button (click)="clearFilters()" mat-raised-button class="btn-red">
-            <mat-icon>clear</mat-icon>
-            Réinitialiser
-          </button>
+          <mat-icon>clear</mat-icon>
+          Réinitialiser
+        </button>
         <button mat-raised-button class="btn-primary add-button" (click)="goToAddRisk()">
           <mat-icon>add</mat-icon>
           Ajouter un risque
@@ -76,30 +74,30 @@
     <mat-card class="filters-card">
       <mat-card-content class="filters-section detail">
         <div>
-        <div class="filters-header">
-          <div>
-            <span class="filters-title">Détails du risque</span>
+          <div class="filters-header">
+            <div>
+              <span class="filters-title">Détails du risque</span>
+            </div>
           </div>
-        </div>
 
-        @if(filteredRisks && filteredRisks.length > 0) {
-        <div class="risk-header">
-          <mat-form-field appearance="outline" class="risk-select-field">
-            <mat-label>Sélectionner un risque</mat-label>
-            <mat-select [value]="selectedRisk" (selectionChange)="onSelectRisk($event.value)">
-              @for (option of filteredRisks; track option) {
-              <mat-option [value]="option">
-                {{ option.reference + ' - ' + option.libelle }}
-              </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        </div>
-        }
+          @if(filteredRisks && filteredRisks.length > 0) {
+          <div class="risk-header">
+            <mat-form-field appearance="outline" class="risk-select-field">
+              <mat-label>Sélectionner un risque</mat-label>
+              <mat-select [value]="selectedRisk" (selectionChange)="onSelectRisk($event.value)">
+                @for (option of filteredRisks; track option) {
+                <mat-option [value]="option">
+                  {{ option.reference + ' - ' + option.libelle }}
+                </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          }
         </div>
         <app-risk-matrix style="border-top: 1px solid var(--mat-sys-outline-variant);
     padding-top: 24px; height: 100%;" [riskData]="selectedRisk" [processMap]="processMap"
- (onModify)="handleModifyRisk($event)">
+          (onModify)="handleModifyRisk($event)">
         </app-risk-matrix>
 
       </mat-card-content>
