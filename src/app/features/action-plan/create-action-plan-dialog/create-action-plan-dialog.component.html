@@ -21,6 +21,16 @@
         }
       </select>
     </div>
+    
+    <div>
+      <label for="priority">Risk</label>
+      <select id="priority" [(ngModel)]="actionPlan.taxonomie" name="risk">
+        @for(risk of risks; track risk) {
+        <option [value]="risk">{{ risk.libelle }}</option>
+        }
+      </select>
+
+    </div>
 
     <div>
       <label for="echeance">Échéance</label>

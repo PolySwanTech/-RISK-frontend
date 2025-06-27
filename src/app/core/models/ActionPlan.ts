@@ -1,5 +1,6 @@
 import { Priority } from "../enum/Priority";
 import { Status } from "../enum/status.enum";
+import { RiskTemplate } from "./RiskTemplate";
 
 export class Action {
     id: string;
@@ -40,7 +41,7 @@ export class ActionPlan {
     creator: string;
     userInCharge: string;
 
-    taxonomieId: string;
+    taxonomie: RiskTemplate | null;
     incidentId: string;
     echeance: Date;
 
@@ -57,7 +58,7 @@ export class ActionPlan {
         priority: Priority,
         creator: string,
         userInCharge: string,
-        taxonomieId: string,
+        taxonomie: RiskTemplate | null,
         incidentId: string,
         echeance: Date
     ) {
@@ -68,7 +69,7 @@ export class ActionPlan {
         this.priority = priority;
         this.creator = creator;
         this.userInCharge = userInCharge;
-        this.taxonomieId = taxonomieId;
+        this.taxonomie = taxonomie;
         this.incidentId = incidentId;
         this.echeance = echeance;
     }

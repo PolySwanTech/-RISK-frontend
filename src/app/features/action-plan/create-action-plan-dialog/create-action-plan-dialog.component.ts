@@ -15,6 +15,8 @@ import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.serv
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Status } from '../../../core/enum/status.enum';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { RiskService } from '../../../core/services/risk/risk.service';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -36,20 +38,30 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
   private confirmService = inject(ConfirmService);
   private equipeService = inject(EquipeService);
+  private riskService = inject(RiskService);
   private router = inject(Router);
   priorities = Object.values(Priority);
 
   listTeams: Equipe[] = [];
 
+  risks: RiskTemplate[] = [];
+
   actionPlan: ActionPlan = new ActionPlan(
     '', new Date(), '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', '', '', new Date()
+    '', '', null, '', new Date()
   );
 
   actions: Action[] = []
 
   ngOnInit(): void {
     this.fetchTeams();
+    this.getRisk();
+  }
+
+  getRisk() {
+    this.riskService.getAll().subscribe(data => {
+      this.risks = data;
+    });
   }
 
 
@@ -87,7 +99,6 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Soumettre le plan d'action
   submitActionPlan() {
-    this.actionPlan.taxonomieId = '8ba9587b-0f2d-40c2-8e0e-fd275fb56920'
     console.log(this.actionPlan);
     this.actionPlanService.createActionPlan(this.actionPlan)
       .subscribe(id => {
