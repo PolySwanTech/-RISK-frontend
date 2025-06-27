@@ -2,7 +2,16 @@
   <h2>Créer un Plan d'Action</h2>
 
   <form (ngSubmit)="submitActionPlan()">
+
+
     <!-- Informations du Plan d'Action -->
+    @if(data.incidentId){
+      <div>
+        <label>Référence de l'incident</label>
+        <input id="reference" [(ngModel)]="data.reference" name="reference" disabled required>
+      </div>
+    }
+
     <div>
       <label for="libelle">Libellé</label>
       <input id="libelle" [(ngModel)]="actionPlan.libelle" name="libelle" required>
@@ -26,7 +35,7 @@
       <label for="priority">Risk</label>
       <select id="priority" [(ngModel)]="actionPlan.taxonomie" name="risk">
         @for(risk of risks; track risk) {
-        <option [value]="risk">{{ risk.libelle }}</option>
+        <option [ngValue]="risk">{{ risk.libelle }}</option>
         }
       </select>
 

@@ -1,4 +1,4 @@
-import { Component, inject, Type } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -6,7 +6,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { ActionPlan } from '../../../core/models/ActionPlan';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { Process } from '../../../core/models/Process';
 import { Utilisateur } from '../../../core/models/Utilisateur';
@@ -14,7 +13,7 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
-import { ControlTemplate, ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
+import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { Degree } from '../../../core/enum/degree.enum';
@@ -22,6 +21,7 @@ import { Priority } from '../../../core/enum/Priority';
 import { Recurence } from '../../../core/enum/recurence.enum';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { Type } from '../../../core/enum/controltype.enum';
 
 @Component({
   selector: 'app-create-control',

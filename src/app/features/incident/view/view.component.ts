@@ -26,6 +26,7 @@ import { State } from '../../../core/enum/state.enum';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {
@@ -55,8 +56,6 @@ export class ViewComponent {
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private suiviIncidentService = inject(SuiviIncidentService);
-  private http = inject(HttpClient);
-  private riskCategoryService = inject(RiskCategoryService);
   private entitiesService = inject(EntitiesService);
 
 
@@ -428,7 +427,20 @@ export class ViewComponent {
     if(this.incident == null) {
       return;
     }
-    this.router.navigate(['action-plan', 'create', this.incident?.id]);
+    
+    let choice = confirm("Créer un plan d'action ou consulter un plan d'action existant ?")
+    if(choice){
+      this.dialog.open(CreateActionPlanDialogComponent, {
+        width: '400px', 
+        data : {
+          incidentId : this.incident.id,
+          reference : this.incident.reference
+        }
+      })
+    }
+    else{
+      this.router.navigate(['action-plan', 'create', this.incident.id]);
+    }
   }
 
 }

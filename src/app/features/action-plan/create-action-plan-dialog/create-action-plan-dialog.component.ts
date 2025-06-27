@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, Inject, inject, OnInit } from '@angular/core';
 import { Action, ActionPlan } from '../../../core/models/ActionPlan';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -10,7 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -41,6 +41,9 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private riskService = inject(RiskService);
   private router = inject(Router);
   priorities = Object.values(Priority);
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference : string }
+  ) { }
 
   listTeams: Equipe[] = [];
 
@@ -99,6 +102,9 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Soumettre le plan d'action
   submitActionPlan() {
+    if(this.data){
+      this.actionPlan.incidentId = this.data.incidentId
+    }
     console.log(this.actionPlan);
     this.actionPlanService.createActionPlan(this.actionPlan)
       .subscribe(id => {
