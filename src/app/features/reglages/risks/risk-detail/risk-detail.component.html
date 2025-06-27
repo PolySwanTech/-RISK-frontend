@@ -36,7 +36,7 @@
               <div class="metric-label">Types d'impact</div>
             </div>
             <div class="metric">
-              <div class="metric-value">{{ risk.id.version | date:'short' }}</div>
+              <div class="metric-value">{{ risk.id.version | date : 'dd/MM/yyyy' }}</div>
               <div class="metric-label">Version</div>
             </div>
           </div>
@@ -52,6 +52,7 @@
               {{ risk.riskBrut | lowercase }}
             </span>
             <span class="score">
+              Dernière évaluation
               {{ lastEvaluation?.riskNet ?? '—' }}
             </span>
           </div>
@@ -104,7 +105,7 @@
           <div class="card full-width">
             <h3 class="card-title">Historique des évaluations</h3>
             <div *ngFor="let eval of risk.riskEvaluations" class="incident">
-              <div class="incident-date">{{ eval.createdAt | date:'short' }}</div>
+              <div class="incident-date">{{ eval.createdAt | date : 'dd/MM/yyyy' }}</div>
               <div class="incident-title">Score net : {{ eval.riskNet }}</div>
               <div class="evaluateur">Evaluateur : {{ eval.evaluator }}</div>
             </div>

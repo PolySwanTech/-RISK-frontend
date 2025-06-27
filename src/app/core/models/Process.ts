@@ -9,6 +9,8 @@ export class Process {
     enfants: Process[] = []
     risks: RiskTemplate[] = []
 
+    buName : string = ''
+
     constructor(
         name: string,
         bu: EntiteResponsable,

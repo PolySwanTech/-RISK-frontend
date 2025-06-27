@@ -41,7 +41,7 @@ export class RiskMatrixComponent {
   }
 
   get buName(): string {
-    return this.process?.bu?.name ?? 'Inconnu';
+    return this.process?.buName ?? 'Inconnu';
   }
 
   get processName(): string {
