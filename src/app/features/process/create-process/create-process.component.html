@@ -1,17 +1,25 @@
 <h2>Créer un Processus</h2>
 
 <form [formGroup]="processForm" (ngSubmit)="onSubmit()">
-  <label for="name">Nom du Processus:</label>
+  <label>Nom du Processus:</label>
   <input type="text" formControlName="name" />
-  @if(processForm.get('name')?.invalid && processForm.get('name')?.touched) {
-    <div>Le nom est requis.</div>
-  }
+  <div *ngIf="processForm.get('name')?.invalid && processForm.get('name')?.touched">
+    Le nom est requis.
+  </div>
 
-  <label for="bu_id">Business Unit:</label>
-  <input type="text" formControlName="bu_id" />
-  @if(processForm.get('bu_id')?.invalid && processForm.get('bu_id')?.touched) {
-    <div>Le BU ID est requis.</div>
-  }
+  <label>Business Unit:</label>
+  <select formControlName="bu_id">
+    <option *ngFor="let bu of businessUnits" [ngValue]="bu">{{ bu.name }}</option>
+  </select>
+  <div *ngIf="processForm.get('bu_id')?.invalid && processForm.get('bu_id')?.touched">
+    La BU est requise.
+  </div>
+
+  <label>Processus parent (optionnel):</label>
+  <select formControlName="parent">
+    <option [ngValue]="null">Aucun</option>
+    <option *ngFor="let proc of processes" [ngValue]="proc.id">{{ proc.name }}</option>
+  </select>
 
   <button type="submit" [disabled]="processForm.invalid">Créer le Process</button>
 </form>

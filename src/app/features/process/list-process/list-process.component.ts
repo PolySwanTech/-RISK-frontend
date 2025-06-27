@@ -1,27 +1,40 @@
+import { Router } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ProcessService } from '../../../core/services/process/process.service';
+import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
 @Component({
   selector: 'app-list-process',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, MatTableModule, MatIconModule, MatButtonModule, GoBackComponent],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'
 })
 export class ListProcessComponent {
-
   processService = inject(ProcessService);
-
+  router = inject(Router);
   processes: any[] = [];
+  displayedColumns: string[] = ['name', 'niveau', 'buName', 'parentName'];
 
   ngOnInit(): void {
     this.fetchProcesses();
   }
+
   fetchProcesses(): void {
-    this.processService.getAllByEntite("d9039d48-07ce-4f98-a776-69dc668f1f33").subscribe((data: any[]) => {
+    this.processService.getAll().subscribe((data: any[]) => {
       this.processes = data;
-    }, error => {
-      console.error('Error fetching processes:', error);
     });
   }
 
+  navToCreate() {
+    this.router.navigate(['reglages', 'process', 'create']);
+  }
+
+  navToEdit(id: string) {
+    this.router.navigate(['reglages', 'process', id]);
+  }
 }

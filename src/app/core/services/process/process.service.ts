@@ -22,7 +22,7 @@ export class ProcessService {
 }
 
 
-  createProcess(process : Process){ 
+  createProcess(process : { name: string; bu: { id: string; name: string }; parentId?: string }){ 
     return this.http.post<Process>(this.baseUrl , process)
   }
 
