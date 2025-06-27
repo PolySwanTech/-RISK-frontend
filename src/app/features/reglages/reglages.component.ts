@@ -22,4 +22,8 @@ export class ReglagesComponent {
   navToRisk(){
     this.router.navigate(['reglages', 'risks'])
   }
+
+  navToProcess(){
+    this.router.navigate(['reglages', 'process'])
+  }
 }
