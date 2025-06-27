@@ -1,52 +1,148 @@
-<div style="margin: 15px;">
+<div class="process-container">
     <app-go-back previousPageName="Paramétrage Global" currentPageName="Gestion des processus"
         [redirectUrl]="['reglages']" />
-    <div class="list-container">
-        <h2>Gestion des processus</h2>
 
-        <div class="filters-container">
+    <!-- Header avec glassmorphism -->
+    <div class="header-container">
+        <div class="header-content">
+            <div class="header-info">
+                <h1 class="main-title">Gestion des Processus</h1>
+            </div>
+
             <button mat-raised-button class="btn-primary" (click)="navToCreate()">
                 <mat-icon>add</mat-icon>
-                Ajouter un nouveau process
+                Nouveau Processus
             </button>
+        </div>
 
-            <div class="table-container">
-                <table mat-table [dataSource]="processes" class="mat-elevation-z8">
-
-                    <!-- Nom -->
-                    <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef>Nom</th>
-                        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
-                    </ng-container>
-
-                    <!-- Niveau -->
-                    <ng-container matColumnDef="niveau">
-                        <th mat-header-cell *matHeaderCellDef>Niveau</th>
-                        <td mat-cell *matCellDef="let row">{{ row.niveau }}</td>
-                    </ng-container>
-
-                    <!-- BU -->
-                    <ng-container matColumnDef="buName">
-                        <th mat-header-cell *matHeaderCellDef>BU</th>
-                        <td mat-cell *matCellDef="let row">{{ row.buName || '-' }}</td>
-                    </ng-container>
-
-                    <!-- Parent -->
-                    <ng-container matColumnDef="parentName">
-                        <th mat-header-cell *matHeaderCellDef>Parent</th>
-                        <td mat-cell *matCellDef="let row">{{ row.parentName || '-' }}</td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-                    <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center;">
-                            Aucun résultat trouvé.
-                        </td>
-                    </tr>
-                </table>
-            </div>
+        <!-- Barre de recherche -->
+        <div class="search-container">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input type="text" placeholder="Rechercher un processus..." class="search-input" [(ngModel)]="searchTerm"
+                (input)="onSearch($event)" />
         </div>
     </div>
+
+    <!-- Arbre hiérarchique -->
+    <div class="hierarchy-container">
+        <div class="tree-wrapper">
+            <ng-container *ngFor="let node of filteredProcesses">
+                <div class="node-container" [ngClass]="'level-' + node.niveau">
+
+                    <!-- Ligne de connexion -->
+                    <div class="connection-line" *ngIf="node.niveau > 0"></div>
+
+                    <!-- Node principal -->
+                    <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
+                        <!-- Effet de brillance -->
+                        <div class="shine-effect"></div>
+
+                        <div class="node-content">
+                            <div class="node-left">
+                                <!-- Chevron d'expansion -->
+                                <div class="chevron-container" *ngIf="hasChildren(node)">
+                                    <mat-icon class="chevron-icon" [ngClass]="{'expanded': isExpanded(node.id)}">
+                                        chevron_right
+                                    </mat-icon>
+                                </div>
+
+                                <!-- Icône et infos -->
+                                <div class="node-info">
+                                    <div class="icon-container" [ngClass]="'icon-' + node.type">
+                                        <mat-icon>{{ getNodeIcon(node.type) }}</mat-icon>
+                                    </div>
+
+                                    <div class="text-info">
+                                        <h3 class="node-name" [ngClass]="'name-' + node.type">
+                                            {{ node.name }}
+                                        </h3>
+                                        <p class="node-description" *ngIf="hasChildren(node)">
+                                            {{ getChildrenCount(node) }} processus
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Badge de niveau -->
+                            <div class="level-badge" [ngClass]="'badge-' + node.type">
+                                Niveau {{ node.niveau }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Children avec animation -->
+                    <div class="children-container" [ngClass]="{'expanded': isExpanded(node.id)}"
+                        *ngIf="hasChildren(node)">
+                        <div class="children-wrapper">
+                            <ng-container *ngFor="let child of node.children">
+                                <ng-container
+                                    *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }"></ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Template récursif pour les enfants -->
+    <ng-template #nodeTemplate let-node>
+        <div class="node-container" [ngClass]="'level-' + node.level">
+
+            <!-- Ligne de connexion -->
+            <div class="connection-line" *ngIf="node.level > 0"></div>
+
+            <!-- Node principal -->
+            <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
+                <!-- Effet de brillance -->
+                <div class="shine-effect"></div>
+
+                <div class="node-content">
+                    <div class="node-left">
+                        <!-- Chevron d'expansion -->
+                        <div class="chevron-container" *ngIf="hasChildren(node)">
+                            <mat-icon class="chevron-icon" [ngClass]="{'expanded': isExpanded(node.id)}">
+                                chevron_right
+                            </mat-icon>
+                        </div>
+
+                        <!-- Icône et infos -->
+                        <div class="node-info">
+                            <div class="icon-container" [ngClass]="'icon-' + node.type">
+                                <mat-icon>{{ getNodeIcon(node.type) }}</mat-icon>
+                            </div>
+
+                            <div class="text-info">
+                                <h3 class="node-name" [ngClass]="'name-' + node.type">
+                                    {{ node.name }}
+                                </h3>
+                                <p class="node-description" *ngIf="hasChildren(node)">
+                                    {{ getChildrenCount(node) }} processus
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Badge de niveau -->
+                    <div class="level-badge" [ngClass]="'badge-' + node.type">
+                        Niveau {{ node.niveau }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Children avec animation -->
+            <div class="children-container" [ngClass]="{'expanded': isExpanded(node.id)}" *ngIf="hasChildren(node)">
+                <div class="children-wrapper">
+                    <ng-container *ngFor="let child of node.children">
+                        <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }"></ng-container>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- Floating action button -->
+    <button mat-fab class="floating-btn" (click)="openFilters()">
+        <mat-icon>filter_list</mat-icon>
+    </button>
 </div>
