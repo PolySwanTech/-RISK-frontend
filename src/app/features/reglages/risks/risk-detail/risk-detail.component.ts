@@ -54,7 +54,8 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
 
   onEvaluate(): void {
     this.router.navigate(['/reglages/risks/evaluation'], {
-      queryParams: { id: this.risk?.id.id, version: this.risk?.id.version }
+      queryParams: { id: this.risk?.id.id, version: this.risk?.id.version },
+      state: { risk: this.risk }
     });
   }
 
