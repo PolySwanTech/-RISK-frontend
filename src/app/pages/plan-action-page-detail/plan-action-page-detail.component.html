@@ -8,9 +8,9 @@
         <mat-card class="action-plan-card">
             <mat-card-header>
                 <mat-card-title>
-                    <span>{{ actionPlan.reference }} - {{ actionPlan.libelle }} 
+                    <span>{{ actionPlan.reference }} - {{ actionPlan.libelle }}
                         @if(actionPlan.incidentId){
-                            (Ref incident : {{ actionPlan.incidentId }} )
+                        (Ref incident : {{ actionPlan.incidentId }} )
                         }
                     </span>
                     <button mat-raised-button class="btn-green">
@@ -55,6 +55,7 @@
                         </div>
                     </div>
 
+                    @if(actionPlan.taxonomie){
                     <div class="info-block">
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
@@ -64,6 +65,7 @@
                             </span>
                         </div>
                     </div>
+                    }
                 </div>
 
                 <mat-card class="description-card">
