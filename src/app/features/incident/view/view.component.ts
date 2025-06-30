@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
-import { Impact } from '../../../core/models/Impact';
+import { Impact, ImpactCreateDto } from '../../../core/models/Impact';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
@@ -207,25 +207,36 @@ export class ViewComponent {
     }
   }
 
-  addImpact() {
-    const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
-      width: '400px',
-    });
+addImpact() {
+  const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
+    width: '400px'
+  });
 
-    dialogRef.afterClosed().subscribe((result: Impact) => {
-      if (result) {
-        if (this.incident) {
-          result.incidentId = this.incident.id
-          this.incidentService.addImpact(result).subscribe(
-            _ => {
-              this.confirmService.openConfirmDialog("Impact ajouté", "L'impact a bien été ajouté à l'incident", false);
-              this.ngOnInit();
-            }
-          )
-        }
-      }
-    });
-  }
+  dialogRef.afterClosed().subscribe((result: Impact) => {
+    if (result && this.incident) {
+
+      /* ─── Construction explicite du DTO ─── */
+      const dto: ImpactCreateDto = {
+        montant:    result.montant,
+        entityId:   result.entityId,      // ou result.entiteResponsableId
+        incidentId: this.incident.id,     // ← lier à l’incident courant
+        type:       result.type,          // enum/chaine côté back
+        message:    result.message ?? ''  // commentaire optionnel
+      };
+
+      console.log('Envoi du DTO :', dto);
+
+      this.incidentService.addImpact(dto).subscribe(() => {
+        this.confirmService.openConfirmDialog(
+          'Impact ajouté',
+          "L'impact a bien été ajouté à l'incident",
+          false
+        );
+        this.ngOnInit();     // rafraîchir la vue
+      });
+    }
+  });
+}
 
   isNotClosed() {
     if (this.incident) {

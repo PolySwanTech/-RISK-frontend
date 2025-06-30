@@ -29,3 +29,12 @@ export class Impact{
         this.comptabilisationDate = comptabilisationDate
     }
 }
+
+// -------------  DTO -------------
+export interface ImpactCreateDto {
+  montant:        number;
+  entityId: string;
+  incidentId:   string; 
+  type:    string;
+  message:  string;    
+}

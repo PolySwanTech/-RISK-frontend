@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
-import { Impact } from '../../models/Impact';
+import { Impact, ImpactCreateDto } from '../../models/Impact';
 import { saveAs } from 'file-saver';
 
 @Injectable({
@@ -34,7 +34,7 @@ export class IncidentService {
     return this.http.get<any>(this.baseUrl + '/' + id);
   }
 
-  addImpact(impact: Impact) {
+  addImpact(impact: ImpactCreateDto) {
     return this.http.post(this.baseUrl + '/impact', impact)
   }
 
