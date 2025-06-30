@@ -1,5 +1,4 @@
 import { Component, ViewChild, OnInit, Input, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartOptions } from 'chart.js';
 import { CommonModule } from '@angular/common';
@@ -8,7 +7,6 @@ import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateControlComponent } from '../../create-control/create-control.component';
 import { ControlService } from '../../../../core/services/control/control.service';
 
 @Component({
@@ -83,8 +81,6 @@ export class ControlChartComponent implements OnInit {
         this.updateChart();
       });
     });
-
-
   }
 
   updateChart() {
