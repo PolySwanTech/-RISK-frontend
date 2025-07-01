@@ -4,7 +4,7 @@ import { ControlListComponent } from '../../features/control/control-list/contro
 
 @Component({
   selector: 'app-control-page',
-  imports: [ControlChartComponent, ControlListComponent],
+  imports: [ControlListComponent],
   templateUrl: './control-page.component.html',
   styleUrl: './control-page.component.scss'
 })

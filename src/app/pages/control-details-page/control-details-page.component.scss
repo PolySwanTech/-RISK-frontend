@@ -1,0 +1,421 @@
+/* control-details.component.scss */
+.control-details-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+
+  .header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+
+    .header-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 4rem;
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .back-button {
+          padding: 0.5rem;
+          border: none;
+          background: none;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #f3f4f6;
+          }
+
+          .icon-arrow-left {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #6b7280;
+          }
+        }
+
+        .header-info {
+          .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+          }
+
+          .page-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+          }
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+    }
+  }
+
+  .main-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2rem;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  .card {
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 1rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+  }
+
+  .control-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+
+    .control-info {
+      .control-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .control-badges {
+        display: flex;
+        gap: 1rem;
+      }
+    }
+
+    .control-score {
+      text-align: right;
+
+      .score-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2563eb;
+      }
+
+      .score-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+    }
+  }
+
+  .control-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .details-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+
+      .detail-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        color: #9ca3af;
+        margin-right: 0.75rem;
+      }
+
+      .detail-content {
+        .detail-label {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #111827;
+        }
+
+        .detail-value {
+          font-size: 0.875rem;
+          color: #6b7280;
+        }
+      }
+    }
+  }
+
+  .taxonomie-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .taxonomie-item {
+      .taxonomie-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #111827;
+      }
+
+      .taxonomie-value {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  .description-text {
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .audit-trail {
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+
+    .audit-text {
+      color: #374151;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .audit-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+      color: #6b7280;
+
+      i {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
+
+  .executions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .execution-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      background-color: #f9fafb;
+      border-radius: 0.5rem;
+
+      .execution-info {
+        .execution-date {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #111827;
+        }
+
+        .execution-responsible {
+          font-size: 0.75rem;
+          color: #6b7280;
+        }
+      }
+
+      .execution-status {
+        text-align: right;
+
+        .execution-score {
+          font-size: 0.75rem;
+          color: #6b7280;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+
+  .quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  // Badges
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    &.small {
+      padding: 0.125rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    i {
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+
+    // Status colors
+    &.status-realise {
+      color: #059669;
+      background-color: #d1fae5;
+    }
+
+    &.status-en-cours {
+      color: #d97706;
+      background-color: #fef3c7;
+    }
+
+    &.status-non-realise {
+      color: #dc2626;
+      background-color: #fee2e2;
+    }
+
+    // Priority colors
+    &.priority-maximale {
+      color: #dc2626;
+      background-color: #fee2e2;
+    }
+
+    &.priority-moyenne {
+      color: #d97706;
+      background-color: #fef3c7;
+    }
+
+    &.priority-minimale {
+      color: #059669;
+      background-color: #d1fae5;
+    }
+  }
+
+  // Buttons
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+
+    &.full-width {
+      width: 100%;
+    }
+
+    i {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &.btn-primary {
+      background-color: #2563eb;
+      color: white;
+
+      &:hover {
+        background-color: #1d4ed8;
+      }
+    }
+
+    &.btn-secondary {
+      background-color: white;
+      color: #374151;
+      border-color: #d1d5db;
+
+      &:hover {
+        background-color: #f9fafb;
+      }
+    }
+
+    &.btn-outline {
+      background-color: white;
+      color: #374151;
+      border-color: #d1d5db;
+
+      &:hover {
+        background-color: #f9fafb;
+      }
+    }
+  }
+
+  .btn-link {
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 1rem 0 0 0;
+    width: 100%;
+
+    &:hover {
+      color: #1d4ed8;
+    }
+  }
+}
+
+// Icons (remplacez par vos propres icônes ou utilisez Angular Material Icons)
+.icon-arrow-left::before { content: '←'; }
+.icon-download::before { content: '⬇'; }
+.icon-edit::before { content: '✏'; }
+.icon-alert-triangle::before { content: '⚠'; }
+.icon-check-circle::before { content: '✓'; }
+.icon-clock::before { content: '🕒'; }
+.icon-target::before { content: '🎯'; }
+.icon-shield::before { content: '🛡'; }
+.icon-user::before { content: '👤'; }
+.icon-calendar::before { content: '📅'; }
+.icon-users::before { content: '👥'; }
+.icon-file-text::before { content: '📄'; }
+.icon-activity::before { content: '📊'; }
