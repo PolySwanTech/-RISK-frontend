@@ -65,13 +65,18 @@ export class ListProcessComponent implements OnInit {
   }
 
   add() {
-      this.dialog.open(CreateProcessComponent, {
-        width: '600px !important',
-        height: '550px',
-        minWidth: '600px',
-        maxWidth: '600px',
-      });
-    }
+    const dialogRef = this.dialog.open(CreateProcessComponent, {
+      width: '600px !important',
+      height: '550px',
+      minWidth: '600px',
+      maxWidth: '600px',
+    });
+    dialogRef.afterClosed().subscribe((needRefresh: boolean) => {
+      if (needRefresh) {
+        this.fetchProcesses();
+      }
+    });
+  }
 
   buildHierarchy(): void {
     // Grouper par BU d'abord

@@ -61,6 +61,7 @@ export class CreateProcessComponent {
       const { name, bu_id, parent } = this.processForm.value;
       const dto = { name, bu: bu_id, parentId: parent || null };
       this.processService.createProcess(dto).subscribe(() => {
+        this.dialogRef.close(true);
         this.router.navigate(['reglages', 'process']);
       });
 
