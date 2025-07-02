@@ -75,3 +75,14 @@ export class ActionPlan {
     }
 
 }
+
+export interface ActionPlanCreateDto {
+  libelle:     string;
+  description: string;
+  status:      Status;
+  priority:    Priority;
+  echeance:    Date | string;
+  userInCharge: string;
+  taxonomieId:  string | null;
+  incidentId:   string | null;
+}

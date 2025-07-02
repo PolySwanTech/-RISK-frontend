@@ -2,7 +2,7 @@ import { Priority } from '../../enum/Priority';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Action, ActionPlan } from '../../models/ActionPlan';
+import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/ActionPlan';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class ActionPlanService {
   base = environment.apiUrl + '/risks/action-plans';
   http = inject(HttpClient);
 
-  createActionPlan(actionPlan: ActionPlan) {
+  createActionPlan(actionPlan: ActionPlanCreateDto) {
     return this.http.post<string>(this.base, actionPlan);
   }
 

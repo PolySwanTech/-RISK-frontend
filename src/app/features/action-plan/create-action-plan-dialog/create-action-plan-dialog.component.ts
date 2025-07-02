@@ -1,5 +1,5 @@
 import { Component, Inject, inject, OnInit } from '@angular/core';
-import { Action, ActionPlan } from '../../../core/models/ActionPlan';
+import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/ActionPlan';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
@@ -102,11 +102,21 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Soumettre le plan d'action
   submitActionPlan() {
-    if(this.data){
-      this.actionPlan.incidentId = this.data.incidentId
-    }
+    const incidentId = this.data?.incidentId ?? undefined;
+
+    const dto: ActionPlanCreateDto = {
+      libelle      : this.actionPlan.libelle,
+      description  : this.actionPlan.description,
+      status       : this.actionPlan.status,
+      priority     : this.actionPlan.priority,
+      echeance     : this.actionPlan.echeance,
+      userInCharge : this.actionPlan.userInCharge,
+      taxonomieId  : this.actionPlan.taxonomie?.id.id ?? null,
+      incidentId               // undefined si pas d’incident
+    };
+
     console.log(this.actionPlan);
-    this.actionPlanService.createActionPlan(this.actionPlan)
+    this.actionPlanService.createActionPlan(dto)
       .subscribe(id => {
         this.actionPlanService.addActions(this.actions, id).subscribe(() => {
         });
