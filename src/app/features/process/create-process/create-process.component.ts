@@ -1,17 +1,25 @@
 import { Component, inject } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatButtonModule } from '@angular/material/button';
+import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
 @Component({
   selector: 'app-create-process',
-  imports: [ReactiveFormsModule, ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, ReactiveFormsModule, CommonModule, FormsModule, ReactiveFormsModule,
+      MatFormFieldModule, MatInputModule, MatSelectModule,
+      MatStepperModule, MatButtonModule],
   templateUrl: './create-process.component.html',
   styleUrl: './create-process.component.scss'
 })
@@ -24,6 +32,7 @@ export class CreateProcessComponent {
   equipeService = inject(EquipeService);
   router = inject(Router);
   fb = inject(FormBuilder);
+  dialogRef = inject(MatDialogRef<CreateProcessComponent>);
 
   constructor(
   ) {

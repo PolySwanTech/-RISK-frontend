@@ -165,7 +165,7 @@ export class CreateRisksComponent implements OnInit {
     }
 
     const riskLevel = this.detailsForm.get('level')?.value;
-    const category = this.infoForm.get('balois2')?.value;
+    const category = this.infoForm.get('balois2')?.value ? this.infoForm.get('balois2')?.value : this.infoForm.get('balois1')?.value;
     const impactType = this.detailsForm.get('impactType')?.value;
 
     if (!riskLevel || !category || !impactType) {

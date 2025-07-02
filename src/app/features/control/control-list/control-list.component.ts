@@ -33,7 +33,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-
   columns = [
     {
       columnDef: 'Référence',
@@ -93,7 +92,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   // This method will be triggered when a row is clicked
   onRowClick(control: ControlTemplate) {
-    this.router.navigate(['controls', control.id]);
+    this.router.navigate(['control', 'details', control.id]);
   }
   
   create() {

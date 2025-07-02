@@ -20,6 +20,8 @@ interface ProcessNode {
   children?: ProcessNode[];
 }
 import { Process } from '../../../core/models/Process';
+import { MatDialog } from '@angular/material/dialog';
+import { CreateProcessComponent } from '../create-process/create-process.component';
 
 @Component({
   selector: 'app-list-process',
@@ -40,6 +42,8 @@ import { Process } from '../../../core/models/Process';
 export class ListProcessComponent implements OnInit {
   processService = inject(ProcessService);
   router = inject(Router);
+  private dialog = inject(MatDialog);
+  
   processes: Process[] = [];
   displayedColumns: string[] = ['name', 'niveau', 'buName', 'parentName'];
     hierarchicalProcesses: ProcessNode[] = [];
@@ -59,6 +63,15 @@ export class ListProcessComponent implements OnInit {
       this.filteredProcesses = [...this.hierarchicalProcesses];
     });
   }
+
+  add() {
+      this.dialog.open(CreateProcessComponent, {
+        width: '600px !important',
+        height: '550px',
+        minWidth: '600px',
+        maxWidth: '600px',
+      });
+    }
 
   buildHierarchy(): void {
     // Grouper par BU d'abord

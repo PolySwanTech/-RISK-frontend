@@ -49,8 +49,8 @@ export class RisksComponent implements OnInit {
     //   cell: (element: RiskTemplate) => `${element.category?.category?.name || 'Inconnu'}`,
     // },
     {
-      columnDef: 'balois2',
-      header: 'balois2',
+      columnDef: 'balois',
+      header: 'balois',
       cell: (element: RiskTemplate) => `${element.category?.name || 'Inconnu'}`,
     },
     {
@@ -75,7 +75,7 @@ export class RisksComponent implements OnInit {
     }
   ];
 
-  displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
+  displayedColumns = [...this.columns.map(c => c.columnDef)];
 
   dataSource = new MatTableDataSource<RiskTemplate>([]);
 
