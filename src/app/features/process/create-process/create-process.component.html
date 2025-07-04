@@ -1,0 +1,44 @@
+<h2>Créer un Processus</h2>
+
+<form [formGroup]="processForm" (ngSubmit)="onSubmit()">
+  <!-- Nom du Processus -->
+  <mat-form-field class="full-width">
+    <mat-label>Nom du Processus</mat-label>
+    <input matInput type="text" formControlName="name" placeholder="Entrez le nom du processus" />
+    <mat-error *ngIf="processForm.get('name')?.invalid && processForm.get('name')?.touched">
+      Le nom est requis.
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Business Unit -->
+  <mat-form-field class="full-width">
+    <mat-label>Business Unit</mat-label>
+    <mat-select formControlName="bu_id">
+      <mat-option *ngFor="let bu of businessUnits" [value]="bu">
+        {{ bu.name }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="processForm.get('bu_id')?.invalid && processForm.get('bu_id')?.touched">
+      La BU est requise.
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Processus Parent (optionnel) -->
+  <mat-form-field class="full-width">
+    <mat-label>Processus parent (optionnel)</mat-label>
+    <mat-select formControlName="parent">
+      <mat-option [value]="null">Aucun</mat-option>
+      <mat-option *ngFor="let proc of processes" [value]="proc.id">
+        {{ proc.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Bouton de soumission -->
+  <div class="actions">
+    <button mat-raised-button color="primary" type="submit" [disabled]="processForm.invalid">
+      Créer le Process
+    </button>
+  </div>
+</form>
+

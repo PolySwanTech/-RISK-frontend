@@ -1,0 +1,126 @@
+<div style="margin: 15px;">
+    @if(actionPlan){
+    <app-go-back previousPageName="Liste des plans d'action"
+        [currentPageName]="`Détails du plan d'action - ` + actionPlan.libelle"></app-go-back>
+    <div class="plan-detail-container">
+
+
+        <mat-card class="action-plan-card">
+            <mat-card-header>
+                <mat-card-title>
+                    <span>{{ actionPlan.reference }} - {{ actionPlan.libelle }}
+                        @if(actionPlan.incidentId){
+                        (Ref incident : {{ actionPlan.incidentId }} )
+                        }
+                    </span>
+                    <button mat-raised-button class="btn-green">
+                        <mat-icon>file_download</mat-icon> Exporter
+                    </button>
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="plan-info-content">
+
+                <div class="info-grid">
+                    <div class="info-block">
+                        <mat-icon>person</mat-icon>
+                        <div class="info-text">
+                            <label>Equipe responsable</label>
+                            <div class="value">{{ actionPlan.userInCharge }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <mat-icon>event</mat-icon>
+                        <div class="info-text">
+                            <label>Date d’échéance</label>
+                            <div class="value">{{ actionPlan.echeance | date: 'dd/MM/yyyy' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <mat-icon>priority_high</mat-icon>
+                        <div class="info-text">
+                            <label>Priorité</label>
+                            <div class="value" [innerHTML]="getPriorityBarHtml(actionPlan.priority)"></div>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <mat-icon>check_circle</mat-icon>
+                        <div class="info-text">
+                            <label>Statut</label>
+                            <span class="badge status" [ngClass]="actionPlan.status.toLowerCase()">
+                                {{ getReadableStatut(actionPlan.status) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    @if(actionPlan.taxonomie){
+                    <div class="info-block">
+                        <mat-icon>check_circle</mat-icon>
+                        <div class="info-text">
+                            <label>Risk</label>
+                            <span class="badge status" [ngClass]="actionPlan.taxonomie!.libelle.toLowerCase()">
+                                {{ actionPlan.taxonomie!.libelle }}
+                            </span>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <mat-card class="description-card">
+                    <label>DESCRIPTION</label>
+                    <p>{{ actionPlan.description }}</p>
+                </mat-card>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="actions-card">
+            <mat-card-header>
+                <mat-card-title>
+                    <span>Actions à réaliser</span>
+                    <div class="progression-section">
+                        <label>Progression globale</label>
+                        <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
+                        <small>
+                            {{ completedActions }} sur {{ totalActions }} actions terminées
+                            ({{ progressionPercent | number: '1.0-0' }}%)
+                        </small>
+                    </div>
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="actions-content">
+                @for(action of actionPlan.actions; track action.id) {
+                <div class="action-row">
+                    <div class="action-info">
+                        <p class="action-title">
+                            <strong>{{ action.name }}</strong>
+                            <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy' }})</span>
+                        </p>
+
+
+                        @if(!action.performedAt){
+                        <ng-container>
+                            <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
+                                <mat-icon>upload</mat-icon>
+                                Déposer un justificatif
+                            </button>
+                            <input style="display: none;" type="file" (change)="validateAction(action, $event)" />
+                        </ng-container>
+                        }
+                        @else {
+                        <ng-container>
+                            <p class="validated">
+                                ✔ Terminé par <strong>{{ action.performedBy }}</strong>
+                                le {{ action.performedAt | date: 'dd/MM/yyyy' }}
+                            </p>
+                        </ng-container>
+                        }
+                    </div>
+                </div>
+                }
+            </mat-card-content>
+        </mat-card>
+    </div>
+    }
+</div>

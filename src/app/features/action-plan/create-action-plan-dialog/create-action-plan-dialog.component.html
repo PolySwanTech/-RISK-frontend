@@ -1,0 +1,81 @@
+<div class="container">
+  <h2>Créer un Plan d'Action</h2>
+
+  <form (ngSubmit)="submitActionPlan()">
+
+
+    <!-- Informations du Plan d'Action -->
+    @if(data){
+      <div>
+        <label>Référence de l'incident</label>
+        <input id="reference" [(ngModel)]="data.reference" name="reference" disabled required>
+      </div>
+    }
+
+    <div>
+      <label for="libelle">Libellé</label>
+      <input id="libelle" [(ngModel)]="actionPlan.libelle" name="libelle" required>
+    </div>
+
+    <div>
+      <label for="description">Description</label>
+      <textarea id="description" [(ngModel)]="actionPlan.description" name="description" required></textarea>
+    </div>
+
+    <div>
+      <label for="priority">Priorité</label>
+      <select id="priority" [(ngModel)]="actionPlan.priority" name="priority">
+        @for(priority of priorities; track priority) {
+        <option [value]="priority">{{ formatPriority(priority) }}</option>
+        }
+      </select>
+    </div>
+    
+    <div>
+      <label for="priority">Risk</label>
+      <select id="priority" [(ngModel)]="actionPlan.taxonomie" name="risk">
+        @for(risk of risks; track risk) {
+        <option [ngValue]="risk">{{ risk.libelle }}</option>
+        }
+      </select>
+
+    </div>
+
+    <div>
+      <label for="echeance">Échéance</label>
+      <input id="echeance" type="date" [(ngModel)]="actionPlan.echeance" name="echeance" required>
+    </div>
+
+
+    <mat-form-field>
+      <mat-label>Choisissez une équipe</mat-label>
+      <mat-select [(ngModel)]="actionPlan.userInCharge" [ngModelOptions]="{standalone: true}">
+        <mat-option *ngFor="let team of listTeams" [value]="team.id">
+          {{ team.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+
+    <!-- Liste des actions -->
+    <div class="actions-container">
+      <label for="actions">Actions à effectuer</label>
+      <div class="actions-list">
+        @for(action of actions; track action; let index = $index) {
+        <div class="add-action">
+          <input [(ngModel)]="action.name" [ngModelOptions]="{standalone: true}" placeholder="Entrez une action"
+            class="action-input" />
+          <button type="button" (click)="removeAction(index)" class="remove-btn">X</button>
+        </div>
+        }
+
+        <!-- Champ d'ajout d'action -->
+        <div class="add-action">
+          <button type="button" (click)="addAction()" class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">Créer le Plan d'Action</button>
+  </form>
+</div>

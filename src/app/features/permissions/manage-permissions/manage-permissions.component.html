@@ -1,0 +1,59 @@
+<h2>Gestion des permissions</h2>
+
+<button mat-raised-button color="btn-primary" (click)="create()">Ajouter un rôle</button>
+<div class="container">
+  <div class="user-list" *ngIf="roles && roles.length > 0">
+    <mat-form-field class="full-width autocomplete-field">
+      <input
+        type="text"
+        matInput
+        placeholder="Roles"
+        [matAutocomplete]="auto"
+        [(ngModel)]="searchQuery"
+        (input)="filterBySearch()"
+        (focus)="filterBySearch()"
+        (keydown.enter)="filterBySearch()" />
+
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        [displayWith]="displayFn"
+        (optionSelected)="selectUser($event.option.value)">
+        <mat-option
+          *ngIf="filteredRoles.length === 0"
+          disabled
+          class="no-results">
+          Aucun rôle trouvé
+        </mat-option>
+        <mat-option
+          *ngFor="let role of filteredRoles"
+          [value]="role"
+          class="autocomplete-option">
+          {{ role.name }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+
+  <div class="permissions" *ngIf="selectedRole">
+    <mat-card class="permissions-card">
+      <mat-card-title>
+        Permissions de {{ selectedRole.name }}
+      </mat-card-title>
+      <mat-card-content>
+        <div class="permissions-list">
+          <mat-checkbox
+            *ngFor="let permission of permissions"
+            [checked]="hasPermission(permission)"
+            (change)="togglePermission(permission)">
+            {{ formatPermission(permission) }}
+          </mat-checkbox>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button class="btn-green" (click)="savePermissions()">
+          Valider
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

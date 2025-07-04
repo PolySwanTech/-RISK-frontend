@@ -1,0 +1,96 @@
+<h2>Formulaire de création d'un contrôle</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Libellé</mat-label>
+      <input matInput formControlName="libelle" />
+    </mat-form-field>
+  </div>
+
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Récurrence</mat-label>
+      <mat-select formControlName="frequency">
+        @for (rec of recurences; track rec) {
+        <mat-option [value]="rec">{{ rec }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Degré du niveau</mat-label>
+      <mat-select formControlName="level">
+        @for (lev of levels; track lev) {
+        <mat-option [value]="lev">{{ lev }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline">
+      <mat-label>Type de contrôle</mat-label>
+      <mat-select formControlName="type">
+        @for (t of types; track t) {
+        <mat-option [value]="t">{{ t }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Priorité</mat-label>
+      <mat-select formControlName="priority">
+        @for (t of priorities; track t) {
+        <mat-option [value]="t">{{ t }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    </div>
+
+
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Entité Responsable</mat-label>
+      <mat-select formControlName="buId" (selectionChange)="onEntiteResponsableChange()">
+        @for (bu of entitesResponsables; track bu.id) {
+        <mat-option [value]="bu.id">{{ bu.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="row-add">
+    @if (form.get('buId')?.value) {
+    <mat-form-field appearance="outline">
+      <mat-label>Process</mat-label>
+      <mat-select formControlName="processId" (selectionChange)="onProcessChange()">
+        @for (p of processes; track p.id) {
+        <mat-option [value]="p.id">{{ p.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    }
+  </div>
+
+  <div class="row-add">
+    @if (form.get('processId')?.value) {
+    <mat-form-field appearance="outline">
+      <mat-label>Risk</mat-label>
+      <mat-select formControlName="taxonomie">
+        @for (r of risks; track r.id) {
+        <mat-option [value]="r">{{ r.libelle }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    }
+  </div>
+
+  <button mat-raised-button class="btn-primary" type="submit">Créer</button>
+</form>

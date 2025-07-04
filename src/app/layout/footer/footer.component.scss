@@ -1,9 +1,10 @@
 .footer {
-    background-color: var(--mat-sys-surface);
-    color: var(--mat-sys-tertiary);
+    background-color: var(--mat-sys-background);
+    color: var(--mat-sys-primary);
     padding: 10px;
     text-align: center;
     font-size: 14px;
+    margin-left : 260px;
 
     p {
         font-size: 14px;

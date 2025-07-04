@@ -1,0 +1,13 @@
+/* Corriger l'alignement */
+mat-checkbox {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.checkbox-cell,
+.checkbox-header-cell {
+    width: 48px;
+    text-align: center;
+}

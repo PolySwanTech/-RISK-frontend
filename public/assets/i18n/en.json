@@ -1,0 +1,23 @@
+{
+  "MENU": {
+    "DASHBOARD": "Dashboard",
+    "INCIDENTS": "Incidents",
+    "ADMIN": "Administration",
+    "SETTINGS": "Global Settings",
+    "USERS": "User Management",
+    "PERMISSIONS": "Permission Management",
+    "LANGUAGE": "Language",
+    "LOGOUT": "Logout"
+  },
+    "LOGIN": {
+      "TITLE": "Login",
+      "USERNAME": "Username",
+      "PASSWORD": "Password",
+      "LOGIN_BUTTON": "Login",
+      "FORGOT_PASSWORD": "Forgot password?",
+      "RESET_TITLE": "Password Reset",
+      "EMAIL": "Email",
+      "RESET_BUTTON": "Reset Password",
+      "CANCEL_BUTTON": "Cancel"
+    }
+  }

@@ -1,0 +1,41 @@
+<div class="list-container">
+    <h2>Liste des utilisateurs</h2>
+    <div class="table-container">
+        <button mat-raised-button class="btn-primary" (click)="openCreateUserDialog()">
+            Ajouter un utilisateur
+        </button>
+
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+            <ng-container matColumnDef="username">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom d'utilisateur</th>
+                <td mat-cell *matCellDef="let user">{{ user.username }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let user">
+                    <button mat-icon-button (click)="openEditDialog(user)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center;">
+                        Aucun résultat trouvé.
+                    </td>
+                </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+    </div>
+</div>

@@ -1,0 +1,158 @@
+<div class="create-container">
+  <app-go-back previousPageName="Liste des incidents" currentPageName="Ajout d'un incident" />
+  <section>
+    <div class="form-container">
+      <h2>Ajout d'un incident</h2>
+      <mat-stepper [linear]="false" #stepper>
+        <mat-step [stepControl]="incidentForm1" label="Informations de base">
+          <form [formGroup]="incidentForm1">
+            <mat-form-field>
+              <mat-label>Titre</mat-label>
+              <input matInput formControlName="titre" placeholder="Titre">
+            </mat-form-field>
+
+            <ng-container *ngIf="hasTeam; else selectTeam">
+              <mat-form-field>
+                <mat-label>Équipe</mat-label>
+                <input matInput formControlName="equipeName" readonly>
+              </mat-form-field>
+            </ng-container>
+            <ng-template #selectTeam>
+              <mat-form-field>
+                <mat-label>Choisissez une équipe</mat-label>
+                <mat-select formControlName="equipeName">
+                  <mat-option *ngFor="let team of listTeams" [value]="team">{{ team }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ng-template>
+
+            <mat-form-field class="full-width">
+              <mat-label>Description de l'incident</mat-label>
+              <textarea matInput formControlName="commentaire" placeholder="Description de l'incident"></textarea>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Localisation de l'incident</mat-label>
+              <input matInput formControlName="location" placeholder="Location">
+            </mat-form-field>
+
+            <div class="actions">
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
+              <button mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid"
+                matStepperNext>Suivant</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step [stepControl]="incidentForm2" label="Dates">
+          <form [formGroup]="incidentForm2">
+            <mat-form-field>
+              <mat-label>Date de déclaration</mat-label>
+              <input matInput type="date" formControlName="dateDeDeclaration" readonly>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Date de survenance</mat-label>
+              <input matInput type="date" formControlName="dateDeSurvenance">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Date de détection</mat-label>
+              <input matInput type="date" formControlName="dateDeDetection">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Date de clôture (si clôturé)</mat-label>
+              <input matInput type="date" formControlName="dateDeCloture">
+            </mat-form-field>
+
+            <div class="actions">
+              <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
+              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
+              <button mat-raised-button class="btn-primary" [disabled]="incidentForm2.invalid"
+                matStepperNext>Suivant</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step [stepControl]="incidentForm3" label="Autres info">
+          <form [formGroup]="incidentForm3">
+
+            <app-button-add-file label="Télécharger des images" [accept]="'image/*'" [preview]="true"
+              property="newImages" (filesSelected)="onFilesChange($event)">
+            </app-button-add-file>
+
+            <mat-form-field>
+              <mat-label>Catégorie Niveau 1</mat-label>
+              <mat-select (selectionChange)="onBaloisChange($event.value, 1)">
+                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1">{{ c1.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="listCatLvl2.length > 0">
+              <mat-label>Catégorie Niveau 2</mat-label>
+              <mat-select (selectionChange)="onBaloisChange($event.value, 2)">
+                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2">{{ c2.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="listCatLvl3.length > 0">
+              <mat-label>Catégorie Niveau 3</mat-label>
+              <mat-select (selectionChange)="onBaloisChange($event.value, 3)">
+                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3">{{ c3.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Cause</mat-label>
+              <mat-select formControlName="cause" (selectionChange)="onCauseChange($event.value)">
+                <mat-option *ngFor="let cause of listCauses" [value]="cause">{{ cause.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Montant des pertes</mat-label>
+              <input matInput formControlName="lossAmount" type="number" placeholder="Ex: 25000">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Conséquence</mat-label>
+              <mat-select formControlName="consequenceId">
+                <mat-option *ngFor="let cons of listConsequence" [value]="cons.id">{{ cons.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Macro Processus (niveau 1)</mat-label>
+              <mat-select (selectionChange)="onProcessChange($event.value, 1)">
+                <mat-option *ngFor="let p1 of listP1" [value]="p1">{{ p1.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="listP2.length > 0">
+              <mat-label>Processus (niveau 2)</mat-label>
+              <mat-select (selectionChange)="onProcessChange($event.value, 2)">
+                <mat-option *ngFor="let p2 of listP2" [value]="p2">{{ p2.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="listP3.length > 0">
+              <mat-label>Micro-processus</mat-label>
+              <mat-select (selectionChange)="onProcessChange($event.value, 3)">
+                <mat-option *ngFor="let mp of listP3" [value]="mp">{{ mp.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <app-select-users (userSelected)="changeUser($event)" placeholder="Collaborateur pouvant vous aider" />
+          </form>
+
+          <div class="actions">
+            <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
+            <button mat-raised-button class="btn-primary"
+              [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid"
+              (click)="addIncident()">Soumettre</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </div>
+  </section>
+</div>

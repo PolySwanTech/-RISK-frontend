@@ -1,0 +1,7 @@
+export enum Type {
+    PREVENTIVE = 'PREVENTIVE',
+    DETECTIVE = 'DETECTIVE', 
+    CORRECTIVE = 'CORRECTIVE', 
+    AUTOMATIC = 'AUTOMATIC', 
+    MANUAL = 'MANUAL'
+}

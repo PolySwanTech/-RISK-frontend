@@ -1,0 +1,35 @@
+[
+    {
+        "id" : 1,
+        "name": "LE",
+        "isLM": true,
+        "children": [
+            {
+                "name": "IT",
+                "children": [
+                    {
+                        "name": "Dev"
+                    },
+                    {
+                        "name": "Projet"
+                    },
+                    {
+                        "name": "Maintenance"
+                    }
+                ]
+            },
+            {
+                "name": "BP"
+            },
+            {
+                "name": "Conseil"
+            }
+        ]
+    },
+    {   
+        "id" : 2,
+        "isLM" : false,
+        "name": "BD", 
+        "children" : []
+    }
+]

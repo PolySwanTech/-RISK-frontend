@@ -1,19 +1,37 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment'
+import { Utilisateur } from '../../models/Utilisateur';
+import { UtilisateurProfil } from '../../models/UtilisateurProfil';
+import { TeamRole } from '../../models/TeamMember';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilisateurService {
 
-  private readonly http: HttpClient = inject(HttpClient);
+  http = inject(HttpClient);
+  
+  baseUrl = environment.apiUrl + '/users';
 
-  private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+  getUsers(): Observable<Utilisateur[]> {
+    return this.http.get<Utilisateur[]>(this.baseUrl);
+  }    
 
-  constructor() { }
+  getUser(id: string): Observable<Utilisateur[]> {
+    return this.http.get<Utilisateur[]>(this.baseUrl + '/' + id);
+  }    
 
-  getPosts(): Observable<any> {
-    return this.http.get(this.apiUrl);
+  getUserProfiles(): Observable<UtilisateurProfil[]> {
+    return this.http.get<UtilisateurProfil[]>(this.baseUrl);
+  }  
+
+  updateUser(user: Utilisateur) {
+    return this.http.put(`${this.baseUrl}/update`, user);
+  }  
+
+  getUserRoles(userId : string): Observable<TeamRole[]> {
+    return this.http.get<TeamRole[]>(`${this.baseUrl}/${userId}/roles`);
   }
 }

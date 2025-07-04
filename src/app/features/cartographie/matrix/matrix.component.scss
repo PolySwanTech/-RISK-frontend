@@ -1,0 +1,292 @@
+$primary-color: #1976d2;
+$secondary-color: #f4f4f4;
+$background-color: #f9f9f9;
+$hover-color: #f0f0f0;
+$focus-border-color: $primary-color;
+$border-color: #ccc;
+
+// Mixin pour les transitions
+@mixin transition($property) {
+  transition: $property 0.3s ease;
+}
+
+#matrix {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #34495e;
+    font-size: 24px;
+    font-weight: bold;
+  }
+}
+
+// Contrôles
+.controls {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  label {
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+
+  select {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    font-size: 14px;
+
+    &:focus {
+      outline: none;
+      border-color: $focus-border-color;
+    }
+  }
+
+  input[type="color"] {
+    width: 40px;
+    height: 35px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+}
+
+// Container principal avec les axes
+.matrix-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+// Label IMPACT vertical
+.impact-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  margin-right: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #7f8c8d;
+  letter-spacing: 2px;
+}
+
+// Wrapper de la matrice
+.matrix-wrapper {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+// Table de la matrice
+.risk-matrix {
+  border-collapse: collapse;
+  
+  // Headers des lignes (Impact)
+  .row-header {
+    background-color: #2980b9 !important;
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid $border-color;
+    min-width: 120px;
+    height: 100px;
+  }
+
+  // Inputs dans les headers de lignes
+  .row-input {
+    background: none;
+    border: none;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    width: 116px;
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  // Cellules de la matrice
+  .matrix-cell {
+    cursor: pointer;
+    @include transition(opacity);
+    position: relative;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  // Ligne des labels de colonnes
+  .column-labels-row {
+    .probability-header {
+      background-color: $secondary-color;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      border: 1px solid $border-color;
+      color: #333;
+    }
+
+    .column-label-cell {
+      background-color: $secondary-color;
+      padding: 12px;
+      height: 45px;
+      border: 1px solid $border-color;
+      text-align: center;
+    }
+  }
+
+  // Inputs dans les labels de colonnes
+  .col-input {
+    background: none;
+    border: none;
+    text-align: center;
+    font-size: 14px;
+    width: 85px;
+    color: #333;
+    outline: none;
+
+    &:focus {
+      background-color: $hover-color;
+      border-radius: 3px;
+    }
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// Indicateurs de risques
+.risk-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid #666;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+  animation: popIn 0.4s ease-out;
+}
+
+// Légende des couleurs
+.color-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0 30px 0;
+  flex-wrap: wrap;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    @include transition(all);
+    border: 2px solid transparent;
+
+    &.modif{
+      cursor: pointer;
+
+      &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      transform: translateY(-1px);
+    }
+    }
+
+    &.selected {
+      border-color: $primary-color;
+      background-color: rgba(25, 118, 210, 0.1);
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+    }
+  }
+
+  .legend-color {
+    width: 24px;
+    height: 24px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+  }
+
+  .legend-label {
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+  }
+}
+
+// Bouton de sauvegarde
+.save-button {
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  @include transition(background-color);
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+table th {
+  padding: 0 !important;
+  font-size: 12px;
+  text-align: center !important;
+}
+
+table td {
+  padding: 6px !important;
+}

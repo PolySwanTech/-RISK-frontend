@@ -1,7 +1,70 @@
-@for(item of listTest; track item.id){
-<mat-card appearance="outlined" [id]="item.id">
-  <mat-card-content>{{item.title}}</mat-card-content>
-</mat-card>
-} @empty {
-<li>There are no items.</li>
-}
+<section class="dashboard-container">
+  <!-- En-tête avec titre et boutons d'action -->
+  <mat-card class="dashboard-header-card">
+    <mat-card-content class="dashboard-header">
+      <h1>Tableau de bord</h1>
+      <div class="header-controls">
+        <button mat-raised-button class="btn-green">
+          <mat-icon>file_download</mat-icon>
+          Exporter
+        </button>
+        <button (click)="refreshData()" mat-raised-button class="btn-primary">
+          <mat-icon>refresh</mat-icon>
+          Actualiser
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Section des filtres -->
+  <mat-card class="filters-card">
+    <mat-card-content class="filters-section">
+      <div class="filters-header">
+        <div>
+          <mat-icon>filter_alt</mat-icon>
+          <span class="filters-title">Filtres</span>
+        </div>
+        <button (click)="clearFilters()" mat-raised-button class="btn-red">
+          <mat-icon>clear</mat-icon>
+          Réinitialiser
+        </button>
+      </div>
+
+      <div class="filters-row">
+        <div class="filter-group">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Période</mat-label>
+            <mat-select [(ngModel)]="selectedPeriod">
+              <mat-option value="2024">Année 2024</mat-option>
+              <mat-option value="current-quarter">Trimestre actuel</mat-option>
+              <mat-option value="current-month">Mois actuel</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filter-group">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Département</mat-label>
+            <mat-select [(ngModel)]="selectedDepartment">
+              <mat-option value="all">Tous les départements</mat-option>
+              <mat-option value="it">IT</mat-option>
+              <mat-option value="rh">RH</mat-option>
+              <mat-option value="finance">Finance</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Vos graphiques existants -->
+  <div class="graphs-container">
+    <app-action-plan-chart></app-action-plan-chart>
+    <app-control-chart></app-control-chart>
+  </div>
+
+  <div class="graphs-container">
+    <app-bar-chart [incidents]="incidents"></app-bar-chart>
+    <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
+  </div>
+</section>

@@ -1,23 +1,30 @@
 <mat-toolbar color="primary">
     <span>Risk View</span>
     <span class="spacer"></span>
-    <nav>
-        <a routerLink="/" mat-raised-button>Home</a>
-        <a routerLink="/" mat-button>Home</a>
-        <a routerLink="/auth/login" mat-flat-button>Connexion</a>
-        <a routerLink="/auth/register" mat-stroked-button>Inscription</a>
-        <button mat-flat-button [matMenuTriggerFor]="menu">
-            <mat-icon>account_circle</mat-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-            <button mat-menu-item>
-                <mat-icon>person</mat-icon>
-                <span>Profil</span>
+    @if(isLogin$){
+        <nav>
+            <a routerLink="/dashboard" mat-button>Tableau de bord</a>
+            <a routerLink="/incident" [matBadge]="unreadIncidents" matBadgeColor="warn" matBadgePosition="above after"
+                mat-button>Incidents</a>
+            <a routerLink="/user/create" mat-button>Utilisateurs</a>
+            <button routerLink="/reglages" mat-raised-button>
+                <mat-icon>settings</mat-icon>
             </button>
-            <button mat-menu-item>
-                <mat-icon>logout</mat-icon>
-                <span>Déconnexion</span>
+            <!-- <a routerLink="/auth/login" mat-flat-button>Connexion</a>
+            <a routerLink="/auth/register" mat-stroked-button>Inscription</a> -->
+            <button mat-flat-button [matMenuTriggerFor]="menu">
+                <mat-icon>account_circle</mat-icon>
             </button>
-        </mat-menu>
-    </nav>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item>
+                    <mat-icon>person</mat-icon>
+                    <span>Profil</span>
+                </button>
+                <button mat-menu-item (click)="onLogout()">
+                    <mat-icon>logout</mat-icon>
+                    <span>Déconnexion</span>
+                </button>
+            </mat-menu>
+        </nav>
+    }
 </mat-toolbar>

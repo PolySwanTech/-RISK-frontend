@@ -1,0 +1,119 @@
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+div {
+  margin-bottom: 15px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.actions-container {
+  margin-top: 20px;
+}
+
+.add-action {
+  display: flex;
+  gap: 20px;
+}
+
+
+.action-input {
+  width: 85%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-btn {
+  background-color: #4CAF50;
+  max-width: 30px;
+  height: 30px;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1.2em;
+  text-align: center;
+  border-radius: 50%;
+}
+
+.add-btn:hover {
+  background-color: #45a049;
+}
+
+.actions {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.actions li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+
+.remove-btn {
+  background-color: red;
+  max-width: 30px;
+  height: 30px;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1.2em;
+  text-align: center;
+  border-radius: 50%;
+}
+
+.remove-btn:hover {
+  background-color: #f44336;
+}
+
+.submit-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2em;
+  cursor: pointer;
+  border-radius: 1%;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}

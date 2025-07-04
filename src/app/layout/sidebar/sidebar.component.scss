@@ -1,0 +1,135 @@
+
+
+
+  .mat-drawer-side{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0px;
+    border-right-style: none;
+    position: fixed;
+  }
+
+  ::ng-deep .mdc-list-item__primary-text{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  mat-nav-list a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+
+    ::ng-deep .mdc-list-item__primary-text{
+        justify-content: left;
+      }
+  }
+
+  .mat-badge-medium.mat-badge-overlap .mat-badge-content{
+    margin: -22px 10px;
+    font-size: 14px;
+    min-width: 20px;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  mat-icon {
+    font-size: 24px !important;
+    height: 24px !important;
+    width: 24px !important;
+    margin-inline: 0px !important;
+    color: var(--mat-sys-on-primary);
+  }
+
+  ::ng-deep .mat-mdc-menu-content {
+    width: 250px;
+  }
+
+  .sidenav-container {
+    min-height: 100vh;
+  }
+  
+  mat-drawer {
+    width: 260px;
+    background-color: var(--mat-sys-on-primary-container); // Bleu foncé sobre
+    color: var(--mat-sys-on-primary);
+    border-right: 1px solid var(--mat-sys-on-primary-fixed-variant);
+  }
+  
+  .mat-toolbar {
+    display: flex;
+    align-items: center;
+    background-color: var(--mat-sys-on-primary-fixed-variant); // Couleur assortie à la sidebar
+    color: var(--mat-sys-on-primary);
+    padding: 16px;
+    font-weight: bold;
+  }
+  
+  mat-nav-list {
+    padding: 10px;
+  }
+  
+  mat-nav-list a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    color: var(--mat-sys-on-primary);
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+  
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+  
+  button[mat-menu-item] {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: 500;
+    padding: 10px;
+    transition: background 0.3s ease;
+
+    mat-icon, span {
+      color: var(--mat-sys-on-primary-container) !important;
+    }
+  
+    &:hover {
+      background-color: var(--mat-sys-on-tertiary);
+    }
+  }
+  
+  .mat-mdc-menu-content {
+    background-color: var(--mat-sys-on-primary);
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  ::ng-deep .mdc-list-item__primary-text{
+    color: var(--mat-sys-on-primary) !important;
+  }
+
+  .deco{
+    margin-top: 20px;
+  }
+
+  .lang-select {
+    width: 200px;
+    margin: 1rem 0;
+  
+    mat-select {
+      text-align: start;
+    }
+  
+    mat-option {
+      display: flex;
+      align-items: center;
+    }
+  }

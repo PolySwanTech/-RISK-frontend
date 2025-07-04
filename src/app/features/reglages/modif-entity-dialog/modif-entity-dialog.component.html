@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Modification de l'entité</h2>
+<mat-dialog-content>
+  <form>
+    <div class="form-group">
+      <label for="reset-email">Nom :</label>
+      <input [(ngModel)]="entite.name" name="name" placeholder="Nom" required />
+    </div>
+  </form>
+  <div class="actions">
+    <button (click)="onSave()">Enregitrer</button>
+    <button class="red" (click)="goBack()">Retour</button>
+  </div>
+</mat-dialog-content>

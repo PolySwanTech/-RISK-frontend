@@ -1,0 +1,129 @@
+$success-color: #4caf50;
+$accent-color: #2196f3;
+$danger-color: #f44336;
+$text-primary: #333;
+$text-secondary: #666;
+$border-color: #e0e0e0;
+$light-gray: #f5f7fa;
+
+.timeline-container {
+    padding: 20px;
+
+    h2 {
+        font-size: 24px;
+        color: #0D47A1;
+        margin-bottom: 20px;
+        font-weight: 500;
+        border-bottom: 2px solid $accent-color;
+        padding-bottom: 8px;
+    }
+
+    .empty {
+        text-align: center;
+        color: $text-secondary;
+        padding: 40px 0;
+
+        mat-icon {
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+    }
+
+    .timeline {
+        position: relative;
+        margin-left: 30px;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: $border-color;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: flex-start;
+
+            .timeline-icon {
+                position: absolute;
+                left: -5px;
+                top: 0;
+                width: 30px;
+                height: 30px;
+                background: white;
+                border-radius: 50%;
+                border: 2px solid $border-color;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &.creation {
+                    border-color: $success-color;
+                    color: $success-color;
+                }
+
+                &.modification {
+                    border-color: $accent-color;
+                    color: $accent-color;
+                }
+
+                &.suppression {
+                    border-color: $danger-color;
+                    color: $danger-color;
+                }
+            }
+
+            .timeline-content {
+                background: white;
+                border-radius: 8px;
+                padding: 16px 20px;
+                margin-left: 40px;
+                width: 100%;
+
+                .header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 8px;
+
+                    .meta {
+                        font-size: 13px;
+                        color: $text-secondary;
+                    }
+                }
+
+                .comment {
+                    margin-bottom: 12px;
+                    color: $text-primary;
+                }
+
+                .impact-summary {
+                    font-style: italic;
+                    color: $text-secondary;
+                    margin-bottom: 8px;
+                }                
+
+                button {
+                    font-size: 13px;
+                    color: $accent-color;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+
+                    mat-icon {
+                        font-size: 18px;
+                    }
+
+                    &:hover {
+                        background-color: lighten($accent-color, 40%);
+                    }
+                }
+            }
+        }
+    }
+}

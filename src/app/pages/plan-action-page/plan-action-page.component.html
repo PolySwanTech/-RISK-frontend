@@ -1,0 +1,120 @@
+<section class="dashboard-container">
+    <!-- En-tête avec titre et boutons d'action -->
+    <mat-card class="dashboard-header-card">
+        <mat-card-content class="dashboard-header">
+            <h1>Liste des plans d'action</h1>
+            <div class="header-controls">
+                <button mat-raised-button class="btn-green">
+                    <mat-icon>file_download</mat-icon>
+                    Exporter
+                </button>
+                <button (click)="refreshData()" mat-raised-button class="btn-primary">
+                    <mat-icon>refresh</mat-icon>
+                    Actualiser
+                </button>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Section des filtres -->
+    <mat-card class="filters-card">
+        <mat-card-content class="dashboard-header">
+            <div class="filters-section">
+                <div class="files-search-container">
+                    <mat-form-field class="files-search-field" appearance="outline">
+                        <mat-label>Rechercher des plans d'action</mat-label>
+                        <div class="files-search-input-container">
+                            <input matInput [(ngModel)]="searchQuery" (input)="onSearchFiles($event)"
+                                placeholder="Nom du plan d'action, Ref, Titre ...">
+                            <div class="files-search-input-actions">
+                                <mat-icon matSuffix>search</mat-icon>
+                                @if(searchQuery && searchQuery.length > 0) {
+                                <button matSuffix mat-icon-button aria-label="Effacer" (click)="clearSearch()">
+                                    <mat-icon>close</mat-icon>
+                                </button>
+
+                                }
+                            </div>
+                        </div>
+                    </mat-form-field>
+                </div>
+
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Date d'échéance</mat-label>
+                            <input matInput [matDatepicker]="picker" [formControl]="dateFilter"
+                                (dateChange)="applyAllFilters()">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="filter-group">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Priorité</mat-label>
+                            <mat-select [formControl]="priorityFilter" (selectionChange)="applyAllFilters()">
+                                <mat-option value="">Toutes</mat-option>
+                                <mat-option *ngFor="let priority of priorities" [value]="priority">{{
+                                    formatPriority(priority)
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="filter-group">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Statut</mat-label>
+                            <mat-select [formControl]="statusFilter" (selectionChange)="applyAllFilters()">
+                                <mat-option value="">Tous</mat-option>
+                                <mat-option *ngFor="let status of statuses" [value]="status">{{
+                                    getReadableStatut(status)
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button (click)="clearFilters()" mat-raised-button class="btn-red">
+                    <mat-icon>clear</mat-icon>
+                    Réinitialiser
+                </button>
+                <button mat-raised-button class="btn-primary add-button" (click)="add()"><mat-icon>add</mat-icon>Ajouter
+                    un plan d'action</button>
+            </div>
+        </mat-card-content>
+
+    </mat-card>
+
+    <mat-card>
+        <div class="table-container">
+            <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+                @for (column of columns; track column) {
+                <ng-container *ngIf="column.columnDef" matColumnDef="{{ column.columnDef }}">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{column.header}}
+                    </th>
+                    <td mat-cell *matCellDef="let row" [innerHTML]="column.cell(row)">
+
+                    </td>
+                </ng-container>
+                }
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onRowClick(row)"
+                    matTooltip="Cliquez pour voir plus">
+                </tr>
+
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center;">
+                        Aucun résultat trouvé.
+                    </td>
+                </tr>
+
+            </table>
+            <mat-paginator [length]="dataSource.data.length" [pageSizeOptions]="[5, 10, 15]"
+                aria-label="Page selection pour le tableau" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </mat-card>
+</section>

@@ -1,0 +1,68 @@
+form{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+
+
+mat-form-field input:read-only {
+    width: 100%;
+
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    /* Adjust the gap between the form and button */
+}
+
+.form-container {
+    flex: 1;
+    /* This allows the form container to take up available space */
+    padding: 10px;
+}
+
+.next-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5%;
+}
+
+::ng-deep .mat-horizontal-stepper-wrapper {
+    width: 550px;
+}
+
+.create-container {
+    margin: 15px;
+}
+
+.form-container {
+    display: flex;
+    height: auto;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+
+    mat-stepper {
+        background-color: var(--mat-sys-surface-container-low);
+    }
+
+}
+
+section{
+    display: flex;
+    justify-content: center;
+    align-items: inherit;
+    height: auto;
+    margin-top: 30px;
+    width: 100%;
+}
+
+mat-radio-group{
+    text-align: justify;
+}

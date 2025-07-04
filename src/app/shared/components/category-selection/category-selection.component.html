@@ -1,0 +1,40 @@
+<section>
+  <app-go-back previousPageName="Paramétrage Global" currentPageName="Gestion des entités" />
+  <h2>Gestion des entités</h2>
+
+  <div class="entite-container">
+  @if(settings){
+  <button class="add" matRipple (click)="openEntityDialog()">
+    <mat-icon>add</mat-icon><span>Ajouter</span>
+  </button>
+  }
+
+  <mat-form-field appearance="outline">
+    <mat-label>Rechercher</mat-label>
+    <input matInput (input)="applyFilter($event)" placeholder="Entrez une entité...">
+  </mat-form-field>
+
+  @if(filteredEntities && filteredEntities.length > 0){
+  <mat-tree #tree [dataSource]="filteredEntities" [childrenAccessor]="childrenAccessor">
+    <!-- Nœud feuille -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <button mat-icon-button disabled></button>
+      <span>{{node.name}}</span>
+      <button (click)="openEntityDialog(node, $event)" mat-icon-button><mat-icon>edit</mat-icon></button>
+    </mat-tree-node>
+
+    <!-- Nœud avec enfants -->
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodeToggle>
+      <button mat-icon-button matTreeNodeToggle>
+        <mat-icon>{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+      </button>
+      <span>{{node.name}}</span>
+      <button (click)="openEntityDialog(node, $event)" mat-icon-button><mat-icon>edit</mat-icon></button>
+    </mat-tree-node>
+  </mat-tree>
+  }
+  @else{
+  <p>Aucune entité trouvé</p>
+  }
+</div>
+</section>
