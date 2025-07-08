@@ -21,7 +21,7 @@ COPY --from=build /app/dist/risk-view/browser /usr/share/nginx/html
 COPY --from=build /app/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Expose port
-EXPOSE 80
+EXPOSE 4200
 
 # Start nginx server
 CMD ["nginx", "-g", "daemon off;"]
