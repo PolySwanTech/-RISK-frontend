@@ -16,7 +16,7 @@ export class IncidentService {
   http = inject(HttpClient);
 
   loadIncidents(): Observable<Incident[]> {
-    return this.http.get<Incident[]>(this.baseUrl );
+    return this.http.get<Incident[]>(this.baseUrl);
   }
 
   countIncidentsNonClotures(): Observable<number> {
