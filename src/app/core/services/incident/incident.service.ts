@@ -11,7 +11,7 @@ import { saveAs } from 'file-saver';
 })
 export class IncidentService {
 
-  baseUrl = environment.apiUrl + '/incidents'
+  baseUrl = environment.apiUrl + '/incidents/incident'
 
   http = inject(HttpClient);
 
