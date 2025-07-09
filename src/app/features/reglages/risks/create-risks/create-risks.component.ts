@@ -71,6 +71,7 @@ export class CreateRisksComponent implements OnInit {
 
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
+    parentRisk: this.fb.control<RiskTemplate | null>(null), // pour les risques enfants
     libelle: this.fb.nonNullable.control<string>(''),
     balois1: this.fb.control<BaloiseCategory | null>(null, Validators.required),
     balois2: this.fb.control<BaloiseCategory | null>(null),
@@ -83,7 +84,6 @@ export class CreateRisksComponent implements OnInit {
   detailsForm = this.fb.group({
     description: this.fb.nonNullable.control<string>(''),
     level: this.fb.nonNullable.control<RiskLevel>(RiskLevel.LOW),
-    probability: this.fb.control<number | null>(null, Validators.pattern(/^\d+(\.\d+)?$/)),
     impactType: this.fb.control<RiskImpactType | null>(null)
   });
 
@@ -179,7 +179,8 @@ export class CreateRisksComponent implements OnInit {
       processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,
       category: category,
-      impactTypes: [impactType]
+      impactTypes: [impactType],
+      parent: this.infoForm.get('parent')?.value  // si c'est un risque enfant
     };
 
     // Log pour débug
