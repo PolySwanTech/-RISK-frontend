@@ -87,6 +87,7 @@ export class ViewComponent implements OnInit {
     this.loadAttachedFiles(this.idIncident);
     this.suiviIncidentService.getSuiviIncidentById(this.idIncident).subscribe(
       (res) => {
+        this.suivi = [];
         this.suivi = res;
       },
       (err) => {
