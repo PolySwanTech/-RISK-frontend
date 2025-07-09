@@ -87,13 +87,13 @@ export class ViewComponent implements OnInit {
     this.loadAttachedFiles(this.idIncident);
     this.suiviIncidentService.getSuiviIncidentById(this.idIncident).subscribe(
       (res) => {
-        this.suivi = [];
         this.suivi = res;
       },
       (err) => {
         console.error("Erreur lors du chargement du suivi de l'incident :", err);
       }
     );
+    this.message = "";
   }
 
   loadIncident(id: string): void {
@@ -253,6 +253,7 @@ addImpact() {
       this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
         () => {
           this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
+          this.ngOnInit();
         });
     }
   }
