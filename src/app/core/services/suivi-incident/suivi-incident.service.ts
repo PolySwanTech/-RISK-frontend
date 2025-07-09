@@ -9,7 +9,7 @@ import { IncidentHistory } from '../../models/IncidentHistory';
 })
 export class SuiviIncidentService {
 
-  private base = environment.apiUrl + '/incidents/suivi';
+  private base = environment.apiUrl + '/incidents/incident/suivi';
   private http = inject(HttpClient);
 
 

@@ -27,6 +27,7 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
+import { ImpactService } from '../../../core/services/impact/impact.service';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {
@@ -51,6 +52,7 @@ interface AttachedFile {
 })
 export class ViewComponent {
   private incidentService = inject(IncidentService);
+  private impactService = inject(ImpactService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService);
@@ -104,7 +106,7 @@ export class ViewComponent {
     });
 
 
-    this.incidentService.sum(id).subscribe(
+    this.impactService.sum(id).subscribe(
       result => this.totalAmount = result
     )
   }
@@ -226,7 +228,7 @@ addImpact() {
 
       console.log('Envoi du DTO :', dto);
 
-      this.incidentService.addImpact(dto).subscribe(() => {
+      this.impactService.addImpact(dto).subscribe(() => {
         this.confirmService.openConfirmDialog(
           'Impact ajouté',
           "L'impact a bien été ajouté à l'incident",
