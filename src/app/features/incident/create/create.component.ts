@@ -204,7 +204,6 @@ export class CreateComponent implements OnInit {
   addIncident() {
 
     const incident = this.convertFormToIncident();
-    console.log("Incident à créer :", incident);
     this.incidentService.saveIncident(incident).subscribe(
       {
         next: resp => {
@@ -267,6 +266,5 @@ export class CreateComponent implements OnInit {
   }
 
   onCauseChange(cause :Cause) {
-    console.log("Cause sélectionnée :", cause);
   }
 }

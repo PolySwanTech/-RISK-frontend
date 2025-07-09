@@ -187,7 +187,6 @@ export class ListComponent implements OnInit {
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
       this.incidents = data;
-      console.log('Incidents loaded:', this.incidents);
       this.dataSource.data = data;
     });
   }

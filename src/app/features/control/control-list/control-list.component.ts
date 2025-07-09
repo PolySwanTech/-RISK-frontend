@@ -85,7 +85,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   getAll() {
     this.controlService.getAllTemplates().subscribe(resp => {
       this.controls = resp;
-      console.log(this.controls);
       this.dataSource.data = resp;
     });
   }

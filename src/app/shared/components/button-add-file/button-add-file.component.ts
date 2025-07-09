@@ -56,9 +56,7 @@ export class ButtonAddFileComponent {
   
         // Supprime également l'image correspondante de newImages
         if (list) {
-          console.log(list);
           list.splice(index, 1); // Suppression de l'image basée sur le nom
-          console.log(list);
         }
       }
     }

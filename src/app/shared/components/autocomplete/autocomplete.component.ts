@@ -43,7 +43,6 @@ export class AutocompleteComponent {
 
   loadUsers(): void {
     this.filteredList = this.list;
-    console.log(this.list);
   }
 
   selectUser(element: any): void {

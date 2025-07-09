@@ -102,7 +102,6 @@ export class RisksComponent implements OnInit {
   }
 
   navToCreate() {
-    alert("ici")
     this.router.navigate(['reglages', 'risks', 'create']);
   }
 }

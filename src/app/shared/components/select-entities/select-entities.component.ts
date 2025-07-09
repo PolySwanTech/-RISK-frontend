@@ -75,7 +75,6 @@ export class SelectEntitiesComponent {
 
   onOptionSelected(event: MatAutocompleteSelectedEvent): void {
     this.searchQuery = event.option.value; // Stocke l'objet utilisateur
-    console.log(this.searchQuery);
     this.entitieSelected.emit(this.searchQuery)
   }
 

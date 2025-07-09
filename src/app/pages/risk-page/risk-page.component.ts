@@ -73,7 +73,6 @@ export class RiskPageComponent implements OnInit {
       bus   : this.entitiesSrv.loadEntities()
     }).subscribe({
       next: ({ risks, bus }) => {
-        console.log(risks);
         /* ---------------- Pré-traitement ---------------- */
         this.risks = risks.map(risk => {
           const lastEval = risk.riskEvaluations?.at(-1);

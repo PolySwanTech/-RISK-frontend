@@ -54,7 +54,6 @@ export class PlanActionPageDetailComponent {
           team => {
             this.actionPlan = resp;
             this.actionPlan.userInCharge = team.name;
-            console.log(this.actionPlan);
             if (this.actionPlan?.actions?.length) {
               this.totalActions = this.actionPlan.actions.length;
               this.completedActions = this.getCompletedCount(this.actionPlan.actions);

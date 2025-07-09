@@ -77,6 +77,5 @@ export class BarChartComponent implements OnChanges {
     }]
   };
 
-  console.log('Données du graph :', this.barChartData.datasets[0].data);
 }
 }

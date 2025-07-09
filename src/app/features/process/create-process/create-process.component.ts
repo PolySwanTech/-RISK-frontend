@@ -44,14 +44,11 @@ export class CreateProcessComponent {
   }
 
   ngOnInit() {
-    console.log('[INIT] CreateProcessComponent loaded');
     this.equipeService.getAllEquipes().subscribe(data => {
-      console.log('[BU] Reçues :', data);
       this.businessUnits = data;
     });
 
     this.processService.getAll().subscribe(data => {
-      console.log('[PROCESS] Reçus :', data);
       this.processes = data;
     });
   }

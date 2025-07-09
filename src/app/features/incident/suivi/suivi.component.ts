@@ -55,17 +55,14 @@ export class SuiviComponent implements OnInit {
     const id = this.route.snapshot.params['id'];
     this.entitiesService.loadEntities().subscribe(units => {
       this.businessUnits = units;
-      console.log("🏢 Business units chargées :", this.businessUnits);
     });
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
-      console.log("✅ Incident chargé :", this.incident);
     }
     );
 
     this.suiviIncidentService.getSuiviIncidentById(id).subscribe((suiviIncident) => {
       this.messages = suiviIncident;
-      console.log("💬 Messages reçus :", this.messages);
     });
 
 

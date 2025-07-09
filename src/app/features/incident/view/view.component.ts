@@ -1,4 +1,4 @@
-import { Component, inject, Input, LOCALE_ID } from '@angular/core';
+import { Component, inject, Input, LOCALE_ID, OnInit } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -50,7 +50,7 @@ interface AttachedFile {
     { provide: LOCALE_ID, useValue: 'fr' }
   ]
 })
-export class ViewComponent {
+export class ViewComponent implements OnInit {
   private incidentService = inject(IncidentService);
   private impactService = inject(ImpactService);
   private dialog = inject(MatDialog);
@@ -88,10 +88,9 @@ export class ViewComponent {
     this.suiviIncidentService.getSuiviIncidentById(this.idIncident).subscribe(
       (res) => {
         this.suivi = res;
-        console.log("📬 Messages de suivi :", this.suivi);
       },
       (err) => {
-        console.error("Erreur récupération des messages de suivi", err);
+        console.error("Erreur lors du chargement du suivi de l'incident :", err);
       }
     );
   }
@@ -99,7 +98,6 @@ export class ViewComponent {
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
-      console.log("Incident chargé :", this.incident);
       
       this.extractTokenInfo();
       this.checkCloseAuthorization();
@@ -173,7 +171,6 @@ export class ViewComponent {
     // this.userTeam = payload.roles?.[0]?.team_id;
     this.username = payload.username;
 
-    console.log("👤 Role:", this.userRole, "| Team:", this.userTeam);
   }
 
   checkCloseAuthorization(): void {
@@ -226,7 +223,6 @@ addImpact() {
         message:    result.message ?? ''  // commentaire optionnel
       };
 
-      console.log('Envoi du DTO :', dto);
 
       this.impactService.addImpact(dto).subscribe(() => {
         this.confirmService.openConfirmDialog(
