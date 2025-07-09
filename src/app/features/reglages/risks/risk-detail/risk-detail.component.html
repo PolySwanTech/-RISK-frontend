@@ -7,7 +7,7 @@
       <div class="risk-id">{{ risk.reference| uppercase }}</div>
       <h1 class="risk-title">{{ risk.libelle }}</h1>
       <div class="risk-category">
-        {{ "B2: " + risk.category?.name || 'Catégorie inconnue' }}
+        {{ "B2: " + risk.category || 'Catégorie inconnue' }}
       </div>
     </div>
 
