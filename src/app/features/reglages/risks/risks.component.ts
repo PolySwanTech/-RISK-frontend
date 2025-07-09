@@ -51,7 +51,7 @@ export class RisksComponent implements OnInit {
     {
       columnDef: 'balois',
       header: 'balois',
-      cell: (element: RiskTemplate) => `${element.category?.name || 'Inconnu'}`,
+      cell: (element: RiskTemplate) => `${element.category?.toString() || 'Inconnu'}`,
     },
     {
       columnDef: 'process',
@@ -90,8 +90,9 @@ export class RisksComponent implements OnInit {
         (acc, p) => ({ ...acc, [p.id]: p.name }),
         {}
       );
-
+      
       this.riskService.getAll().subscribe(risks => {
+        console.log(risks);
         this.dataSource.data = risks;
       });
     });

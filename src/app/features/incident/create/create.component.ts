@@ -17,23 +17,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
 import { NgIf, NgFor } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { BaloisCategoriesService } from '../../../core/services/balois-categories/balois-categories.service';
 import { ConsequenceService } from '../../../core/services/consequence/consequence.service';
-// import { MicroProcessService } from '../../../core/services/micro_process/micro-process.service';
 import { Consequence } from '../../../core/models/Consequence';
-import { MicroProcess } from '../../../core/models/MicroProcess';
-import { RiskCategory } from '../../../core/models/RiskCategory';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
-import { BaloiseCategory } from '../../../core/models/BaloiseCategory';
-import { Incident } from '../../../core/models/Incident';
-import { State } from '../../../core/enum/state.enum';
+import { BaloiseCategoryEnum } from '../../../core/enum/baloisecategory.enum';
 
 
 @Component({
@@ -106,9 +98,9 @@ export class CreateComponent implements OnInit {
   // listBaloiseL1: BaloiseCategoryL1[] = [];
   listConsequence: Consequence[] = [];
 
-  listCatLvl1: BaloiseCategory[] = [];
-  listCatLvl2: BaloiseCategory[] = [];
-  listCatLvl3: BaloiseCategory[] = [];
+  listCatLvl1: BaloiseCategoryEnum[] = [];
+  listCatLvl2: BaloiseCategoryEnum[] = [];
+  listCatLvl3: BaloiseCategoryEnum[] = [];
 
   listP1: Process[] = [];
   listP2: Process[] = [];
@@ -120,7 +112,6 @@ export class CreateComponent implements OnInit {
 
   incidentService = inject(IncidentService);
   riskService = inject(RiskService);
-  baloisCategoriesService = inject(BaloisCategoriesService);
   riskCategoryService = inject(RiskCategoryService);
   equipeService = inject(EquipeService);
   causeService = inject(CauseService);
@@ -244,17 +235,27 @@ export class CreateComponent implements OnInit {
     return risk;
   }
 
-  onBaloisChange(cat: BaloiseCategory, level: number) {
-    this.incidentForm3.get('risk')!.setValue(cat.id);
+  onBaloisChange(cat: BaloiseCategoryEnum, level: number) {
+    this.incidentForm3.get('risk')!.setValue(cat);
     if (level === 1) {
-      this.listCatLvl2 = cat.enfants || [];
+      this.riskCategoryService.getByParent(cat).subscribe(data => {
+        this.listCatLvl2 = data;
+        this.listCatLvl3 = [];
+      });
     }
     if (level === 2) {
-      this.listCatLvl3 = cat.enfants || [];
+      this.riskCategoryService.getByParent(cat).subscribe(data => {
+        this.listCatLvl3 = data;
+      });
     }
   }
 
+  formatCategoryName(cat: BaloiseCategoryEnum): string {
+    return cat;
+  }
+
   onProcessChange(process: Process, level: number) {
+    console.log("Processus sélectionné :", process, "Niveau :", level);
     if (level === 1) {
       this.incidentForm3.get('process')!.setValue(process); // sélection niveau 1
       this.listP2 = process.enfants || [];
@@ -266,7 +267,7 @@ export class CreateComponent implements OnInit {
     }
   }
 
-  onCauseChange(cause :Cause) {
+  onCauseChange(cause: Cause) {
     console.log("Cause sélectionnée :", cause);
   }
 }

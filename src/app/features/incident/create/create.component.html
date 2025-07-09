@@ -83,23 +83,44 @@
             </app-button-add-file>
 
             <mat-form-field>
+              <mat-label>Macro Processus (niveau 1)</mat-label>
+              <mat-select (selectionChange)="onProcessChange($event.value, 1)">
+                <mat-option *ngFor="let p1 of listP1" [value]="p1">{{ p1.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="listP2.length > 0">
+              <mat-label>Processus (niveau 2)</mat-label>
+              <mat-select (selectionChange)="onProcessChange($event.value, 2)">
+                <mat-option *ngFor="let p2 of listP2" [value]="p2">{{ p2.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field *ngIf="listP3.length > 0">
+              <mat-label>Micro-processus</mat-label>
+              <mat-select (selectionChange)="onProcessChange($event.value, 3)">
+                <mat-option *ngFor="let mp of listP3" [value]="mp">{{ mp.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
               <mat-label>Catégorie Niveau 1</mat-label>
               <mat-select (selectionChange)="onBaloisChange($event.value, 1)">
-                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1">{{ c1.name }}</mat-option>
+                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1">{{ formatCategoryName(c1) }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field *ngIf="listCatLvl2.length > 0">
               <mat-label>Catégorie Niveau 2</mat-label>
               <mat-select (selectionChange)="onBaloisChange($event.value, 2)">
-                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2">{{ c2.name }}</mat-option>
+                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2">{{ formatCategoryName(c2) }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field *ngIf="listCatLvl3.length > 0">
               <mat-label>Catégorie Niveau 3</mat-label>
               <mat-select (selectionChange)="onBaloisChange($event.value, 3)">
-                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3">{{ c3.name }}</mat-option>
+                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3">{{ formatCategoryName(c3) }}</mat-option>
               </mat-select>
             </mat-form-field>
 
@@ -119,27 +140,6 @@
               <mat-label>Conséquence</mat-label>
               <mat-select formControlName="consequenceId">
                 <mat-option *ngFor="let cons of listConsequence" [value]="cons.id">{{ cons.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Macro Processus (niveau 1)</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 1)">
-                <mat-option *ngFor="let p1 of listP1" [value]="p1">{{ p1.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listP2.length > 0">
-              <mat-label>Processus (niveau 2)</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 2)">
-                <mat-option *ngFor="let p2 of listP2" [value]="p2">{{ p2.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listP3.length > 0">
-              <mat-label>Micro-processus</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 3)">
-                <mat-option *ngFor="let mp of listP3" [value]="mp">{{ mp.name }}</mat-option>
               </mat-select>
             </mat-form-field>
             <app-select-users (userSelected)="changeUser($event)" placeholder="Collaborateur pouvant vous aider" />

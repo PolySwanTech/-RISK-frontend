@@ -16,15 +16,14 @@ import { GoBackComponent } from '../../../../shared/components/go-back/go-back.c
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { RiskService } from '../../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
-import { BaloisCategoriesService } from '../../../../core/services/balois-categories/balois-categories.service';
 
 import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
 import { RiskLevel, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
 import { Process } from '../../../../core/models/Process';
-import { BaloiseCategory } from '../../../../core/models/BaloiseCategory';
 import { RiskCategoryService } from '../../../../core/services/risk/risk-category.service';
+import { BaloiseCategoryEnum } from '../../../../core/enum/baloisecategory.enum';
 
 @Component({
   selector: 'app-create-risks',
@@ -50,9 +49,9 @@ export class CreateRisksComponent implements OnInit {
   private readonly procSrv = inject(ProcessService);
 
   /* ---------------- données ----------------- */
-  bal1: BaloiseCategory[] = [];
-  bal2: BaloiseCategory[] = [];
-  bal3: BaloiseCategory[] = [];
+  bal1: BaloiseCategoryEnum[] = [];
+  bal2: BaloiseCategoryEnum[] = [];
+  bal3: BaloiseCategoryEnum[] = [];
 
   process1: Process[] = [];
   process2: Process[] = [];
@@ -72,9 +71,9 @@ export class CreateRisksComponent implements OnInit {
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
     libelle: this.fb.nonNullable.control<string>(''),
-    balois1: this.fb.control<BaloiseCategory | null>(null, Validators.required),
-    balois2: this.fb.control<BaloiseCategory | null>(null),
-    balois3: this.fb.control<BaloiseCategory | null>(null),
+    balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
+    balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
+    balois3: this.fb.control<BaloiseCategoryEnum | null>(null),
     process1: this.fb.nonNullable.control<string>('', Validators.required),
     process2: this.fb.control<Process | null>(null),
     process3: this.fb.control<Process | null>(null)
@@ -87,20 +86,32 @@ export class CreateRisksComponent implements OnInit {
     impactType: this.fb.control<RiskImpactType | null>(null)
   });
 
-  onCategoryChange(baloise : BaloiseCategory, level: number): void {
-    if(level === 1){
-      this.bal2 = baloise.enfants ?? [];
+  onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
+    if (level === 1) {
+      this.riskCategoryService.getByParent(baloise).subscribe(
+        data => {
+          this.bal2 = data;
+          this.bal3 = []; // Réinitialiser le niveau 3
+          this.infoForm.patchValue({ balois2: null, balois3: null });
+        }
+      );
     }
-    if(level === 2){
-      this.bal3 = baloise.enfants ?? [];
+
+    if (level === 2) {
+      this.riskCategoryService.getByParent(baloise).subscribe(
+        data => {
+          this.bal3 = data;
+          this.infoForm.patchValue({ balois3: null });
+        }
+      );
     }
   }
 
-  onProcessChange(process : Process, level: number): void {
-    if(level === 1){
+  onProcessChange(process: Process, level: number): void {
+    if (level === 1) {
       this.process2 = process.enfants ?? [];
     }
-    if(level === 2){
+    if (level === 2) {
       this.process3 = process.enfants ?? [];
     }
   }
@@ -144,7 +155,7 @@ export class CreateRisksComponent implements OnInit {
         balois2: this.risk.category ?? null,
         balois3: this.risk.category ?? null,
         process1: this.risk.processId,
-        
+
       });
 
       this.detailsForm.patchValue({
