@@ -17,7 +17,7 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 import { RiskService } from '../../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
 
-import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
+import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
 import { RiskLevel, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
@@ -52,6 +52,7 @@ export class CreateRisksComponent implements OnInit {
   bal1: BaloiseCategoryEnum[] = [];
   bal2: BaloiseCategoryEnum[] = [];
   bal3: BaloiseCategoryEnum[] = [];
+  risks: RiskTemplate[] = []; // liste des risques existants
 
   process1: Process[] = [];
   process2: Process[] = [];
@@ -64,13 +65,14 @@ export class CreateRisksComponent implements OnInit {
   impactTypes = Object.values(RiskImpactType);
   riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
+  
 
   /** instance courante (vide ou chargée) */
   risk: RiskTemplate = new RiskTemplate();
 
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
-    parentRisk: this.fb.control<RiskTemplate | null>(null), // pour les risques enfants
+    parentRisk: this.fb.control<string | null>(null), // pour les risques enfants
     libelle: this.fb.nonNullable.control<string>(''),
     balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
     balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
@@ -85,6 +87,7 @@ export class CreateRisksComponent implements OnInit {
     level: this.fb.nonNullable.control<RiskLevel>(RiskLevel.LOW),
     impactType: this.fb.control<RiskImpactType | null>(null)
   });
+  
 
   onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
     if (level === 1) {
@@ -130,6 +133,8 @@ export class CreateRisksComponent implements OnInit {
     )
 
     this.procSrv.getAll().subscribe(list => this.process1 = list);
+
+    this.riskSrv.getAll().subscribe(risks => this.risks = risks);
 
     /* --- id dans l’URL ?  => édition  ---------------------- */
     const id = this.route.snapshot.paramMap.get('id');   // id OU 'create'
@@ -191,10 +196,11 @@ export class CreateRisksComponent implements OnInit {
       riskBrut: riskLevel,
       category: category,
       impactTypes: [impactType],
-      parent: this.infoForm.get('parent')?.value  // si c'est un risque enfant
+      parent: this.infoForm.get('parentRisk')?.value // si c'est un risque enfant
     };
 
     // Log pour débug
+    console.log('Payload de création ou mise à jour du risque:', payload);
 
     this.riskSrv.save(payload).subscribe(() => {
       this.confirm.openConfirmDialog(

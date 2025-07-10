@@ -24,6 +24,18 @@
                 />
               </mat-form-field>
 
+              <!-- Parent ----------------------------------------------------- --> 
+              <mat-form-field class="full-width">
+                <mat-label>Risque parent</mat-label>
+               <mat-select formControlName="parentRisk">
+                  <mat-option [value]="null">Aucun</mat-option>
+                  <!-- on utilise risk.id pour lier le risque parent -->
+                  <mat-option *ngFor="let r of risks" [value]="r.id.id">
+                    {{ r.libelle }}
+                  </mat-option>
+                </mat-select> 
+              </mat-form-field>
+
               <!-- Catégorie L1 -------------------------------------------------- -->
               <mat-form-field class="full-width">
                 <mat-label>Catégorie&nbsp;Bâloise</mat-label>

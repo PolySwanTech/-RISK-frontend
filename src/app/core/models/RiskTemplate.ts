@@ -68,5 +68,5 @@ export interface RiskTemplateCreateDto {
   riskBrut:    RiskLevel;
   category:  BaloiseCategoryEnum;      // objet complet (cf. back)
   impactTypes: RiskImpactType[];       // tableau → Set côté Java
-  parent ?: string; // optionnel, pour les risques enfants
+  parent? : string | null; // optionnel, pour les risques enfants
 }
