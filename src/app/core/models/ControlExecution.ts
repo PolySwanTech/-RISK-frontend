@@ -10,6 +10,7 @@ export class ControlExecution {
     status: Status
     achievedAt: Date | null;
     performedBy: string;
+    performedByName: string = '';
     comments: string;
     createdAt: Date;
     evaluation: Evaluation;

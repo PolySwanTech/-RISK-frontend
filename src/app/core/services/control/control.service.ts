@@ -27,7 +27,7 @@ export class ControlService {
     return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`);
   }
 
-  getAllExections() {
-    return this.http.get<ControlExecution[]>(`${this.baseUrlExec}`);
+  getAllExecutions(controlId?: string) {
+    return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${controlId ? `?controlId=${controlId}` : ''}`);
   }
 }

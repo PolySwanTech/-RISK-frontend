@@ -9,6 +9,7 @@ import { Priority, priorityLabels } from '../../core/enum/Priority';
 import { Degree, degreeLabels } from '../../core/enum/degree.enum';
 import { ControlService } from '../../core/services/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
+import { ControlExecution } from '../../core/models/ControlExecution';
 
 @Component({
   selector: 'app-control-details-page',
@@ -29,22 +30,22 @@ export class ControlDetailsPageComponent implements OnInit {
   activeTab = 'details';
 
   control: ControlTemplate | null = null;
+  controlExecutions : ControlExecution[] = [];
 
   // Enum references for template
   ControlStatus = Status;
   Priority = Priority;
   ControlLevel = Degree;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router
-  ) { }
+  private route =  inject(ActivatedRoute);
+  private router =  inject(Router);
 
   ngOnInit(): void {
     // Récupérer l'ID du contrôle depuis l'URL
     const controlId = this.route.snapshot.paramMap.get('id');
     if (controlId) {
       this.loadControl(controlId);
+      this.loadControlExecutions(controlId);
     }
   }
 
@@ -52,6 +53,12 @@ export class ControlDetailsPageComponent implements OnInit {
     // TODO: Appeler votre service pour récupérer les données du contrôle
     this.controlService.getControl(id).subscribe(control => {
       this.control = control;
+    });
+  }
+
+  loadControlExecutions(id: string): void {
+    this.controlService.getAllExecutions(id).subscribe(executions => {
+      this.controlExecutions = executions;
     });
   }
 

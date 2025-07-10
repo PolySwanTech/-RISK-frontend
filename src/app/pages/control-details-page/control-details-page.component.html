@@ -163,10 +163,10 @@
                 Historique des exécutions
               </h3>
               <div class="executions-list">
-                <div class="execution-item" *ngFor="let execution of control.controlExecutions">
+                <div class="execution-item" *ngFor="let execution of controlExecutions">
                   <div class="execution-info">
                     <div class="execution-date">{{ execution.achievedAt | date : "le dd/MM/yyyy" }}</div>
-                    <div class="execution-responsible">{{ execution.performedBy }}</div>
+                    <div class="execution-responsible">{{ 'par ' + execution.performedByName }}</div>
                   </div>
                   <div class="execution-status">
                     <span class="badge small" [ngClass]="getStatusClass(execution.status)">
