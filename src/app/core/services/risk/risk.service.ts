@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
+import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +27,11 @@ export class RiskService {
     let params = new HttpParams();
     params = params.append('processId', processId);
     return this.http.get<RiskTemplate[]>(this.baseUrl)
+  }
+
+  getByParent(parentId: RiskId) {
+    let params = new HttpParams();
+    params = params.append('parentId', parentId.toString());
+    return this.http.get<RiskTemplate[]>(this.baseUrl, { params: params });
   }
 }

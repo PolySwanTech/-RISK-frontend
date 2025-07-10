@@ -88,7 +88,10 @@ export class CreateComponent implements OnInit {
     process: new FormControl(null, Validators.required),
   });
 
-  listRisk: RiskTemplate[] = [];
+  listRiskLv1: RiskTemplate[] = [];
+  listRiskLv2: RiskTemplate[] = [];
+  listRiskLv3: RiskTemplate[] = [];
+
   listProcess: Process[] = [];
 
   errorMessage = signal('');
@@ -97,10 +100,6 @@ export class CreateComponent implements OnInit {
 
   // listBaloiseL1: BaloiseCategoryL1[] = [];
   listConsequence: Consequence[] = [];
-
-  listCatLvl1: BaloiseCategoryEnum[] = [];
-  listCatLvl2: BaloiseCategoryEnum[] = [];
-  listCatLvl3: BaloiseCategoryEnum[] = [];
 
   listP1: Process[] = [];
   listP2: Process[] = [];
@@ -131,11 +130,9 @@ export class CreateComponent implements OnInit {
       this.listConsequence = data);
 
     this.consequenceService.getAll().subscribe(data => this.listConsequence = data);
-    this.riskCategoryService.getAll().subscribe(
-      data => {
-        this.listCatLvl1 = data;
-      }
-    )
+    this.riskService.getAll().subscribe(data => {
+      this.listRiskLv1 = data;
+    });
 
     this.processService.getAll().subscribe(data => {
       this.listP1 = data;
@@ -226,31 +223,23 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('files')!.setValue(event);
   }
 
-  getSubRisk(): any {
-    let risk: any = this.incidentForm3.get('risk')!.value;
-    if (this.incidentForm3.get('risk')!.value != null) {
-      return risk.subRisks
-    }
-    return risk;
-  }
-
-  onBaloisChange(cat: BaloiseCategoryEnum, level: number) {
-    this.incidentForm3.get('risk')!.setValue(cat);
+  onRiskChange(template: RiskTemplate, level: number) {
+    this.incidentForm3.get('risk')!.setValue(template.id.id);
     if (level === 1) {
-      this.riskCategoryService.getByParent(cat).subscribe(data => {
-        this.listCatLvl2 = data;
-        this.listCatLvl3 = [];
+      this.riskService.getByParent(template.id).subscribe(data => {
+        this.listRiskLv2 = data;
+        this.listRiskLv3 = [];
       });
     }
     if (level === 2) {
-      this.riskCategoryService.getByParent(cat).subscribe(data => {
-        this.listCatLvl3 = data;
+      this.riskService.getByParent(template.id).subscribe(data => {
+        this.listRiskLv3 = data;
       });
     }
   }
 
-  formatCategoryName(cat: BaloiseCategoryEnum): string {
-    return cat;
+  formatCategoryName(risk: RiskTemplate): string {
+    return risk.libelle;
   }
 
   onProcessChange(process: Process, level: number) {

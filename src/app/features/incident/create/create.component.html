@@ -105,22 +105,22 @@
 
             <mat-form-field>
               <mat-label>Catégorie Niveau 1</mat-label>
-              <mat-select (selectionChange)="onBaloisChange($event.value, 1)">
-                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1">{{ formatCategoryName(c1) }}</mat-option>
+              <mat-select (selectionChange)="onRiskChange($event.value, 1)">
+                <mat-option *ngFor="let r1 of listRiskLv1" [value]="r1">{{ formatCategoryName(r1) }}</mat-option>
               </mat-select>
             </mat-form-field>
 
-            <mat-form-field *ngIf="listCatLvl2.length > 0">
+            <mat-form-field *ngIf="listRiskLv2.length > 0">
               <mat-label>Catégorie Niveau 2</mat-label>
-              <mat-select (selectionChange)="onBaloisChange($event.value, 2)">
-                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2">{{ formatCategoryName(c2) }}</mat-option>
+              <mat-select (selectionChange)="onRiskChange($event.value, 2)">
+                <mat-option *ngFor="let r2 of listRiskLv2" [value]="r2">{{ formatCategoryName(r2) }}</mat-option>
               </mat-select>
             </mat-form-field>
 
-            <mat-form-field *ngIf="listCatLvl3.length > 0">
+            <mat-form-field *ngIf="listRiskLv3.length > 0">
               <mat-label>Catégorie Niveau 3</mat-label>
-              <mat-select (selectionChange)="onBaloisChange($event.value, 3)">
-                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3">{{ formatCategoryName(c3) }}</mat-option>
+              <mat-select (selectionChange)="onRiskChange($event.value, 3)">
+                <mat-option *ngFor="let r3 of listRiskLv3" [value]="r3">{{ formatCategoryName(r3) }}</mat-option>
               </mat-select>
             </mat-form-field>
 
