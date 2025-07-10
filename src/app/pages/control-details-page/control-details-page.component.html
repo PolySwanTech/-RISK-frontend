@@ -1,207 +1,211 @@
-<div class="control-details-page">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-content">
-      <div class="header-left">
-        <button class="back-button" (click)="goBack()">
-          <i class="icon-arrow-left"></i>
-        </button>
-        <div class="header-info">
-          <h1 class="page-title">Détails du Contrôle</h1>
-          <p class="page-subtitle">{{ control.reference }}</p>
+@if(!control) {
+  <div class="loading-spinner">
+    <i class="icon-spinner"></i>
+    Chargement des détails du contrôle...
+  </div>
+}
+@else {
+  <div class="control-details-page">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <button class="back-button" (click)="goBack()">
+            <i class="icon-arrow-left"></i>
+          </button>
+          <div class="header-info">
+            <h1 class="page-title">Détails du Contrôle</h1>
+            <p class="page-subtitle">{{ control.reference }}</p>
+          </div>
         </div>
-      </div>
-      <div class="header-actions">
-        <button class="btn btn-secondary" (click)="exportControl()">
-          <i class="icon-download"></i>
-          Exporter
-        </button>
-        <button class="btn btn-primary" (click)="editControl()">
-          <i class="icon-edit"></i>
-          Modifier
-        </button>
+        <div class="header-actions">
+          <button class="btn btn-secondary" (click)="exportControl()">
+            <i class="icon-download"></i>
+            Exporter
+          </button>
+          <button class="btn btn-primary" (click)="editControl()">
+            <i class="icon-edit"></i>
+            Modifier
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="main-content">
-    <div class="content-grid">
-      <!-- Colonne principale -->
-      <div class="main-column">
-        <!-- Informations générales -->
-        <div class="card">
-          <div class="card-content">
-            <div class="control-header">
-              <div class="control-info">
-                <h2 class="control-title">{{ control.libelle }}</h2>
-                <div class="control-badges">
-                  <span class="badge" [ngClass]="getPriorityClass(control.priority)">
-                    <i class="icon-alert-triangle"></i>
-                    Priorité {{ formatPriority(control.priority) }}
-                  </span>
-                  <span class="badge" [ngClass]="getStatusClass(control.lastExecution.status)">
-                    <i class="icon-check-circle" *ngIf="control.lastExecution.status === ControlStatus.REALISE"></i>
-                    <i class="icon-clock" *ngIf="control.lastExecution.status !== ControlStatus.REALISE"></i>
-                    {{ formatStatus(control.lastExecution.status) }}
-                  </span>
+  
+    <div class="main-content">
+      <div class="content-grid">
+        <!-- Colonne principale -->
+        <div class="main-column">
+          <!-- Informations générales -->
+          <div class="card">
+            <div class="card-content">
+              <div class="control-header">
+                <div class="control-info">
+                  <h2 class="control-title">{{ control.libelle }}</h2>
+                  <div class="control-badges">
+                    <span class="badge" [ngClass]="getPriorityClass(control.priority)">
+                      <i class="icon-alert-triangle"></i>
+                      Priorité {{ formatPriority(control.priority) }}
+                    </span>
+                    <!-- <span class="badge" [ngClass]="getStatusClass(control.lastExecution.status)">
+                      <i class="icon-check-circle" *ngIf="control.lastExecution.status === ControlStatus.REALISE"></i>
+                      <i class="icon-clock" *ngIf="control.lastExecution.status !== ControlStatus.REALISE"></i>
+                      {{ formatStatus(control.lastExecution.status) }}
+                    </span> -->
+                  </div>
+                </div>
+                <div class="control-score">
+                  <!-- <div class="score-value">{{ control.lastExecution.cotationFinale }}</div> -->
+                  <div class="score-label">Cotation finale</div>
                 </div>
               </div>
-              <div class="control-score">
-                <div class="score-value">{{ control.lastExecution.cotationFinale }}</div>
-                <div class="score-label">Cotation finale</div>
-              </div>
-            </div>
-
-            <div class="control-details-grid">
-              <div class="details-column">
-                <div class="detail-item">
-                  <i class="icon-target detail-icon"></i>
-                  <div class="detail-content">
-                    <div class="detail-label">Type de contrôle</div>
-                    <div class="detail-value">{{ control.controlType }}</div>
+  
+              <div class="control-details-grid">
+                <div class="details-column">
+                  <div class="detail-item">
+                    <i class="icon-target detail-icon"></i>
+                    <div class="detail-content">
+                      <div class="detail-label">Type de contrôle</div>
+                      <div class="detail-value">{{ control.controlType }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-item">
+                    <i class="icon-shield detail-icon"></i>
+                    <div class="detail-content">
+                      <div class="detail-label">Degré de contrôle</div>
+                      <div class="detail-value">{{ formatLevel(control.level) }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-item">
+                    <i class="icon-clock detail-icon"></i>
+                    <div class="detail-content">
+                      <div class="detail-label">Fréquence</div>
+                      <div class="detail-value">{{ control.frequency }}</div>
+                    </div>
                   </div>
                 </div>
-                <div class="detail-item">
-                  <i class="icon-shield detail-icon"></i>
-                  <div class="detail-content">
-                    <div class="detail-label">Degré de contrôle</div>
-                    <div class="detail-value">{{ formatLevel(control.level) }}</div>
+                <div class="details-column">
+                  <div class="detail-item">
+                    <i class="icon-user detail-icon"></i>
+                    <div class="detail-content">
+                      <div class="detail-label">Créé par</div>
+                      <div class="detail-value">{{ control.creator }}</div>
+                    </div>
                   </div>
-                </div>
-                <div class="detail-item">
-                  <i class="icon-clock detail-icon"></i>
-                  <div class="detail-content">
-                    <div class="detail-label">Fréquence</div>
-                    <div class="detail-value">{{ control.frequency }}</div>
+                  <div class="detail-item">
+                    <i class="icon-calendar detail-icon"></i>
+                    <div class="detail-content">
+                      <div class="detail-label">Dernière exécution</div>
+                      <div class="detail-value">{{ control.lastExecutionDate | date : "dd MM yyyy" }}</div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div class="details-column">
-                <div class="detail-item">
-                  <i class="icon-user detail-icon"></i>
-                  <div class="detail-content">
-                    <div class="detail-label">Créé par</div>
-                    <div class="detail-value">{{ control.creator }}</div>
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <i class="icon-calendar detail-icon"></i>
-                  <div class="detail-content">
-                    <div class="detail-label">Dernière exécution</div>
-                    <div class="detail-value">{{ control.lastExecution.date }}</div>
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <i class="icon-users detail-icon"></i>
-                  <div class="detail-content">
-                    <div class="detail-label">Responsable</div>
-                    <div class="detail-value">{{ control.lastExecution.responsible }}</div>
+                  <div class="detail-item">
+                    <i class="icon-users detail-icon"></i>
+                    <div class="detail-content">
+                      <div class="detail-label">Responsable</div>
+                      <div class="detail-value">{{ control.creator }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Taxonomie -->
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">Taxonomie</h3>
-            <div class="taxonomie-grid">
-              <div class="taxonomie-item">
-                <div class="taxonomie-label">Entité</div>
-                <div class="taxonomie-value">{{ control.taxonomie.entite }}</div>
-              </div>
-              <div class="taxonomie-item">
-                <div class="taxonomie-label">Macro-processus</div>
-                <div class="taxonomie-value">{{ control.taxonomie.macroProcess }}</div>
-              </div>
-              <div class="taxonomie-item">
-                <div class="taxonomie-label">Processus</div>
-                <div class="taxonomie-value">{{ control.taxonomie.process }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Description -->
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">Description du contrôle</h3>
-            <p class="description-text">{{ control.description }}</p>
-          </div>
-        </div>
-
-        <!-- Piste d'audit -->
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">
-              <i class="icon-file-text"></i>
-              Piste d'audit
-            </h3>
-            <div class="audit-trail">
-              <p class="audit-text">{{ control.lastExecution.auditTrail }}</p>
-              <div class="audit-meta">
-                <i class="icon-calendar"></i>
-                Trimestre {{ control.lastExecution.quarter }} {{ control.lastExecution.year }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <!-- Historique des exécutions -->
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">
-              <i class="icon-activity"></i>
-              Historique des exécutions
-            </h3>
-            <div class="executions-list">
-              <div class="execution-item" *ngFor="let execution of control.executions">
-                <div class="execution-info">
-                  <div class="execution-date">{{ execution.date }}</div>
-                  <div class="execution-responsible">{{ execution.responsible }}</div>
+  
+          <!-- Taxonomie -->
+          <div class="card">
+            <div class="card-content">
+              <h3 class="card-title">Taxonomie</h3>
+              <div class="taxonomie-grid">
+                <div class="taxonomie-item">
+                  <div class="taxonomie-label">Entité</div>
+                  <div class="taxonomie-value">{{ control.buName }}</div>
                 </div>
-                <div class="execution-status">
-                  <span class="badge small" [ngClass]="getStatusClass(execution.status)">
-                    {{ formatStatus(execution.status) }}
-                  </span>
-                  <div class="execution-score" *ngIf="execution.score !== '-'">
-                    {{ execution.score }}
-                  </div>
+                <div class="taxonomie-item">
+                  <div class="taxonomie-label">Processus</div>
+                  <div class="taxonomie-value">{{ control.taxonomie.processName }}</div>
                 </div>
               </div>
             </div>
-            <button class="btn-link full-width" (click)="viewFullHistory()">
-              Voir tout l'historique
-            </button>
           </div>
-        </div>
-
-        <!-- Actions rapides -->
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">Actions rapides</h3>
-            <div class="quick-actions">
-              <button class="btn btn-outline full-width" (click)="markAsRealized()">
-                <i class="icon-check-circle"></i>
-                Marquer comme réalisé
-              </button>
-              <button class="btn btn-outline full-width" (click)="scheduleExecution()">
-                <i class="icon-calendar"></i>
-                Planifier exécution
-              </button>
-              <button class="btn btn-outline full-width" (click)="addNote()">
+  
+          <!-- Description -->
+          <div class="card">
+            <div class="card-content">
+              <h3 class="card-title">Description du contrôle</h3>
+              <p class="description-text">{{ control.description }}</p>
+            </div>
+          </div>
+  
+          <!-- Piste d'audit -->
+          <div class="card">
+            <div class="card-content">
+              <h3 class="card-title">
                 <i class="icon-file-text"></i>
-                Ajouter une note
+                Piste d'audit
+              </h3>
+              <div class="audit-trail">
+                <!-- <p class="audit-text">{{ control.lastExecution.auditTrail }}</p> -->
+                <div class="audit-meta">
+                  <i class="icon-calendar"></i>
+                  <!-- Trimestre {{ control.lastExecution.quarter }} {{ control.lastExecution.year }} -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <!-- Historique des exécutions -->
+          <div class="card">
+            <div class="card-content">
+              <h3 class="card-title">
+                <i class="icon-activity"></i>
+                Historique des exécutions
+              </h3>
+              <div class="executions-list">
+                <div class="execution-item" *ngFor="let execution of controlExecutions">
+                  <div class="execution-info">
+                    <div class="execution-date">{{ execution.achievedAt | date : "le dd/MM/yyyy" }}</div>
+                    <div class="execution-responsible">{{ 'par ' + execution.performedByName }}</div>
+                  </div>
+                  <div class="execution-status">
+                    <span class="badge small" [ngClass]="getStatusClass(execution.status)">
+                      {{ formatStatus(execution.status) }}
+                    </span>
+                    <!-- <div class="execution-score" *ngIf="execution.score !== '-'">
+                      {{ execution.score }}
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+              <button class="btn-link full-width" (click)="viewFullHistory()">
+                Voir tout l'historique
               </button>
+            </div>
+          </div>
+  
+          <!-- Actions rapides -->
+          <div class="card">
+            <div class="card-content">
+              <h3 class="card-title">Actions rapides</h3>
+              <div class="quick-actions">
+                <button class="btn btn-outline full-width" (click)="markAsRealized()">
+                  <i class="icon-check-circle"></i>
+                  Marquer comme réalisé
+                </button>
+                <button class="btn btn-outline full-width" (click)="scheduleExecution()">
+                  <i class="icon-calendar"></i>
+                  Planifier exécution
+                </button>
+                <button class="btn btn-outline full-width" (click)="addNote()">
+                  <i class="icon-file-text"></i>
+                  Ajouter une note
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+}

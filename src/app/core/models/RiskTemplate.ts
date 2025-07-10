@@ -47,6 +47,7 @@ export class RiskTemplate {
   creator?: string; // UUID de l'utilisateur qui a créé le risque
 
   buName : string = ''
+  processName: string = '';
 
   parent: RiskTemplate | null = null; // pour les risques parents, sinon null
 

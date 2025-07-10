@@ -91,7 +91,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   // This method will be triggered when a row is clicked
   onRowClick(control: ControlTemplate) {
-    this.router.navigate(['control', 'details', control.id]);
+    this.router.navigate(['control', 'details', control.id.id]);
   }
   
   create() {

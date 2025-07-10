@@ -76,7 +76,7 @@ export class ControlChartComponent implements OnInit {
   ngOnInit() {
     this.controlService.getAllTemplates().subscribe(data => {
       this.controls = data;
-      this.controlService.getAllExections().subscribe(data => {
+      this.controlService.getAllExecutions().subscribe(data => {
         this.controls = this.controls.concat(data);
         this.updateChart();
       });
