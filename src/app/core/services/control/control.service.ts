@@ -9,21 +9,25 @@ import { ControlExecution } from '../../models/ControlExecution';
 })
 export class ControlService {
 
-  
+
   http = inject(HttpClient);
   baseUrlTemp = environment.apiUrl + '/risks/controls/templates';
   baseUrlExec = environment.apiUrl + '/risks/controls/executions';
-  
-  
+
+
   createControl(control: ControlTemplateCreateDto) {
     return this.http.post<ControlTemplateCreateDto>(`${this.baseUrlTemp}`, control);
   }
 
-  getAllTemplates(){
+  getControl(id: string) {
+    return this.http.get<ControlTemplate>(`${this.baseUrlTemp}/${id}`);
+  }
+
+  getAllTemplates() {
     return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`);
   }
 
-  getAllExections(){
-    return this.http.get<ControlExecution[]>(`${this.baseUrlExec}`);
+  getAllExecutions(controlId?: string) {
+    return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${controlId ? `?controlId=${controlId}` : ''}`);
   }
 }
