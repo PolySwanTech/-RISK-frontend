@@ -18,6 +18,7 @@ export class Incident {
     closedAt: Date | null ;
 
     risk: string;
+    riskName : string = "";
     cause : Cause;
     process: Process ;
     equipeId?: string;
