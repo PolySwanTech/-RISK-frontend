@@ -194,7 +194,6 @@ export class CreateRisksComponent implements OnInit {
     };
 
     // Log pour débug
-    console.log('Payload à envoyer:', payload);
 
     this.riskSrv.save(payload).subscribe(() => {
       this.confirm.openConfirmDialog(
@@ -203,7 +202,6 @@ export class CreateRisksComponent implements OnInit {
         false
       );
       this.router.navigate(['reglages', 'risks']);
-      console.log('Risque créé avec succès', payload);
     });
   }
 }

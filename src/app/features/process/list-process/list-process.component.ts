@@ -57,7 +57,6 @@ export class ListProcessComponent implements OnInit {
 
   fetchProcesses(): void {
     this.processService.getAll().subscribe((data: any[]) => {
-      console.log(data);
       this.processes = data;
       this.buildHierarchy();
       this.filteredProcesses = [...this.hierarchicalProcesses];

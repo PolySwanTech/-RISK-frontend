@@ -90,7 +90,6 @@ export class CreateActionPlanDialogComponent implements OnInit {
   }
 
   updateAction(index: number, action: Action) {
-    console.log(action)
     // Mettre à jour l'action à l'index spécifié
     this.actions[index] = action;
   }
@@ -115,7 +114,6 @@ export class CreateActionPlanDialogComponent implements OnInit {
       incidentId               // undefined si pas d’incident
     };
 
-    console.log(this.actionPlan);
     this.actionPlanService.createActionPlan(dto)
       .subscribe(id => {
         this.actionPlanService.addActions(this.actions, id).subscribe(() => {

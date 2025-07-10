@@ -90,26 +90,18 @@ export class ControlDetailsPageComponent implements OnInit {
 
   exportControl(): void {
     // TODO: Implémenter l'export
-    if (this.control)
-      console.log('Export du contrôle:', this.control.id);
   }
 
   markAsRealized(): void {
     // TODO: Implémenter la mise à jour du statut
-    if (this.control)
-      console.log('Marquer comme réalisé:', this.control.id);
   }
 
   scheduleExecution(): void {
     // TODO: Implémenter la planification
-    if (this.control)
-      console.log('Planifier exécution:', this.control.id);
   }
 
   addNote(): void {
     // TODO: Implémenter l'ajout de note
-    if (this.control)
-      console.log('Ajouter une note:', this.control.id);
   }
 
   viewFullHistory(): void {

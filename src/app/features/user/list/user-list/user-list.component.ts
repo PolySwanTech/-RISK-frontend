@@ -43,7 +43,6 @@ export class UserListComponent implements OnInit, AfterViewInit {
   loadUsers(): void {
     this.userService.getUserProfiles().subscribe(users => {
       this.dataSource.data = users;
-      console.log(users)
     });
   }
 
@@ -55,20 +54,16 @@ export class UserListComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(u => {
       if (u) {
-        console.log('📝 Modification de l\'utilisateur :', u);
           this.userService.updateUser(u).subscribe({
             next: () => {
-              console.log('✅ Utilisateur mis à jour avec succès !');
               this.loadUsers();
             },
             error: (err) => {
-              console.error('❌ Erreur lors de la mise à jour', err);
             }
           });
         
 
       } else {
-        console.log('⛔ Modification annulée.');
       }
     });
   }

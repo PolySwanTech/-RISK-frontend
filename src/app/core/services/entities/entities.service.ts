@@ -37,7 +37,6 @@ export class EntitiesService {
   }
 
   update(entite: EntiteResponsable) {
-    console.log(entite);
     return this.http.put(this.baseUrl, entite);
   }
 }

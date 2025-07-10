@@ -99,8 +99,6 @@ export class CreateControlComponent {
 
     };
 
-    console.log('Création du contrôle avec les données :', payload);
-
     this.controlService.createControl(payload).subscribe({
       next : ()  => {
         this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);

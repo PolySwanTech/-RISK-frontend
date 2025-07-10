@@ -210,7 +210,6 @@ export class PlanActionPageComponent {
     // 1. Filtre par date
     if (this.dateFilter.value) {
       filteredData = filteredData.filter(incident => {
-        console.log('Incident Echeance:', incident.echeance);
         const formattedDate = new Date(this.dateFilter.value!).toISOString().replace('Z', '+00:00');
         return incident.echeance && new Date(incident.echeance) < new Date(formattedDate);
       });

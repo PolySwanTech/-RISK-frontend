@@ -51,7 +51,6 @@ export class OrganigrammeComponent {
       roles: this.roleService.getAllRoles()
     }).subscribe(({ entities, roles }) => {
       this.entities = entities;
-      console.log(this.entities);
       this.filteredEntities = this.entities;
       this.roles = roles;
 
@@ -72,7 +71,6 @@ export class OrganigrammeComponent {
         if (match) {
           node.checked = true;
 
-          console.log(match)
           // Chercher le rôle dans la liste des rôles disponibles
           const matchingRole = this.roles.find(r => r.name == match.role?.name);
           node.role = matchingRole || null;
@@ -105,7 +103,6 @@ export class OrganigrammeComponent {
 
     dialogRef.afterClosed().subscribe(entiteResponsable => {
       if (entiteResponsable) {
-        console.log(entiteResponsable);
         if(entiteResponsable.id == null){ // creation
           this.entityService.save(entiteResponsable).subscribe(() => {
             this.ngOnInit(); // Rafraîchir après ajout/modification
@@ -206,7 +203,6 @@ export class OrganigrammeComponent {
     };
 
     traverse(tree);
-    console.log(leaves);
     this.rolesEvent.emit(leaves);
   }
 }
