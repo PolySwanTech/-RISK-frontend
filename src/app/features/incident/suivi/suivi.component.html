@@ -24,6 +24,7 @@
                 </mat-icon>
             </div>
 
+
             <div class="timeline-content mat-elevation-z2">
                 <div class="header">
                     <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
@@ -32,27 +33,18 @@
                     </span>
                 </div>
 
-                <div class="timeline-content mat-elevation-z2">
-                    <div class="header">
-                        <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
-                        <span class="meta">
-                            Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
-                        </span>
-                    </div>
+                <div *ngIf="entry.action === 'IMPACT_ADDED' && getImpactFromHistory(entry)">
+                    <p class="impact-summary">
+                        {{ getImpactFromHistory(entry) }}
+                    </p>
+                </div>
 
-                    <div *ngIf="entry.action === 'IMPACT_ADDED' && getImpactFromHistory(entry)">
-                        <p class="impact-summary">
-                            {{ getImpactFromHistory(entry) }}
-                        </p>
-                    </div>
+                <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
 
-                    <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
-
-                    <!-- <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
+                <!-- <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
                         (click)="openSnapshotDialog(entry)">
                         <mat-icon>compare</mat-icon> Détails des changements
                     </button> -->
-                </div>
             </div>
 
         </div>
