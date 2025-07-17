@@ -92,7 +92,6 @@ export class RisksComponent implements OnInit {
       );
       
       this.riskService.getAll().subscribe(risks => {
-        console.log(risks);
         this.dataSource.data = risks;
       });
     });

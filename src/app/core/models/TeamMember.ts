@@ -1,12 +1,11 @@
-export interface Team {
-    id: string;
-    name: string;
+import { PermissionName } from "../enum/permission.enum";
+
+export interface Role {
+  name: string;
+  permissions: PermissionName[];
 }
 
-export type TeamRole = 'VALIDATEUR' | 'MEMBRE';
-
 export interface TeamMember {
-    id: string;
-    role: TeamRole;
-    team: Team;
+  role: Role;
+  buId: string;
 }  

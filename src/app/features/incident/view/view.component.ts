@@ -99,7 +99,6 @@ export class ViewComponent implements OnInit {
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
-      console.log("Incident chargé :", this.incident);
       this.extractTokenInfo();
       this.checkCloseAuthorization();
     });

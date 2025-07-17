@@ -20,14 +20,13 @@
         <input matInput type="password" formControlName="password" placeholder="Mot de passe" autocomplete="new-password" />
       </mat-form-field>
     </div>
-    <app-organigramme (rolesEvent)="getRoles($event)"></app-organigramme>
+    <app-organigramme (rolesEvent)="getRoles($event)"/>
     }
     @else{
-    @if(teamRoles.length > 0){
-    <app-organigramme [teamRoles]="teamRoles" (rolesEvent)="getRoles($event)"></app-organigramme>
-    }
+      <app-organigramme (rolesEvent)="getRoles($event)" [userId]="data.user.id"/>
     }
 
-    <button type="submit" mat-raised-button class="btn-primary" [disabled]="userForm.invalid">{{title}}</button>
+    <button type="submit" mat-raised-button class="btn-primary">{{title}}</button>
+
   </form>
 </mat-dialog-content>
