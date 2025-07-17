@@ -96,6 +96,7 @@ export class CreateUserComponent implements OnInit {
           next: user => {
             this.userService.updateUserRoles(user.id, this.userForm.value.teamRoleList).subscribe({
               next: () => {
+                alert("✅ Utilisateur créé avec succès");
                 this.dialogRef.close(true);
               }
             });

@@ -58,26 +58,11 @@ export class UserListComponent implements OnInit, AfterViewInit {
   }
 
   openCreateUserDialog(): void {
-    const dialogRef = this.dialog.open(CreateUserComponent, {
+    this.dialog.open(CreateUserComponent, {
       width: '700px'
-    });
-
-    dialogRef.afterClosed().subscribe(u => {
-      if (u) {
-        this.authService.register(u).subscribe({
-          next: () => {
-            alert("✅ Utilisateur créé !");
-            this.loadUsers();
-          },
-          error: () => {
-            alert("❌ Une erreur est survenue");
-          }
-        });
-      }
-    });
+    })
+      .afterClosed().subscribe(() => this.loadUsers());
   }
-
-
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
