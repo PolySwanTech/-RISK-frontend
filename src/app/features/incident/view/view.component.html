@@ -148,20 +148,8 @@
                 </mat-card-content>
             </mat-card>
 
-            <mat-card class="files-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
-                <mat-card-header>
-                    <mat-card-title>
-                        <span>Pièces jointes</span>
-                        @if(isNotClosed()){
-                        <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
-                            <mat-icon>attach_file</mat-icon>
-                            Ajouter
-                        </button>
-                        }
-                    </mat-card-title>
-                </mat-card-header>
-                <app-fichiers [idIncident]="incident.id" [closed]="isNotClosed()" style="height: 90%;"></app-fichiers>
-            </mat-card>
+            <app-fichiers [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isNotClosed()" style="height: 90%;"></app-fichiers>
+            
             <mat-card class="state-card none">
                 <mat-card-header>
                     <mat-card-title><span>Suivi</span>
