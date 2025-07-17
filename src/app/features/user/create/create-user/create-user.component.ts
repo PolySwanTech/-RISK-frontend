@@ -52,7 +52,6 @@ export class CreateUserComponent implements OnInit {
 
 
   ngOnInit() {
-    console.log("Data received in CreateUserComponent:", this.data);
     if (this.data && this.data.update) {
       this.title = "Modifier";
       this.update = this.data.update;

@@ -51,13 +51,11 @@ export class OrganigrammeComponent {
   ) { }
 
   ngOnInit(): void {
-    console.log("User ID in OrganigrammeComponent:", this.userId);
     forkJoin({
       entities: this.entityService.loadEntitiesTree(),
       roles: this.roleService.getAllRoles(),
       teamRoles: this.userService.getUserRoles(this.userId)
     }).subscribe(({ entities, roles, teamRoles }) => {
-      console.log(teamRoles)
       this.entities = entities;
       this.filteredEntities = this.entities;
       this.roles = roles;

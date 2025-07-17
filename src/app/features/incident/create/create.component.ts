@@ -243,7 +243,6 @@ export class CreateComponent implements OnInit {
   }
 
   onProcessChange(process: Process, level: number) {
-    console.log("Processus sélectionné :", process, "Niveau :", level);
     if (level === 1) {
       this.incidentForm3.get('process')!.setValue(process); // sélection niveau 1
       this.listP2 = process.enfants || [];
