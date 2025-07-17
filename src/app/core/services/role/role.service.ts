@@ -3,11 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { PermissionName } from '../../enum/permission.enum';
-
-export interface Role {
-  name: string;
-  permissions: PermissionName[];
-}
+import { Role } from '../../models/TeamMember';
 
 @Injectable({
   providedIn: 'root'

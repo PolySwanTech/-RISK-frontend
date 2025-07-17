@@ -49,21 +49,10 @@ export class UserListComponent implements OnInit, AfterViewInit {
   openEditDialog(user: Utilisateur): void {
     const dialogRef = this.dialog.open(CreateUserComponent, {
       width: '700px',
-      data: user
-    });
-
-    dialogRef.afterClosed().subscribe(u => {
-      if (u) {
-          this.userService.updateUser(u).subscribe({
-            next: () => {
-              this.loadUsers();
-            },
-            error: (err) => {
-            }
-          });
-        
-
-      } else {
+      data:
+      {
+        user: user,
+        update: true
       }
     });
   }

@@ -8,10 +8,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { permissionLabels, PermissionName } from '../../../core/enum/permission.enum';
-import { Role, RoleService } from '../../../core/services/role/role.service';
+import { RoleService } from '../../../core/services/role/role.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateRoleDialogComponent } from '../role/create-role-dialog/create-role-dialog.component';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { Role } from '../../../core/models/TeamMember';
 
 @Component({
   selector: 'app-manage-permissions',
