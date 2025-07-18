@@ -211,17 +211,17 @@ addImpact() {
     width: '400px'
   });
 
-  dialogRef.afterClosed().subscribe((result: Impact) => {
-    if (result && this.incident) {
-
-      /* ─── Construction explicite du DTO ─── */
-      const dto: ImpactCreateDto = {
-        montant:    result.montant,
-        entityId:   result.entityId,      // ou result.entiteResponsableId
-        incidentId: this.incident.id,     // ← lier à l’incident courant
-        type:       result.type,          // enum/chaine côté back
-        message:    result.message ?? ''  // commentaire optionnel
-      };
+    dialogRef.afterClosed().subscribe((result: Impact) => {
+      if (result && this.incident) {
+        /* ─── Construction explicite du DTO ─── */
+        const dto: ImpactCreateDto = {
+          montant: result.montant,
+          comptabilisationDate: result.comptabilisationDate ? result.comptabilisationDate : null,
+          entityId: result.entityId,      // ou result.entiteResponsableId
+          incidentId: this.incident.id,     // ← lier à l’incident courant
+          type: result.type,          // enum/chaine côté back
+          message: result.message ?? ''  // commentaire optionnel
+        };
 
 
       this.impactService.addImpact(dto).subscribe(() => {
