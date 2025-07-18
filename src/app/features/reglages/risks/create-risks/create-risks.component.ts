@@ -200,9 +200,6 @@ export class CreateRisksComponent implements OnInit {
       parent: this.infoForm.get('parentRisk')?.value // si c'est un risque enfant
     };
 
-    // Log pour débug
-    console.log('Payload de création ou mise à jour du risque:', payload);
-
     this.riskSrv.save(payload).subscribe(() => {
       this.confirm.openConfirmDialog(
         this.dialogLabel.title,

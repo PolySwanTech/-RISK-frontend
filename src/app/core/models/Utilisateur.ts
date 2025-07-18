@@ -1,7 +1,5 @@
 import { PermissionName } from "../enum/permission.enum";
 import { EntiteResponsable } from "./EntiteResponsable"
-import { TeamMember } from "./TeamMember";
-
 
 export enum Right {
     VIEWER = 'VIEWER',
@@ -18,7 +16,6 @@ export class Utilisateur {
     equipe: EntiteResponsable;
     right: Right;
     permissions: PermissionName[] = [];
-    memberships?: TeamMember[] = [];
 
     constructor(
         id: string,
