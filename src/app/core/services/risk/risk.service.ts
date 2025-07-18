@@ -24,9 +24,10 @@ export class RiskService {
   }
 
   getAllByProcess(processId: string = "") {
+    console.log('Fetching risks for process ID:', processId);
     let params = new HttpParams();
     params = params.append('processId', processId);
-    return this.http.get<RiskTemplate[]>(this.baseUrl)
+    return this.http.get<RiskTemplate[]>(this.baseUrl, { params })
   }
 
   getByParent(parentId: RiskId) {

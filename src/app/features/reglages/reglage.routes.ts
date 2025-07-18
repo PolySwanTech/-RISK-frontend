@@ -8,6 +8,7 @@ import { CreateRisksEvaluationsComponent } from './risks/risk-evaluation/create-
 import { RiskDetailComponent } from './risks/risk-detail/risk-detail.component';
 import { createComponent } from '@angular/core';
 import { ListProcessComponent } from '../process/list-process/list-process.component';
+import { CartographieComponent } from '../../pages/cartographie/cartographie.component';
 
 export const reglagesRoute: Routes = [
   { path: '', component: ReglagesComponent },
@@ -17,6 +18,7 @@ export const reglagesRoute: Routes = [
     children: [
       { path: '',        component: RisksComponent },
       { path: 'create',  component: CreateRisksComponent },
+      { path: 'create/:id',  component: CreateRisksComponent },
       { path: 'evaluation',  component: CreateRisksEvaluationsComponent },
       { path: ':id',         component: RiskDetailComponent },
     ]
@@ -28,6 +30,4 @@ export const reglagesRoute: Routes = [
       { path: 'create', component: CreateProcessComponent }
     ]
   }
-
-
 ];
