@@ -136,6 +136,9 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 }
 
 .process-node {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
@@ -154,7 +157,7 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
         height: 100%;
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         transition: left 0.5s ease;
-        transform: skewX(-12deg);
+        transform: skewX(-3deg);
     }
 
     &:hover .shine-effect {
@@ -429,4 +432,113 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
         width: 48px;
         height: 48px;
     }
+}
+
+.risk-table {
+    width: 100%;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr 1fr 80px;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-row {
+    display: grid;
+    background: #f3f4f6;
+    grid-template-columns: 2fr 1fr 2fr 1fr 80px;
+    gap: 16px;
+    padding: 16px 20px;
+    border-top: 1px solid #f3f4f6;
+    align-items: center;
+}
+
+.table-row:hover {
+    background: #f9fafb;
+}
+
+.col-risque {
+    font-size: 14px;
+    color: #374151;
+}
+
+.col-controle {
+    font-size: 14px;
+    color: #374151;
+}
+
+.risk-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.risk-badge.high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.risk-badge.medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.risk-badge.low {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.btn-edit {
+    padding: 6px;
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.node-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    .node-left {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .node-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .level-badge {
+            white-space: nowrap;
+        }
+    }
+}
+
+.node-actions {
+    display: flex;
+    gap: 20px;
 }

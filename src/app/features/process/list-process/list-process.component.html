@@ -6,7 +6,7 @@
     <div class="header-container">
         <div class="header-content">
             <div class="header-info">
-                <h1 class="main-title">Gestion des Processus</h1>
+                <h1 class="main-title">{{ isCartographie ? 'Cartographie' : 'Gestion des Processus' }}</h1>
             </div>
 
             <button mat-raised-button class="btn-primary" (click)="add()">
@@ -123,9 +123,46 @@
                         </div>
                     </div>
 
-                    <!-- Badge de niveau -->
+                    <div *ngIf="isCartographie" class="node-actions">
+                        <button mat-raised-button class="btn-primary" (click)="addRisk(node.id)">
+                            <mat-icon>add</mat-icon>
+                            Nouveau risk
+                        </button>
+                        <button mat-raised-button class="btn-green" (click)="getRisks($event, node)">
+                            {{ node.risks && node.risks.length > 0 ? 'Fermer les risques' : 'Voir les risques' }}
+                        </button>
+                    </div>
                     <div class="level-badge" [ngClass]="'badge-' + node.type">
                         Niveau {{ node.niveau }}
+                    </div>
+                </div>
+
+                <div *ngIf="node.risks && node.risks.length > 0 && isCartographie" class="risk-table">
+                    <div class="table-header">
+                        <div class="col-risque">RISQUE</div>
+                        <div class="col-risque-brut">RISQUE BRUT</div>
+                        <div class="col-controle">CONTRÔLE</div>
+                        <div class="col-risque-net">RISQUE NET</div>
+                        <div class="col-actions">ACTIONS</div>
+                    </div>
+
+                    <div *ngFor="let risk of node.risks; let i = index" class="table-row">
+                        <div class="col-risque">{{risk.libelle}}</div>
+                        <div class="col-risque-brut">
+                            <span class="risk-badge" [ngClass]="getRiskClass(risk.riskBrut)">
+                                {{risk.riskBrut}}
+                            </span>
+                        </div>
+                        <div class="col-controle">controle</div>
+                        <div class="col-risque-net">
+                            <span class="risk-badge"
+                                [ngClass]="getRiskClass(risk.riskEvaluations[0]?.riskNet || 'MEDIUM')">
+                                {{risk.riskEvaluations[0]?.riskNet || 'MEDIUM'}}
+                            </span>
+                        </div>
+                        <div class="col-actions">
+                            <button class="btn-edit">✏️</button>
+                        </div>
                     </div>
                 </div>
             </div>

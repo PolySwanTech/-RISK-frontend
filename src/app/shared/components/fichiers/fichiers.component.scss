@@ -10,6 +10,16 @@
   margin-bottom: 20px;
 }
 
+.files-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.files-card {
+  overflow: hidden; // pour éviter que la card déborde
+  display: flex;
+  flex-direction: column;
+}
+
 .upload-zone:hover {
   border-color: var(--mat-sys-primary);
   background-color: #f0f8ff;

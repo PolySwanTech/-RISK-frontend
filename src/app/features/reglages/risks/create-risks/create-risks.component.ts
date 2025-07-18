@@ -77,7 +77,7 @@ export class CreateRisksComponent implements OnInit {
     balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
     balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
     balois3: this.fb.control<BaloiseCategoryEnum | null>(null),
-    process1: this.fb.nonNullable.control<string>('', Validators.required),
+    process1: this.fb.nonNullable.control<Process | null>(null, Validators.required),
     process2: this.fb.control<Process | null>(null),
     process3: this.fb.control<Process | null>(null)
   });
@@ -139,7 +139,8 @@ export class CreateRisksComponent implements OnInit {
     /* --- id dans l’URL ?  => édition  ---------------------- */
     const id = this.route.snapshot.paramMap.get('id');   // id OU 'create'
     if (id && id !== 'create') {
-      this.loadRiskById(id);
+      console.log('Chargement du risque avec ID:', id);
+      // this.loadRiskById(id);
     }
   }
 
@@ -159,7 +160,7 @@ export class CreateRisksComponent implements OnInit {
         balois1: this.risk.category ?? null,
         balois2: this.risk.category ?? null,
         balois3: this.risk.category ?? null,
-        process1: this.risk.processId,
+        // process1: this.risk.processId,
 
       });
 
