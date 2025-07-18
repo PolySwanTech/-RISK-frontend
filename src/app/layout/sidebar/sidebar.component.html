@@ -44,6 +44,12 @@
           <span>Contrôles</span>
         </a>
       </ng-container>
+      <ng-container>
+        <a mat-list-item routerLink="/calcul/view">
+          <mat-icon>calculate</mat-icon> 
+          <span>Calcul fonds propres</span>
+        </a>
+      </ng-container>
       <a mat-list-item [matMenuTriggerFor]="menu">
         <mat-icon>settings</mat-icon>
         <span>{{ 'MENU.ADMIN' | translate }}</span>

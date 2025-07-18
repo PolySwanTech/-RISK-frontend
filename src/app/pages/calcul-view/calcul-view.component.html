@@ -1,0 +1,317 @@
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>Calcul des fonds propres - Méthode Standard SMA</h1>
+        <div class="header-actions">
+            <button mat-raised-button (click)="goToCalcul()" color="primary" class="launch-btn">
+                <mat-icon>play_arrow</mat-icon>
+                Lancer le calcul
+            </button>
+            <button mat-raised-button class="export-btn">
+                <mat-icon>download</mat-icon>
+                Exporter
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <mat-tab-group class="main-tabs">
+        <!-- Synthèse des résultats -->
+        <mat-tab label="Synthèse des résultats">
+            <div class="tab-content">
+                <div class="results-grid">
+                    <!-- Exigence de fonds propres SMA -->
+                    <mat-card class="main-result-card">
+                        <mat-card-header>
+                            <mat-card-title>Exigence de fonds propres SMA</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <div class="main-amount">
+                                {{ formatCurrency(exigenceFinale) }}
+                                <span class="percentage-change">-2.3% vs précédent</span>
+                            </div>
+                            <div class="chart-placeholder">
+                                [Graphique d'évolution sur 3 ans]
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+
+                    <!-- Indicateurs clés -->
+                    <mat-card class="indicators-card">
+                        <mat-card-header>
+                            <mat-card-title>Indicateurs clés</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <div class="indicator-item">
+                                <div class="indicator-label">Business Indicator (BI)</div>
+                                <div class="indicator-value">{{ formatCurrency(businessIndicator) }}</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-label">Business Indicator Component (BIC)</div>
+                                <div class="indicator-value">{{ formatCurrency(businessIndicatorComponent) }}</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-label">Internal Loss Multiplier (ILM)</div>
+                                <div class="indicator-value">{{ internalLossMultiplier }}</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-label">Exigence finale</div>
+                                <div class="indicator-value">{{ formatCurrency(exigenceFinale) }}</div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+
+                <!-- Historique des calculs SMA -->
+                <mat-card class="history-card">
+                    <mat-card-header>
+                        <mat-card-title>Historique des calculs SMA</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <table mat-table [dataSource]="historiqueCalculs" class="history-table">
+                            <ng-container matColumnDef="periode">
+                                <th mat-header-cell *matHeaderCellDef>PÉRIODE</th>
+                                <td mat-cell *matCellDef="let element">{{ element.periode }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="bi">
+                                <th mat-header-cell *matHeaderCellDef>BI</th>
+                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.bi) }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="bic">
+                                <th mat-header-cell *matHeaderCellDef>BIC</th>
+                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.bic) }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="ilm">
+                                <th mat-header-cell *matHeaderCellDef>ILM</th>
+                                <td mat-cell *matCellDef="let element">{{ element.ilm }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="exigenceFinale">
+                                <th mat-header-cell *matHeaderCellDef>EXIGENCE FINALE</th>
+                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.exigenceFinale) }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="statut">
+                                <th mat-header-cell *matHeaderCellDef>STATUT</th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span class="status-badge" [class.valid]="element.statut === 'Valide'"
+                                        [class.submitted]="element.statut === 'Soumis'">
+                                        {{ element.statut }}
+                                    </span>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </mat-tab>
+
+        <!-- Composante BI -->
+        <mat-tab label="Composante BI">
+            <div class="tab-content bi-tab">
+
+                <h2>Composantes du Business Indicator (BI)</h2>
+
+                <!-- ILDC -->
+                <mat-card class="component-card">
+                    <mat-card-header><mat-card-title>ILDC (Income Loss Data
+                            Component)</mat-card-title></mat-card-header>
+                    <mat-card-content>
+                        <table mat-table [dataSource]="ildcData" class="component-table" matSort>
+                            <ng-container matColumnDef="categorie">
+                                <th mat-header-cell *matHeaderCellDef> Catégorie </th>
+                                <td mat-cell *matCellDef="let element"> {{ element.categorie }} </td>
+                            </ng-container>
+                            <ng-container matColumnDef="valeur">
+                                <th mat-header-cell *matHeaderCellDef> Valeur (M€) </th>
+                                <td mat-cell *matCellDef="let element"> {{ formatCurrency(element.valeur) }} </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="['categorie', 'valeur']"></tr>
+                            <tr mat-row *matRowDef="let row; columns: ['categorie', 'valeur']"></tr>
+                        </table>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- SC -->
+                <mat-card class="component-card">
+                    <mat-card-header><mat-card-title>SC (Standard Component)</mat-card-title></mat-card-header>
+                    <mat-card-content>
+                        <table mat-table [dataSource]="scData" class="component-table" matSort>
+                            <ng-container matColumnDef="categorie">
+                                <th mat-header-cell *matHeaderCellDef> Catégorie </th>
+                                <td mat-cell *matCellDef="let element"> {{ element.categorie }} </td>
+                            </ng-container>
+                            <ng-container matColumnDef="valeur">
+                                <th mat-header-cell *matHeaderCellDef> Valeur (M€) </th>
+                                <td mat-cell *matCellDef="let element"> {{ formatCurrency(element.valeur) }} </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="['categorie', 'valeur']"></tr>
+                            <tr mat-row *matRowDef="let row; columns: ['categorie', 'valeur']"></tr>
+                        </table>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- FC -->
+                <mat-card class="component-card">
+                    <mat-card-header><mat-card-title>FC (Financial Component)</mat-card-title></mat-card-header>
+                    <mat-card-content>
+                        <table mat-table [dataSource]="fcData" class="component-table" matSort>
+                            <ng-container matColumnDef="categorie">
+                                <th mat-header-cell *matHeaderCellDef> Catégorie </th>
+                                <td mat-cell *matCellDef="let element"> {{ element.categorie }} </td>
+                            </ng-container>
+                            <ng-container matColumnDef="valeur">
+                                <th mat-header-cell *matHeaderCellDef> Valeur (M€) </th>
+                                <td mat-cell *matCellDef="let element"> {{ formatCurrency(element.valeur) }} </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="['categorie', 'valeur']"></tr>
+                            <tr mat-row *matRowDef="let row; columns: ['categorie', 'valeur']"></tr>
+                        </table>
+                    </mat-card-content>
+                </mat-card>
+
+            </div>
+        </mat-tab>
+
+        <!-- Composante ILM -->
+        <mat-tab label="Composante ILM">
+            <div class="tab-content ilm-tab">
+                <h2>Historique des pertes opérationnelles sur 10 ans</h2>
+
+                <table mat-table [dataSource]="historiquePertes" class="losses-table" matSort>
+
+                    <!-- Année -->
+                    <ng-container matColumnDef="annee">
+                        <th mat-header-cell *matHeaderCellDef> Année </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.annee }} </td>
+                    </ng-container>
+
+                    <!-- Montant des pertes -->
+                    <ng-container matColumnDef="perte">
+                        <th mat-header-cell *matHeaderCellDef> Perte (M€) </th>
+                        <td mat-cell *matCellDef="let element"> {{ formatCurrency(element.perte) }} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['annee', 'perte']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['annee', 'perte'];"></tr>
+                </table>
+            </div>
+        </mat-tab>
+
+        <!-- Détails du calcul -->
+        <mat-tab label="Détails du calcul">
+            <div class="tab-content calcul-details">
+                <h3>Formule complète SMA</h3>
+                <h4>Tranches BI et coefficients marginaux (αi)</h4>
+                <table mat-table [dataSource]="tranchesBI" class="bi-table" matSort>
+
+                    <!-- Tranche -->
+                    <ng-container matColumnDef="tranche">
+                        <th mat-header-cell *matHeaderCellDef>Tranche BI</th>
+                        <td mat-cell *matCellDef="let element">{{ element.tranche }}</td>
+                    </ng-container>
+
+                    <!-- Intervalle -->
+                    <ng-container matColumnDef="intervalle">
+                        <th mat-header-cell *matHeaderCellDef>Intervalle BI (en millions €)</th>
+                        <td mat-cell *matCellDef="let element">{{ element.intervalle }}</td>
+                    </ng-container>
+
+                    <!-- Coefficient -->
+                    <ng-container matColumnDef="coefficient">
+                        <th mat-header-cell *matHeaderCellDef>Coefficient marginal (αi)</th>
+                        <td mat-cell *matCellDef="let element">{{ element.coefficient }}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsBi"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsBi;"></tr>
+                </table>
+                <h3>Exemple de calcul du BIC</h3>
+                <p>
+                    Pour un BI de 35 000 millions d'euros, le calcul se fait par tranche :
+                </p>
+
+                <ul>
+                    <li>Tranche 1 : 1 000 × 0,12 = 120</li>
+                    <li>Tranche 2 : (30 000 - 1 000) = 29 000 × 0,15 = 4 350</li>
+                    <li>Tranche 3 : (35 000 - 30 000) = 5 000 × 0,18 = 900</li>
+                </ul>
+
+                <p>
+                    <strong>BIC = 120 + 4 350 + 900 = 5 370 millions d'euros</strong>
+                </p>
+
+                <p>
+                    <em>Note :</em> Le BI correspond au chiffre d'affaires opérationnel global de l'entreprise, exprimé
+                    en millions d'euros.
+                </p>
+            </div>
+        </mat-tab>
+
+        <!-- Reporting C16/C17 -->
+        <mat-tab label="Reporting C16/C17">
+            <div class="reporting-container">
+                <h2>Prévisualisation des états C16 et C17</h2>
+                <p>
+                    Les états C16 et C17 sont des rapports réglementaires relatifs aux fonds propres et aux risques
+                    opérationnels.
+                    Vous pouvez consulter les données ci-dessous et exporter les rapports au format PDF ou Excel.
+                </p>
+
+                <div class="actions">
+                    <button mat-raised-button color="primary" (click)="exportPDF()">
+                        <mat-icon>picture_as_pdf</mat-icon> Exporter en PDF
+                    </button>
+                    <button mat-raised-button color="accent" (click)="exportExcel()">
+                        <mat-icon>table_view</mat-icon> Exporter en Excel
+                    </button>
+                </div>
+
+                <mat-tab-group>
+                    <mat-tab label="État C16">
+                        <table mat-table [dataSource]="dataC16" class="mat-elevation-z8">
+                            <!-- Colonnes C16 (exemple) -->
+                            <ng-container matColumnDef="poste">
+                                <th mat-header-cell *matHeaderCellDef>Poste</th>
+                                <td mat-cell *matCellDef="let element">{{ element.poste }}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="valeur">
+                                <th mat-header-cell *matHeaderCellDef>Valeur (€M)</th>
+                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.valeur) }}</td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsC16"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsC16;"></tr>
+                        </table>
+                    </mat-tab>
+
+                    <mat-tab label="État C17">
+                        <table mat-table [dataSource]="dataC17" class="mat-elevation-z8">
+                            <!-- Colonnes C17 (exemple) -->
+                            <ng-container matColumnDef="poste">
+                                <th mat-header-cell *matHeaderCellDef>Poste</th>
+                                <td mat-cell *matCellDef="let element">{{ element.poste }}</td>
+                            </ng-container>
+                            <ng-container matColumnDef="valeur">
+                                <th mat-header-cell *matHeaderCellDef>Valeur (M€)</th>
+                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.valeur) }}</td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsC17"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsC17;"></tr>
+                        </table>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>

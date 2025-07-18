@@ -30,5 +30,13 @@
     "pathRewrite": {
       "^/minio": ""
     }
+  },
+  "/api/rwa": {
+    "target": "http://rwa:8000",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/rwa": ""
+    }
   }
 }
