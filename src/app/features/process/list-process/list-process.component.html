@@ -1,22 +1,26 @@
 <div class="process-container">
-    <app-go-back previousPageName="Paramétrage Global" currentPageName="Gestion des processus"
-        [redirectUrl]="['reglages']" />
 
+    <mat-card class="dashboard-header-card">
+        <mat-card-content class="dashboard-header">
+            <h1>{{ isCartographie ? 'Cartographie' : 'Gestion des Processus' }}</h1>
+            <div class="header-controls">
+                <button mat-raised-button (click)="add()" class="btn-green">
+                    <mat-icon>add</mat-icon>
+                Nouveau Processus
+                </button>
+                <button mat-raised-button class="btn-primary">
+                    <mat-icon>refresh</mat-icon>
+                    Actualiser
+                </button>
+            </div>
+        </mat-card-content>
+    </mat-card>    
     <!-- Header avec glassmorphism -->
     <div class="header-container">
-        <div class="header-content">
-            <div class="header-info">
-                <h1 class="main-title">{{ isCartographie ? 'Cartographie' : 'Gestion des Processus' }}</h1>
-            </div>
-
-            <button mat-raised-button class="btn-primary" (click)="add()">
-                <mat-icon>add</mat-icon>
-                Nouveau Processus
-            </button>
-        </div>
+      
 
         <!-- Barre de recherche -->
-        <div class="search-container">
+        <div class="search-container" style="margin-top: 20px;">
             <mat-icon class="search-icon">search</mat-icon>
             <input type="text" placeholder="Rechercher un processus..." class="search-input" [(ngModel)]="searchTerm"
                 (input)="onSearch($event)" />
@@ -25,6 +29,9 @@
 
     <!-- Arbre hiérarchique -->
     <div class="hierarchy-container">
+        <button *ngIf="!isCartographie" class="btn-primary" style="margin-bottom: 20px;" mat-raised-button (click)="openEntityDialog()">
+            <mat-icon>add</mat-icon><span>Ajouter une entité</span>
+        </button>
         <div class="tree-wrapper">
             <ng-container *ngFor="let node of filteredProcesses">
                 <div class="node-container" [ngClass]="'level-' + node.niveau">
@@ -60,6 +67,11 @@
                                             {{ getChildrenCount(node) }} processus
                                         </p>
                                     </div>
+
+                                </div>
+                                <div class="icon-container" [ngClass]="'icon-' + node.type">
+                                    <button *ngIf="!isCartographie" (click)="openEntityDialog(node, $event)"
+                                        mat-icon-button><mat-icon>edit</mat-icon></button>
                                 </div>
                             </div>
 
@@ -146,7 +158,8 @@
                         <div class="col-actions">ACTIONS</div>
                     </div>
 
-                    <div *ngFor="let risk of node.risks; let i = index" class="table-row">
+                    <div *ngFor="let risk of node.risks; let i = index" (click)="navToRisk(risk.id.id)"
+                        class="table-row">
                         <div class="col-risque">{{risk.libelle}}</div>
                         <div class="col-risque-brut">
                             <span class="risk-badge" [ngClass]="getRiskClass(risk.riskBrut)">
