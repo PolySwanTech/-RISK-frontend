@@ -15,14 +15,6 @@ export class ReglagesComponent {
 
   settings = true
 
-  navToEntites(){
-    this.router.navigate(['reglages', 'entites'])
-  }
-
-  navToRisk(){
-    this.router.navigate(['reglages', 'risks'])
-  }
-
   navToProcess(){
     this.router.navigate(['reglages', 'process'])
   }
