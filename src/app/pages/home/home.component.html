@@ -64,7 +64,13 @@
   </div>
 
   <div class="graphs-container">
-    <app-bar-chart [incidents]="incidents"></app-bar-chart>
-    <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
+
+    @if(incidents && incidents.length > 0) {
+      <app-bar-chart [incidents]="incidents"></app-bar-chart>
+      <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
+    } @else {
+      <p class="no-incidents">Aucun incident à afficher.</p>
+    }
+
   </div>
 </section>
