@@ -61,9 +61,13 @@ export class RiskMatrixComponent {
     return '—';
   }
 
-  let prob = lastEval.probability! / 2;
-  if(prob % 2 != 0){
+  let prob = 0
+  
+  if(lastEval.probability! % 2 != 0){
     prob = (lastEval.probability! + 1)/ 2;
+  }
+  else{
+    prob = lastEval.probability! / 2;
   }
   
   const label = this.frequencyLabel(prob);
