@@ -1,45 +1,45 @@
 import { Evaluation } from "../enum/evaluation.enum";
+import { ExecutionMode } from "../enum/exceutionmode.enum";
 import { Priority } from "../enum/Priority";
 import { Status } from "../enum/status.enum";
 
 export class ControlExecution {
 
     id: string;
-    templateId: string;
     priority: Priority;
-    status: Status
+    executionMode : ExecutionMode;
+    usedData : string;
+    controlData : string;
     achievedAt: Date | null;
     performedBy: string;
-    performedByName: string = '';
-    comments: string;
-    createdAt: Date;
+    status: Status
     evaluation: Evaluation;
-    evaluator : string;
-    evaluatedAt: Date | null;
+    resume : string;
+    comments: string;
 
-    constructor (
+    constructor(
         id: string,
-        templateId: string,
-        priority: Priority, 
-        status: Status,
+        priority: Priority,
+        executionMode: ExecutionMode,
+        usedData: string,
+        controlData: string,
         achievedAt: Date | null,
         performedBy: string,
-        comments: string,
-        createdAt: Date,
+        status: Status,
         evaluation: Evaluation,
-        evaluator: string,
-        evaluatedAt: Date | null    
-    ){
+        resume: string,
+        comments: string
+    ) {
         this.id = id;
-        this.templateId = templateId;
         this.priority = priority;
-        this.status = status;
+        this.executionMode = executionMode;
+        this.usedData = usedData;
+        this.controlData = controlData;
         this.achievedAt = achievedAt;
         this.performedBy = performedBy;
-        this.comments = comments;
-        this.createdAt = createdAt;
+        this.status = status;
         this.evaluation = evaluation;
-        this.evaluator = evaluator;
-        this.evaluatedAt = evaluatedAt;
+        this.resume = resume;
+        this.comments = comments;
     }
 }
