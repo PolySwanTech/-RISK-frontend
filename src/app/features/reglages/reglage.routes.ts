@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { ReglagesComponent } from './reglages.component';
-import { CategorySelectionComponent } from '../../shared/components/category-selection/category-selection.component';
 import { CreateProcessComponent } from '../process/create-process/create-process.component';
 import { CreateRisksComponent } from './risks/create-risks/create-risks.component';
 import { CreateRisksEvaluationsComponent } from './risks/risk-evaluation/create-risks-evaluations/create-risks-evaluations.component';
