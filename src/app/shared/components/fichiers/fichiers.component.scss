@@ -262,3 +262,10 @@ $file-colors: (
   height: 48px;
   width: 48px;
 }
+
+.files-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}

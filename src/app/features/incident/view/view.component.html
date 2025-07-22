@@ -4,7 +4,7 @@
         [currentPageName]="`Détails de l'incident - ` + incident.title"></app-go-back>
     <div class="view-container">
         <div class="info-container">
-            <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
+            <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '850px' : '820px'}">
                 <mat-card-header>
                     <mat-card-title class="header-with-buttons">
                         <span>Info globale</span>
@@ -26,114 +26,82 @@
                     </mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    <!-- Informations principales en cartes -->
-                    <div class="info-grid">
-                        <!-- Localisation -->
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <mat-icon>location_on</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Localisation</span>
-                                <span class="info-value">{{ incident.location }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Cause -->
-                        <div class="info-item">
-                            <div class="info-icon cause-icon">
-                                <mat-icon>error_outline</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Cause</span>
-                                <span class="info-value">{{ incident.cause.name }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Type de risque -->
-                        <div class="info-item">
-                            <div class="info-icon risk-icon">
-                                <mat-icon>warning</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Type de risque</span>
-                                <span class="info-value">{{ incident.riskName }} 
-                                    <!-- - Niveau {{ incident.risk.level }} -->
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Référence -->
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <mat-icon>confirmation_number</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Référence</span>
-                                <span class="info-value">{{ incident.reference }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Titre -->
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <mat-icon>title</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Libellé</span>
-                                <span class="info-value">{{ incident.title }}</span>
-                            </div>
-                        </div>
-
-                    </div>
 
                     <!-- Timeline des dates -->
-                    <div class="dates-timeline">
+                    <div class="timeline-horizontal">
                         <h3 class="timeline-title">
                             <mat-icon>schedule</mat-icon>
-                            Chronologie
+                            Chronologie de l'incident
                         </h3>
 
-                        <div class="timeline-container">
-                            <!-- Date de déclaration -->
-                            <div class="timeline-item">
-                                <div class="timeline-dot declaration"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Déclaration</span>
-                                    <span class="timeline-date">{{ incident.declaredAt| date : 'dd/MM/yyyy' }}</span>
+                        <div class="timeline-row">
+                            <div class="timeline-step">
+                                <div class="dot red"></div>
+                                <div class="date">{{ incident.survenueAt | date: 'dd/MM/yyyy à HH:mm' }}</div>
+                                <div class="label">
+                                    <mat-icon fontIcon="place"></mat-icon> Date de survenue
                                 </div>
                             </div>
 
-                            <!-- Date de survenance -->
-                            <div class="timeline-item">
-                                <div class="timeline-dot survenance"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Survenance</span>
-                                    <span class="timeline-date">{{ incident.survenueAt| date : 'dd/MM/yyyy' }}</span>
+                            <div class="line-gradient"></div>
+
+                            <div class="timeline-step">
+                                <div class="dot orange"></div>
+                                <div class="date">{{ incident.detectedAt | date: 'dd/MM/yyyy à HH:mm' }}</div>
+                                <div class="label">
+                                    <mat-icon fontIcon="search"></mat-icon> Date de détection
                                 </div>
                             </div>
 
-                            <!-- Date de détection -->
-                            <div class="timeline-item">
-                                <div class="timeline-dot detection"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Détection</span>
-                                    <span class="timeline-date">{{ incident.detectedAt| date : 'dd/MM/yyyy' }}</span>
-                                </div>
-                            </div>
+                            <div class="line-gradient"></div>
 
-                            <!-- Date de clôture (si existe) -->
-                            @if(incident.closedAt) {
-                            <div class="timeline-item">
-                                <div class="timeline-dot closure"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Clôture</span>
-                                    <span class="timeline-date">{{ incident.closedAt| date : 'dd/MM/yyyy' }}</span>
+                            <div class="timeline-step">
+                                <div class="dot green"></div>
+                                <div class="date">{{ incident.declaredAt | date: 'dd/MM/yyyy à HH:mm' }}</div>
+                                <div class="label">
+                                    <mat-icon fontIcon="calendar_today"></mat-icon> Date de déclaration
                                 </div>
                             </div>
-                            }
                         </div>
                     </div>
+
+                    <!-- Informations principales en cartes -->
+                    <mat-card class="general-info-card">
+                        <span class="section-header">
+                            <span class="pin-emoji">📌</span>
+                            <span>Informations générales</span>
+                        </span>
+
+                        <mat-card-content>
+                            <div class="info-pairs-grid">
+                                <div class="info-field">
+                                    <label>Localisation</label>
+                                    <div class="info-box">{{ incident.location }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Cause</label>
+                                    <div class="info-box">{{ incident.cause.name }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Type de risque</label>
+                                    <div class="info-box">{{ incident.riskName }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Référence</label>
+                                    <div class="info-box">{{ incident.reference }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Libellé</label>
+                                    <div class="info-box">{{ incident.title }}</div>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+
 
                     <!-- Description -->
                     <div class="description-section">
@@ -148,8 +116,9 @@
                 </mat-card-content>
             </mat-card>
 
-            <app-fichiers [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isNotClosed()" style="height: 90%;"></app-fichiers>
-            
+            <app-fichiers [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isNotClosed()"
+                style="height: 90%;"></app-fichiers>
+
             <mat-card class="state-card none">
                 <mat-card-header>
                     <mat-card-title><span>Suivi</span>
