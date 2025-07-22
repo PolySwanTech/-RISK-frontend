@@ -17,6 +17,7 @@ export interface RiskEvaluation {
   id           : string;      // UUID
   riskNet      : RiskLevel;
   evaluator    : string;      // UUID de l’évaluateur
+  evaluatorUsername?: string;
   probability ?: number;
   createdAt    : Date;      // ISO
   taxonomie : { id: RiskId };

@@ -107,7 +107,7 @@
             <div *ngFor="let eval of risk.riskEvaluations" class="incident">
               <div class="incident-date">{{ eval.createdAt | date : 'dd/MM/yyyy' }}</div>
               <div class="incident-title">Score net : {{ eval.riskNet }}</div>
-              <div class="evaluateur">Evaluateur : {{ eval.evaluator }}</div>
+              <div class="evaluateur">Evaluateur : {{ eval.evaluatorUsername || eval.evaluator }}</div>
             </div>
           </div>
         </div>
