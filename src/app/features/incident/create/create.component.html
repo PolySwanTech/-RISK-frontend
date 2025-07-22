@@ -14,14 +14,14 @@
             <ng-container *ngIf="hasTeam; else selectTeam">
               <mat-form-field>
                 <mat-label>Équipe</mat-label>
-                <input matInput formControlName="equipeName" readonly>
+                <input matInput formControlName="equipe" readonly>
               </mat-form-field>
             </ng-container>
             <ng-template #selectTeam>
               <mat-form-field>
                 <mat-label>Choisissez une équipe</mat-label>
-                <mat-select formControlName="equipeName">
-                  <mat-option *ngFor="let team of listTeams" [value]="team">{{ team }}</mat-option>
+                <mat-select formControlName="equipe" (selectionChange)="onTeamChange($event)">
+                  <mat-option *ngFor="let team of listTeams" [value]="team">{{ team.name }}</mat-option>
                 </mat-select>
               </mat-form-field>
             </ng-template>
@@ -82,51 +82,19 @@
               property="newImages" (filesSelected)="onFilesChange($event)">
             </app-button-add-file>
 
-            <mat-form-field>
-              <mat-label>Macro Processus (niveau 1)</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 1)">
-                <mat-option *ngFor="let p1 of listP1" [value]="p1">{{ p1.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+            @if(listProcess.length != 0){
+            <app-select-arborescence (changeValue)="onSelectionProcess($event)" placeholder="Selectionnez un processus"
+              [list]="listProcess" />
+            }
 
-            <mat-form-field *ngIf="listP2.length > 0">
-              <mat-label>Processus (niveau 2)</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 2)">
-                <mat-option *ngFor="let p2 of listP2" [value]="p2">{{ p2.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listP3.length > 0">
-              <mat-label>Micro-processus</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 3)">
-                <mat-option *ngFor="let mp of listP3" [value]="mp">{{ mp.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Catégorie Niveau 1</mat-label>
-              <mat-select (selectionChange)="onRiskChange($event.value, 1)">
-                <mat-option *ngFor="let r1 of listRiskLv1" [value]="r1">{{ formatCategoryName(r1) }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listRiskLv2.length > 0">
-              <mat-label>Catégorie Niveau 2</mat-label>
-              <mat-select (selectionChange)="onRiskChange($event.value, 2)">
-                <mat-option *ngFor="let r2 of listRiskLv2" [value]="r2">{{ formatCategoryName(r2) }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listRiskLv3.length > 0">
-              <mat-label>Catégorie Niveau 3</mat-label>
-              <mat-select (selectionChange)="onRiskChange($event.value, 3)">
-                <mat-option *ngFor="let r3 of listRiskLv3" [value]="r3">{{ formatCategoryName(r3) }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+            @if(listRisks.length != 0){
+            <app-select-arborescence (changeValue)="onSelectionRisk($event)" placeholder="Selectionnez un risque"
+              [list]="listRisks"/>
+            }
 
             <mat-form-field>
               <mat-label>Cause</mat-label>
-              <mat-select formControlName="cause" (selectionChange)="onCauseChange($event.value)">
+              <mat-select formControlName="cause">
                 <mat-option *ngFor="let cause of listCauses" [value]="cause">{{ cause.name }}</mat-option>
               </mat-select>
             </mat-form-field>
