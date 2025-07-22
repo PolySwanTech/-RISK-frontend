@@ -9,18 +9,21 @@
                     <mat-card-title class="header-with-buttons">
                         <span>Info globale</span>
                         <span class="buttons-header">
-                            <button mat-raised-button class="btn-primary" (click)="addActionPlan()">
-                                <mat-icon>playlist_add_check</mat-icon>
-                                Plan d'action
-                            </button>
+                            @if(!isClosed()){
+                                <button mat-raised-button class="btn-primary" (click)="addActionPlan()">
+                                    <mat-icon>playlist_add_check</mat-icon>
+                                    Plan d'action
+                                </button>
+                            }
                             <button mat-raised-button class="btn-green" (click)="downloadExport()">
                                 <mat-icon>file_download</mat-icon> Exporter
                             </button>
 
-                            <button *ngIf="canClose && isNotClosed()" mat-raised-button class="btn-red"
-                                (click)="closeIncident()">
+                            @if(canClose()){
+                            <button mat-raised-button class="btn-red" (click)="closeIncident()">
                                 <mat-icon>lock</mat-icon> Clôturer
                             </button>
+                            }
 
                         </span>
                     </mat-card-title>
@@ -57,7 +60,7 @@
                             </div>
                             <div class="info-content">
                                 <span class="info-label">Type de risque</span>
-                                <span class="info-value">{{ incident.riskName }} 
+                                <span class="info-value">{{ incident.riskName }}
                                     <!-- - Niveau {{ incident.risk.level }} -->
                                 </span>
                             </div>
@@ -148,101 +151,16 @@
                 </mat-card-content>
             </mat-card>
 
-            <app-fichiers [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isNotClosed()" style="height: 90%;"></app-fichiers>
-            
-            <mat-card class="state-card none">
-                <mat-card-header>
-                    <mat-card-title><span>Suivi</span>
-                        <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
-                    </mat-card-title>
-
-                </mat-card-header>
-                <mat-card-content>
-                    <div class="comment-section">
-                        <div class="comment-header-bar">
-                            <span>Messages les plus récents</span>
-                        </div>
-                        @for(s of suivi; track s.id){
-                        <div class="comment-card">
-                            <div class="comment-header">
-                                <mat-icon class="user-icon">person</mat-icon>
-                                <span class="username">
-                                    {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
-                                </span>
-                            </div>
-                            <p class="comment-text">{{s.content}}</p>
-                        </div>
-                        }
-                        <mat-form-field>
-                            <mat-label>Message</mat-label>
-                            <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
-                        </mat-form-field>
-                        <button mat-raised-button class="btn-primary" (click)="sendMessage()">Envoyer</button>
-                    </div>
-                </mat-card-content>
-            </mat-card>
+            <app-fichiers [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isClosed()"
+                style="height: 90%;"></app-fichiers>
 
         </div>
         <div class="info2-container" style="display: flex; gap: 20px;">
             <!-- Section Pièces jointes -->
 
-            <mat-card class="state-card display">
-                <mat-card-header>
-                    <mat-card-title><span>Suivi</span>
-                        <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
-                    </mat-card-title>
+            <app-list-suivi [closed]="isClosed()"></app-list-suivi>
 
-                </mat-card-header>
-                <mat-card-content>
-                    <div class="comment-section">
-                        <div class="comment-header-bar">
-                            <span>Messages les plus récents</span>
-                        </div>
-                        @for(s of suivi; track s.id){
-                        <div class="comment-card">
-                            <div class="comment-header">
-                                <mat-icon class="user-icon">person</mat-icon>
-                                <span class="username">
-                                    {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
-                                </span>
-                            </div>
-                            <p class="comment-text">{{s.content}}</p>
-                        </div>
-                        }
-                        <mat-form-field>
-                            <mat-label>Message</mat-label>
-                            <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
-                        </mat-form-field>
-                        <button *ngIf="isNotClosed()" mat-raised-button class="btn-primary"
-                            (click)="sendMessage()">Envoyer</button>
-                    </div>
-                </mat-card-content>
-            </mat-card>
-
-            <mat-card class="state-card">
-                <mat-card-header>
-                    <mat-card-title>
-                        <span>Impacts -
-                            <strong>
-                                Total : {{ totalAmount | currency : 'EUR' }}
-                            </strong>
-                        </span>
-                        @if(isNotClosed()){
-                        <button mat-raised-button class="btn-primary" (click)="addImpact()">
-                            Ajouter
-                            <mat-icon>add</mat-icon>
-                        </button>
-                        }
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <div class="impacts-container">
-                        @for(impact of incident.impacts; track impact.id){
-                        <app-impact-card [impact]="impact" [businessUnits]="businessUnits"></app-impact-card>
-                        }
-                    </div>
-                </mat-card-content>
-            </mat-card>
+            <app-list-impact [closed]="isClosed()"></app-list-impact>
         </div>
     </div>
     }
