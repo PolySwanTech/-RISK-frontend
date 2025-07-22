@@ -9,10 +9,12 @@
                     <mat-card-title class="header-with-buttons">
                         <span>Info globale</span>
                         <span class="buttons-header">
-                            <button mat-raised-button class="btn-primary" (click)="addActionPlan()">
-                                <mat-icon>playlist_add_check</mat-icon>
-                                Plan d'action
-                            </button>
+                            @if(!isClosed()){
+                                <button mat-raised-button class="btn-primary" (click)="addActionPlan()">
+                                    <mat-icon>playlist_add_check</mat-icon>
+                                    Plan d'action
+                                </button>
+                            }
                             <button mat-raised-button class="btn-green" (click)="downloadExport()">
                                 <mat-icon>file_download</mat-icon> Exporter
                             </button>

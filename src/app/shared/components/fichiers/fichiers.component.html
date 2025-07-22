@@ -4,14 +4,16 @@
         <mat-card-header>
             <mat-card-title>
                 <span>Pièces jointes</span>
+                @if(!closed){
                 <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
                     <mat-icon>attach_file</mat-icon>
                     Ajouter
                 </button>
+                }
             </mat-card-title>
         </mat-card-header>
         <!-- Zone de dépôt -->
-        @if(!isNotClosed()){
+        @if(!closed){
         <div class="upload-zone" (click)="fileInput.click()" (dragover)="onDragOver($event)"
             (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.dragover]="isDragOver">
             <mat-icon class="upload-icon">cloud_upload</mat-icon>
@@ -68,7 +70,7 @@
                         <button mat-icon-button matTooltip="Télécharger" (click)="downloadFile(file)">
                             <mat-icon>download</mat-icon>
                         </button>
-                        @if(!isNotClosed()){
+                        @if(!closed){
                         <button mat-icon-button color="warn" matTooltip="Supprimer" (click)="deleteFile(file.id)">
                             <mat-icon>delete</mat-icon>
                         </button>
