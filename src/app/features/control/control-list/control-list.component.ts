@@ -40,9 +40,9 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       cell: (element: ControlTemplate) => `${element.reference}`,
     },
     {
-      columnDef: 'Business Unit',
-      header: 'Business Unit',
-      cell: (element: ControlTemplate) => `${element.buName}`,
+      columnDef: 'Processus métier',
+      header: 'Processus métier',
+      cell: (element: ControlTemplate) => `${element.processName}`,
     },
 
     {
@@ -95,7 +95,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   }
   
   create() {
-    const dialogRef = this.dialog.open(CreateControlComponent, {
+    this.dialog.open(CreateControlComponent, {
       width: '700px !important',
       height: '600px',
       minWidth: '600px',

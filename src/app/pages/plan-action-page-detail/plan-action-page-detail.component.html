@@ -55,13 +55,13 @@
                         </div>
                     </div>
 
-                    @if(actionPlan.taxonomie){
+                    @if(actionPlan.riskName){
                     <div class="info-block">
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Risk</label>
-                            <span class="badge status" [ngClass]="actionPlan.taxonomie!.libelle.toLowerCase()">
-                                {{ actionPlan.taxonomie!.libelle }}
+                            <span class="badge status" [ngClass]="actionPlan.riskName.toLowerCase()">
+                                {{ actionPlan.riskName }}
                             </span>
                         </div>
                     </div>

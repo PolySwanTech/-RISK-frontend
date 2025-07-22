@@ -16,8 +16,8 @@ export class EquipeService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl + '/users/bu';
 
-  getAllEquipes(): Observable<Equipe[]> {
-    return this.http.get<Equipe[]>(`${this.baseUrl}`);
+  getAllEquipes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}`);
   }
 
   getById(userInCharge: string) {

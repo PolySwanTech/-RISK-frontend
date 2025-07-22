@@ -75,8 +75,8 @@ export class ControlDetailsPageComponent implements OnInit {
     }
   }
 
-  getPriorityClass(priority: Priority): string {
-    return priorityLabels[priority];
+  getPriorityClass(priority: Priority | undefined): string {
+    return priorityLabels[priority!] || 'priority-default';
   }
 
   goBack(): void {
@@ -117,7 +117,7 @@ export class ControlDetailsPageComponent implements OnInit {
     return degreeLabels[level];
   }
 
-  formatPriority(priority: Priority): string {
-    return priorityLabels[priority];
+  formatPriority(priority: Priority | undefined): string {
+    return priorityLabels[priority!] || 'Non défini';
   }
 }

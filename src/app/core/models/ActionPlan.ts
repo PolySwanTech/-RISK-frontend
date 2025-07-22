@@ -40,7 +40,7 @@ export class ActionPlan {
     priority: Priority;
     creator: string;
     userInCharge: string;
-
+    riskName : string = "";
     taxonomie: RiskTemplate | null;
     incidentId: string;
     echeance: Date;
