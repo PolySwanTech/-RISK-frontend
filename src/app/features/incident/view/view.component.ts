@@ -7,9 +7,8 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
+import { CreateImpactPopUpComponent } from '../impact/create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
-import { ImpactCardComponent } from '../impact-card/impact-card.component';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,6 +27,8 @@ import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
 import { ImpactService } from '../../../core/services/impact/impact.service';
+import { ImpactCardComponent } from '../impact/impact-card/impact-card.component';
+import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {
@@ -41,8 +42,8 @@ interface AttachedFile {
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe, DatePipe,
-    MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule,
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, ListImpactComponent,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, FichiersComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss',
@@ -52,7 +53,6 @@ interface AttachedFile {
 })
 export class ViewComponent implements OnInit {
   private incidentService = inject(IncidentService);
-  private impactService = inject(ImpactService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService);
@@ -61,7 +61,6 @@ export class ViewComponent implements OnInit {
   private entitiesService = inject(EntitiesService);
 
   incident: Incident | undefined
-  totalAmount = 0;
   userRole: string | undefined;
   userTeam: string | undefined;
   username: string | undefined;
@@ -99,11 +98,6 @@ export class ViewComponent implements OnInit {
       this.extractTokenInfo();
       this.checkCloseAuthorization();
     });
-
-
-    this.impactService.sum(id).subscribe(
-      result => this.totalAmount = result
-    )
   }
 
   extractTokenInfo(): void {
@@ -155,36 +149,6 @@ export class ViewComponent implements OnInit {
           this.confirmService.openConfirmDialog("Incident déjà clôturé", "L'incident est déjà clôturé, vous ne pouvez pas changer son état.", true);
       }
     }
-  }
-
-  addImpact() {
-    const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
-      width: '400px'
-    });
-
-    dialogRef.afterClosed().subscribe((result: Impact) => {
-      if (result && this.incident) {
-        /* ─── Construction explicite du DTO ─── */
-        const dto: ImpactCreateDto = {
-          montant: result.montant,
-          comptabilisationDate: result.comptabilisationDate ? result.comptabilisationDate : null,
-          entityId: result.entityId,      // ou result.entiteResponsableId
-          incidentId: this.incident.id,     // ← lier à l’incident courant
-          type: result.type,          // enum/chaine côté back
-          message: result.message ?? ''  // commentaire optionnel
-        };
-
-
-        this.impactService.addImpact(dto).subscribe(() => {
-          this.confirmService.openConfirmDialog(
-            'Impact ajouté',
-            "L'impact a bien été ajouté à l'incident",
-            false
-          );
-          this.ngOnInit();     // rafraîchir la vue
-        });
-      }
-    });
   }
 
   isNotClosed() {

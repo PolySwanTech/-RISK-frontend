@@ -67,15 +67,6 @@ mat-list-item {
   margin-top: 15px;
 }
 
-
-
-.impacts-container {
-  display: flex;
-  justify-content: flex-start;
-  gap: 20px;
-  overflow-x: auto;
-}
-
 app-impact-card {
   min-width: 180px;
   flex: 1 1 21%;
