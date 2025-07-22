@@ -8,12 +8,9 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
-import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
 import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
-// import { CauseService } from '../../../core/services/cause/cause.service';
-// import { Cause } from '../../../core/models/Cause';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { Router } from '@angular/router';
@@ -25,8 +22,7 @@ import { Consequence } from '../../../core/models/Consequence';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
-import { BaloiseCategoryEnum } from '../../../core/enum/baloisecategory.enum';
-
+import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 
 @Component({
   selector: 'app-create',
@@ -43,8 +39,9 @@ import { BaloiseCategoryEnum } from '../../../core/enum/baloisecategory.enum';
     MatRadioModule,
     SelectUsersComponent,
     ButtonAddFileComponent,
-    NgIf, NgFor
-  ],
+    NgIf, NgFor,
+    SelectArborescenceComponent
+],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
@@ -56,7 +53,7 @@ export class CreateComponent implements OnInit {
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
-    equipeName: ['', Validators.required],
+    equipe: ['', Validators.required],
     commentaire: ['', Validators.required],
     location: ['', Validators.required],
   });
@@ -69,45 +66,34 @@ export class CreateComponent implements OnInit {
   });
 
   incidentForm3 = this._formBuilder.group<{
-    risk: FormControl<string | null>;
-    subRisk: FormControl<string | null>;
+    riskId: FormControl<string | null>;
     userMail: FormControl<string | null>;
     files: FormControl<string | null>;
     lossAmount: FormControl<number | null>;
     cause: FormControl<Cause | null>;
     consequenceId: FormControl<string | null>;
-    process: FormControl<Process | null>;
+    processId: FormControl<string | null>;
   }>({
-    risk: new FormControl(''),
-    subRisk: new FormControl(null),
+    riskId: new FormControl(''),
     userMail: new FormControl(null),
     files: new FormControl(null),
     lossAmount: new FormControl(null, Validators.required),
     cause: new FormControl(null, Validators.required),
     consequenceId: new FormControl(null, Validators.required),
-    process: new FormControl(null, Validators.required),
+    processId: new FormControl(null, Validators.required),
   });
 
-  listRiskLv1: RiskTemplate[] = [];
-  listRiskLv2: RiskTemplate[] = [];
-  listRiskLv3: RiskTemplate[] = [];
+  listRisks: any[] = [];
 
   listProcess: Process[] = [];
 
   errorMessage = signal('');
   hasTeam = true;
-  listTeams: string[] = [];
+  listTeams: any[] = [];
 
-  // listBaloiseL1: BaloiseCategoryL1[] = [];
   listConsequence: Consequence[] = [];
 
-  listP1: Process[] = [];
-  listP2: Process[] = [];
-  listP3: Process[] = [];
-
   listCauses: Cause[] = [];
-
-  selectedCategoryLevel = 1;
 
   incidentService = inject(IncidentService);
   riskService = inject(RiskService);
@@ -119,33 +105,53 @@ export class CreateComponent implements OnInit {
 
   ngOnInit(): void {
     const teamName = this.getUserTeamFromToken();
+    console.log(teamName)
     if (teamName) {
       this.hasTeam = true;
-      this.incidentForm1.patchValue({ equipeName: teamName });
+      this.incidentForm1.patchValue({ equipe: teamName });
     } else {
       this.hasTeam = false;
       this.fetchTeams();
     }
     this.consequenceService.getAll().subscribe(data =>
       this.listConsequence = data);
-
-    this.consequenceService.getAll().subscribe(data => this.listConsequence = data);
-    this.riskService.getAll().subscribe(data => {
-      this.listRiskLv1 = data;
-    });
-
-    this.processService.getAll().subscribe(data => {
-      this.listP1 = data;
-    });
+    
     this.causeService.getAll().subscribe(data => {
       this.listCauses = data
     });
   }
 
+  onTeamChange(event : any){
+    this.listProcess = [];
+    this.listRisks = [];
+    this.incidentForm3.get('processId')?.reset();
+    this.incidentForm3.get('riskId')?.reset();
+    this.processService.getProcessTree(event.value.id).subscribe(data => {
+    this.listProcess = data;
+      console.log(data)
+    });
+  }
+
+  onSelectionProcess(value : Process){
+    this.listRisks = [];
+    this.riskService.getRisksTree(value.id).subscribe(data => {
+      this.listRisks = data;
+      if( this.listRisks.length === 0) {
+        alert("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
+      }
+    });
+    this.incidentForm3.get('processId')?.setValue(value.id);
+  }
+
+  onSelectionRisk(value : any){
+    this.incidentForm3.get('riskId')?.setValue(value.id);
+  }
+
   fetchTeams(): void {
     this.equipeService.getAllEquipes().subscribe({
       next: teams => {
-        this.listTeams = teams.map(t => t.name);
+        this.listTeams = teams.filter(team => team.process && team.process.length > 0);
+        console.log(this.listTeams)
       },
       error: err => {
         console.error("Erreur lors du chargement des équipes", err);
@@ -183,8 +189,8 @@ export class CreateComponent implements OnInit {
       survenueAt: new Date(this.incidentForm2.value.dateDeSurvenance!),
       detectedAt: new Date(this.incidentForm2.value.dateDeDetection!),
       closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
-      risk: this.incidentForm3.value.risk!,
-      processId: (this.incidentForm3.value.process as Process).id,
+      riskId: this.incidentForm3.value.riskId!,
+      processId: this.incidentForm3.value.processId!,
       cause: this.incidentForm3.value.cause!
     };
   }
@@ -221,39 +227,5 @@ export class CreateComponent implements OnInit {
 
   onFilesChange(event: any) {
     this.incidentForm3.get('files')!.setValue(event);
-  }
-
-  onRiskChange(template: RiskTemplate, level: number) {
-    this.incidentForm3.get('risk')!.setValue(template.id.id);
-    if (level === 1) {
-      this.riskService.getByParent(template.id).subscribe(data => {
-        this.listRiskLv2 = data;
-        this.listRiskLv3 = [];
-      });
-    }
-    if (level === 2) {
-      this.riskService.getByParent(template.id).subscribe(data => {
-        this.listRiskLv3 = data;
-      });
-    }
-  }
-
-  formatCategoryName(risk: RiskTemplate): string {
-    return risk.libelle;
-  }
-
-  onProcessChange(process: Process, level: number) {
-    if (level === 1) {
-      this.incidentForm3.get('process')!.setValue(process); // sélection niveau 1
-      this.listP2 = process.enfants || [];
-      this.listP3 = [];
-    }
-    if (level === 2) {
-      this.incidentForm3.get('process')!.setValue(process); // sélection niveau 2
-      this.listP3 = process.enfants || [];
-    }
-  }
-
-  onCauseChange(cause :Cause) {
   }
 }
