@@ -29,6 +29,7 @@ import { CreateActionPlanDialogComponent } from '../../action-plan/create-action
 import { ImpactService } from '../../../core/services/impact/impact.service';
 import { ImpactCardComponent } from '../impact/impact-card/impact-card.component';
 import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
+import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {
@@ -44,7 +45,7 @@ interface AttachedFile {
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
     MatGridListModule, MatButtonModule, MatFormFieldModule, ListImpactComponent,
-    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, FichiersComponent],
+    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, FichiersComponent, ListSuiviComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss',
   providers: [
@@ -57,14 +58,11 @@ export class ViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
-  private suiviIncidentService = inject(SuiviIncidentService);
   private entitiesService = inject(EntitiesService);
 
   incident: Incident | undefined
   userRole: string | undefined;
   userTeam: string | undefined;
-  username: string | undefined;
-  canClose: boolean = false;
   message: string = "";
   idIncident: string = "";
   suivi: SuiviIncident[] = []
@@ -81,22 +79,12 @@ export class ViewComponent implements OnInit {
     });
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident);
-    this.suiviIncidentService.getSuiviIncidentById(this.idIncident).subscribe(
-      (res) => {
-        this.suivi = res;
-      },
-      (err) => {
-        console.error("Erreur lors du chargement du suivi de l'incident :", err);
-      }
-    );
-    this.message = "";
   }
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incident = incident;
       this.extractTokenInfo();
-      this.checkCloseAuthorization();
     });
   }
 
@@ -113,13 +101,10 @@ export class ViewComponent implements OnInit {
     );
     const payload = JSON.parse(jsonPayload);
     this.userRole = payload.roles?.[0]?.role_name;
-    // this.userTeam = payload.roles?.[0]?.team_id;
-    this.username = payload.username;
-
   }
 
-  checkCloseAuthorization(): void {
-    this.canClose = this.userRole === 'VALIDATEUR';
+  canClose(){
+    return this.userRole === 'VALIDATEUR' && this.incident?.closedAt == null;
   }
 
   normalize(str?: string): string {
@@ -151,25 +136,8 @@ export class ViewComponent implements OnInit {
     }
   }
 
-  isNotClosed() {
-    if (this.incident) {
-      return this.incident.closedAt == null
-    }
-    return false
-  }
-
-  accessSuivi() {
-    this.router.navigate(['incident', this.incident?.id, 'suivi'])
-  }
-
-  sendMessage() {
-    if (this.incident && this.username) {
-      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
-        () => {
-          this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
-          this.ngOnInit();
-        });
-    }
+  isClosed() {
+    return this.incident!.closedAt !== null || false;
   }
 
   downloadExport(): void {

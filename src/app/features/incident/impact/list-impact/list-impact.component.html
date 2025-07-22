@@ -6,7 +6,7 @@
                     Total : {{ totalAmount | currency : 'EUR' }}
                 </strong>
             </span>
-            @if(closed){
+            @if(!closed){
             <button mat-raised-button class="btn-primary" (click)="addImpact()">
                 Ajouter
                 <mat-icon>add</mat-icon>

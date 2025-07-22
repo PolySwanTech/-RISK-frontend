@@ -39,7 +39,6 @@ export class ListImpactComponent implements OnInit {
 
   @Input() closed: boolean = false;
 
-
   ngOnInit() {
     if (this.incidentId) {
       this.impactService.getImpactByIncidentId(this.incidentId).subscribe(impacts => {

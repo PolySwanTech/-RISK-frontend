@@ -28,9 +28,9 @@ import { IncidentHistory } from '../../../core/models/IncidentHistory';
   styleUrl: './suivi.component.scss'
 })
 export class SuiviComponent implements OnInit {
+
   private route = inject(ActivatedRoute);
   private suiviIncidentService = inject(SuiviIncidentService);
-  private dialog = inject(MatDialog);
 
   private incidentId = this.route.snapshot.params['id'] || '';
 
