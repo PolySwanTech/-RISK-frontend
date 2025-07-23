@@ -25,6 +25,10 @@ export class ControlTemplate {
     planDate: Date;
     realizeDate: Date;
     execution: ControlExecution | null = null;
+    nextExecution : string;
+    actif : boolean = false;
+    riskLevel : string;
+    creator: string;
 
     constructor
         (
@@ -39,8 +43,12 @@ export class ControlTemplate {
             taxonomie: RiskTemplate,
             responsable: string,
             planDate: Date,
-            realizeDate: Date, 
-            processName : string
+            realizeDate: Date,
+            processName: string,
+            nextExecution: string,
+            actif: boolean,
+            riskLevel: string,
+            creator: string
         ) {
         this.id = { id, version };
         this.reference = reference;
@@ -53,6 +61,10 @@ export class ControlTemplate {
         this.responsable = responsable;
         this.planDate = planDate;
         this.realizeDate = realizeDate;
+        this.nextExecution = nextExecution;
+        this.actif = actif;
+        this.riskLevel = riskLevel;
+        this.creator = creator;
     }
 
 }
@@ -65,6 +77,7 @@ export interface ControlTemplateCreateDto {
     level: Degree,
     controlType: Type,
     priority: Priority,
+    processId: string,
     taxonomieId: string
     taxonomieVersion: String
 }
