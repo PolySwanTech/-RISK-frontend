@@ -16,6 +16,7 @@ export class ControlExecution {
     evaluation: Evaluation;
     evaluator : string;
     evaluatedAt: Date | null;
+    plannedAt: Date | null;
 
     constructor (
         id: string,
@@ -28,7 +29,8 @@ export class ControlExecution {
         createdAt: Date,
         evaluation: Evaluation,
         evaluator: string,
-        evaluatedAt: Date | null    
+        evaluatedAt: Date | null,
+        plannedAt: Date | null
     ){
         this.id = id;
         this.templateId = templateId;
@@ -41,5 +43,6 @@ export class ControlExecution {
         this.evaluation = evaluation;
         this.evaluator = evaluator;
         this.evaluatedAt = evaluatedAt;
+        this.plannedAt = plannedAt;
     }
 }

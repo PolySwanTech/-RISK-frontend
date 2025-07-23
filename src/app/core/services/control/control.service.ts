@@ -30,4 +30,9 @@ export class ControlService {
   getAllExecutions(controlId?: string) {
     return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${controlId ? `?controlId=${controlId}` : ''}`);
   }
+
+  createExecution(data: any) {
+    return this.http.post(`${this.baseUrlExec}`, data);
+  }
+
 }

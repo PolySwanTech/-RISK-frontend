@@ -10,6 +10,7 @@ import { Degree, degreeLabels } from '../../core/enum/degree.enum';
 import { ControlService } from '../../core/services/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
+import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
 
 @Component({
   selector: 'app-control-details-page',
@@ -18,7 +19,8 @@ import { ControlExecution } from '../../core/models/ControlExecution';
     FormsModule,
     RouterModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    PlanifierExecutionPopupComponent
   ],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
@@ -30,15 +32,17 @@ export class ControlDetailsPageComponent implements OnInit {
   activeTab = 'details';
 
   control: ControlTemplate | null = null;
-  controlExecutions : ControlExecution[] = [];
+  controlExecutions: ControlExecution[] = [];
 
   // Enum references for template
   ControlStatus = Status;
   Priority = Priority;
   ControlLevel = Degree;
 
-  private route =  inject(ActivatedRoute);
-  private router =  inject(Router);
+  showPopup = false;
+
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   ngOnInit(): void {
     // Récupérer l'ID du contrôle depuis l'URL
@@ -97,7 +101,7 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   scheduleExecution(): void {
-    // TODO: Implémenter la planification
+    this.showPopup = true;
   }
 
   addNote(): void {
@@ -119,5 +123,11 @@ export class ControlDetailsPageComponent implements OnInit {
 
   formatPriority(priority: Priority): string {
     return priorityLabels[priority];
+  }
+
+  handlePlanification(payload: any): void {
+    this.controlService.createExecution(payload).subscribe(() => {
+      this.loadControlExecutions(this.control!.id.id); // recharger la liste
+    });
   }
 }
