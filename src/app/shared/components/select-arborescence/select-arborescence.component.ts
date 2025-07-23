@@ -16,6 +16,7 @@ export class SelectArborescenceComponent {
   @Input() list: any[] = [];
   @Input() placeholder: string = '';
   @Output() changeValue = new EventEmitter<any>();
+  @Input() id: string = "";
 
   searchControl = new FormControl<Process | null>(null);
 
@@ -27,6 +28,17 @@ export class SelectArborescenceComponent {
 
   ngOnInit() {
     this.filteredOptions = this.list;
+
+    if (this.id) {
+    const found = this.list
+      .flatMap(group => [group, ...(group.enfants || [])])
+      .find(item => item.id === this.id);
+
+    if (found) {
+      this.searchControl.setValue(found);
+    }
+  }
+
     this.searchControl.valueChanges.subscribe((value: Process | string | null) => {
       this.filteredOptions = this.filterGroups(value);
       if (value && typeof value === 'object') {

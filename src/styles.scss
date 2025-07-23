@@ -770,3 +770,13 @@ button[mat-raised-button] {
       color: var(--mat-sys-primary);
     }
   }
+
+  mat-calendar{
+    table th{
+        text-align: center !important;
+        padding: 2px !important;
+    }
+    .mat-calendar-content{
+        padding: 1px !important;
+    }
+  }

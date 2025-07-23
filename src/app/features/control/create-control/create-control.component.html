@@ -21,7 +21,7 @@
       <mat-label>Récurrence</mat-label>
       <mat-select formControlName="frequency">
         @for (rec of recurences; track rec) {
-        <mat-option [value]="rec">{{ rec }}</mat-option>
+        <mat-option [value]="rec">{{ getRecurrenceLabel(rec) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -30,16 +30,19 @@
       <mat-label>Degré du niveau</mat-label>
       <mat-select formControlName="level">
         @for (lev of levels; track lev) {
-        <mat-option [value]="lev">{{ lev }}</mat-option>
+        <mat-option [value]="lev">{{ getDegresLabel(lev) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
-    
+  </div>
+
+  <div class="row-add">
+
     <mat-form-field appearance="outline">
       <mat-label>Type de contrôle</mat-label>
       <mat-select formControlName="type">
         @for (t of types; track t) {
-        <mat-option [value]="t">{{ t }}</mat-option>
+        <mat-option [value]="t">{{ getTypeLabel(t) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -48,11 +51,11 @@
       <mat-label>Priorité</mat-label>
       <mat-select formControlName="priority">
         @for (t of priorities; track t) {
-        <mat-option [value]="t">{{ t }}</mat-option>
+        <mat-option [value]="t">{{ getPriorityLabel(t) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
-    </div>
+  </div>
 
 
   <div class="row-add">
