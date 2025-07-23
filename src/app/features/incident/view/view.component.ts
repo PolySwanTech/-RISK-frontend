@@ -12,7 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
+import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { Impact, ImpactCreateDto } from '../../../core/models/Impact';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
@@ -30,6 +30,7 @@ import { ImpactService } from '../../../core/services/impact/impact.service';
 import { ImpactCardComponent } from '../impact/impact-card/impact-card.component';
 import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
+import { firstValueFrom } from 'rxjs';
 
 // Interface pour les fichiers attachés
 interface AttachedFile {
@@ -45,7 +46,8 @@ interface AttachedFile {
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
     MatGridListModule, MatButtonModule, MatFormFieldModule, ListImpactComponent,
-    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, FichiersComponent, ListSuiviComponent],
+    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
+    FichiersComponent, ListSuiviComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss',
   providers: [
@@ -73,19 +75,42 @@ export class ViewComponent implements OnInit {
 
   businessUnits: EntiteResponsable[] = [];
 
+  goBackButtons: GoBackButton[] = [];
+
   ngOnInit(): void {
     this.entitiesService.loadEntities().subscribe(entities => {
       this.businessUnits = entities;
     });
     this.idIncident = this.route.snapshot.params['id'];
-    this.loadIncident(this.idIncident);
+    this.loadIncident(this.idIncident)
   }
 
-  loadIncident(id: string): void {
-    this.incidentService.getIncidentById(id).subscribe((incident) => {
-      this.incident = incident;
-      this.extractTokenInfo();
-    });
+  async loadIncident(id: string) {
+    this.incident = await firstValueFrom(this.incidentService.getIncidentById(id));
+    this.extractTokenInfo();
+    this.goBackButtons = [
+      {
+        label: "Plan d'action",
+        icon: 'playlist_add_check',
+        class: 'btn-primary',
+        show: !this.isClosed(),
+        action: () => this.addActionPlan()
+      },
+      {
+        label: 'Exporter',
+        icon: 'file_download',
+        class: 'btn-green',
+        show: true,
+        action: () => this.downloadExport()
+      },
+      {
+        label: 'Clôturer',
+        icon: 'lock',
+        class: 'btn-red',
+        show: this.canClose(),
+        action: () => this.closeIncident()
+      }
+    ];
   }
 
   extractTokenInfo(): void {
@@ -103,7 +128,7 @@ export class ViewComponent implements OnInit {
     this.userRole = payload.roles?.[0]?.role_name;
   }
 
-  canClose(){
+  canClose() {
     return this.userRole === 'VALIDATEUR' && this.incident?.closedAt == null;
   }
 

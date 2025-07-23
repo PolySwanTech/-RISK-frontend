@@ -28,7 +28,6 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
   selector: 'app-create',
   standalone: true,
   imports: [
-    GoBackComponent,
     MatButtonModule,
     MatFormFieldModule,
     MatSelectModule,
