@@ -1,7 +1,7 @@
 <div style="margin: 15px;">
     @if(actionPlan){
-    <app-go-back previousPageName="Liste des plans d'action"
-        [currentPageName]="`Détails du plan d'action - ` + actionPlan.libelle"></app-go-back>
+        <app-go-back [title]="`Détails d'un plan d'action`" [subtitle]="actionPlan.reference"></app-go-back>
+
     <div class="plan-detail-container">
 
 

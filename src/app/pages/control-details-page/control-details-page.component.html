@@ -6,31 +6,8 @@
 }
 @else {
   <div class="control-details-page">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-content">
-        <div class="header-left">
-          <button class="back-button" (click)="goBack()">
-            <i class="icon-arrow-left"></i>
-          </button>
-          <div class="header-info">
-            <h1 class="page-title">Détails du Contrôle</h1>
-            <p class="page-subtitle">{{ control.reference }}</p>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button class="btn btn-secondary" (click)="exportControl()">
-            <i class="icon-download"></i>
-            Exporter
-          </button>
-          <button class="btn btn-primary" (click)="editControl()">
-            <i class="icon-edit"></i>
-            Modifier
-          </button>
-        </div>
-      </div>
-    </div>
-  
+    <app-go-back [title]="'Détails du contrôle'" [buttons]="goBackButtons"></app-go-back>
+   
     <div class="main-content">
       <div class="content-grid">
         <!-- Colonne principale -->

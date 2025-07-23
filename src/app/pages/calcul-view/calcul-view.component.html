@@ -1,19 +1,8 @@
 <div class="container">
-    <!-- Header -->
-    <div class="header">
-        <h1>Calcul des fonds propres - Méthode Standard SMA</h1>
-        <div class="header-actions">
-            <button mat-raised-button (click)="goToCalcul()" color="primary" class="launch-btn">
-                <mat-icon>play_arrow</mat-icon>
-                Lancer le calcul
-            </button>
-            <button mat-raised-button class="export-btn">
-                <mat-icon>download</mat-icon>
-                Exporter
-            </button>
-        </div>
-    </div>
 
+    <app-go-back [title]="`Calcul des fonds propres - Méthode Standard SMA`"
+        [buttons]="goBackButtons"></app-go-back>
+ 
     <!-- Tabs -->
     <mat-tab-group class="main-tabs">
         <!-- Synthèse des résultats -->
