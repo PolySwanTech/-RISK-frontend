@@ -215,7 +215,7 @@
     </div>
   </div>
 </div>
-<app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id.id" [controlVersion]="control!.id.version"
-  (close)="showPopup = false" (planifier)="handlePlanification($event)">
+<app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id.id" [controlVersion]="control!.id.version" [frequence]="control!.frequency"
+  [createdAt]="control!.id.version" (close)="showPopup = false" (planifier)="handlePlanification($event)">
 </app-planifier-execution-popup>
 }
