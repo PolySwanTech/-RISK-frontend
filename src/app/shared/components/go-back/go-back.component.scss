@@ -2,15 +2,16 @@
   position: fixed;
   top: 0;
   z-index : 1000;
-  left : 250px;
+  left: 260px;
 }
 
 .header {
-  width: 95%;
+  width: -webkit-fill-available;
   background: white;
   box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
 
   .header-content {
+    padding: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
