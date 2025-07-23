@@ -7,12 +7,14 @@ import { RiskEvaluation } from '../../../../core/models/RiskEvaluation';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 
 @Component({
   standalone: true,
   imports: [
     CommonModule,
     MatDividerModule,
+    GoBackComponent,
     MatProgressSpinnerModule],
   selector: 'app-risk-detail',
   templateUrl: './risk-detail.component.html',
@@ -24,6 +26,24 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   lastEvaluation?: RiskEvaluation;
   loading = true;
   private destroy$ = new Subject<void>();
+
+  goBackButtons = [
+  {
+    label: 'Évaluer ce risque',
+    icon: '', // pas d’icône ici, ou ajoute-en si tu veux (ex: 'assessment')
+    class: 'mat-primary', // ou remplace par 'btn-primary' si tu utilises des classes
+    show: true,
+    action: () => this.onEvaluate()
+  },
+  {
+    label: 'Générer Rapport',
+    icon: '', // idem
+    class: 'mat-accent outlined', // à styliser si tu veux un style stroked
+    show: true,
+    action: () => {} // à ajouter si fonction disponible
+  }
+];
+
 
   constructor(
     private route: ActivatedRoute,

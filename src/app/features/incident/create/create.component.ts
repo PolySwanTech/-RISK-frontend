@@ -38,7 +38,9 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
     MatRadioModule,
     SelectUsersComponent,
     ButtonAddFileComponent,
-    NgIf, NgFor,
+    GoBackComponent,
+    NgIf, 
+    NgFor,
     SelectArborescenceComponent
 ],
   templateUrl: './create.component.html',

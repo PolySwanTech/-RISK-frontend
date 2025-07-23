@@ -10,6 +10,7 @@ import { Degree, degreeLabels } from '../../core/enum/degree.enum';
 import { ControlService } from '../../core/services/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
+import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
 
 @Component({
   selector: 'app-control-details-page',
@@ -18,7 +19,8 @@ import { ControlExecution } from '../../core/models/ControlExecution';
     FormsModule,
     RouterModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    GoBackComponent
   ],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
@@ -36,6 +38,24 @@ export class ControlDetailsPageComponent implements OnInit {
   ControlStatus = Status;
   Priority = Priority;
   ControlLevel = Degree;
+
+  goBackButtons = [
+  {
+    label: 'Exporter',
+    icon: 'download', // ou 'icon-download' si tu veux garder une classe <i>, cf remarque plus bas
+    class: 'btn-secondary',
+    show: true,
+    action: () => this.exportControl()
+  },
+  {
+    label: 'Modifier',
+    icon: 'edit', // idem, voir ci-dessous
+    class: 'btn-primary',
+    show: true,
+    action: () => this.editControl()
+  }
+];
+
 
   private route =  inject(ActivatedRoute);
   private router =  inject(Router);
