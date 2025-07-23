@@ -27,6 +27,18 @@
         </div>
     </div>
 
+    <div class="year-selection" *ngIf="isCartographie" style="margin: 20px 0; display: flex; gap: 10px;">
+        <ng-container *ngFor="let year of getLastFiveYears()">
+            <button mat-raised-button
+                [color]="selectedYear === year ? 'accent' : ''"
+                [class.selected]="selectedYear === year"
+                (click)="selectYear(year)">
+                <mat-icon *ngIf="selectedYear === year">check_circle</mat-icon>
+                {{ 'Cartographie ' + year }}
+            </button>
+        </ng-container>
+    </div>
+
     <!-- Arbre hiérarchique -->
     <div class="hierarchy-container">
         <button *ngIf="!isCartographie" class="btn-primary" style="margin-bottom: 20px;" mat-raised-button (click)="openEntityDialog()">

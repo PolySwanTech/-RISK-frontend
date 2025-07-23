@@ -29,10 +29,10 @@ export class RiskService {
     return this.http.get<any[]>(this.baseUrl + '/tree', { params })
   }
 
-  getAllByProcess(processId: string = "") {
-    console.log('Fetching risks for process ID:', processId);
+  getAllByProcess(processId: string = "", year: number = new Date().getFullYear()) {
     let params = new HttpParams();
     params = params.append('processId', processId);
+    params = params.append('year', year);
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params })
   }
 

@@ -39,7 +39,6 @@ import { MatCardModule } from '@angular/material/card';
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
-    GoBackComponent,
     MatCardModule
   ],
   templateUrl: './list-process.component.html',
@@ -58,28 +57,42 @@ export class ListProcessComponent implements OnInit {
   filteredProcesses: ProcessNode[] = [];
   expandedNodes: Set<string> = new Set();
   searchTerm: string = '';
+  selectedYear : number = new Date().getFullYear();
 
   @Input() isCartographie: boolean = false;
 
   ngOnInit(): void {
-     this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
-    this.fetchProcesses(entities);
-  });
+    this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
+      this.fetchProcesses(entities);
+    });
   }
 
   fetchProcesses(allEntities: EntiteResponsable[]): void {
-  this.processService.getAll().subscribe((data: any[]) => {
-    this.processes = data;
-    this.buildHierarchy(allEntities);
-    this.filteredProcesses = [...this.hierarchicalProcesses];
-  });
-}
+    this.processService.getAll().subscribe((data: any[]) => {
+      this.processes = data;
+      this.buildHierarchy(allEntities);
+      this.filteredProcesses = [...this.hierarchicalProcesses];
+    });
+  }
+
+  getLastFiveYears(): number[] {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 5 }, (_, i) => currentYear - i);
+  }
+
+  selectYear(year : number){
+    this.selectedYear = year;
+    // this.getRisks
+    this.entityService.loadEntitiesTree().subscribe((entities: EntiteResponsable[]) => {
+      this.fetchProcesses(entities);
+    });
+  }
 
 
   getRisks(event: any, process: Process) {
     event.stopPropagation();
     if (!process.risks || process.risks.length === 0) {
-      this.riskService.getAllByProcess(process.id).subscribe(risks => {
+      this.riskService.getAllByProcess(process.id, this.selectedYear).subscribe(risks => {
         process.risks = risks;
       });
     }
@@ -115,43 +128,43 @@ export class ListProcessComponent implements OnInit {
     this.router.navigate(['reglages', 'risks', id]);
   }
 
-buildHierarchy(allEntities: EntiteResponsable[]): void {
-  const buMap = new Map<string, Process[]>();
+  buildHierarchy(allEntities: EntiteResponsable[]): void {
+    const buMap = new Map<string, Process[]>();
 
-  this.processes.forEach(process => {
-    const buName = process.buName || 'Sans BU';
-    if (!buMap.has(buName)) {
-      buMap.set(buName, []);
-    }
-    buMap.get(buName)!.push(process);
-  });
-
-  this.hierarchicalProcesses = allEntities
-    .filter(entity => !this.isCartographie || buMap.has(entity.name)) // 💡 Le filtre
-    .map(entity => {
-      const processes = buMap.get(entity.name) || [];
-      return {
-        id: `bu-${entity.name}`,
-        name: entity.name,
-        niveau: 0,
-        type: 'bu' as const,
-        children: this.buildBUChildren(processes)
-      };
+    this.processes.forEach(process => {
+      const buName = process.buName || 'Sans BU';
+      if (!buMap.has(buName)) {
+        buMap.set(buName, []);
+      }
+      buMap.get(buName)!.push(process);
     });
 
-  if (!this.isCartographie) {
-    const orphanProcesses = buMap.get('Sans BU');
-    if (orphanProcesses) {
-      this.hierarchicalProcesses.push({
-        id: `bu-no-bu`,
-        name: 'Sans BU',
-        niveau: 0,
-        type: 'bu' as const,
-        children: this.buildBUChildren(orphanProcesses)
+    this.hierarchicalProcesses = allEntities
+      .filter(entity => !this.isCartographie || buMap.has(entity.name)) // 💡 Le filtre
+      .map(entity => {
+        const processes = buMap.get(entity.name) || [];
+        return {
+          id: `bu-${entity.name}`,
+          name: entity.name,
+          niveau: 0,
+          type: 'bu' as const,
+          children: this.buildBUChildren(processes)
+        };
       });
+
+    if (!this.isCartographie) {
+      const orphanProcesses = buMap.get('Sans BU');
+      if (orphanProcesses) {
+        this.hierarchicalProcesses.push({
+          id: `bu-no-bu`,
+          name: 'Sans BU',
+          niveau: 0,
+          type: 'bu' as const,
+          children: this.buildBUChildren(orphanProcesses)
+        });
+      }
     }
   }
-}
 
   private groupByBU(): Array<{ buName: string | null, processes: any[] }> {
     const buMap = new Map<string, any[]>();
@@ -295,28 +308,28 @@ buildHierarchy(allEntities: EntiteResponsable[]): void {
   }
 
   openEntityDialog(entite?: any, event?: Event) {
-      if (event) {
-        event.stopPropagation(); // Empêche la propagation du clic
-      }
-  
-      const dialogRef = this.dialog.open(AddEntityDialogComponent, {
-        width: '500px',
-        data: entite || null // Passe l'entité si c'est une modification, sinon null
-      });
-  
-      dialogRef.afterClosed().subscribe(entiteResponsable => {
-        if (entiteResponsable) {
-          if (entiteResponsable.id == null) {
-            this.entityService.save(entiteResponsable).subscribe(() => {
-              this.ngOnInit(); // Rafraîchir après ajout/modification
-            });
-          }
-          else {
-            this.entityService.update(entiteResponsable).subscribe(() => {
-              this.ngOnInit(); // Rafraîchir après ajout/modification
-            });
-          }
-        }
-      });
+    if (event) {
+      event.stopPropagation(); // Empêche la propagation du clic
     }
+
+    const dialogRef = this.dialog.open(AddEntityDialogComponent, {
+      width: '500px',
+      data: entite || null // Passe l'entité si c'est une modification, sinon null
+    });
+
+    dialogRef.afterClosed().subscribe(entiteResponsable => {
+      if (entiteResponsable) {
+        if (entiteResponsable.id == null) {
+          this.entityService.save(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
+        else {
+          this.entityService.update(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
+      }
+    });
+  }
 }
