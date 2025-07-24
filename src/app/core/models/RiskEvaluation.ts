@@ -20,5 +20,5 @@ export interface RiskEvaluation {
   evaluatorUsername?: string;
   probability ?: number;
   createdAt    : Date;      // ISO
-  taxonomie : { id: RiskId };
+  riskId : string; // UUID du risque
 }

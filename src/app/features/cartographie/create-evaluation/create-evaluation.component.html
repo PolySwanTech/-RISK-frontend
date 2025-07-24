@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="sidebar">
+    <h3>Risques</h3>
+    <ul>
+      <li *ngFor="let risk of risks" (click)="getProcessByRisks(risk)" [class.selected]="risk === selectedRisk">
+        {{ risk.libelle }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="content" *ngIf="selectedRisk">
+    <h2>{{ selectedRisk.libelle }}</h2>
+    <p><strong>Total des pertes ({{ selectedYear }}):</strong> {{ totalImpact | currency:'EUR' }}</p>
+
+    <div class="processes">
+      <h4>Processus impactés</h4>
+      <ul>
+        <li *ngFor="let process of processes" (click)="getControlsByProcessAndRisk(process)" [class.selected]="process === selectedProcess">
+          {{ process.name }} - 
+          <!-- {{ process.impact | currency:'EUR' }} -->
+        </li>
+      </ul>
+    </div>
+
+    <div class="controls" *ngIf="selectedProcess">
+      <h4>Contrôles liés</h4>
+      <ul>
+        <li *ngFor="let control of controls" (click)="selectedControl = control" [class.selected]="control === selectedControl">
+          {{ control.libelle }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="evaluation-form" *ngIf="selectedControl">
+      <h4>Évaluer le contrôle : {{ selectedControl.libelle }}</h4>
+      <form #evalForm="ngForm" (ngSubmit)="submitEvaluation(evalForm.value)">
+        <label for="efficacite">Efficacité</label>
+        <input type="number" id="efficacite" name="efficacite" ngModel min="0" max="100" required>
+
+        <label for="commentaire">Commentaire</label>
+        <textarea id="commentaire" name="commentaire" ngModel></textarea>
+
+        <button type="submit" [disabled]="!evalForm.valid">Soumettre</button>
+      </form>
+    </div>
+  </div>
+</div>

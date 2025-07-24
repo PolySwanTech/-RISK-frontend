@@ -1,18 +1,21 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { ControlTemplate, ControlTemplateCreateDto } from '../../models/ControlTemplate';
 import { ControlExecution } from '../../models/ControlExecution';
+import { RiskTemplate } from '../../models/RiskTemplate';
+import { Process } from '../../models/Process';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ControlService {
+  
 
 
   http = inject(HttpClient);
-  baseUrlTemp = environment.apiUrl + '/risks/controls/templates';
-  baseUrlExec = environment.apiUrl + '/risks/controls/executions';
+  private baseUrlTemp = environment.apiUrl + '/risks/controls/templates';
+  private baseUrlExec = environment.apiUrl + '/risks/controls/executions';
 
 
   createControl(control: ControlTemplateCreateDto) {
@@ -23,11 +26,22 @@ export class ControlService {
     return this.http.get<ControlTemplate>(`${this.baseUrlTemp}/${id}`);
   }
 
-  getAllTemplates() {
-    return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`);
+  getAllTemplates(
+    processId? : string,
+    riskId? : string,
+  ) {
+    let params = new HttpParams();
+    if(processId && riskId){
+      params = params.set('riskId', riskId).set('processId', processId);
+    }
+    return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`, {params : params});
   }
 
   getAllExecutions(controlId?: string) {
     return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${controlId ? `?controlId=${controlId}` : ''}`);
+  }
+
+  getAllTemplatesByProcessAndRisk(selectedProcess: Process, selectedRisk: RiskTemplate) {
+    return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`)
   }
 }

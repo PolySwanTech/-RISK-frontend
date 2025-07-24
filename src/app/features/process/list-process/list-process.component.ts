@@ -17,6 +17,7 @@ interface ProcessNode {
   type: 'bu' | 'parent' | 'child';
   buName?: string;
   parentName?: string;
+  risks?: any[]; 
   children?: ProcessNode[];
 }
 import { Process } from '../../../core/models/Process';
@@ -27,6 +28,8 @@ import { AddEntityDialogComponent } from '../../reglages/add-entity-dialog/add-e
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { MatCardModule } from '@angular/material/card';
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-list-process',
@@ -49,6 +52,7 @@ export class ListProcessComponent implements OnInit {
   router = inject(Router);
   private dialog = inject(MatDialog);
   riskService = inject(RiskService); // Assuming you have a risk service to fetch risks
+  riskEvaluationService = inject(RiskEvaluationService);
   entityService = inject(EntitiesService);
 
   processes: Process[] = [];
@@ -57,7 +61,8 @@ export class ListProcessComponent implements OnInit {
   filteredProcesses: ProcessNode[] = [];
   expandedNodes: Set<string> = new Set();
   searchTerm: string = '';
-  selectedYear : number = new Date().getFullYear();
+  years: number[] = [];
+  selectedYear: number = new Date().getFullYear();
 
   @Input() isCartographie: boolean = false;
 
@@ -65,6 +70,12 @@ export class ListProcessComponent implements OnInit {
     this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
       this.fetchProcesses(entities);
     });
+
+    this.getEvaluationYears().then(
+      (years: number[]) => {
+        this.years = years;
+      }
+    )
   }
 
   fetchProcesses(allEntities: EntiteResponsable[]): void {
@@ -75,16 +86,26 @@ export class ListProcessComponent implements OnInit {
     });
   }
 
-  getLastFiveYears(): number[] {
-    const currentYear = new Date().getFullYear();
-    return Array.from({ length: 5 }, (_, i) => currentYear - i);
+  async getEvaluationYears() {
+    return await firstValueFrom(this.riskEvaluationService.getYearsOfEvaluation())
   }
 
-  selectYear(year : number){
+  selectYear(year: number) {
+    // TODO : get les evaluations pour cette année
     this.selectedYear = year;
-    // this.getRisks
-    this.entityService.loadEntitiesTree().subscribe((entities: EntiteResponsable[]) => {
-      this.fetchProcesses(entities);
+    this.riskEvaluationService.getAll(this.selectedYear).subscribe(evaluations => {
+      // 2. Pour chaque process
+      this.filteredProcesses.forEach(bu => {
+        // 3. Pour chaque risque de ce process
+        bu.children?.forEach(process => {
+          process.risks?.forEach(risk => {
+            var rId = risk.id.id;
+            console.log('Evaluations:', evaluations.filter(e => e.riskId === rId));
+            risk.riskEvaluations = evaluations.filter(e => e.riskId === rId);
+            console.log(risk)
+          });
+        });
+      });
     });
   }
 
@@ -331,5 +352,9 @@ export class ListProcessComponent implements OnInit {
         }
       }
     });
+  }
+
+  navToCreateCarto(){
+    this.router.navigate(['reglages', 'evaluation', 'create'])
   }
 }

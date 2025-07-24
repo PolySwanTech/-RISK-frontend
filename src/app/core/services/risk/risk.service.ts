@@ -7,6 +7,7 @@ import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTe
   providedIn: 'root'
 })
 export class RiskService {
+  
 
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/risks/taxonomie';
@@ -41,4 +42,6 @@ export class RiskService {
     params = params.append('parentId', parentId.toString());
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params: params });
   }
+
+  
 }
