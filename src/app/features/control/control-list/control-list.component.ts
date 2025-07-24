@@ -182,12 +182,27 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   applyFilters(start?: string, end?: string) {
   let filtered = [...this.controls];
 
-  const dateStart = start ? new Date(start) : null;
-  const dateEnd = end ? new Date(end) : null;
+  const toStartOfDay = (str?: string) => {
+    if (!str) return null;
+    const d = new Date(str);
+    d.setHours(0, 0, 0, 0); // début de la journée
+    return d;
+  };
+
+  const toEndOfDay = (str?: string) => {
+    if (!str) return null;
+    const d = new Date(str);
+    d.setHours(23, 59, 59, 999); // fin de la journée
+    return d;
+  };
+
+  const dateStart = toStartOfDay(start);
+  const dateEnd = toEndOfDay(end);
 
   if (dateStart && dateEnd) {
     filtered = filtered.filter(item => {
       const itemDate = new Date(item.nextExecution);
+      console.log(`Filtrage par date : ${itemDate} entre ${dateStart} et ${dateEnd}`);
       return itemDate >= dateStart && itemDate <= dateEnd;
     });
   }

@@ -73,6 +73,7 @@ export class ControlDetailsPageComponent implements OnInit {
     // TODO: Appeler votre service pour récupérer les données du contrôle
     this.controlService.getControl(id).subscribe(control => {
       this.control = control;
+      console.log('Contrôle chargé :', this.control);
     });
   }
 
