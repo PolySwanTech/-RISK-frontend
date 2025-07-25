@@ -16,6 +16,7 @@ export class FileService {
     formData.append('file', file);
     formData.append('incidentRef', incidentRef);
     formData.append('incidentId', incidentId);
+    console.log('Uploading file:', file, 'for incident:', incidentRef, incidentId);
     return this.http.post(`${this.baseUrl}/upload`, formData);
   }
 

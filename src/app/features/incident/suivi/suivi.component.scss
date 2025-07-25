@@ -159,3 +159,71 @@ $light-gray: #f5f7fa;
     }
   }
 }
+
+mat-vertical-stepper {
+  // Ajoute une marge autour du stepper
+  margin: 1rem 0;
+
+  .mat-step-header {
+    // Masque les titres par défaut si tu veux tout gérer via matStepLabel
+    display: none;
+  }
+
+  .mat-step {
+    // Un peu de marge entre les steps
+    margin-bottom: 1rem;
+  }
+
+  .timeline-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #1976d2; // Couleur primaire
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+
+  .timeline-content:hover {
+    transform: scale(1.01);
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+
+    strong {
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .meta {
+      font-size: 0.9rem;
+      color: #666;
+    }
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #444;
+  }
+
+  .comment {
+    margin: 0.25rem 0 0;
+    padding-left: 0.5rem;
+    border-left: 3px solid #cfd8dc; // Gris clair
+    color: #333;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+  }
+
+  ::ng-deep .mat-step-label{
+    width: 100%;
+  }
+
+  ::ng-deep .mat-vertical-stepper-header{
+    height: 80px !important;
+  }
+}

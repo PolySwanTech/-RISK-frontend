@@ -200,13 +200,13 @@ export class CreateRisksComponent implements OnInit {
       parent: this.infoForm.get('parentRisk')?.value // si c'est un risque enfant
     };
 
-    this.riskSrv.save(payload).subscribe(() => {
+    this.riskSrv.save(payload).subscribe((risk) => {
       this.confirm.openConfirmDialog(
         this.dialogLabel.title,
         `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
         false
       );
-      this.router.navigate(['reglages', 'risks']);
+      this.router.navigate(['reglages', 'risks', risk.id.id]);
     });
   }
 }

@@ -16,7 +16,7 @@ export class RiskService {
   }
 
   save(dto: RiskTemplateCreateDto) {
-  return this.http.post(this.baseUrl, dto);
+  return this.http.post<RiskTemplate>(this.baseUrl, dto);
 }
 
   getAll() {
