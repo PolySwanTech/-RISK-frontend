@@ -3,7 +3,5 @@ export interface IncidentHistory {
   performed_by: string;
   action: string;
   timestamp: string;
-  oldSnapshot?: string;
-  newSnapshot?: string;
   comment?: string;
 }

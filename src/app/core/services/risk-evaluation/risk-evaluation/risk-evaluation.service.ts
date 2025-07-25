@@ -31,8 +31,8 @@ export class RiskEvaluationService {
   /*  POST – création d’une nouvelle évaluation                         */
   /*       (l’UUID de l’utilisateur est injecté côté back via @Jwt)     */
   /* ------------------------------------------------------------------ */
-  save(payload: RiskEvaluationCreateDto): Observable<RiskEvaluation> {
-    return this.http.post<RiskEvaluation>(this.baseUrl, payload);
+  save(payload: RiskEvaluationCreateDto): Observable<string> {
+    return this.http.post<string>(this.baseUrl, payload);
   }
 
   updateLevel(

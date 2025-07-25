@@ -11,6 +11,7 @@ import { ControlService } from '../../core/services/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
+import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
 
 @Component({
   selector: 'app-control-details-page',
@@ -20,7 +21,8 @@ import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/pl
     RouterModule,
     MatButtonModule,
     MatIconModule,
-    PlanifierExecutionPopupComponent
+    PlanifierExecutionPopupComponent,
+    GoBackComponent
   ],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
@@ -41,10 +43,29 @@ export class ControlDetailsPageComponent implements OnInit {
 
   showPopup = false;
 
+  currentUsername: string = '';
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  goBackButtons = [
+    {
+      label: 'Exporter',
+      icon: 'download', // ou 'icon-download' si tu veux garder une classe <i>, cf remarque plus bas
+      class: 'btn-secondary',
+      show: true,
+      action: () => this.exportControl()
+    },
+    {
+      label: 'Modifier',
+      icon: 'edit', // idem, voir ci-dessous
+      class: 'btn-primary',
+      show: true,
+      action: () => this.editControl()
+    }
+  ];
 
   ngOnInit(): void {
+    this.currentUsername = this.getUsernameFromToken() || '';
     // Récupérer l'ID du contrôle depuis l'URL
     const controlId = this.route.snapshot.paramMap.get('id');
     if (controlId) {
@@ -62,6 +83,7 @@ export class ControlDetailsPageComponent implements OnInit {
 
   loadControlExecutions(id: string): void {
     this.controlService.getAllExecutions(id).subscribe(executions => {
+      console.log('Executions reçues du backend :', executions);
       this.controlExecutions = executions;
     });
   }
@@ -79,8 +101,8 @@ export class ControlDetailsPageComponent implements OnInit {
     }
   }
 
-  getPriorityClass(priority: Priority): string {
-    return priorityLabels[priority];
+  getPriorityClass(priority: Priority | undefined): string {
+    return priorityLabels[priority!] || 'priority-default';
   }
 
   goBack(): void {
@@ -121,8 +143,8 @@ export class ControlDetailsPageComponent implements OnInit {
     return degreeLabels[level];
   }
 
-  formatPriority(priority: Priority): string {
-    return priorityLabels[priority];
+  formatPriority(priority: Priority | undefined): string {
+    return priorityLabels[priority!] || 'Non défini';
   }
 
   handlePlanification(payload: any): void {
@@ -130,4 +152,25 @@ export class ControlDetailsPageComponent implements OnInit {
       this.loadControlExecutions(this.control!.id.id); // recharger la liste
     });
   }
+
+  getUsernameFromToken(): string | null {
+    const token = sessionStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.username || null;
+    } catch (e) {
+      console.error("Erreur de décodage du token :", e);
+      return null;
+    }
+  }
+
+  canMarkAsRealized(): boolean {
+    if (!this.controlExecutions.length || !this.currentUsername) return false;
+
+    const last = this.controlExecutions[this.controlExecutions.length - 1];
+    return last.performedBy === this.currentUsername && last.status !== Status.ACHIEVED;
+  }
+
 }

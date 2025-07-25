@@ -22,6 +22,7 @@ import { Recurence } from '../../../core/enum/recurence.enum';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Type } from '../../../core/enum/controltype.enum';
+import { EnumLabels } from '../../../core/enum/enum-labels';
 
 @Component({
   selector: 'app-create-control',
@@ -72,6 +73,24 @@ export class CreateControlComponent {
   recurences = Object.values(Recurence);
   entiteResponsableId = ""
   processId = "";
+  
+  enumLabels = EnumLabels;
+
+  getTypeLabel(type: keyof typeof EnumLabels.type): string {
+    return this.enumLabels.type[type];
+  }
+
+  getPriorityLabel(priority: keyof typeof EnumLabels.priority): string {
+    return this.enumLabels.priority[priority];
+  }
+
+  getDegresLabel(control: keyof typeof EnumLabels.degres): string {
+    return this.enumLabels.degres[control];
+  }
+
+  getRecurrenceLabel(recurrence: keyof typeof EnumLabels.reccurency): string {
+    return this.enumLabels.reccurency[recurrence];
+  }
 
 
   ngOnInit(): void {
@@ -91,8 +110,9 @@ export class CreateControlComponent {
       libelle: this.form.value.libelle,
       description: this.form.value.description,
       frequency: this.form.value.frequency,
-      level: this.form.value.level,
       controlType: this.form.value.type,
+      processId: this.form.value.processId,
+      level: this.form.value.level,
       priority: this.form.value.priority,
       taxonomieId: this.form.value.taxonomie.id.id,
       taxonomieVersion: this.form.value.taxonomie.id.version,

@@ -72,12 +72,12 @@ export class DoughnutChartComponent implements OnChanges {
     let countClosed = 0;
     for (const incident of this.incidents) {
       const state = incident.state?.toUpperCase?.();
-      if (state === 'NEW') countNew++;
+      if (state === 'DRAFT') countNew++;
       else if (state === 'CLOSED') countClosed++;
     }
 
     this.doughnutChartDataFull = {
-      labels: ['Nouveaux', 'Clôturés'],
+      labels: ['Brouillons', 'Clôturés'],
       datasets: [{
         data: [countNew, countClosed],
         backgroundColor: ['#66bb6a', '#ef5350'],

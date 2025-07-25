@@ -1,0 +1,19 @@
+@if(filteredOptions){
+<mat-form-field appearance="fill">
+    <input type="text" matInput [formControl]="searchControl" [matAutocomplete]="auto" [placeholder]="placeholder ? placeholder : 'Selectionnez une valeur'">
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" autoActiveFirstOption>
+        @for(parent of filteredOptions; track parent){
+        <ng-container>
+            <mat-optgroup [label]="parent.name">
+                <mat-option [value]="parent">{{ parent.name }}</mat-option>
+                @for(child of parent.enfants; track child){
+                <mat-option [value]="child">
+                    &nbsp;&nbsp;↳ {{ child.name }}
+                </mat-option>
+                }
+            </mat-optgroup>
+        </ng-container>
+        }
+    </mat-autocomplete>
+</mat-form-field>
+}

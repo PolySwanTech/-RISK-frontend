@@ -60,13 +60,6 @@ export class FichiersComponent {
     return dateString ? dateString.toLocaleDateString("fr-FR") : null;
   }
 
-  isNotClosed() {
-    if (this.closed) {
-      return false;
-    }
-    return true
-  }
-
   normalize(str?: string): string {
     return str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() || '';
   }
