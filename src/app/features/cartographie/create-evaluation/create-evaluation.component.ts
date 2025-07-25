@@ -1,5 +1,5 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
@@ -8,15 +8,15 @@ import { Process } from '../../../core/models/Process';
 import { ImpactService } from '../../../core/services/impact/impact.service';
 import { ControlService } from '../../../core/services/control/control.service';
 import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { CreateRisksEvaluationsComponent } from "../../reglages/risks/risk-evaluation/create-risks-evaluations/create-risks-evaluations.component";
 
 @Component({
   selector: 'app-create-evaluation',
-  imports: [CurrencyPipe, FormsModule, CommonModule],
+  imports: [CurrencyPipe, FormsModule, CommonModule, CreateRisksEvaluationsComponent],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })
 export class CreateEvaluationComponent implements OnInit {
-
 
   private riskService = inject(RiskService);
   private processService = inject(ProcessService);
@@ -48,13 +48,17 @@ export class CreateEvaluationComponent implements OnInit {
   getProcessByRisks(risk: RiskTemplate) {
     this.processService.getAllByRisks(risk.id.id).subscribe(processes => {
       this.processes = processes;
+      this.totalImpact = 0;
+      this.processes.forEach(process => {
+        this.impactService.sumByProcess(process.id).subscribe(sum => 
+          {
+          process.sum = sum
+          this.totalImpact += sum;
+        });
+      });
+      console.log('Processus:', this.processes);
       this.selectedRisk = risk
     });
-  }
-
-  getSumImpactForProcess() {
-    if (this.selectedProcess)
-      this.impactService.sumByProcess(this.selectedProcess.id).subscribe(sum => this.totalImpact = sum)
   }
 
   getControlsByProcessAndRisk(process: Process) {

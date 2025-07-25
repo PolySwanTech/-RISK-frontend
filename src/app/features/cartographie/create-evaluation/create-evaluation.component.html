@@ -1,47 +1,61 @@
 <div class="container">
   <div class="sidebar">
-    <h3>Risques</h3>
-    <ul>
-      <li *ngFor="let risk of risks" (click)="getProcessByRisks(risk)" [class.selected]="risk === selectedRisk">
-        {{ risk.libelle }}
-      </li>
-    </ul>
+    <div class="sidebar-header">
+      <h3>Risques</h3>
+    </div>
+    <div class="sidebar-content">
+      <ul class="risks-list">
+        <li *ngFor="let risk of risks" (click)="getProcessByRisks(risk)" [class.selected]="risk === selectedRisk"
+          class="risk-item">
+          <span class="risk-label">{{ risk.libelle }}</span>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <div class="content" *ngIf="selectedRisk">
-    <h2>{{ selectedRisk.libelle }}</h2>
-    <p><strong>Total des pertes ({{ selectedYear }}):</strong> {{ totalImpact | currency:'EUR' }}</p>
+    <div class="content-header">
+      <h2 class="risk-title">{{ selectedRisk.libelle }}</h2>
+      <div class="impact-summary">
+        <span class="impact-label">Total des pertes ({{ selectedYear }}):</span>
+        <span class="impact-value">{{ totalImpact | currency:'EUR' }}</span>
+      </div>
+    </div>
 
-    <div class="processes">
-      <h4>Processus impactés</h4>
-      <ul>
-        <li *ngFor="let process of processes" (click)="getControlsByProcessAndRisk(process)" [class.selected]="process === selectedProcess">
-          {{ process.name }} - 
-          <!-- {{ process.impact | currency:'EUR' }} -->
+    <div class="section processes-section">
+      <h4 class="section-title">Processus impactés</h4>
+      <ul class="processes-list">
+        <li *ngFor="let process of processes" (click)="getControlsByProcessAndRisk(process)"
+          [class.selected]="process === selectedProcess" class="process-item">
+          @if(process.sum !== undefined){
+          <span class="process-name">{{ process.name }} - {{process.sum}} €</span>
+          }
+
+          <!-- <span class="process-impact">{{ process.impact | currency:'EUR' }}</span> -->
         </li>
       </ul>
     </div>
 
-    <div class="controls" *ngIf="selectedProcess">
-      <h4>Contrôles liés</h4>
-      <ul>
-        <li *ngFor="let control of controls" (click)="selectedControl = control" [class.selected]="control === selectedControl">
-          {{ control.libelle }}
+    <div class="section controls-section" *ngIf="selectedProcess">
+      <h4 class="section-title">Contrôles liés</h4>
+      <ul class="controls-list">
+        <li *ngFor="let control of controls" (click)="selectedControl = control"
+          [class.selected]="control === selectedControl" class="control-item">
+          <span class="control-label">{{ control.libelle }}</span>
         </li>
       </ul>
     </div>
 
-    <div class="evaluation-form" *ngIf="selectedControl">
-      <h4>Évaluer le contrôle : {{ selectedControl.libelle }}</h4>
-      <form #evalForm="ngForm" (ngSubmit)="submitEvaluation(evalForm.value)">
-        <label for="efficacite">Efficacité</label>
-        <input type="number" id="efficacite" name="efficacite" ngModel min="0" max="100" required>
+    <div class="section evaluation-section" *ngIf="selectedControl">
+      <h4 class="section-title">Évaluer le contrôle : {{ selectedControl.libelle }}</h4>
+      <app-risk-evaluation [riskId]="selectedRisk.id.id"></app-risk-evaluation>
+    </div>
+  </div>
 
-        <label for="commentaire">Commentaire</label>
-        <textarea id="commentaire" name="commentaire" ngModel></textarea>
-
-        <button type="submit" [disabled]="!evalForm.valid">Soumettre</button>
-      </form>
+  <div class="empty-state" *ngIf="!selectedRisk">
+    <div class="empty-state-content">
+      <h3>Sélectionnez un risque</h3>
+      <p>Choisissez un risque dans la liste pour commencer l'évaluation</p>
     </div>
   </div>
 </div>

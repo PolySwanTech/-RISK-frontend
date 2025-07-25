@@ -11,6 +11,7 @@ export class Process {
     risks: RiskTemplate[] = []
 
     buName : string = ''
+    sum = 0;
 
     constructor(
         name: string,
