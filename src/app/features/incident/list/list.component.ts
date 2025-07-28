@@ -15,19 +15,19 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { State } from '../../../core/enum/state.enum';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuModule }    from '@angular/material/menu';
 
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
+  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, MatMenuModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule,
     ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule, MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule, MatButtonModule],
   templateUrl: './list.component.html',
@@ -86,6 +86,7 @@ export class ListComponent implements OnInit {
   incidents: Incident[] = [];
 
   selectedIncidents = new Set<string>();
+  
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -203,11 +204,17 @@ export class ListComponent implements OnInit {
     );
   }
 
-  onConfirmAction(incidentId: number) {
+  delete(incidentId: string) {
 
     this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
       .subscribe(res => {
-        // delete incidentId
+        if (res) {
+          this.incidentService.deleteIncident(incidentId).subscribe(() => {
+            this.loadIncidents();
+          }, error => {
+            console.error('Error deleting incident:', error);
+          });
+        }
       })
   }
   toggleIncidentSelection(incidentId: string) {
@@ -231,6 +238,11 @@ export class ListComponent implements OnInit {
       });
     }
   }
+
+  edit(row: Incident) {
+    this.router.navigate(['incident', 'create'], {
+      queryParams: { id: row.id }
+  })}
 
   isAllSelected(): boolean {
     return this.selectedIncidents.size === this.dataSource.data.length && this.dataSource.data.length > 0;
