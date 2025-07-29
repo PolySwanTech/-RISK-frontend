@@ -67,11 +67,11 @@ export class RiskTemplate {
 
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
-  libelle:        string;
+  libellePerso:        string;
+  libelleBalois:        string;
   description: string;
   processId:   string;                 // UUID
   riskBrut:    RiskLevel;
-  category:  BaloiseCategoryEnum;      // objet complet (cf. back)
   impactTypes: RiskImpactType[];       // tableau → Set côté Java
   parent? : string | null; // optionnel, pour les risques enfants
 }

@@ -49,9 +49,6 @@ export class CreateRisksComponent implements OnInit {
   private readonly procSrv = inject(ProcessService);
 
   /* ---------------- données ----------------- */
-  bal1: BaloiseCategoryEnum[] = [];
-  bal2: BaloiseCategoryEnum[] = [];
-  bal3: BaloiseCategoryEnum[] = [];
   risks: RiskTemplate[] = []; // liste des risques existants
 
   process1: Process[] = [];
@@ -65,7 +62,7 @@ export class CreateRisksComponent implements OnInit {
   impactTypes = Object.values(RiskImpactType);
   riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
-  
+
 
   /** instance courante (vide ou chargée) */
   risk: RiskTemplate = new RiskTemplate();
@@ -74,9 +71,7 @@ export class CreateRisksComponent implements OnInit {
   infoForm = this.fb.group({
     parentRisk: this.fb.control<string | null>(null), // pour les risques enfants
     libellePerso: this.fb.nonNullable.control<string>(''),
-    balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
-    balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
-    balois3: this.fb.control<BaloiseCategoryEnum | null>(null),
+    libelleBalois: this.fb.nonNullable.control<string>(''),
     process1: this.fb.nonNullable.control<Process | null>(null, Validators.required),
     process2: this.fb.control<Process | null>(null),
     process3: this.fb.control<Process | null>(null)
@@ -87,28 +82,6 @@ export class CreateRisksComponent implements OnInit {
     level: this.fb.nonNullable.control<RiskLevel>(RiskLevel.LOW),
     impactType: this.fb.control<RiskImpactType | null>(null)
   });
-  
-
-  onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
-    if (level === 1) {
-      this.riskCategoryService.getByParent(baloise).subscribe(
-        data => {
-          this.bal2 = data;
-          this.bal3 = []; // Réinitialiser le niveau 3
-          this.infoForm.patchValue({ balois2: null, balois3: null });
-        }
-      );
-    }
-
-    if (level === 2) {
-      this.riskCategoryService.getByParent(baloise).subscribe(
-        data => {
-          this.bal3 = data;
-          this.infoForm.patchValue({ balois3: null });
-        }
-      );
-    }
-  }
 
   onProcessChange(process: Process, level: number): void {
     if (level === 1) {
@@ -125,13 +98,6 @@ export class CreateRisksComponent implements OnInit {
   ngOnInit(): void {
 
     /* --- chargements parallèles --- */
-
-    this.riskCategoryService.getAll().subscribe(
-      data => {
-        this.bal1 = data;
-      }
-    )
-
     this.procSrv.getAll().subscribe(list => this.process1 = list);
 
     this.riskSrv.getAll().subscribe(risks => this.risks = risks);
@@ -157,11 +123,7 @@ export class CreateRisksComponent implements OnInit {
       /* pré-remplissage des formulaires */
       this.infoForm.patchValue({
         libellePerso: this.risk.libellePerso,
-        balois1: this.risk.category ?? null,
-        balois2: this.risk.category ?? null,
-        balois3: this.risk.category ?? null,
         // process1: this.risk.processId,
-
       });
 
       this.detailsForm.patchValue({
@@ -182,31 +144,30 @@ export class CreateRisksComponent implements OnInit {
     }
 
     const riskLevel = this.detailsForm.get('level')?.value;
-    const category = this.infoForm.get('balois2')?.value ? this.infoForm.get('balois2')?.value : this.infoForm.get('balois1')?.value;
     const impactType = this.detailsForm.get('impactType')?.value;
 
-    if (!riskLevel || !category || !impactType) {
+    if (!riskLevel || !impactType) {
       console.error('Valeurs obligatoires manquantes');
       return;
     }
 
     const payload: RiskTemplateCreateDto = {
-      libelle: this.infoForm.get('libelle')!.value!,
+      libellePerso: this.infoForm.get('libellePerso')!.value!,
+      libelleBalois: this.infoForm.get('libelleBalois')!.value!,
       description: this.detailsForm.get('description')!.value!,
       processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,
-      category: category,
       impactTypes: [impactType],
       parent: this.infoForm.get('parentRisk')?.value // si c'est un risque enfant
     };
 
-    this.riskSrv.save(payload).subscribe(() => {
+    this.riskSrv.save(payload).subscribe(riskId => {
       this.confirm.openConfirmDialog(
         this.dialogLabel.title,
         `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
         false
       );
-      this.router.navigate(['reglages', 'risks']);
+      this.router.navigate(['reglages', 'risks', riskId]);
     });
   }
 }

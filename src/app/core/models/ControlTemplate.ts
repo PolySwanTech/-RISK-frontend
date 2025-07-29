@@ -18,7 +18,7 @@ export class ControlTemplate {
     libelle: string;
     description: string;
     frequency: Recurence;
-    level: Degree;
+    controlLevel: Degree;
     controlType: Type;
     processName: string;
     responsable: string;
@@ -38,7 +38,7 @@ export class ControlTemplate {
             libelle: string,
             description: string,
             frequency: Recurence,
-            level: Degree,
+            controlLevel: Degree,
             controlType: Type,
             taxonomie: RiskTemplate,
             responsable: string,
@@ -55,7 +55,7 @@ export class ControlTemplate {
         this.libelle = libelle;
         this.description = description;
         this.frequency = frequency;
-        this.level = level;
+        this.controlLevel = controlLevel;
         this.controlType = controlType;
         this.processName = processName;
         this.responsable = responsable;

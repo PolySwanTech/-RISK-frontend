@@ -18,8 +18,17 @@
                 <mat-label>Titre du risque</mat-label>
                 <input
                   matInput
-                  formControlName="libelle"
+                  formControlName="libellePerso"
                   placeholder="Entrez le titre du risque"
+                />
+              </mat-form-field>
+
+              <mat-form-field class="full-width">
+                <mat-label>Taxonomie bâloise</mat-label>
+                <input
+                  matInput
+                  formControlName="libelleBalois"
+                  placeholder="Entrez la taxonomie bâloise du risque"
                 />
               </mat-form-field>
 
@@ -33,31 +42,6 @@
                     {{ r.libellePerso }}
                   </mat-option>
                 </mat-select> 
-              </mat-form-field>
-
-              <!-- Catégorie L1 -------------------------------------------------- -->
-              <mat-form-field class="full-width">
-                <mat-label>Catégorie&nbsp;Bâloise</mat-label>
-                <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
-                  <mat-option *ngFor="let cat of bal1" [value]="cat">
-                    {{ cat }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Sous-catégorie L2 -------------------------------------------- -->
-              <mat-form-field class="full-width" *ngIf="bal2.length > 0">
-                <mat-label>Sous-catégorie&nbsp;Bâloise</mat-label>
-                <mat-select formControlName="balois2" (selectionChange)="onCategoryChange($event.value, 2)">
-                  <!-- on envoie ici l’OBJET L2 complet,
-                       car risk.categoryL2 est de type BaloiseCategoryL2 -->
-                  <mat-option
-                    *ngFor="let sub of bal2"
-                    [value] = "sub"
-                  >
-                    {{ sub }}
-                  </mat-option>
-                </mat-select>
               </mat-form-field>
 
               <!-- Processus ----------------------------------------------------- -->

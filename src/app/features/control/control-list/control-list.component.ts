@@ -30,7 +30,7 @@ import { DateRangePickerComponent } from "../../../shared/components/date-range-
     MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule,
     MatIconModule, MatTooltipModule, FormsModule,
     DateRangePickerComponent
-],
+  ],
   providers: [DatePipe],
   templateUrl: './control-list.component.html',
   styleUrl: './control-list.component.scss'
@@ -42,7 +42,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   datePipe = inject(DatePipe);
   fb = inject(FormBuilder);
-  
+
   columns = [
     { columnDef: 'Référence', header: 'Référence', cell: (e: ControlTemplate) => e.reference },
     { columnDef: 'libelle', header: 'Nom du contrôle', cell: (e: ControlTemplate) => e.libelle },
@@ -58,9 +58,9 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     { columnDef: 'Fréquence', header: 'Fréquence', cell: (e: ControlTemplate) => this.getRecurrenceLabel(e.frequency) },
 
     // ✅ Mappé via enum
-    { columnDef: 'controlLevel', header: 'Degré de contrôle', cell: (e: any) => this.getDegresLabel(e.controlLevel), isBadge: 'control' },
+    { columnDef: 'controlLevel', header: 'Degré de contrôle', cell: (e: ControlTemplate) => this.getDegresLabel(e.controlLevel), isBadge: 'control' },
 
-    { columnDef: 'creatorName', header: 'Responsable', cell: (e: any) => e.creatorName },
+    { columnDef: 'creatorName', header: 'Responsable', cell: (e: ControlTemplate) => e.creator },
 
     { columnDef: 'actif', header: 'Statut', cell: (e: ControlTemplate) => e.actif ? 'Actif' : 'Suspendu', isBadge: 'statut' },
 
@@ -77,8 +77,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   router = inject(Router);
   dialog = inject(MatDialog);
 
-  controls: any[] = [];
-  listUsers: any[] = [];
+  controls: ControlTemplate[] = [];
 
   searchQuery: string = '';
 
@@ -130,11 +129,11 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     this.getUsersAndControls();
   }
 
-  export(){
+  export() {
     alert('Fonctionnalité d\'exportation non implémentée');
   }
 
-  refresh(){
+  refresh() {
     this.ngOnInit();
     this.resetFilters();
   }
@@ -146,20 +145,15 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   }
 
   getUsersAndControls() {
-    this.userService.getUsers().subscribe(users => {
-      this.listUsers = users;
-      this.controlService.getAllTemplates().subscribe(resp => {
-        this.controls = resp.map(control => {
-          const creator = this.listUsers.find(u => u.id === control.creator);
-          return {
-            ...control,
-            creatorName: creator ? creator.username : 'Utilisateur inconnu'
-          };
-        });
-        this.dataSource.data = this.controls;
-        console.log('Contrôles récupérés avec succès', this.controls);
-      }, err => console.error('Erreur lors de la récupération des contrôles', err));
-    }, err => console.error('Erreur lors de la récupération des utilisateurs', err));
+    this.controlService.getAllTemplates().subscribe(
+      {
+        next: resp => {
+          this.controls = resp;
+          this.dataSource.data = this.controls;
+        },
+        error: err => console.error('Erreur lors de la récupération des contrôles', err)
+      }
+    )
   }
 
   onRowClick(control: ControlTemplate) {
@@ -176,54 +170,54 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   }
 
   onDateRangeSelected(event: any) {
-  this.applyFilters(event.start, event.end);
-}
+    this.applyFilters(event.start, event.end);
+  }
 
   applyFilters(start?: string, end?: string) {
-  let filtered = [...this.controls];
+    let filtered = [...this.controls];
 
-  const toStartOfDay = (str?: string) => {
-    if (!str) return null;
-    const d = new Date(str);
-    d.setHours(0, 0, 0, 0); // début de la journée
-    return d;
-  };
+    const toStartOfDay = (str?: string) => {
+      if (!str) return null;
+      const d = new Date(str);
+      d.setHours(0, 0, 0, 0); // début de la journée
+      return d;
+    };
 
-  const toEndOfDay = (str?: string) => {
-    if (!str) return null;
-    const d = new Date(str);
-    d.setHours(23, 59, 59, 999); // fin de la journée
-    return d;
-  };
+    const toEndOfDay = (str?: string) => {
+      if (!str) return null;
+      const d = new Date(str);
+      d.setHours(23, 59, 59, 999); // fin de la journée
+      return d;
+    };
 
-  const dateStart = toStartOfDay(start);
-  const dateEnd = toEndOfDay(end);
+    const dateStart = toStartOfDay(start);
+    const dateEnd = toEndOfDay(end);
 
-  if (dateStart && dateEnd) {
-    filtered = filtered.filter(item => {
-      const itemDate = new Date(item.nextExecution);
-      console.log(`Filtrage par date : ${itemDate} entre ${dateStart} et ${dateEnd}`);
-      return itemDate >= dateStart && itemDate <= dateEnd;
-    });
+    if (dateStart && dateEnd) {
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.nextExecution);
+        console.log(`Filtrage par date : ${itemDate} entre ${dateStart} et ${dateEnd}`);
+        return itemDate >= dateStart && itemDate <= dateEnd;
+      });
+    }
+
+    if (this.searchQuery && this.searchQuery.trim().length > 0) {
+      const query = this.searchQuery.trim().toLowerCase();
+      filtered = filtered.filter(c =>
+        (c.reference?.toLowerCase().includes(query) || '') ||
+        (c.libelle?.toLowerCase().includes(query) || '') ||
+        (c.processName?.toLowerCase().includes(query) || '') ||
+        (c.responsable?.toLowerCase().includes(query) || '') ||
+        this.getTypeLabel(c.controlType as keyof typeof this.enumLabels.type).toLowerCase().includes(query) ||
+        this.getRiskLabel(c.riskLevel as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
+        this.getDegresLabel(c.controlLevel as keyof typeof this.enumLabels.degres).toLowerCase().includes(query) ||
+        this.getRecurrenceLabel(c.frequency as keyof typeof this.enumLabels.reccurency).toLowerCase().includes(query) ||
+        (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
+      );
+    }
+
+    this.dataSource.data = filtered;
   }
-
-  if (this.searchQuery && this.searchQuery.trim().length > 0) {
-    const query = this.searchQuery.trim().toLowerCase();
-    filtered = filtered.filter(c =>
-      (c.reference?.toLowerCase().includes(query) || '') ||
-      (c.libelle?.toLowerCase().includes(query) || '') ||
-      (c.processName?.toLowerCase().includes(query) || '') ||
-      (c.creatorName?.toLowerCase().includes(query) || '') ||
-      this.getTypeLabel(c.controlType as keyof typeof this.enumLabels.type).toLowerCase().includes(query) ||
-      this.getRiskLabel(c.riskLevel as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
-      this.getDegresLabel(c.controlLevel as keyof typeof this.enumLabels.degres).toLowerCase().includes(query) ||
-      this.getRecurrenceLabel(c.frequency as keyof typeof this.enumLabels.reccurency).toLowerCase().includes(query) ||
-      (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
-    );
-  }
-
-  this.dataSource.data = filtered;
-}
 
   resetFilters() {
     this.searchQuery = '';

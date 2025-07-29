@@ -79,6 +79,7 @@ export class ListProcessComponent implements OnInit {
     event.stopPropagation();
     if (!process.risks || process.risks.length === 0) {
       this.riskService.getAllByProcess(process.id).subscribe(risks => {
+        console.table(risks);
         process.risks = risks;
       });
     }
@@ -89,7 +90,8 @@ export class ListProcessComponent implements OnInit {
   }
 
   getRiskClass(level: string): string {
-    return level.toLowerCase().replace('é', 'e');
+    return ""
+    // return level.toLowerCase().replace('é', 'e');
   }
 
   add() {

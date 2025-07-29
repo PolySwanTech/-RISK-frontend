@@ -160,17 +160,20 @@
 
                     <div *ngFor="let risk of node.risks; let i = index" (click)="navToRisk(risk.id.id)"
                         class="table-row">
-                        <div class="col-risque">{{risk.libelle}}</div>
+                        <div class="col-risque">{{risk.reference + ' - ' + risk.libellePerso}}</div>
                         <div class="col-risque-brut">
                             <span class="risk-badge" [ngClass]="getRiskClass(risk.riskBrut)">
-                                {{risk.riskBrut}}
+                                {{risk.rpc[0].brutLevel}}
                             </span>
                         </div>
-                        <div class="col-controle">controle</div>
+                        <div class="col-controle"><span class="risk-badge"
+                                [ngClass]="getRiskClass(risk.rpc[0]?.netLevel || 'MEDIUM')">
+                                {{risk.rpc[0]?.controlReference || 'MEDIUM'}}
+                            </span></div>
                         <div class="col-risque-net">
                             <span class="risk-badge"
-                                [ngClass]="getRiskClass(risk.riskEvaluations[0]?.riskNet || 'MEDIUM')">
-                                {{risk.riskEvaluations[0]?.riskNet || 'MEDIUM'}}
+                                [ngClass]="getRiskClass(risk.rpc[0]?.netLevel || 'MEDIUM')">
+                                {{risk.rpc[0]?.netLevel || 'MEDIUM'}}
                             </span>
                         </div>
                         <div class="col-actions">
