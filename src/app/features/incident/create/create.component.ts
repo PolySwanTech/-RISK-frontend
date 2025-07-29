@@ -13,7 +13,7 @@ import { ButtonAddFileComponent } from "../../../shared/components/button-add-fi
 import { MatSelectModule } from '@angular/material/select';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
 import { NgIf, NgFor } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
@@ -23,6 +23,9 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
+import { forkJoin, map, tap } from 'rxjs';
+import { Incident } from '../../../core/models/Incident';
+
 
 @Component({
   selector: 'app-create',
@@ -49,12 +52,16 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
 export class CreateComponent implements OnInit {
 
   private _formBuilder = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
+  incident : Incident | null = null;
+  title = "Ajout d'un incident";
+
 
   incidentForm1 = this._formBuilder.group({
     titre: ['', Validators.required],
-    equipe: ['', Validators.required],
+    equipeId: ['', Validators.required],
     commentaire: ['', Validators.required],
     location: ['', Validators.required],
   });
@@ -68,19 +75,17 @@ export class CreateComponent implements OnInit {
 
   incidentForm3 = this._formBuilder.group<{
     riskId: FormControl<string | null>;
-    userMail: FormControl<string | null>;
+    intervenant: FormControl<string | null>;
     files: FormControl<string | null>;
-    lossAmount: FormControl<number | null>;
     cause: FormControl<Cause | null>;
-    consequenceId: FormControl<string | null>;
+    consequences: FormControl<string[] | null>;
     processId: FormControl<string | null>;
   }>({
     riskId: new FormControl(''),
-    userMail: new FormControl(null),
+    intervenant: new FormControl(null),
     files: new FormControl(null),
-    lossAmount: new FormControl(null, Validators.required),
     cause: new FormControl(null, Validators.required),
-    consequenceId: new FormControl(null, Validators.required),
+    consequences: new FormControl(null, Validators.required),
     processId: new FormControl(null, Validators.required),
   });
 
@@ -104,21 +109,75 @@ export class CreateComponent implements OnInit {
   consequenceService = inject(ConsequenceService);
   processService = inject(ProcessService);
 
+
   ngOnInit(): void {
     const teamName = this.getUserTeamFromToken();
-    console.log(teamName)
+    const incidentId = this.route.snapshot.queryParams['id'];
+
+    if (incidentId) {
+      this.title = "Modification d'un incident";
+      this.loadIncident(incidentId);
+    } else {
+      this.loadTrees().subscribe();
+    }
     if (teamName) {
       this.hasTeam = true;
-      this.incidentForm1.patchValue({ equipe: teamName });
+      this.incidentForm1.patchValue({ equipeId: teamName });
     } else {
       this.hasTeam = false;
       this.fetchTeams();
     }
-    this.consequenceService.getAll().subscribe(data =>
-      this.listConsequence = data);
-    
-    this.causeService.getAll().subscribe(data => {
-      this.listCauses = data
+  }
+
+private loadTrees(processRootId?: string /** optionnel */) {
+  /* on renvoie un Observable<void> qui émet quand tout est chargé */
+  return forkJoin({
+    processes     : this.processService.getProcessTree(processRootId),
+    risks         : this.riskService.getRisksTree(processRootId),
+    consequences  : this.consequenceService.getAll(),
+    causes        : this.causeService.getAll()
+  }).pipe(
+    tap(({ processes, risks, consequences, causes }) => {
+      this.listProcess       = processes;
+      this.listRisks         = risks;
+      this.listConsequence   = consequences;
+      this.listCauses        = causes;
+    }),
+    /* on ne renvoie plus de valeur (juste la fin du chargement) */
+    map(() => void 0)
+  );
+}
+
+  loadIncident(id: string): void {
+    this.incidentService.getIncidentById(id).subscribe((incident) => {
+      console.log('Incident: ', incident);
+      console.log('incident.consequenceId =', incident.consequences); // 1
+
+      this.incidentForm1.patchValue({
+        titre: incident.title,
+        equipeId: incident.equipeId,
+        commentaire: incident.commentaire,
+        location: incident.location
+      });
+      this.incidentForm2.patchValue({
+        dateDeDeclaration: this.toInputDate(incident.declaredAt),
+        dateDeSurvenance: this.toInputDate(incident.survenueAt),
+        dateDeDetection: this.toInputDate(incident.detectedAt),
+        dateDeCloture: this.toInputDate(incident.closedAt),
+      });
+
+      const wantedProcessId = incident.process;
+
+      this.loadTrees(wantedProcessId).subscribe(() => {
+        this.incidentForm3.patchValue({
+          riskId: incident.risk,
+          cause: incident.cause,
+          consequences: incident.consequences,
+          processId: incident.process,
+          intervenant: incident.intervenant,
+        });
+      });
+      this.incident = incident;
     });
   }
 
@@ -128,8 +187,7 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('processId')?.reset();
     this.incidentForm3.get('riskId')?.reset();
     this.processService.getProcessTree(event.value.id).subscribe(data => {
-    this.listProcess = data;
-      console.log(data)
+      this.listProcess = data;
     });
   }
 
@@ -178,7 +236,8 @@ export class CreateComponent implements OnInit {
   }
 
   changeUser(event: any) {
-    this.incidentForm3.get('userMail')!.setValue(event.email);
+    console.log("Intervenant sélectionné :", event);
+    this.incidentForm3.get('intervenant')!.setValue(event.id);
   }
 
   private convertFormToIncident() {
@@ -186,20 +245,39 @@ export class CreateComponent implements OnInit {
       title: this.incidentForm1.value.titre!,
       location: this.incidentForm1.value.location!,
       commentaire: this.incidentForm1.value.commentaire!,
+      equipeId: this.incidentForm1.value.equipeId!,
       declaredAt: new Date(this.incidentForm2.value.dateDeDeclaration!),
       survenueAt: new Date(this.incidentForm2.value.dateDeSurvenance!),
       detectedAt: new Date(this.incidentForm2.value.dateDeDetection!),
       closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
       riskId: this.incidentForm3.value.riskId!,
       processId: this.incidentForm3.value.processId!,
-      cause: this.incidentForm3.value.cause!
+      consequences: [this.incidentForm3.value.consequences!],
+      cause: this.incidentForm3.value.cause!,
+      intervenant: this.incidentForm3.value.intervenant || null,
     };
   }
 
   addIncident() {
 
     const incident = this.convertFormToIncident();
-    this.incidentService.saveIncident(incident).subscribe(
+    console.log("Incident à créer :", incident);
+    this.incidentService.saveIncidentSubmit(incident).subscribe(
+      {
+        next: resp => {
+          this.afterCreation("Création réussie", resp);
+        },
+        error: err => {
+          console.error("Erreur lors de la création de l'incident", err);
+        }
+      },
+    );
+  }
+
+  addDraft() {
+
+    const incident = this.convertFormToIncident();
+    this.incidentService.saveIncidentDraft(incident).subscribe(
       {
         next: resp => {
           this.afterCreation("Création réussie", resp);
@@ -226,7 +304,19 @@ export class CreateComponent implements OnInit {
     return date ? new Date(date) : null;
   }
 
+  private toInputDate(d?: string | Date | null): string | null {
+    if (!d) return null;
+    return (d instanceof Date ? d : new Date(d))
+          .toISOString()
+          .split('T')[0];
+  }
+
   onFilesChange(event: any) {
     this.incidentForm3.get('files')!.setValue(event);
   }
+
+  compareById = (a: { id: string } | null, b: { id: string } | null) =>
+  a && b ? a.id === b.id : a === b;
+
+
 }
