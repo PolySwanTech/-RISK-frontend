@@ -25,6 +25,7 @@ import { CauseService } from '../../../core/services/cause/cause.service';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 import { forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
+import { State } from '../../../core/enum/state.enum';
 
 
 @Component({
@@ -55,7 +56,10 @@ export class CreateComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
+  private incidentId = this.route.snapshot.queryParams['id'];
+
   incident : Incident | null = null;
+  selectedUser: string | null = null;
   title = "Ajout d'un incident";
 
 
@@ -78,14 +82,14 @@ export class CreateComponent implements OnInit {
     intervenant: FormControl<string | null>;
     files: FormControl<string | null>;
     cause: FormControl<Cause | null>;
-    consequences: FormControl<string[] | null>;
+    consequences: FormControl<string[]> ;
     processId: FormControl<string | null>;
   }>({
     riskId: new FormControl(''),
     intervenant: new FormControl(null),
     files: new FormControl(null),
     cause: new FormControl(null, Validators.required),
-    consequences: new FormControl(null, Validators.required),
+    consequences: new FormControl<string[]>([], { validators: [Validators.required], nonNullable: true }),
     processId: new FormControl(null, Validators.required),
   });
 
@@ -112,11 +116,10 @@ export class CreateComponent implements OnInit {
 
   ngOnInit(): void {
     const teamName = this.getUserTeamFromToken();
-    const incidentId = this.route.snapshot.queryParams['id'];
 
-    if (incidentId) {
+    if (this.incidentId) {
       this.title = "Modification d'un incident";
-      this.loadIncident(incidentId);
+      this.loadIncident(this.incidentId);
     } else {
       this.loadTrees().subscribe();
     }
@@ -178,6 +181,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
         });
       });
       this.incident = incident;
+      this.selectedUser = incident.intervenant || null;
     });
   }
 
@@ -252,7 +256,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
       closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
       riskId: this.incidentForm3.value.riskId!,
       processId: this.incidentForm3.value.processId!,
-      consequences: [this.incidentForm3.value.consequences!],
+      consequences: this.incidentForm3.value.consequences!,
       cause: this.incidentForm3.value.cause!,
       intervenant: this.incidentForm3.value.intervenant || null,
     };
@@ -261,32 +265,57 @@ private loadTrees(processRootId?: string /** optionnel */) {
   addIncident() {
 
     const incident = this.convertFormToIncident();
-    console.log("Incident à créer :", incident);
-    this.incidentService.saveIncidentSubmit(incident).subscribe(
-      {
-        next: resp => {
-          this.afterCreation("Création réussie", resp);
+    console.log("Incident à ajouter :", incident);
+    if(this.incidentId){
+      this.incidentService.updateIncident(this.incidentId, incident, State.SUBMIT).subscribe(
+        {
+          error: err => {
+            console.error("Erreur lors de la modification de l'incident", err);
+          }
         },
-        error: err => {
-          console.error("Erreur lors de la création de l'incident", err);
-        }
-      },
-    );
+      );
+      this.router.navigate(['incident']);
+    }
+    else {
+      this.incidentService.saveIncident(incident, State.SUBMIT).subscribe(
+        {
+          next: resp => {
+            this.afterCreation("Création réussie", resp);
+          },
+          error: err => {
+            console.error("Erreur lors de la création de l'incident", err);
+          }
+        },
+      );
+    }
   }
 
   addDraft() {
 
     const incident = this.convertFormToIncident();
-    this.incidentService.saveIncidentDraft(incident).subscribe(
-      {
-        next: resp => {
-          this.afterCreation("Création réussie", resp);
+    console.log("Incident à sauvegarder en brouillon :", incident);
+    if(this.incidentId){
+      this.incidentService.updateIncident(this.incidentId, incident, State.DRAFT).subscribe(
+        {
+          error: err => {
+            console.error("Erreur lors de la modification de l'incident", err);
+          }
         },
-        error: err => {
-          console.error("Erreur lors de la création de l'incident", err);
-        }
-      },
-    );
+      );
+      this.router.navigate(['incident']);
+    }
+    else{
+      this.incidentService.saveIncident(incident, State.DRAFT).subscribe(
+        {
+          next: resp => {
+            this.afterCreation("Création réussie", resp);
+          },
+          error: err => {
+            console.error("Erreur lors de la création de l'incident", err);
+          }
+        },
+      );
+    }
   }
 
   afterCreation(title: string, incidentId: string) {
@@ -317,6 +346,5 @@ private loadTrees(processRootId?: string /** optionnel */) {
 
   compareById = (a: { id: string } | null, b: { id: string } | null) =>
   a && b ? a.id === b.id : a === b;
-
 
 }

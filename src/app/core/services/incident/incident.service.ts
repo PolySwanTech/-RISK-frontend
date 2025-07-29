@@ -32,14 +32,15 @@ export class IncidentService {
     return this.http.get<any>(this.baseUrl + '/' + id);
   }
 
-  saveIncidentSubmit(incident: any): Observable<any> {
-    const params = new HttpParams().set('state', State.SUBMIT);
+  saveIncident(incident: any, state: State): Observable<any> {
+    const params = new HttpParams().set('state', state);
     return this.http.post(this.baseUrl, incident, { params });
   }
 
-  saveIncidentDraft(incident: any): Observable<any> {
-    const params = new HttpParams().set('state', State.DRAFT);
-    return this.http.post(this.baseUrl, incident, { params });
+  updateIncident(id: string, incidentDto: any, state: State) {
+
+    const params = new HttpParams().set('state', state);
+    return this.http.put<void>(`${this.baseUrl}/${id}`, incidentDto, { params });
   }
 
   draftIncident(incident: any): Observable<any> {

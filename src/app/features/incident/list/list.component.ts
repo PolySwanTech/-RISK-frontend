@@ -251,4 +251,8 @@ export class ListComponent implements OnInit {
   isIndeterminate(): boolean {
     return this.selectedIncidents.size > 0 && this.selectedIncidents.size < this.dataSource.data.length;
   }
+
+  isUpdatable(incident: Incident): boolean {
+    return incident!.state === State.DRAFT ;
+  }
 }

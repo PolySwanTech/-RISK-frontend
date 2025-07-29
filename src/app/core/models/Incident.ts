@@ -26,7 +26,7 @@ export class Incident {
     impacts: Impact[];
 
     state: State;
-    consequences?: string[] | null;
+    consequences: string[];
     intervenant?: string | null;
 
     constructor(
@@ -44,7 +44,7 @@ export class Incident {
         equipeId?: string,
         impacts: Impact[] = [],
         state: State = State.DRAFT,
-        consequences?: string[] | null,
+        consequences: string[] = [],
         intervenant?: string | null,
     ){
         this.id = id;

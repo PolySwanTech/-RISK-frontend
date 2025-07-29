@@ -139,7 +139,7 @@
                 </ng-container>
 
                 <mat-menu #rowMenu="matMenu">
-                <button mat-menu-item (click)="edit(selectedIncident!)">
+                <button *ngIf="selectedIncident && isUpdatable(selectedIncident!)" mat-menu-item (click)="edit(selectedIncident!)">
                     <mat-icon>edit</mat-icon>
                     <span>Modifier</span>
                 </button>
