@@ -105,7 +105,6 @@ export class CreateRisksComponent implements OnInit {
     /* --- id dans l’URL ?  => édition  ---------------------- */
     const id = this.route.snapshot.paramMap.get('id');   // id OU 'create'
     if (id && id !== 'create') {
-      console.log('Chargement du risque avec ID:', id);
       // this.loadRiskById(id);
     }
   }

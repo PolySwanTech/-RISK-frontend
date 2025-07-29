@@ -196,7 +196,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     if (dateStart && dateEnd) {
       filtered = filtered.filter(item => {
         const itemDate = new Date(item.nextExecution);
-        console.log(`Filtrage par date : ${itemDate} entre ${dateStart} et ${dateEnd}`);
         return itemDate >= dateStart && itemDate <= dateEnd;
       });
     }

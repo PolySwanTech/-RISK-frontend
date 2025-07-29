@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActionPlanService } from '../../core/services/action-plan/action-plan.service';
-import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
@@ -42,6 +42,16 @@ export class PlanActionPageDetailComponent {
   totalActions: number = 0;
 
   validator: string = '';
+
+  goBackButtons : GoBackButton[] = [
+      {
+        label: "Exporter",
+        icon: 'file_download',
+        class: 'btn-green',
+        show: true,
+        action: () => this.export()
+      }
+    ];
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
@@ -156,6 +166,9 @@ export class PlanActionPageDetailComponent {
         <span class="priority-label ${config.class}">${config.label}</span>
       </div>
     `;
+  }
+
+  export(){
   }
 
 }

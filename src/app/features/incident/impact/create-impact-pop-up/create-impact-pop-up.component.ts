@@ -47,7 +47,6 @@ export class CreateImpactPopUpComponent implements OnInit {
 
 
   addImpact() {
-    console.log(this.impact);
     const message = prompt("Pourquoi voulez-vous ajouter cet impact ?");
     if (message && message.trim().length > 0) {
       this.dialogRef.close(

@@ -67,7 +67,6 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
             this.lastEvaluation = risk.riskEvaluations[risk.riskEvaluations.length - 1];
           }
           this.loading = false;
-          console.log('RiskDetailComponent initialized with risk:', this.risk);
         },
         error: () => {
           this.loading = false;

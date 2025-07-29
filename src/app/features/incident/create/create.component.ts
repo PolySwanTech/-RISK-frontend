@@ -39,10 +39,10 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
     SelectUsersComponent,
     ButtonAddFileComponent,
     GoBackComponent,
-    NgIf, 
+    NgIf,
     NgFor,
     SelectArborescenceComponent
-],
+  ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
@@ -106,7 +106,6 @@ export class CreateComponent implements OnInit {
 
   ngOnInit(): void {
     const teamName = this.getUserTeamFromToken();
-    console.log(teamName)
     if (teamName) {
       this.hasTeam = true;
       this.incidentForm1.patchValue({ equipe: teamName });
@@ -116,35 +115,34 @@ export class CreateComponent implements OnInit {
     }
     this.consequenceService.getAll().subscribe(data =>
       this.listConsequence = data);
-    
+
     this.causeService.getAll().subscribe(data => {
       this.listCauses = data
     });
   }
 
-  onTeamChange(event : any){
+  onTeamChange(event: any) {
     this.listProcess = [];
     this.listRisks = [];
     this.incidentForm3.get('processId')?.reset();
     this.incidentForm3.get('riskId')?.reset();
     this.processService.getProcessTree(event.value.id).subscribe(data => {
-    this.listProcess = data;
-      console.log(data)
+      this.listProcess = data;
     });
   }
 
-  onSelectionProcess(value : Process){
+  onSelectionProcess(value: Process) {
     this.listRisks = [];
     this.riskService.getRisksTree(value.id).subscribe(data => {
       this.listRisks = data;
-      if( this.listRisks.length === 0) {
+      if (this.listRisks.length === 0) {
         alert("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
       }
     });
     this.incidentForm3.get('processId')?.setValue(value.id);
   }
 
-  onSelectionRisk(value : any){
+  onSelectionRisk(value: any) {
     this.incidentForm3.get('riskId')?.setValue(value.id);
   }
 
@@ -152,7 +150,6 @@ export class CreateComponent implements OnInit {
     this.equipeService.getAllEquipes().subscribe({
       next: teams => {
         this.listTeams = teams.filter(team => team.process && team.process.length > 0);
-        console.log(this.listTeams)
       },
       error: err => {
         console.error("Erreur lors du chargement des équipes", err);

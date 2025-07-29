@@ -46,7 +46,6 @@ export class CalculInputParametersComponent {
     this.calculService.getLosses().subscribe({
       next: (data: any) => {
         this.formData.pertes_annuelles = data;
-        console.log('Pertes récupérées:', data);
       },
       error: (err: any) => {
         console.error('Erreur lors du chargement des pertes', err);
@@ -64,15 +63,13 @@ export class CalculInputParametersComponent {
 
   onSubmit() {
     const dataToSubmit = {
-  ...this.formData,
-  ratio_cet1: this.formData.ratio_cet1 / 100,
-  pertes_annuelles: Object.values(this.formData.pertes_annuelles || {}).map(val => parseFloat(val as string) || 0)
-};
-console.log('Données à soumettre:', dataToSubmit);
+      ...this.formData,
+      ratio_cet1: this.formData.ratio_cet1 / 100,
+      pertes_annuelles: Object.values(this.formData.pertes_annuelles || {}).map(val => parseFloat(val as string) || 0)
+    };
 
     this.calculService.submitFormData(dataToSubmit).subscribe({
       next: (res) => {
-        console.log('Données envoyées avec succès :', res);
         alert('Formulaire soumis avec succès !');
       },
       error: (err) => {

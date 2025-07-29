@@ -79,7 +79,6 @@ export class ListProcessComponent implements OnInit {
     event.stopPropagation();
     if (!process.risks || process.risks.length === 0) {
       this.riskService.getAllByProcess(process.id).subscribe(risks => {
-        console.table(risks);
         process.risks = risks;
       });
     }

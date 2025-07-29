@@ -186,8 +186,6 @@ export class MatrixComponent {
     const data = this._risks[key];
     if (!data) { return; }
 
-    console.log(data)
-
     if (Array.isArray(data)){
       /* ouvre la boîte de dialogue pour choisir un risque */
       const ref = this.dialog.open(RiskSelectionDialogComponent,{
