@@ -12,6 +12,8 @@ import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
 import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { ControlEvaluationPopupComponent } from './control-evaluation/control-evaluation-popup/control-evaluation-popup.component';
+import { RecurenceLabels } from '../../core/enum/recurence.enum';
 
 @Component({
   selector: 'app-control-details-page',
@@ -22,7 +24,8 @@ import { GoBackComponent } from '../../shared/components/go-back/go-back.compone
     MatButtonModule,
     MatIconModule,
     PlanifierExecutionPopupComponent,
-    GoBackComponent
+    GoBackComponent,
+    ControlEvaluationPopupComponent
   ],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
@@ -44,6 +47,12 @@ export class ControlDetailsPageComponent implements OnInit {
   showPopup = false;
 
   currentUsername: string = '';
+
+  showEvaluationPopup = false;
+  selectedExecutionId: string | null = null;
+
+  recurenceLabels = RecurenceLabels;
+  selectedExecutionToEdit: ControlExecution | null = null;
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -83,10 +92,10 @@ export class ControlDetailsPageComponent implements OnInit {
 
   loadControlExecutions(id: string): void {
     this.controlService.getAllExecutions(id).subscribe(executions => {
-      console.log('Executions reçues du backend :', executions);
       this.controlExecutions = executions;
     });
   }
+
 
   getStatusClass(status: Status): string {
     switch (status) {
@@ -119,7 +128,9 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   markAsRealized(): void {
-    // TODO: Implémenter la mise à jour du statut
+    const lastExecution = this.controlExecutions[this.controlExecutions.length - 1];
+    this.selectedExecutionId = lastExecution.id;
+    this.showEvaluationPopup = true;
   }
 
   scheduleExecution(): void {
@@ -148,10 +159,19 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   handlePlanification(payload: any): void {
-    this.controlService.createExecution(payload).subscribe(() => {
-      this.loadControlExecutions(this.control!.id.id); // recharger la liste
-    });
+    if (payload.id) {
+      // cas modification
+      this.controlService.updateExecution(payload).subscribe(() => {
+        this.loadControlExecutions(this.control!.id.id);
+      });
+    } else {
+      // cas création
+      this.controlService.createExecution(payload).subscribe(() => {
+        this.loadControlExecutions(this.control!.id.id);
+      });
+    }
   }
+
 
   getUsernameFromToken(): string | null {
     const token = sessionStorage.getItem('token');
@@ -171,6 +191,16 @@ export class ControlDetailsPageComponent implements OnInit {
 
     const last = this.controlExecutions[this.controlExecutions.length - 1];
     return last.performedBy === this.currentUsername && last.status !== Status.ACHIEVED;
+  }
+
+  handleEvaluationSubmitted(): void {
+    this.loadControlExecutions(this.control!.id.id);
+  }
+
+  editExecution(execution: ControlExecution): void {
+    if (execution.status === this.ControlStatus.ACHIEVED) return;
+    this.selectedExecutionToEdit = execution;
+    this.showPopup = true;
   }
 
 }

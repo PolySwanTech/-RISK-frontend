@@ -6,3 +6,12 @@ export enum Recurence {
     SEMESTERLY = 'SEMESTERLY',
     YEARLY = 'YEARLY'
 }
+
+export const RecurenceLabels: Record<Recurence, string> = {
+    [Recurence.DAILY]: 'Quotidien',
+    [Recurence.WEEKLY]: 'Hebdomadaire',
+    [Recurence.MONTHLY]: 'Mensuel',
+    [Recurence.QUARTERLY]: 'Trimestriel',
+    [Recurence.SEMESTERLY]: 'Semestriel',
+    [Recurence.YEARLY]: 'Annuel'
+};

@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Recurence } from '../../../../core/enum/recurence.enum';
 import { addDays, addMonths, addWeeks } from 'date-fns';
+import { ControlExecution } from '../../../../core/models/ControlExecution';
 
 @Component({
   standalone: true,
@@ -25,7 +26,8 @@ export class PlanifierExecutionPopupComponent {
   @Output() close = new EventEmitter<void>();
   @Output() planifier = new EventEmitter<any>();
   @Input() frequence!: string;
-  @Input() createdAt!: Date;
+  @Input() isEditing = false;
+  @Input() executionToEdit?: ControlExecution;
 
   form: FormGroup;
   utilisateurs: Utilisateur[] = [];
@@ -42,27 +44,23 @@ export class PlanifierExecutionPopupComponent {
   }
 
   ngOnInit(): void {
-    console.log('Frequence reçue :', this.frequence);
     this.utilisateurService.getUsers().subscribe({
-      next: (users) => (this.utilisateurs = users),
-      error: () => console.error('Erreur lors du chargement des utilisateurs')
+      next: (users) => {
+        this.utilisateurs = users;
+        this.isEditing && this.executionToEdit
+          ? this.initFormForEditing()
+          : this.initFormForCreation();
+      },
+      error: () => console.error('❌ Erreur lors du chargement des utilisateurs')
     });
-    const defaultDate = this.calculerDatePlanifieeParDefaut(new Date(this.controlVersion), this.frequence);
-    this.form.patchValue({ plannedAt: defaultDate });
   }
 
   submit(): void {
     if (this.form.invalid) return;
 
-    const { evaluator, plannedAt, priority } = this.form.value;
-
-    this.planifier.emit({
-      controlTemplateId: this.controlId,
-      controlTemplateVersion: this.controlVersion,
-      evaluator,
-      plannedAt: new Date(plannedAt).toISOString(),
-      priority
-    });
+    this.isEditing && this.executionToEdit
+      ? this.emitEditPayload()
+      : this.emitCreatePayload();
 
     this.close.emit();
   }
@@ -70,6 +68,53 @@ export class PlanifierExecutionPopupComponent {
   cancel(): void {
     this.close.emit();
   }
+
+  initFormForEditing() {
+    const exec = this.executionToEdit!;
+    const userId = this.utilisateurs.find(u => u.username === exec.performedBy)?.id ?? null;
+
+    this.form.patchValue({
+      evaluator: userId,
+      priority: exec.priority,
+      plannedAt: exec.plannedAt ? this.formatDateInput(exec.plannedAt) : ''
+    });
+
+    this.form.get('plannedAt')?.disable();
+  }
+
+  formatDateInput(date: Date | string): string {
+    const parsedDate = typeof date === 'string' ? new Date(date) : date;
+    return parsedDate.toISOString().substring(0, 10);
+  }
+
+  initFormForCreation() {
+    const defaultDate = this.calculerDatePlanifieeParDefaut(
+      new Date(this.controlVersion),
+      this.frequence
+    );
+    this.form.patchValue({ plannedAt: defaultDate });
+  }
+
+  emitEditPayload() {
+    const { evaluator, priority } = this.form.getRawValue();
+    this.planifier.emit({
+      id: this.executionToEdit!.id,
+      performedBy: evaluator,
+      priority
+    });
+  }
+
+  emitCreatePayload() {
+    const { evaluator, plannedAt, priority } = this.form.getRawValue();
+    this.planifier.emit({
+      controlTemplateId: this.controlId,
+      controlTemplateVersion: this.controlVersion,
+      evaluator,
+      plannedAt: new Date(plannedAt).toISOString(),
+      priority
+    });
+  }
+
 
   private calculerDatePlanifieeParDefaut(date: Date, freq: string | undefined): string {
     if (!freq) return date.toISOString().substring(0, 10);

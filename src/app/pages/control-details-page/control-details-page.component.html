@@ -5,25 +5,25 @@
 </div>
 }
 @else {
-  <div class="control-details-page">
-    <app-go-back [title]="'Détails du contrôle'" [buttons]="goBackButtons"></app-go-back>
-   
-    <div class="main-content">
-      <div class="content-grid">
-        <!-- Colonne principale -->
-        <div class="main-column">
-          <!-- Informations générales -->
-          <div class="card">
-            <div class="card-content">
-              <div class="control-header">
-                <div class="control-info">
-                  <h2 class="control-title">{{ control.libelle }}</h2>
-                  <div class="control-badges">
-                    <span class="badge" [ngClass]="getPriorityClass(control.execution?.priority)">
-                      <i class="icon-alert-triangle"></i>
-                      Priorité {{ formatPriority(control.execution?.priority) }}
-                    </span>
-                    <!-- <span class="badge" [ngClass]="getStatusClass(control.lastExecution.status)">
+<div class="control-details-page">
+  <app-go-back [title]="'Détails du contrôle'" [buttons]="goBackButtons"></app-go-back>
+
+  <div class="main-content">
+    <div class="content-grid">
+      <!-- Colonne principale -->
+      <div class="main-column">
+        <!-- Informations générales -->
+        <div class="card">
+          <div class="card-content">
+            <div class="control-header">
+              <div class="control-info">
+                <h2 class="control-title">{{ control.libelle }}</h2>
+                <div class="control-badges">
+                  <span class="badge" [ngClass]="getPriorityClass(control.execution?.priority)">
+                    <i class="icon-alert-triangle"></i>
+                    Priorité {{ formatPriority(control.execution?.priority) }}
+                  </span>
+                  <!-- <span class="badge" [ngClass]="getStatusClass(control.lastExecution.status)">
                       <i class="icon-check-circle" *ngIf="control.lastExecution.status === ControlStatus.REALISE"></i>
                       <i class="icon-clock" *ngIf="control.lastExecution.status !== ControlStatus.REALISE"></i>
                       {{ formatStatus(control.lastExecution.status) }}
@@ -54,6 +54,13 @@
                     </div>
                   </div>
                   <div class="detail-item">
+                    <i class="icon-repeat detail-icon"></i>
+                    <div class="detail-content">
+                      <div class="detail-label">Fréquence</div>
+                      <div class="detail-value">{{ recurenceLabels[control.frequency] }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-item">
                     <i class="icon-calendar detail-icon"></i>
                     <div class="detail-content">
                       <div class="detail-label">Dernière exécution</div>
@@ -71,32 +78,31 @@
               </div>
             </div>
           </div>
-  
-          <!-- Taxonomie -->
-          <div class="card">
-            <div class="card-content">
-              <h3 class="card-title">Taxonomie</h3>
-              <div class="taxonomie-grid">
-                <!-- <div class="taxonomie-item">
+        </div>
+        <!-- Taxonomie -->
+        <div class="card">
+          <div class="card-content">
+            <h3 class="card-title">Taxonomie</h3>
+            <div class="taxonomie-grid">
+              <!-- <div class="taxonomie-item">
                   <div class="taxonomie-label">Entité</div>
                   <div class="taxonomie-value">{{ control.buName }}</div>
                 </div> -->
-                <div class="taxonomie-item">
-                  <div class="taxonomie-label">Processus</div>
-                  <div class="taxonomie-value">{{ control.processName }}</div>
-                </div>
-                <div class="detail-item">
-                  <i class="icon-users detail-icon"></i>
-                  <div class="detail-content">
-                    <div class="detail-label">Responsable</div>
-                    <div class="detail-value">{{ control.creator }}</div>
-                  </div>
+              <div class="taxonomie-item">
+                <div class="taxonomie-label">Processus</div>
+                <div class="taxonomie-value">{{ control.processName }}</div>
+              </div>
+              <div class="detail-item">
+                <i class="icon-users detail-icon"></i>
+                <div class="detail-content">
+                  <div class="detail-label">Responsable</div>
+                  <div class="detail-value">{{ control.creator }}</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-  
+
         <!-- Description -->
         <div class="card">
           <div class="card-content">
@@ -133,7 +139,8 @@
               Historique des exécutions
             </h3>
             <div class="executions-list">
-              <div class="execution-item" *ngFor="let execution of controlExecutions">
+              <div class="execution-item" *ngFor="let execution of controlExecutions"
+                [class.disabled]="execution.status === ControlStatus.ACHIEVED" (click)="editExecution(execution)">
                 <div class="execution-info">
                   <div class="execution-date">
                     <ng-container *ngIf="execution.achievedAt; else planifiee">
@@ -185,7 +192,13 @@
     </div>
   </div>
 </div>
-<app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id.id" [controlVersion]="control!.id.version" [frequence]="control!.frequency"
-  [createdAt]="control!.id.version" (close)="showPopup = false" (planifier)="handlePlanification($event)">
+<app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id.id" [controlVersion]="control!.id.version"
+  [frequence]="control!.frequency" [isEditing]="selectedExecutionToEdit !== null"
+  [executionToEdit]="selectedExecutionToEdit!" (close)="showPopup = false; selectedExecutionToEdit = null"
+  (planifier)="handlePlanification($event)">
 </app-planifier-execution-popup>
+<app-control-evaluation-popup *ngIf="showEvaluationPopup" [executionId]="selectedExecutionId!"
+  (close)="showEvaluationPopup = false" (submitted)="handleEvaluationSubmitted()">
+</app-control-evaluation-popup>
+
 }

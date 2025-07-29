@@ -1,0 +1,32 @@
+<div class="popup-overlay">
+    <div class="popup-container">
+        <h2>Évaluer le contrôle</h2>
+
+        <form (ngSubmit)="submit()" #form="ngForm">
+            <div class="form-group">
+                <label for="evaluation">Évaluation</label>
+                <select [(ngModel)]="evaluationData.evaluation" name="evaluation" required>
+                    <option *ngFor="let option of evaluationOptions" [value]="option">
+                        {{ labels[option] }}
+                    </option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label for="resume">Résumé</label>
+                <textarea [(ngModel)]="evaluationData.resume" name="resume" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="comments">Commentaires</label>
+                <textarea [(ngModel)]="evaluationData.comments" name="comments"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Soumettre</button>
+                <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button>
+            </div>
+        </form>
+    </div>
+</div>
