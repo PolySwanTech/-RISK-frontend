@@ -18,7 +18,7 @@ import { GoBackComponent } from "../go-back/go-back.component";
   selector: 'app-category-selection',
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatIconModule,
-    MatRippleModule, MatChipsModule, MatTreeModule, MatButtonModule, MatFormFieldModule, MatInputModule, GoBackComponent],
+    MatRippleModule, MatChipsModule, MatTreeModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   templateUrl: './category-selection.component.html',
   styleUrls: ['./category-selection.component.scss']
 })

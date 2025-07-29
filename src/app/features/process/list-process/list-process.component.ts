@@ -39,7 +39,6 @@ import { MatCardModule } from '@angular/material/card';
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
-    GoBackComponent,
     MatCardModule
   ],
   templateUrl: './list-process.component.html',

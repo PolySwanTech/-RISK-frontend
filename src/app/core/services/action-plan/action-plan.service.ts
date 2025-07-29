@@ -9,7 +9,7 @@ import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/ActionPlan
 })
 export class ActionPlanService {
 
-  base = environment.apiUrl + '/risks/action-plans';
+  base = environment.apiUrl + '/action-plans';
   http = inject(HttpClient);
 
   createActionPlan(actionPlan: ActionPlanCreateDto) {

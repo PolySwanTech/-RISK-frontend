@@ -8,7 +8,7 @@ import { UploadedFile } from '../../../shared/components/fichiers/fichiers.compo
 })
 export class FileService {
 
-  private baseUrl = environment.apiUrl + '/incidents/files'; 
+  private baseUrl = environment.apiUrl + '/files'; 
   private http = inject(HttpClient);
 
   uploadFile(file: File, incidentRef: string, incidentId : string) {

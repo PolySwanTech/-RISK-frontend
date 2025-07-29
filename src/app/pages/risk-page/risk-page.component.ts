@@ -63,16 +63,15 @@ export class RiskPageComponent implements OnInit {
       (acc, p) => ({ ...acc, [p.id]: p }),
       {}
     );
-
-      this.filteredRisks = [...this.risks];   // ou ton chargement réel
-    });
-
-    /* On charge les risques ET les BUs en parallèle */
-    forkJoin({
-      risks : this.riskService.getAll(),
-      bus   : this.entitiesSrv.loadEntities()
-    }).subscribe({
-      next: ({ risks, bus }) => {
+    this.filteredRisks = [...this.risks];   // ou ton chargement réel
+  });
+  
+  /* On charge les risques ET les BUs en parallèle */
+  forkJoin({
+    risks : this.riskService.getAll(),
+    bus   : this.entitiesSrv.loadEntities()
+  }).subscribe({
+    next: ({ risks, bus }) => {
         /* ---------------- Pré-traitement ---------------- */
         this.risks = risks.map(risk => {
           const lastEval = risk.riskEvaluations?.at(-1);

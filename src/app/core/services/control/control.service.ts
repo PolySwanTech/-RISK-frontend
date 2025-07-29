@@ -11,8 +11,8 @@ export class ControlService {
 
 
   http = inject(HttpClient);
-  baseUrlTemp = environment.apiUrl + '/risks/controls/templates';
-  baseUrlExec = environment.apiUrl + '/risks/controls/executions';
+  baseUrlTemp = environment.apiUrl + '/controls/templates';
+  baseUrlExec = environment.apiUrl + '/controls/executions';
 
 
   createControl(control: ControlTemplateCreateDto) {

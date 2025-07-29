@@ -1,9 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
-import { Impact, ImpactCreateDto } from '../../models/Impact';
 import { saveAs } from 'file-saver';
 
 @Injectable({
@@ -11,7 +10,7 @@ import { saveAs } from 'file-saver';
 })
 export class IncidentService {
 
-  baseUrl = environment.apiUrl + '/incidents/incident'
+  baseUrl = environment.apiUrl + '/incidents'
 
   http = inject(HttpClient);
 

@@ -13,7 +13,7 @@ export class UtilisateurService {
 
   http = inject(HttpClient);
   
-  baseUrl = environment.apiUrl + '/users/user';
+  baseUrl = environment.apiUrl + '/user';
 
   getUsers(): Observable<Utilisateur[]> {
     return this.http.get<Utilisateur[]>(this.baseUrl);

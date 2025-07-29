@@ -30,7 +30,7 @@
                   <mat-option [value]="null">Aucun</mat-option>
                   <!-- on utilise risk.id pour lier le risque parent -->
                   <mat-option *ngFor="let r of risks" [value]="r.id.id">
-                    {{ r.libelle }}
+                    {{ r.libellePerso }}
                   </mat-option>
                 </mat-select> 
               </mat-form-field>

@@ -11,7 +11,7 @@ import { RiskLevel } from '../../../enum/riskLevel.enum';
 export class RiskEvaluationService {
 
   private readonly http     = inject(HttpClient);
-  private readonly baseUrl  = environment.apiUrl + '/risks/evaluations';
+  private readonly baseUrl  = environment.apiUrl + '/evaluations';
 
   /* ------------------------------------------------------------------ */
   /*  GET – détail d’une évaluation par son UUID                        */

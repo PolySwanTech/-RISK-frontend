@@ -9,7 +9,7 @@ import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTe
 export class RiskService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/risks/taxonomie';
+  baseUrl = environment.apiUrl + '/taxonomie';
 
   getById(id: string) {
     return this.http.get<RiskTemplate>(this.baseUrl + '/' + id)

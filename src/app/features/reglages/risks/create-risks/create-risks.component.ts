@@ -73,7 +73,7 @@ export class CreateRisksComponent implements OnInit {
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
     parentRisk: this.fb.control<string | null>(null), // pour les risques enfants
-    libelle: this.fb.nonNullable.control<string>(''),
+    libellePerso: this.fb.nonNullable.control<string>(''),
     balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
     balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
     balois3: this.fb.control<BaloiseCategoryEnum | null>(null),
@@ -151,12 +151,12 @@ export class CreateRisksComponent implements OnInit {
 
     this.riskSrv.getById(id).subscribe(r => {
       this.risk = new RiskTemplate(r);     // instanciation propre
-      this.pageTitle = `Mise à jour du risque : ${this.risk.libelle}`;
+      this.pageTitle = `Mise à jour du risque : ${this.risk.libellePerso}`;
       this.dialogLabel = { title: 'Mise à jour', message: 'mise à jour' };
 
       /* pré-remplissage des formulaires */
       this.infoForm.patchValue({
-        libelle: this.risk.libelle,
+        libellePerso: this.risk.libellePerso,
         balois1: this.risk.category ?? null,
         balois2: this.risk.category ?? null,
         balois3: this.risk.category ?? null,
@@ -167,7 +167,7 @@ export class CreateRisksComponent implements OnInit {
       this.detailsForm.patchValue({
         description: this.risk.description,
         level: this.risk.riskBrut,
-        impactType: this.risk.impactTypes[0] ?? null   // simple sélection
+        // impactType: this.risk.impactTypes[0] ?? null   // simple sélection
       });
     });
   }

@@ -33,29 +33,29 @@ export class RiskMatrixComponent {
   /* ----------- helpers d’affichage ----------- */
   /** Libellé lisible du niveau (High, Low, …) */
   get riskLabel(): string {
-    return RiskLevelLabels[this.riskData!.riskBrut as RiskLevel] ?? 'Unknown';
-  }
-
-  get process(): Process | undefined {
-    return this.processMap[this.riskData!.processId];
+    return RiskLevelLabels[this.riskData!.rpc[0].brutLevel as RiskLevel] ?? 'Unknown';
   }
 
   get buName(): string {
-    return this.process?.buName ?? 'Inconnu';
+    return this.riskData?.buName ?? 'Inconnu';
   }
 
   get processName(): string {
-    return this.process?.name ?? 'Inconnu';
+    return this.riskData?.processName ?? 'Inconnu';
   }
 
   /** Classe CSS : level-low | level-high … */
   get riskClass(): string {
-    return 'level-' + (this.riskData!.riskBrut as string).toLowerCase();
+    return 'level-' + (this.riskData!.rpc[0].brutLevel as string).toLowerCase();
+  }
+
+  get control() : string {
+    return this.riskData?.rpc[0].controlReference + ' - ' + this.riskData?.rpc[0].controlName || 'Non renseigné'
   }
 
   getProbabilityText(): string {
 
-  const lastEval = this.riskData!.riskEvaluations?.at(-1);
+  const lastEval = this.riskData?.rpc[0]
 
   if (!lastEval) {
     return '—';
@@ -76,12 +76,12 @@ export class RiskMatrixComponent {
 }
 
   getImpactText(): string {
-    const lastEval = this.riskData!.riskEvaluations?.at(-1);
+    const lastEval = this.riskData?.rpc[0];
     if (!lastEval) {                     // aucun historique
       return '—';
     }
 
-    const level  = lastEval.riskNet as RiskLevel;
+    const level  = lastEval.netLevel as RiskLevel;
     const label  = RiskLevelLabels[level] ?? 'Unknown';
     const score  = RiskLevelScores[level] ?? '∅';
 
@@ -99,6 +99,7 @@ export class RiskMatrixComponent {
       default: return 'Inconnu';
     }
   }
+
   private impactLabel(v:number){
     switch (v){
       case 1: return 'Insignifiant';

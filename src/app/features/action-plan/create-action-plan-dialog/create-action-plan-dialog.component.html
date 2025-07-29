@@ -35,7 +35,7 @@
       <label for="priority">Risk</label>
       <select id="priority" [(ngModel)]="actionPlan.taxonomie" name="risk">
         @for(risk of risks; track risk) {
-        <option [ngValue]="risk">{{ risk.libelle }}</option>
+        <option [ngValue]="risk">{{ risk.libellePerso }}</option>
         }
       </select>
 

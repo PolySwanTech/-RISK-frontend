@@ -3,6 +3,7 @@ import { RiskImpactType } from "../enum/riskImpactType.enum";
 import { RiskLevel } from "../enum/riskLevel.enum";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
+import { RPC } from "./RPC";
 
 
 
@@ -21,7 +22,8 @@ export class RiskTemplate {
   /** Identifiant composite (UUID + version) */
   id!: RiskId;
 
-  libelle = '';
+  libellePerso = '';
+  libelleBalois = '';
   description = '';
 
   /** Enum à iso avec le back */
@@ -35,7 +37,7 @@ export class RiskTemplate {
   category?: BaloiseCategoryEnum;
 
   /** Set côté back → tableau côté front  */
-  impactTypes: RiskImpactType[] = [];
+  // impactTypes: RiskImpactType[] = [];
 
   /** actif par défaut */
   active = true;
@@ -43,6 +45,8 @@ export class RiskTemplate {
   /* relations */
   riskEvaluations?: RiskEvaluation[];
   controlTemplates?: ControlTemplate[];
+
+  rpc : RPC[] = []
 
   creator?: string; // UUID de l'utilisateur qui a créé le risque
 

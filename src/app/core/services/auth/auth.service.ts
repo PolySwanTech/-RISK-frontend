@@ -11,7 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 })
 export class AuthService {
   
-  base = environment.apiUrl + '/users';
+  base = environment.apiUrl;
   http = inject(HttpClient);
   router = inject(Router);
   

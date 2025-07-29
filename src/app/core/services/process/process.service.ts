@@ -10,7 +10,7 @@ import { Observable } from 'rxjs/internal/Observable';
 export class ProcessService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/users/processes'; ;
+  baseUrl = environment.apiUrl + '/processes'; ;
 
   getAllGroupedByBu() {
     return this.http.get<{ [key: string]: Process[] }>(this.baseUrl);

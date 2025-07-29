@@ -88,7 +88,7 @@
       <mat-label>Risk</mat-label>
       <mat-select formControlName="taxonomie">
         @for (r of risks; track r.id) {
-        <mat-option [value]="r">{{ r.libelle }}</mat-option>
+        <mat-option [value]="r">{{ r.libellePerso }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

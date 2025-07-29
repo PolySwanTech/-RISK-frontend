@@ -6,7 +6,7 @@
 
     @for (risk of data.risks; let i = $index; track trackByRisk(i, risk)) {
       <mat-chip (click)="selectRisk(risk)">
-        {{ risk.reference }} – {{ risk.libelle }}
+        {{ risk.reference }} – {{ risk.libellePerso }}
       </mat-chip>
     }
 

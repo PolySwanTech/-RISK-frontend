@@ -6,9 +6,9 @@
     <!-- ---------------- HEADER ------------------- -->
     <div class="header">
       <div class="risk-id">{{ risk.reference| uppercase }}</div>
-      <h1 class="risk-title">{{ risk.libelle }}</h1>
+      <h1 class="risk-title">{{ risk.libellePerso }}</h1>
       <div class="risk-category">
-        {{ "B2: " + risk.category || 'Catégorie inconnue' }}
+        {{ "Catégorie baloise: " + risk.libelleBalois || 'Catégorie inconnue' }}
       </div>
     </div>
 
@@ -26,14 +26,12 @@
           <div class="metrics">
             <div class="metric">
               <div class="metric-value">
-                {{ lastEvaluation?.probability != null
-                    ? (lastEvaluation?.probability ?? 0) * 10
-                    : '—' }}%
+                {{ ((risk.rpc[0].probability) * 10) || '-' }}%
               </div>
               <div class="metric-label">Probabilité</div>
             </div>
             <div class="metric">
-              <div class="metric-value">{{ risk.impactTypes.length }}</div>
+              <!-- <div class="metric-value">{{ risk.impactTypes.length }}</div> -->
               <div class="metric-label">Types d'impact</div>
             </div>
             <div class="metric">
@@ -49,20 +47,20 @@
 
           <div class="risk-level">
             <span class="risk-badge"
-                  [ngClass]="risk.riskBrut.toLowerCase()">
-              {{ risk.riskBrut | lowercase }}
+                  [ngClass]="risk.rpc[0].brutLevel.toLowerCase()">
+              {{ risk.rpc[0].brutLevel | lowercase }}
             </span>
             <span class="score">
               Dernière évaluation
-              {{ lastEvaluation?.riskNet ?? '—' }}
+              {{ risk.rpc[0].netLevel || '—' }}
             </span>
           </div>
 
-          <div class="last-review" *ngIf="lastEvaluation">
+          <div class="last-review" *ngIf="risk.rpc">
             <strong>Dernière évaluation :</strong><br />
-            <span>{{ lastEvaluation.createdAt | date:'medium' }}</span>
+            <span>{{ risk.rpc[0].date | date:'medium' }}</span>
           </div>
-          <div class="last-review no-eval" *ngIf="!lastEvaluation">
+          <div class="last-review no-eval" *ngIf="!risk.rpc">
             Aucune évaluation pour le moment
           </div>
         </div>
@@ -105,10 +103,10 @@
              [class.active]="activeTab==='evaluations'">
           <div class="card full-width">
             <h3 class="card-title">Historique des évaluations</h3>
-            <div *ngFor="let eval of risk.riskEvaluations" class="incident">
-              <div class="incident-date">{{ eval.createdAt | date : 'dd/MM/yyyy' }}</div>
-              <div class="incident-title">Score net : {{ eval.riskNet }}</div>
-              <div class="evaluateur">Evaluateur : {{ eval.evaluatorUsername || eval.evaluator }}</div>
+            <div *ngFor="let eval of risk.rpc" class="incident">
+              <div class="incident-date">{{ eval.date | date : 'dd/MM/yyyy' }}</div>
+              <div class="incident-title">Score net : {{ eval.netLevel }}</div>
+              <div class="evaluateur">Evaluateur : {{ eval.performedBy || 'N/R' }}</div>
             </div>
           </div>
         </div>
@@ -119,7 +117,7 @@
              [class.active]="activeTab==='impacts'">
           <div class="card full-width">
             <h3 class="card-title">Types d'impact</h3>
-            <p *ngFor="let impact of risk.impactTypes">{{ impact }}</p>
+            <!-- <p *ngFor="let impact of risk.impactTypes">{{ impact }}</p> -->
           </div>
         </div>
       </div>
