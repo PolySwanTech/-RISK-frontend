@@ -153,9 +153,6 @@ private loadTrees(processRootId?: string /** optionnel */) {
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
-      console.log('Incident: ', incident);
-      console.log('incident.consequenceId =', incident.consequences); // 1
-
       this.incidentForm1.patchValue({
         titre: incident.title,
         equipeId: incident.equipeId,
@@ -169,9 +166,9 @@ private loadTrees(processRootId?: string /** optionnel */) {
         dateDeCloture: this.toInputDate(incident.closedAt),
       });
 
-      const wantedProcessId = incident.process;
+      const wantedBuId = incident.equipeId;
 
-      this.loadTrees(wantedProcessId).subscribe(() => {
+      this.loadTrees(wantedBuId).subscribe(() => {
         this.incidentForm3.patchValue({
           riskId: incident.risk,
           cause: incident.cause,
