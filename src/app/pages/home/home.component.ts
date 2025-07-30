@@ -13,18 +13,41 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { Filter } from '../../core/enum/filter.enum';
+import { FilterTableComponent } from "../../shared/components/filter-table/filter-table.component";
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent, 
-    BarChartComponent, DoughnutChartComponent, MatIconModule, 
-    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule],
+  imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent,
+    BarChartComponent, DoughnutChartComponent, MatIconModule,
+    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
 
   incidents: Incident [] = [];
+
+  filtersConfig: Filter[] = [
+  {
+    key: 'department',
+    label: 'Département',
+    type: 'select',
+    icon: 'domain', // 🏢
+    options: [
+      { value: 'all', label: 'Tous les départements' },
+      { value: 'it', label: 'IT' },
+      { value: 'rh', label: 'RH' },
+      { value: 'finance', label: 'Finance' },
+    ],
+  },
+  {
+    key: 'date',
+    label: 'Période',
+    type: 'date',
+    icon: 'event' // 📅
+  }
+];
 
   selectedPeriod: string | null = null;
 selectedDepartment: string | null = null;
@@ -51,5 +74,9 @@ selectedDepartment: string | null = null;
 
   refreshData(){
     this.ngOnInit();
+  }
+
+  handleFiltersChanged(filters: any) {
+    console.log('Filtres appliqués :', filters);
   }
 }

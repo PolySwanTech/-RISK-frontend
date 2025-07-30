@@ -20,7 +20,7 @@
     max-width: 350px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    
+
     .mat-mdc-card-content {
         padding: 24px !important;
     }
@@ -107,7 +107,7 @@
 .controls-list {
     margin: 0;
     padding-left: 20px;
-    
+
     li {
         font-size: 0.9rem;
         color: var(--mat-sys-on-surface-variant);
@@ -131,18 +131,23 @@
 }
 
 .risk-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--mat-sys-on-surface);
-  margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface);
+    margin: 0;
 }
 
-mat-form-field{
+mat-form-field {
     width: 100%;
 }
 
-.detail{
+.detail {
     display: flex;
     flex-direction: column;
     height: 100%;
+}
+
+.filters-section {
+    width: auto;
+    gap: auto;
 }
