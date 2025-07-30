@@ -21,12 +21,18 @@ import { ActionPlan } from "../../core/models/ActionPlan";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
 import { Priority, priorityLabels } from '../../core/enum/Priority';
 import { Status, statusLabels } from '../../core/enum/status.enum';
+import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
+import { Filter } from '../../core/enum/filter.enum';
+import { FilterTableComponent } from "../../shared/components/filter-table/filter-table.component";
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { GlobalSearchBarComponent } from "../../shared/components/global-search-bar/global-search-bar.component";
 
 @Component({
   selector: 'app-plan-action-page',
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, FormsModule,
-    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, MatSelectModule, MatFormFieldModule, MatButtonModule],
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule,
+    MatSelectModule, MatFormFieldModule, MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent],
   providers: [DatePipe],
   templateUrl: './plan-action-page.component.html',
   styleUrl: './plan-action-page.component.scss'
@@ -38,41 +44,67 @@ export class PlanActionPageComponent {
   private confirmService = inject(ConfirmService)
   private actionPlanService = inject(ActionPlanService);
 
+  filterMode: 'general' | 'detailed' = 'general';
+
   columns = [
-    {
-      columnDef: 'reference',
-      header: 'Ref',
-      cell: (element: ActionPlan) => `${element.reference}`,
-    },
-    {
-      columnDef: 'libelle',
-      header: 'Titre',
-      cell: (element: ActionPlan) => `${element.libelle}`,
-    },
-    {
-      columnDef: 'userInCharge',
-      header: 'Responsable',
-      cell: (element: ActionPlan) => `${element.userInCharge}`,
-    },
-    {
-      columnDef: 'echeance',
-      header: 'Date d\'échéance',
-      cell: (element: ActionPlan) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
-    },
-    {
-      columnDef: 'priority',
-      header: 'Priorité',
-      cell: (element: ActionPlan) => this.getPriorityBarHtml(element.priority)
-    },
-    {
-      columnDef: 'statut',
-      header: 'Statut',
-      cell: (element: ActionPlan) => `
-  <span class="badge ${element.status.toLowerCase()}">
-      ${this.getReadableStatut(element.status)}
-    </span>
-`    }
-  ];
+  {
+    columnDef: 'reference',
+    header: 'Référence',
+    cell: (element: ActionPlan) => `${element.reference}`,
+    filterType: 'text',
+    icon: 'tag' // 🏷️
+  },
+  {
+    columnDef: 'libelle',
+    header: 'Titre',
+    cell: (element: ActionPlan) => `${element.libelle}`,
+    filterType: 'text',
+    icon: 'title' // 📝
+  },
+  {
+    columnDef: 'userInCharge',
+    header: 'Responsable',
+    cell: (element: ActionPlan) => `${element.userInCharge}`,
+    filterType: 'text',
+    icon: 'person' // 👤
+  },
+  {
+    columnDef: 'echeance',
+    header: 'Date d\'échéance',
+    cell: (element: ActionPlan) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
+    filterType: 'date',
+    icon: 'event' // 📅
+  },
+  {
+    columnDef: 'priority',
+    header: 'Priorité',
+    cell: (element: ActionPlan) => this.getPriorityBarHtml(element.priority),
+    filterType: 'select',
+    icon: 'signal_cellular_alt', // 📶
+    options: [
+      { value: Priority.MAXIMUM, label: 'Maximale' },
+      { value: Priority.MEDIUM, label: 'Moyenne' },
+      { value: Priority.MINIMAL, label: 'Minimale' }
+    ]
+  },
+  {
+    columnDef: 'status',
+    header: 'Statut',
+    cell: (element: ActionPlan) => `
+      <span class="badge ${element.status.toLowerCase()}">
+        ${this.getReadableStatut(element.status)}
+      </span>
+    `,
+    filterType: 'select',
+    icon: 'flag', // 🚩
+    options: Object.values(Status).map(status => ({
+      value: status,
+      label: this.getReadableStatut(status)
+    }))
+  }
+];
+
+  filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
   displayedColumns = [...this.columns.map(c => c.columnDef)];
 
@@ -299,12 +331,49 @@ export class PlanActionPageComponent {
 
   searchQuery: string = '';
   onSearchFiles(event: any): void {
-    this.searchQuery = event.target.value.trim();
+    console.log('Search query:', event);
+    this.searchQuery = event.trim();
     this.applyAllFilters();
   }
 
   clearSearch() {
     this.searchQuery = '';
     this.dataSource.data = this.actionPlans;
+  }
+
+  handleFiltersChanged(filters: Record<string, any>) {
+    let filtered = [...this.actionPlans];
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value === null || value === '' || value === undefined) continue;
+
+      filtered = filtered.filter(actionPlan => {
+        const itemValue = actionPlan[key as keyof ActionPlan];
+        console.log(itemValue, value);
+
+        // 🎯 Cas plage de dates
+        if (typeof value === 'object' && value.start && value.end) {
+          const start = new Date(value.start);
+          const end = new Date(value.end);
+          const actionDate = new Date(itemValue as string | number | Date);
+
+          // ⚠️ Normaliser les dates à minuit pour ignorer l'heure
+          start.setHours(0, 0, 0, 0);
+          end.setHours(23, 59, 59, 999);
+          actionDate.setHours(0, 0, 0, 0);
+
+          return actionDate >= start && actionDate <= end;
+        }
+
+        // 🎯 Cas select ou text simple
+        if (typeof itemValue === 'string' || typeof itemValue === 'number') {
+          return itemValue.toString().toLowerCase().includes(value.toString().toLowerCase());
+        }
+
+        return itemValue === value;
+      });
+    }
+
+    this.dataSource.data = filtered;
   }
 }

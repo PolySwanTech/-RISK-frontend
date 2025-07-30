@@ -4,6 +4,8 @@
         <mat-card-content class="dashboard-header">
             <h1>Liste des incidents</h1>
             <div class="header-controls">
+                <button mat-raised-button class="btn-primary add-button" (click)="add()"
+                    *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter un incident</button>
                 <button mat-raised-button class="btn-green">
                     <mat-icon>file_download</mat-icon>
                     Exporter
@@ -19,81 +21,26 @@
     <!-- Section des filtres -->
     <mat-card class="filters-card">
         <mat-card-content class="dashboard-header">
-            <div class="filters-section">
-                <!-- <div class="filters-header">
-                <div>
-                    <mat-icon>filter_alt</mat-icon>
-                    <span class="filters-title">Filtres</span>
+            <div class="filters-section" style="width: 100%;">
+                <div class="filters-header">
+                    <div>
+                        <mat-icon>filter_alt</mat-icon>
+                        <span class="filters-title">Filtres</span>
+                    </div>
+                    <mat-button-toggle-group [(ngModel)]="filterMode" exclusive>
+                        <mat-button-toggle value="general">Mode général</mat-button-toggle>
+                        <mat-button-toggle value="detailed">Filtres détaillés</mat-button-toggle>
+                    </mat-button-toggle-group>
                 </div>
-                <button (click)="clearFilters()" mat-raised-button class="btn-red">
-                    <mat-icon>clear</mat-icon>
-                    Réinitialiser
-                </button>
-            </div> -->
 
-                <div class="filters-row">
-                    <div class="filter-group">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Type de date</mat-label>
-                            <mat-select [formControl]="dateTypeFilter">
-                                <mat-option value="survenance">Date de survenance</mat-option>
-                                <mat-option value="declaration">Date de déclaration</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                    <div class="filter-group date-range-group" style="display: flex; gap: 16px;">
-                        <mat-form-field appearance="outline" class="date-field">
-                            <mat-label>Date de début</mat-label>
-                            <input matInput [matDatepicker]="startPicker" [formControl]="startDateFilter"
-                                placeholder="Date de début">
-                            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-                            <mat-datepicker #startPicker></mat-datepicker>
-                        </mat-form-field>
-
-                        <mat-form-field appearance="outline" class="date-field">
-                            <mat-label>Date de fin</mat-label>
-                            <input matInput [matDatepicker]="endPicker" [formControl]="endDateFilter"
-                                placeholder="Date de fin">
-                            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-                            <mat-datepicker #endPicker></mat-datepicker>
-                        </mat-form-field>
-                    </div>
-
-
-                    <!-- <div class="filter-group">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Catégorie</mat-label>
-                            <mat-select [formControl]="categoryFilter">
-                                <mat-option value="">Toutes</mat-option>
-                                <mat-option *ngFor="let category of getUniqueCategories()" [value]="category">{{
-                                    category
-                                    }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div> -->
-
-                    <div class="filter-group">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Statut</mat-label>
-                            <mat-select [formControl]="statusFilter">
-                                <mat-option value="">Tous</mat-option>
-                                <mat-option value="En cours">En cours</mat-option>
-                                <mat-option value="Clôturé">Clôturé</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                </div>
-            </div>
-            <div class="header-controls">
-                <button (click)="clearFilters()" mat-raised-button class="btn-red">
-                    <mat-icon>clear</mat-icon>
-                    Réinitialiser
-                </button>
-                <button mat-raised-button class="btn-primary add-button" (click)="add()"
-                    *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter un incident</button>
+                <app-filter-table *ngIf="filterMode === 'detailed'" [availableFilters]="filtersConfig"
+                    (filtersChanged)="handleFiltersChanged($event)">
+                </app-filter-table>
+                <app-global-search-bar *ngIf="filterMode === 'general'" [(model)]="searchQuery"
+                    [placeholder]="'Rechercher des incidents'" (modelChange)="onSearchFiles($event)"
+                    (cleared)="clearSearch()" />
             </div>
         </mat-card-content>
-
     </mat-card>
 
     <mat-card>
@@ -123,7 +70,6 @@
                     </td>
                 </ng-container>
                 }
-                <!-- Actions -->
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef>Actions</th>
                     <td mat-cell *matCellDef="let row">
