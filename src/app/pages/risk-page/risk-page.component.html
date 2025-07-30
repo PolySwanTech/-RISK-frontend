@@ -4,6 +4,10 @@
     <mat-card-content class="dashboard-header">
       <h1>Analyse et évaluation des risques</h1>
       <div class="header-controls">
+        <button mat-raised-button class="btn-primary add-button" (click)="goToAddRisk()">
+          <mat-icon>add</mat-icon>
+          Ajouter un risque
+        </button>
         <button mat-raised-button class="btn-green">
           <mat-icon>file_download</mat-icon>
           Exporter
@@ -49,10 +53,7 @@
           <mat-icon>clear</mat-icon>
           Réinitialiser
         </button>
-        <button mat-raised-button class="btn-primary add-button" (click)="goToAddRisk()">
-          <mat-icon>add</mat-icon>
-          Ajouter un risque
-        </button>
+        
       </div>
     </mat-card-content>
   </mat-card>

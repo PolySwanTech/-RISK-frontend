@@ -21,6 +21,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { EnumLabels } from '../../../core/enum/enum-labels';
 import { DateRangePickerComponent } from "../../../shared/components/date-range-picker/date-range-picker.component";
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
+import { Filter } from '../../../core/enum/filter.enum';
+import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
+import { filter } from 'rxjs';
+import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
 
 @Component({
   selector: 'app-control-list',
@@ -28,8 +34,9 @@ import { DateRangePickerComponent } from "../../../shared/components/date-range-
     MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule,
     MatSelectModule, CommonModule, MatCardModule, MatPaginatorModule,
     MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule,
-    MatIconModule, MatTooltipModule, FormsModule,
-    DateRangePickerComponent
+    MatIconModule, MatTooltipModule, FormsModule, MatButtonToggleModule,
+    GlobalSearchBarComponent,
+    FilterTableComponent
   ],
   providers: [DatePipe],
   templateUrl: './control-list.component.html',
@@ -43,29 +50,113 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   datePipe = inject(DatePipe);
   fb = inject(FormBuilder);
 
+  filterMode: 'general' | 'detailed' = 'general';
+
   columns = [
-    { columnDef: 'Référence', header: 'Référence', cell: (e: ControlTemplate) => e.reference },
-    { columnDef: 'libelle', header: 'Nom du contrôle', cell: (e: ControlTemplate) => e.libelle },
-    { columnDef: 'Processus métier', header: 'Processus métier', cell: (e: ControlTemplate) => e.processName },
+    {
+      columnDef: 'reference',
+      header: 'Référence',
+      cell: (e: ControlTemplate) => e.reference,
+      filterType: 'text',
+      icon: 'tag' // 🏷️
+    },
+    {
+      columnDef: 'libelle',
+      header: 'Nom du contrôle',
+      cell: (e: ControlTemplate) => e.libelle,
+      filterType: 'text',
+      icon: 'title' // 📝
+    },
+    {
+      columnDef: 'processName',
+      header: 'Processus métier',
+      cell: (e: ControlTemplate) => e.processName,
+      filterType: 'text',
+      icon: 'business_center' // 🏢
+    },
 
-    // ✅ Mappé via enum
-    { columnDef: 'type', header: 'Type de contrôle', cell: (e: ControlTemplate) => this.getTypeLabel(e.controlType), isBadge: 'type' },
+    {
+      columnDef: 'type',
+      header: 'Type de contrôle',
+      cell: (e: ControlTemplate) => this.getTypeLabel(e.controlType),
+      isBadge: 'type',
+      filterType: 'select',
+      options: Object.keys(EnumLabels.type).map(key => ({
+        value: key,
+        label: this.getTypeLabel(key as keyof typeof EnumLabels.type)
+      })),
+      icon: 'category' // 📂
+    },
 
-    // ✅ Mappé via enum
-    { columnDef: 'riskLevel', header: 'Degré de risque', cell: (e: any) => this.getRiskLabel(e.riskLevel), isBadge: 'risk' },
+    {
+      columnDef: 'riskLevel',
+      header: 'Degré de risque',
+      cell: (e: any) => this.getRiskLabel(e.riskLevel),
+      isBadge: 'risk',
+      filterType: 'select',
+      options: Object.keys(EnumLabels.risk).map(key => ({
+        value: key,
+        label: this.getRiskLabel(key as keyof typeof EnumLabels.risk)
+      })),
+      icon: 'report_problem' // ⚠️
+    },
 
-    // ✅ Mappé via enum
-    { columnDef: 'Fréquence', header: 'Fréquence', cell: (e: ControlTemplate) => this.getRecurrenceLabel(e.frequency) },
+    {
+      columnDef: 'Fréquence',
+      header: 'Fréquence',
+      cell: (e: ControlTemplate) => this.getRecurrenceLabel(e.frequency),
+      filterType: 'select',
+      options: Object.keys(EnumLabels.reccurency).map(key => ({
+        value: key,
+        label: this.getRecurrenceLabel(key as keyof typeof EnumLabels.reccurency)
+      })),
+      icon: 'schedule' // ⏰
+    },
 
-    // ✅ Mappé via enum
-    { columnDef: 'controlLevel', header: 'Degré de contrôle', cell: (e: ControlTemplate) => this.getDegresLabel(e.controlLevel), isBadge: 'control' },
+    {
+      columnDef: 'controlLevel',
+      header: 'Degré de contrôle',
+      cell: (e: any) => this.getDegresLabel(e.controlLevel),
+      isBadge: 'control',
+      filterType: 'select',
+      options: Object.keys(EnumLabels.degres).map(key => ({
+        value: key,
+        label: this.getDegresLabel(key as keyof typeof EnumLabels.degres)
+      })),
+      icon: 'tune' // 🎚️
+    },
 
-    { columnDef: 'creatorName', header: 'Responsable', cell: (e: ControlTemplate) => e.creator },
+    {
+      columnDef: 'creator',
+      header: 'Responsable',
+      cell: (e: any) => e.creator,
+      filterType: 'text',
+      icon: 'person' // 👤
+    },
 
-    { columnDef: 'actif', header: 'Statut', cell: (e: ControlTemplate) => e.actif ? 'Actif' : 'Suspendu', isBadge: 'statut' },
+    {
+      columnDef: 'actif',
+      header: 'Statut',
+      cell: (e: ControlTemplate) => e.actif ? 'Actif' : 'Suspendu',
+      isBadge: 'statut',
+      filterType: 'select',
+      options: [
+        { value: 'actif', label: 'Actif' },
+        { value: 'suspendu', label: 'Suspendu' }
+      ],
+      icon: 'toggle_on' // 🔛
+    },
 
-    { columnDef: 'nextExecution', header: 'Prochaine échéance', cell: (e: ControlTemplate) => this.datePipe.transform(e.nextExecution, 'dd/MM/yyyy') || '' }
+    {
+      columnDef: 'nextExecution',
+      header: 'Prochaine échéance',
+      cell: (e: ControlTemplate) => this.datePipe.transform(e.nextExecution, 'dd/MM/yyyy') || '',
+      filterType: 'date',
+      icon: 'event' // 📅
+    }
   ];
+
+  filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
   selectedRange: { start: Date | null; end: Date | null } = { start: null, end: null };
 
@@ -84,23 +175,23 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   enumLabels = EnumLabels;
 
   getTypeLabel(type: keyof typeof EnumLabels.type): string {
-    return this.enumLabels.type[type];
+    return EnumLabels?.type?.[type] ?? type;
   }
 
   getPriorityLabel(priority: keyof typeof EnumLabels.priority): string {
-    return this.enumLabels.priority[priority];
+    return EnumLabels?.priority?.[priority] ?? priority;
   }
 
-  getDegresLabel(control: keyof typeof EnumLabels.degres): string {
-    return this.enumLabels.degres[control];
+  getDegresLabel(degres: keyof typeof EnumLabels.degres): string {
+    return EnumLabels?.degres?.[degres] ?? degres;
   }
 
-  getRecurrenceLabel(recurrence: keyof typeof EnumLabels.reccurency): string {
-    return this.enumLabels.reccurency[recurrence];
+  getRecurrenceLabel(key: keyof typeof EnumLabels.reccurency): string {
+    return EnumLabels?.reccurency?.[key] ?? key;
   }
 
   getRiskLabel(risk: keyof typeof EnumLabels.risk): string {
-    return this.enumLabels.risk[risk];
+    return EnumLabels?.risk?.[risk] ?? risk;
   }
 
   getBadgeClass(type: string, value: string) {
@@ -196,6 +287,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     if (dateStart && dateEnd) {
       filtered = filtered.filter(item => {
         const itemDate = new Date(item.nextExecution);
+        console.log(`Filtrage par date : ${itemDate} entre ${dateStart} et ${dateEnd}`);
         return itemDate >= dateStart && itemDate <= dateEnd;
       });
     }
@@ -207,6 +299,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         (c.libelle?.toLowerCase().includes(query) || '') ||
         (c.processName?.toLowerCase().includes(query) || '') ||
         (c.responsable?.toLowerCase().includes(query) || '') ||
+        (c.creator?.toLowerCase().includes(query) || '') ||
         this.getTypeLabel(c.controlType as keyof typeof this.enumLabels.type).toLowerCase().includes(query) ||
         this.getRiskLabel(c.riskLevel as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
         this.getDegresLabel(c.controlLevel as keyof typeof this.enumLabels.degres).toLowerCase().includes(query) ||
@@ -223,13 +316,69 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     this.dataSource.data = this.controls;
   }
 
-  onSearchControls(event: Event) {
+  onSearchControls() {
     this.applyFilters();
   }
 
   clearSearch() {
     this.searchQuery = '';
     this.applyFilters();
+  }
+
+  handleFiltersChanged(filters: Record<string, any>) {
+    let filtered = [...this.controls];
+    console.log('Filtres appliqués :', this.controls);
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value === null || value === '') continue;
+
+      filtered = filtered.filter(control => {
+        const fieldValue = (control as any)[key];
+
+        // ✅ Filtrage par plage de dates
+        if (value.start instanceof Date && value.end instanceof Date) {
+          if (!fieldValue) return false;
+
+          const controlDate = new Date(fieldValue);
+          const start = new Date(value.start);
+          const end = new Date(value.end);
+
+          start.setHours(0, 0, 0, 0);
+          end.setHours(23, 59, 59, 999);
+
+          return controlDate >= start && controlDate <= end;
+        }
+
+        // ✅ Filtrage du champ `actif` : Actif / Suspendu
+        if (key === 'actif') {
+          if (value === 'actif') return control.actif === true;
+          if (value === 'suspendu') return control.actif === false;
+        }
+
+        // ✅ Champs enum mappés via fonctions
+        if (key === 'type') {
+          console.log(this.getTypeLabel(control.controlType).toLowerCase() === this.getTypeLabel(value).toLowerCase());
+          return this.getTypeLabel(control.controlType).toLowerCase() === this.getTypeLabel(value).toLowerCase();
+        }
+
+        if (key === 'riskLevel') {
+          return this.getRiskLabel(control.riskLevel).toLowerCase() === this.getRiskLabel(value).toLowerCase();
+        }
+
+        if (key === 'controlLevel') {
+          return this.getDegresLabel(control.controlLevel).toLowerCase() === this.getDegresLabel(value).toLowerCase();
+        }
+
+        if (key === 'Fréquence') {
+          return this.getRecurrenceLabel(control.frequency).toLowerCase() === this.getRecurrenceLabel(value).toLowerCase();
+        }
+
+        // ✅ Champ texte : reference, libelle, processName, creatorName, etc.
+        return fieldValue?.toString().toLowerCase().includes(value.toString().toLowerCase());
+      });
+    }
+
+    this.dataSource.data = filtered;
   }
 
 }

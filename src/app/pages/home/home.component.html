@@ -24,36 +24,10 @@
           <mat-icon>filter_alt</mat-icon>
           <span class="filters-title">Filtres</span>
         </div>
-        <button (click)="clearFilters()" mat-raised-button class="btn-red">
-          <mat-icon>clear</mat-icon>
-          Réinitialiser
-        </button>
       </div>
-
-      <div class="filters-row">
-        <div class="filter-group">
-          <mat-form-field appearance="outline" class="filter-field">
-            <mat-label>Période</mat-label>
-            <mat-select [(ngModel)]="selectedPeriod">
-              <mat-option value="2024">Année 2024</mat-option>
-              <mat-option value="current-quarter">Trimestre actuel</mat-option>
-              <mat-option value="current-month">Mois actuel</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="filter-group">
-          <mat-form-field appearance="outline" class="filter-field">
-            <mat-label>Département</mat-label>
-            <mat-select [(ngModel)]="selectedDepartment">
-              <mat-option value="all">Tous les départements</mat-option>
-              <mat-option value="it">IT</mat-option>
-              <mat-option value="rh">RH</mat-option>
-              <mat-option value="finance">Finance</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </div>
+      <app-filter-table [availableFilters]="filtersConfig"
+                    (filtersChanged)="handleFiltersChanged($event)">
+                </app-filter-table>
     </mat-card-content>
   </mat-card>
 

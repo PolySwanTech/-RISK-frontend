@@ -3,6 +3,10 @@
     <mat-card-content class="dashboard-header">
       <h1>Liste des controles</h1>
       <div class="header-controls">
+        <button (click)="create()" mat-raised-button class="btn-primary add-button">
+          <mat-icon>add</mat-icon>
+          Ajouter un contrôle
+        </button>
         <button (click)="export()" mat-raised-button class="btn-green">
           <mat-icon>file_download</mat-icon>
           Exporter
@@ -18,39 +22,25 @@
   <!-- SECTION FILTRES -->
   <mat-card class="filters-card">
     <mat-card-content class="dashboard-header">
-      <div class="filters-section">
-        <!-- Zone de recherche (optionnelle) -->
-        <div class="files-search-container">
-          <mat-form-field class="files-search-field" appearance="outline">
-            <mat-label>Rechercher un contrôle</mat-label>
-            <div class="files-search-input-container">
-              <input matInput [(ngModel)]="searchQuery" (input)="onSearchControls($event)"
-                placeholder="Nom du contrôle, responsable..." />
-              <div class="files-search-input-actions">
-                <mat-icon matSuffix>search</mat-icon>
-                @if (searchQuery && searchQuery.length > 0) {
-                <button matSuffix mat-icon-button aria-label="Effacer" (click)="clearSearch()">
-                  <mat-icon>close</mat-icon>
-                </button>
-                }
-              </div>
-            </div>
-          </mat-form-field>
-          <app-date-range-picker #picker (dateRangeSelected)="onDateRangeSelected($event)"></app-date-range-picker>
-        </div>
-      </div>
+       <div class="filters-section" style="width: 100%;">
+                <div class="filters-header">
+                    <div>
+                        <mat-icon>filter_alt</mat-icon>
+                        <span class="filters-title">Filtres</span>
+                    </div>
+                    <mat-button-toggle-group [(ngModel)]="filterMode" exclusive>
+                        <mat-button-toggle value="general">Mode général</mat-button-toggle>
+                        <mat-button-toggle value="detailed">Filtres détaillés</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </div>
 
-      <!-- Boutons -->
-      <div class="header-controls">
-        <button (click)="resetFilters()" mat-raised-button class="btn-red">
-          <mat-icon>clear</mat-icon>
-          Réinitialiser
-        </button>
-        <button (click)="create()" mat-raised-button class="btn-primary add-button">
-          <mat-icon>add</mat-icon>
-          Ajouter
-        </button>
-      </div>
+                <app-filter-table *ngIf="filterMode === 'detailed'" [availableFilters]="filtersConfig"
+                    (filtersChanged)="handleFiltersChanged($event)">
+                </app-filter-table>
+                <app-global-search-bar *ngIf="filterMode === 'general'" [(model)]="searchQuery"
+                    [placeholder]="'Rechercher des plans d\'action'" (modelChange)="onSearchControls()"
+                    (cleared)="clearSearch()" />
+            </div>
     </mat-card-content>
   </mat-card>
   <div>
