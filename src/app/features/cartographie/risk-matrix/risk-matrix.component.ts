@@ -55,7 +55,7 @@ export class RiskMatrixComponent {
 
   getProbabilityText(): string {
 
-  const lastEval = this.riskData?.rpc[0]
+  const lastEval = this.riskData?.rpc.at(-1)
 
   if (!lastEval) {
     return '—';
@@ -76,7 +76,7 @@ export class RiskMatrixComponent {
 }
 
   getImpactText(): string {
-    const lastEval = this.riskData?.rpc[0];
+    const lastEval = this.riskData?.rpc.at(-1);
     if (!lastEval) {                     // aucun historique
       return '—';
     }
