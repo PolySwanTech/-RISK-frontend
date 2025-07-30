@@ -20,13 +20,14 @@ export class Incident {
     risk: string;
     riskName : string = "";
     cause : Cause;
-    process: Process ;
+    process: string ;
     equipeId?: string;
 
     impacts: Impact[];
 
     state: State;
-    consequenceId?: string;
+    consequences: string[];
+    intervenant?: string | null;
 
     constructor(
         id: string,
@@ -39,11 +40,12 @@ export class Incident {
         closedAt: Date | null,
         risk: string,
         cause: Cause,
-        process: Process,
+        process: string,
         equipeId?: string,
         impacts: Impact[] = [],
         state: State = State.DRAFT,
-        consequenceId?: string
+        consequences: string[] = [],
+        intervenant?: string | null,
     ){
         this.id = id;
         this.title = title;
@@ -59,7 +61,8 @@ export class Incident {
         this.equipeId = equipeId;
         this.impacts = impacts;
         this.state = state;
-        this.consequenceId = consequenceId;
+        this.consequences = consequences;
+        this.intervenant = intervenant || null;
     }
 
 

@@ -1,4 +1,4 @@
-export enum State {
+export enum IncidentState {
     DRAFT = 'DRAFT',
     VALIDATE = 'VALIDATE', 
     SUBMIT = 'SUBMIT', 

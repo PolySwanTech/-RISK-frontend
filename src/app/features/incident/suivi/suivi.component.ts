@@ -14,6 +14,10 @@ import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { IncidentHistory } from '../../../core/models/IncidentHistory';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @Component({
@@ -22,7 +26,11 @@ import { IncidentHistory } from '../../../core/models/IncidentHistory';
     CommonModule,
     MatCardModule,
     MatButtonModule,
-    MatIconModule],
+    MatIconModule,
+    MatStepperModule,       // ✅ stepper vertical/horizontal
+    MatFormFieldModule,     // ✅ <mat-form-field>
+    MatInputModule,         // ✅ <input matInput>
+    ReactiveFormsModule],
 
   templateUrl: './suivi.component.html',
   styleUrl: './suivi.component.scss'
@@ -36,7 +44,7 @@ export class SuiviComponent implements OnInit {
 
   isLoading: boolean = true;
 
-  history : IncidentHistory[] = [];
+  history: IncidentHistory[] = [];
 
   ngOnInit(): void {
     this.loadHistory(this.incidentId);

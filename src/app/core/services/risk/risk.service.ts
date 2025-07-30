@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,17 +17,17 @@ export class RiskService {
   }
 
   save(dto: RiskTemplateCreateDto) {
-  return this.http.post(this.baseUrl, dto);
+  return this.http.post<RiskTemplate>(this.baseUrl, dto);
 }
 
   getAll() {
     return this.http.get<RiskTemplate[]>(this.baseUrl)
   }
 
-  getRisksTree(processId: string) {
-     let params = new HttpParams();
-    params = params.append('processId', processId);
-    return this.http.get<any[]>(this.baseUrl + '/tree', { params })
+  getRisksTree(processId?: string) {
+    let params = new HttpParams();
+    const option = processId ? { params: params.set('processId', processId) } : {};
+    return this.http.get<any[]>(this.baseUrl + '/tree', option)
   }
 
   getAllByProcess(processId: string = "") {
