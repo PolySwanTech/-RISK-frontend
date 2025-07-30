@@ -26,4 +26,8 @@ export class ImpactService {
   getImpactByIncidentId(id: string) {
     return this.http.get<Impact[]>(`${this.baseUrl}`, { params: { incidentId: id } });
   }
+
+  sumByProcess(processId : string){
+    return this.http.get<number>(`${this.baseUrl}/sum`, { params: { processId: processId } })
+  }
 }

@@ -17,6 +17,7 @@ interface ProcessNode {
   type: 'bu' | 'parent' | 'child';
   buName?: string;
   parentName?: string;
+  risks?: any[]; 
   children?: ProcessNode[];
 }
 import { Process } from '../../../core/models/Process';
@@ -27,6 +28,8 @@ import { AddEntityDialogComponent } from '../../reglages/add-entity-dialog/add-e
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { MatCardModule } from '@angular/material/card';
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-list-process',
@@ -49,6 +52,7 @@ export class ListProcessComponent implements OnInit {
   router = inject(Router);
   private dialog = inject(MatDialog);
   riskService = inject(RiskService); // Assuming you have a risk service to fetch risks
+  riskEvaluationService = inject(RiskEvaluationService);
   entityService = inject(EntitiesService);
 
   processes: Process[] = [];
@@ -57,28 +61,59 @@ export class ListProcessComponent implements OnInit {
   filteredProcesses: ProcessNode[] = [];
   expandedNodes: Set<string> = new Set();
   searchTerm: string = '';
+  years: number[] = [];
+  selectedYear: number = new Date().getFullYear();
 
   @Input() isCartographie: boolean = false;
 
   ngOnInit(): void {
-     this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
-    this.fetchProcesses(entities);
-  });
+    this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
+      this.fetchProcesses(entities);
+    });
+
+    this.getEvaluationYears().then(
+      (years: number[]) => {
+        this.years = years;
+      }
+    )
   }
 
   fetchProcesses(allEntities: EntiteResponsable[]): void {
-  this.processService.getAll().subscribe((data: any[]) => {
-    this.processes = data;
-    this.buildHierarchy(allEntities);
-    this.filteredProcesses = [...this.hierarchicalProcesses];
-  });
-}
+    this.processService.getAll().subscribe((data: any[]) => {
+      this.processes = data;
+      this.buildHierarchy(allEntities);
+      this.filteredProcesses = [...this.hierarchicalProcesses];
+    });
+  }
+
+  async getEvaluationYears() {
+    return await firstValueFrom(this.riskEvaluationService.getYearsOfEvaluation())
+  }
+
+  selectYear(year: number) {
+    // TODO : get les evaluations pour cette année
+    this.selectedYear = year;
+    this.riskEvaluationService.getAll(this.selectedYear).subscribe(evaluations => {
+      // 2. Pour chaque process
+      this.filteredProcesses.forEach(bu => {
+        // 3. Pour chaque risque de ce process
+        bu.children?.forEach(process => {
+          process.risks?.forEach(risk => {
+            var rId = risk.id.id;
+            console.log('Evaluations:', evaluations.filter(e => e.riskId === rId));
+            risk.riskEvaluations = evaluations.filter(e => e.riskId === rId);
+            console.log(risk)
+          });
+        });
+      });
+    });
+  }
 
 
   getRisks(event: any, process: Process) {
     event.stopPropagation();
     if (!process.risks || process.risks.length === 0) {
-      this.riskService.getAllByProcess(process.id).subscribe(risks => {
+      this.riskService.getAllByProcess(process.id, this.selectedYear).subscribe(risks => {
         process.risks = risks;
       });
     }
@@ -115,43 +150,43 @@ export class ListProcessComponent implements OnInit {
     this.router.navigate(['reglages', 'risks', id]);
   }
 
-buildHierarchy(allEntities: EntiteResponsable[]): void {
-  const buMap = new Map<string, Process[]>();
+  buildHierarchy(allEntities: EntiteResponsable[]): void {
+    const buMap = new Map<string, Process[]>();
 
-  this.processes.forEach(process => {
-    const buName = process.buName || 'Sans BU';
-    if (!buMap.has(buName)) {
-      buMap.set(buName, []);
-    }
-    buMap.get(buName)!.push(process);
-  });
-
-  this.hierarchicalProcesses = allEntities
-    .filter(entity => !this.isCartographie || buMap.has(entity.name)) // 💡 Le filtre
-    .map(entity => {
-      const processes = buMap.get(entity.name) || [];
-      return {
-        id: `bu-${entity.name}`,
-        name: entity.name,
-        niveau: 0,
-        type: 'bu' as const,
-        children: this.buildBUChildren(processes)
-      };
+    this.processes.forEach(process => {
+      const buName = process.buName || 'Sans BU';
+      if (!buMap.has(buName)) {
+        buMap.set(buName, []);
+      }
+      buMap.get(buName)!.push(process);
     });
 
-  if (!this.isCartographie) {
-    const orphanProcesses = buMap.get('Sans BU');
-    if (orphanProcesses) {
-      this.hierarchicalProcesses.push({
-        id: `bu-no-bu`,
-        name: 'Sans BU',
-        niveau: 0,
-        type: 'bu' as const,
-        children: this.buildBUChildren(orphanProcesses)
+    this.hierarchicalProcesses = allEntities
+      .filter(entity => !this.isCartographie || buMap.has(entity.name)) // 💡 Le filtre
+      .map(entity => {
+        const processes = buMap.get(entity.name) || [];
+        return {
+          id: `bu-${entity.name}`,
+          name: entity.name,
+          niveau: 0,
+          type: 'bu' as const,
+          children: this.buildBUChildren(processes)
+        };
       });
+
+    if (!this.isCartographie) {
+      const orphanProcesses = buMap.get('Sans BU');
+      if (orphanProcesses) {
+        this.hierarchicalProcesses.push({
+          id: `bu-no-bu`,
+          name: 'Sans BU',
+          niveau: 0,
+          type: 'bu' as const,
+          children: this.buildBUChildren(orphanProcesses)
+        });
+      }
     }
   }
-}
 
   private groupByBU(): Array<{ buName: string | null, processes: any[] }> {
     const buMap = new Map<string, any[]>();
@@ -295,28 +330,32 @@ buildHierarchy(allEntities: EntiteResponsable[]): void {
   }
 
   openEntityDialog(entite?: any, event?: Event) {
-      if (event) {
-        event.stopPropagation(); // Empêche la propagation du clic
-      }
-  
-      const dialogRef = this.dialog.open(AddEntityDialogComponent, {
-        width: '500px',
-        data: entite || null // Passe l'entité si c'est une modification, sinon null
-      });
-  
-      dialogRef.afterClosed().subscribe(entiteResponsable => {
-        if (entiteResponsable) {
-          if (entiteResponsable.id == null) {
-            this.entityService.save(entiteResponsable).subscribe(() => {
-              this.ngOnInit(); // Rafraîchir après ajout/modification
-            });
-          }
-          else {
-            this.entityService.update(entiteResponsable).subscribe(() => {
-              this.ngOnInit(); // Rafraîchir après ajout/modification
-            });
-          }
-        }
-      });
+    if (event) {
+      event.stopPropagation(); // Empêche la propagation du clic
     }
+
+    const dialogRef = this.dialog.open(AddEntityDialogComponent, {
+      width: '500px',
+      data: entite || null // Passe l'entité si c'est une modification, sinon null
+    });
+
+    dialogRef.afterClosed().subscribe(entiteResponsable => {
+      if (entiteResponsable) {
+        if (entiteResponsable.id == null) {
+          this.entityService.save(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
+        else {
+          this.entityService.update(entiteResponsable).subscribe(() => {
+            this.ngOnInit(); // Rafraîchir après ajout/modification
+          });
+        }
+      }
+    });
+  }
+
+  navToCreateCarto(){
+    this.router.navigate(['reglages', 'evaluation', 'create'])
+  }
 }

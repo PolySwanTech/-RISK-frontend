@@ -2,6 +2,7 @@ import { EntiteResponsable } from "./EntiteResponsable"
 import { RiskTemplate } from "./RiskTemplate"
 
 export class Process {
+    
     id: string = ''
     name: string
     bu: EntiteResponsable
@@ -10,6 +11,7 @@ export class Process {
     risks: RiskTemplate[] = []
 
     buName : string = ''
+    sum = 0;
 
     constructor(
         name: string,

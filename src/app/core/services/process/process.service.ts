@@ -39,4 +39,10 @@ export class ProcessService {
     param = param.set('buId', entiteId);
     return this.http.get<Process[]>(this.baseUrl, {params : param})
   }
+
+  getAllByRisks(riskId: string) {
+    let params = new HttpParams();
+    params = params.append('riskId', riskId);
+    return this.http.get<Process[]>(this.baseUrl + '/by-risk', { params : params });
+  }
 }

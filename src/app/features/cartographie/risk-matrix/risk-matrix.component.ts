@@ -1,8 +1,6 @@
 import { CommonModule }           from '@angular/common';
 import { Component, Input, Output,
-         EventEmitter, 
-         OnChanges,
-         SimpleChanges}           from '@angular/core';
+         EventEmitter }           from '@angular/core';
 import { MatCardModule }          from '@angular/material/card';
 import { MatButtonModule }        from '@angular/material/button';
 import { MatIconModule }          from '@angular/material/icon';
@@ -21,7 +19,7 @@ import { RiskTemplate } from '../../../core/models/RiskTemplate';
 export class RiskMatrixComponent {
   
   /* ----------- entrée/sortie ----------- */
-  @Input()  riskData: RiskTemplate | null = null;  
+  @Input() riskData: RiskTemplate | null = null;  
   @Input() processMap: Record<string,Process> = {};
   @Output() onModify = new EventEmitter<string>();
   

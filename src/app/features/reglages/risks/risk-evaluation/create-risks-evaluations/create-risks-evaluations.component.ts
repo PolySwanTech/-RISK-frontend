@@ -1,4 +1,4 @@
-import { Component, inject, OnInit }           from '@angular/core';
+import { Component, inject, Input, OnInit }           from '@angular/core';
 import { Router, ActivatedRoute }              from '@angular/router';
 import { CommonModule }                        from '@angular/common';
 import { FormBuilder, ReactiveFormsModule,
@@ -47,6 +47,8 @@ export class CreateRisksEvaluationsComponent implements OnInit {
   riskLevels = Object.values(RiskLevel);
   riskLabels = RiskLevelLabels;
 
+  @Input() riskId : string = '';
+
   currentRisk?: RiskTemplate;
 
   form = this.fb.group({
@@ -62,6 +64,8 @@ export class CreateRisksEvaluationsComponent implements OnInit {
     /* 1. — essayer de récupérer le risque depuis navigation.state */
     const nav      = this.router.getCurrentNavigation();
     const navRisk  = nav?.extras.state?.['risk'] as RiskTemplate | undefined;
+    
+    
 
     if (navRisk) {
       this.currentRisk = navRisk;
@@ -70,7 +74,7 @@ export class CreateRisksEvaluationsComponent implements OnInit {
     }
 
     /* 2. — sinon fallback : queryParams → appel REST */
-    const riskId  = this.route.snapshot.queryParamMap.get('id')!;
+    const riskId  = this.route.snapshot.queryParamMap.get('id')! ? this.route.snapshot.queryParamMap.get('id')! : this.riskId;
     const version = this.route.snapshot.queryParamMap.get('version');
 
     this.form.patchValue({ riskId });

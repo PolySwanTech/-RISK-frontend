@@ -6,6 +6,7 @@ import { RiskDetailComponent } from './risks/risk-detail/risk-detail.component';
 import { createComponent } from '@angular/core';
 import { ListProcessComponent } from '../process/list-process/list-process.component';
 import { CartographieComponent } from '../../pages/cartographie/cartographie.component';
+import { CreateEvaluationComponent } from '../cartographie/create-evaluation/create-evaluation.component';
 
 export const reglagesRoute: Routes = [
   { path: '', component: ListProcessComponent },
@@ -22,6 +23,12 @@ export const reglagesRoute: Routes = [
     path: 'process',
     children: [
       { path: 'create', component: CreateProcessComponent }
+    ]
+  }, 
+  {
+    path: 'evaluation',
+    children: [
+      { path: 'create', component: CreateEvaluationComponent }
     ]
   }
 ];
