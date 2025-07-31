@@ -23,18 +23,20 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Type } from '../../../core/enum/controltype.enum';
 import { EnumLabels } from '../../../core/enum/enum-labels';
+import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 
 @Component({
   selector: 'app-create-control',
   imports: [
-    FormsModule, 
+    FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule, MatButtonModule, ReactiveFormsModule
-  ],
+    FormsModule, MatButtonModule, ReactiveFormsModule,
+    SelectArborescenceComponent
+],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
 })
@@ -59,7 +61,6 @@ export class CreateControlComponent {
     processId    : ['',  Validators.required],
     taxonomie    : [null, Validators.required],
     buId : ['', Validators.required],
-
   });
 
   priorities = Object.values(Priority);
@@ -75,6 +76,10 @@ export class CreateControlComponent {
   processId = "";
   
   enumLabels = EnumLabels;
+
+  onSelectionRisk(event : RiskTemplate) {
+    this.form.get('taxonomie')?.setValue(event);
+  }
 
   getTypeLabel(type: keyof typeof EnumLabels.type): string {
     return this.enumLabels.type[type];

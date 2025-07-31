@@ -23,13 +23,13 @@ export class CreateEvaluationComponent implements OnInit {
   private impactService = inject(ImpactService);
   private controlService = inject(ControlService);
 
-  risks: RiskTemplate[] = [];
+  risks: any[] = [];
 
   selectedYear = new Date().getFullYear();
 
   totalImpact = 0
 
-  selectedRisk: RiskTemplate | null = null;
+  selectedRisk: any | null = null;
   selectedProcess: Process | null = null;
   selectedControl: ControlTemplate | null = null;
 
@@ -46,6 +46,7 @@ export class CreateEvaluationComponent implements OnInit {
   }
 
   getProcessByRisks(risk: RiskTemplate) {
+    console.log('Selected Risk:', risk);
     this.processService.getAllByRisks(risk.id.id).subscribe(processes => {
       this.processes = processes;
       this.totalImpact = 0;
