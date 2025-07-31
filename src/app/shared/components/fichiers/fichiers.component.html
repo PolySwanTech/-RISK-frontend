@@ -56,14 +56,16 @@
             @for(file of filteredFiles; track file.id) {
             <mat-card class="file-item">
                 <div class="file-content">
-                    <div class="file-icon" [ngClass]="getFileIcon(file.filename)">
-                        <mat-icon>{{ getFileIcon(file.filename) }}</mat-icon>
-                    </div>
-                    <div class="file-info">
-                        <div class="file-name">{{ file.filename }}</div>
-                        <div class="file-details">
-                            {{ formatFileSize(file.size) }} •
-                            Ajouté le {{ formatDate(file.uploadedAt) }}
+                    <div (click)="preview(file)">
+                        <div class="file-icon" [ngClass]="getFileIcon(file.filename)">
+                            <mat-icon>{{ getFileIcon(file.filename) }}</mat-icon>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">{{ file.filename }}</div>
+                            <div class="file-details">
+                                {{ formatFileSize(file.size) }} •
+                                Ajouté le {{ formatDate(file.uploadedAt) }}
+                            </div>
                         </div>
                     </div>
                     <div class="file-actions">

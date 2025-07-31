@@ -158,13 +158,22 @@ export class FichiersComponent {
     )
   }
 
-  downloadFile(file: UploadedFile): void {
+  downloadFile(file: UploadedFile, openInBrowser: boolean = false): void {
+  const action = openInBrowser ? 'Ouverture' : 'Téléchargement';
+  this.confirmService
+    .openConfirmDialog(action, `${action} de ${file.filename} en cours...`, false)
+    .subscribe();
 
-    this.confirmService.openConfirmDialog("Téléchargement", `Téléchargement de ${file.filename} en cours...`, false);
+  this.fileService.downloadFile(file.objectKey).subscribe({
+    next: (blob: Blob) => {
+      const url = window.URL.createObjectURL(blob);
 
-    this.fileService.downloadFile(file.objectKey).subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
+      if (openInBrowser) {
+        // Ouvrir dans un nouvel onglet
+        window.open(url, '_blank');
+        console.log("ici")
+      } else {
+        // Télécharger
         const a = document.createElement('a');
         a.href = url;
         a.download = file.filename;
@@ -172,8 +181,13 @@ export class FichiersComponent {
         a.click();
         document.body.removeChild(a);
       }
-    });
-  }
+    },
+    error: (err) => {
+      console.error("Erreur lors du téléchargement :", err);
+    }
+  });
+}
+
 
   deleteFile(fileId: string): void {
     // TODO: Implémenter la suppression via votre API
@@ -251,6 +265,10 @@ export class FichiersComponent {
     this.searchQuery = '';
     this.filteredFiles = this.attachedFiles;
     this.filteredFilesCount = 0;
+  }
+
+  preview(file : UploadedFile){
+    this.downloadFile(file, true);
   }
 
 }
