@@ -407,10 +407,18 @@ mat-card-content {
   .line-gradient {
     flex: 1;
     height: 4px;
-    background: linear-gradient(to right, red, orange, green);
     border-radius: 2px;
-    min-width: 60px;
-    max-width: 150px;
+    width: 150px;
+    transition: background 0.3s ease;
+  }
+
+  .days-diff {
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom : 5px;
+    color: #555;
   }
 }
 

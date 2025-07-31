@@ -16,27 +16,45 @@
                         <div class="timeline-row">
                             <div class="timeline-step">
                                 <div class="dot red"></div>
-                                <div class="date">{{ incident.survenueAt | date: 'dd/MM/yyyy à HH:mm' }}</div>
+                                <div class="date">{{ incident.survenueAt | date: 'dd/MM/yyyy' }}</div>
                                 <div class="label">
                                     <mat-icon fontIcon="place"></mat-icon> Date de survenance
                                 </div>
                             </div>
 
-                            <div class="line-gradient"></div>
+                            <div class="timeline-segment">
+                                <div class="days-diff">
+                                    {{ getDaysDiff(incident.survenueAt, incident.detectedAt) }} jours
+                                </div>
+
+                                <div class="line-gradient" [ngStyle]="{
+         'background': 'linear-gradient(to right, ' + getLineColor(incident.survenueAt, incident.detectedAt) + ', ' + getLineColor(incident.survenueAt, incident.detectedAt) + ')'
+       }">
+                                </div>
+                            </div>
 
                             <div class="timeline-step">
                                 <div class="dot orange"></div>
-                                <div class="date">{{ incident.detectedAt | date: 'dd/MM/yyyy à HH:mm' }}</div>
+                                <div class="date">{{ incident.detectedAt | date: 'dd/MM/yyyy' }}</div>
                                 <div class="label">
                                     <mat-icon fontIcon="search"></mat-icon> Date de détection
                                 </div>
                             </div>
 
-                            <div class="line-gradient"></div>
+                            <div class="timeline-segment">
+                                <div class="days-diff">
+                                    {{ getDaysDiff(incident.detectedAt, incident.declaredAt) }} jours
+                                </div>
+
+                                <div class="line-gradient" [ngStyle]="{
+         'background': 'linear-gradient(to right, ' + getLineColor(incident.detectedAt, incident.declaredAt) + ', ' + getLineColor(incident.detectedAt, incident.declaredAt) + ')'
+       }">
+                                </div>
+                            </div>
 
                             <div class="timeline-step">
                                 <div class="dot green"></div>
-                                <div class="date">{{ incident.declaredAt | date: 'dd/MM/yyyy à HH:mm' }}</div>
+                                <div class="date">{{ incident.declaredAt | date: 'dd/MM/yyyy' }}</div>
                                 <div class="label">
                                     <mat-icon fontIcon="calendar_today"></mat-icon> Date de déclaration
                                 </div>

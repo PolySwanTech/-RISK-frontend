@@ -199,4 +199,26 @@ export class ViewComponent implements OnInit {
     }
   }
 
+  getLineColor(from: Date | string, to: Date | string): string {
+    const date1 = new Date(from);
+    const date2 = new Date(to);
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 30) {
+      return 'green';
+    } else if (diffDays < 60) {
+      return 'orange';
+    } else {
+      return 'red';
+    }
+  }
+
+  getDaysDiff(from: Date | string, to: Date | string): number {
+    const date1 = new Date(from);
+    const date2 = new Date(to);
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
 }
