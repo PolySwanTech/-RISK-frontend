@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Incident } from '../../models/Incident';
 import { EntiteResponsable } from '../../models/EntiteResponsable';
 import { environment } from '../../../environments/environment';
 
@@ -13,8 +12,8 @@ export class EntitiesService {
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/business-units'
 
-  loadEntities(): Observable<EntiteResponsable[]> {
-    return this.http.get<EntiteResponsable[]>(this.baseUrl);
+  loadEntities(onlyBL : boolean = false): Observable<EntiteResponsable[]> {
+    return this.http.get<EntiteResponsable[]>(this.baseUrl,  {params : { onlyBL }});
   }
 
   findById(id : string): Observable<EntiteResponsable> {
