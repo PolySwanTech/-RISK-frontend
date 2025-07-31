@@ -7,18 +7,11 @@
                 </strong>
             </span>
             @if(!closed){
+            }
             <button mat-raised-button class="btn-primary" (click)="addImpact()">
-                Ajouter
+                Consulter
                 <mat-icon>add</mat-icon>
             </button>
-            }
         </mat-card-title>
     </mat-card-header>
-    <mat-card-content>
-        <div class="impacts-container">
-            @for(impact of impacts; track impact.id){
-            <app-impact-card [impact]="impact"></app-impact-card>
-            }
-        </div>
-    </mat-card-content>
 </mat-card>

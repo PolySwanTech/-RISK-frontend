@@ -83,15 +83,18 @@
   </div>
 
   <div class="row-add">
+    
     @if (form.get('processId')?.value) {
-    <mat-form-field appearance="outline">
+      <app-select-arborescence [id]="form.get('processId')!.value" (changeValue)="onSelectionRisk($event)" placeholder="Sélectionnez un processus"
+              [list]="risks" />
+    <!-- <mat-form-field appearance="outline">
       <mat-label>Risk</mat-label>
       <mat-select formControlName="taxonomie">
         @for (r of risks; track r.id) {
         <mat-option [value]="r">{{ r.libellePerso }}</mat-option>
         }
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
     }
   </div>
 

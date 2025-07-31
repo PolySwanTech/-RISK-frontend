@@ -49,7 +49,7 @@ export class FichiersComponent {
   isDragOver = false;
 
   ngOnInit(): void {
-    this.fileService.getFiles(this.incidentId).subscribe(files => {
+    this.fileService.getFiles({incidentId : this.incidentId}).subscribe(files => {
       this.attachedFiles = files;
       this.filteredFiles = files;
       this.filteredFilesCount = files.length;
