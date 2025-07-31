@@ -63,6 +63,7 @@ export class RiskPageComponent implements OnInit {
       (acc, p) => ({ ...acc, [p.id]: p }),
       {}
     );
+
     this.filteredRisks = [...this.risks];   // ou ton chargement réel
   });
   

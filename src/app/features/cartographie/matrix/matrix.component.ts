@@ -5,6 +5,7 @@ import { MatDialog }  from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RiskLevel, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
 
 /** Couleur à afficher pour chaque RiskLevel */
 const COLOR_MAP: Record<RiskLevel,string> = {
@@ -141,19 +142,20 @@ export class MatrixComponent {
   /** stockage :  "row,col"  →  risk | risk[] */
   private _risks: Record<string, any|any[]> = {};
 
-  private arrayToMatrixMap(arr:any[]){
+  private arrayToMatrixMap(arr:RiskTemplate[]){
+    console.log(arr)
     const map: Record<string, any|any[]> = {};
 
     arr.forEach(risk => {
       // S’il n’a pas .impact /.frequency on regarde la dernière évaluation
-      let impact    = risk.impact;
-      let frequency = risk.frequency;
+      let impact    = 0;
+      let frequency = risk.rpc.at(-1)?.probability;
 
       if (!impact || !frequency) {
-        const last = risk.riskEvaluations?.at(-1);
+        const last = risk.rpc?.at(-1);
         if (last) {
           frequency = Math.ceil(last.probability / 2);             // 1-5
-          impact    = RiskLevelScores[last.riskNet as RiskLevel];  // 1-5
+          impact    = RiskLevelScores[last.netLevel as RiskLevel];  // 1-5
         }
       }
 

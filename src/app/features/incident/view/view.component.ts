@@ -1,4 +1,4 @@
-import { Component, inject, Input, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, inject, LOCALE_ID, OnInit } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -7,40 +7,24 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateImpactPopUpComponent } from '../impact/create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
-import { Impact, ImpactCreateDto } from '../../../core/models/Impact';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
+import { CommonModule, DatePipe } from '@angular/common';
 import { SuiviIncident } from '../../../core/models/SuiviIncident';
-import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { State } from '../../../core/enum/state.enum';
-import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
-import { ImpactService } from '../../../core/services/impact/impact.service';
-import { ImpactCardComponent } from '../impact/impact-card/impact-card.component';
 import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
 
-// Interface pour les fichiers attachés
-interface AttachedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  uploadedAt: Date;
-  url?: string;
-}
 
 @Component({
   selector: 'app-view',
@@ -50,9 +34,9 @@ interface AttachedFile {
     FichiersComponent, ListSuiviComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss',
-  providers: [
-    { provide: LOCALE_ID, useValue: 'fr' }
-  ]
+  // providers: [
+  //   { provide: LOCALE_ID, useValue: 'fr' }
+  // ]
 })
 export class ViewComponent implements OnInit {
   private incidentService = inject(IncidentService);
@@ -68,10 +52,6 @@ export class ViewComponent implements OnInit {
   message: string = "";
   idIncident: string = "";
   suivi: SuiviIncident[] = []
-
-  // Propriétés pour la gestion des fichiers
-  attachedFiles: AttachedFile[] = [];
-  isDragOver = false;
 
   businessUnits: EntiteResponsable[] = [];
 

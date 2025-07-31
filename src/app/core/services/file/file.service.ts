@@ -8,10 +8,10 @@ import { UploadedFile } from '../../../shared/components/fichiers/fichiers.compo
 })
 export class FileService {
 
-  private baseUrl = environment.apiUrl + '/files'; 
+  private baseUrl = environment.apiUrl + '/files';
   private http = inject(HttpClient);
 
-  uploadFile(file: File, incidentRef: string, incidentId : string) {
+  uploadFile(file: File, incidentRef: string, incidentId: string) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('incidentRef', incidentRef);
@@ -20,13 +20,12 @@ export class FileService {
     return this.http.post(`${this.baseUrl}/upload`, formData);
   }
 
-  getFiles(incidentId: string) {
-    const params = new HttpParams().set('incidentId', incidentId);
-    return this.http.get<UploadedFile[]>(`${this.baseUrl}`, { params : params });
+  getFiles(params: { [key: string]: string }) {
+    return this.http.get<UploadedFile[]>(`${this.baseUrl}`, { params });
   }
 
   downloadFile(objectKey: string) {
     const params = new HttpParams().set('objectKey', objectKey);
-    return this.http.get(this.baseUrl + '/download', {params : params, responseType: 'blob'});
+    return this.http.get(this.baseUrl + '/download', { params: params, responseType: 'blob' });
   }
 }

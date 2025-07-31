@@ -1,8 +1,8 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ImpactService } from '../../../../core/services/impact/impact.service';
 import { Impact, ImpactCreateDto } from '../../../../core/models/Impact';
-import { DatePipe, CommonModule } from '@angular/common';
+import { DatePipe, CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,19 +15,19 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
-import { ImpactCardComponent } from '../impact-card/impact-card.component';
 
 @Component({
   selector: 'app-list-impact',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
     MatGridListModule, MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatTooltipModule, CommonModule, ImpactCardComponent],
+    MatInputModule, MatTooltipModule, CommonModule, CurrencyPipe],
   templateUrl: './list-impact.component.html',
   styleUrl: './list-impact.component.scss'
 })
 export class ListImpactComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private impactService = inject(ImpactService);
   private dialog = inject(MatDialog);
   private confirmService = inject(ConfirmService);
@@ -52,30 +52,22 @@ export class ListImpactComponent implements OnInit {
   }
 
   addImpact() {
-    const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
-      width: '400px'
-    });
 
-    dialogRef.afterClosed().subscribe((result: { impact: Impact, message: string }) => {
-      if (result) {
-        /* ─── Construction explicite du DTO ─── */
-        const dto: ImpactCreateDto = {
-          montant: result.impact.montant,
-          comptabilisationDate: result.impact.comptabilisationDate ? result.impact.comptabilisationDate : null,
-          entityId: result.impact.entityId,
-          incidentId: this.incidentId,
-          type: result.impact.type,
-        };
+    this.router.navigate(['incident', this.incidentId, 'impacts']);
 
-        this.impactService.addImpact(dto, result.message).subscribe(() => {
-          this.confirmService.openConfirmDialog(
-            'Impact ajouté',
-            "L'impact a bien été ajouté à l'incident",
-            false
-          );
-          this.ngOnInit();     // rafraîchir la vue
-        });
-      }
-    });
+    // const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
+    //   width: '700px',
+    //   height : '700px',
+    //   data : {
+    //     impacts : this.impacts 
+    //   }
+    // });
+
+    // dialogRef.afterClosed().subscribe((result: { impact: Impact, message: string }) => {
+    //   if (result) {
+    //     /* ─── Construction explicite du DTO ─── */
+    //     
+    //   }
+    // });
   }
 }
