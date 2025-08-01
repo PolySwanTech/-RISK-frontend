@@ -31,14 +31,12 @@ export class IncidentService {
     return this.http.get<any>(this.baseUrl + '/' + id);
   }
 
-  saveIncident(incident: any, state: State): Observable<any> {
-    let params = new HttpParams().set('state', state);
-    return this.http.post(this.baseUrl, incident, { params });
+  saveIncident(incident: any): Observable<any> {
+    return this.http.post(this.baseUrl, incident);
   }
 
-  updateIncident(id: string, incidentDto: any, state: State) {
-    let params = new HttpParams().set('state', state);
-    return this.http.put<void>(`${this.baseUrl}/${id}`, incidentDto, { params });
+  updateIncident(id: string, incidentDto: any) {
+    return this.http.put<void>(`${this.baseUrl}/${id}`, incidentDto);
   }
 
   draftIncident(incident: any): Observable<any> {
