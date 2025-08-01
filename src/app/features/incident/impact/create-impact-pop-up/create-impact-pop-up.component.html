@@ -1,14 +1,7 @@
-<app-go-back [title]="'Ajouter un impact'" />
-
 @if(impact){
 <mat-dialog-content>
+  <h2>Ajouter un Impact</h2>
   <form (ngSubmit)="addImpact()">
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
 
     <mat-form-field class="full-width">
       <mat-label>Montant</mat-label>
@@ -51,55 +44,3 @@
   </form>
 </mat-dialog-content>
 }
-
-<mat-card>
-  <mat-card-title>Liste des Impacts</mat-card-title>
-
-  <table mat-table [dataSource]="impacts" class="mat-elevation-z8" multiTemplateDataRows>
-
-    <!-- Montant Column -->
-    <ng-container matColumnDef="montant">
-      <th mat-header-cell *matHeaderCellDef> Montant </th>
-      <td mat-cell *matCellDef="let impact"> {{impact.montant | number}} </td>
-    </ng-container>
-
-    <!-- Entity Column -->
-    <ng-container matColumnDef="entityName">
-      <th mat-header-cell *matHeaderCellDef> Entité </th>
-      <td mat-cell *matCellDef="let impact"> {{impact.entityName}} </td>
-    </ng-container>
-
-    <!-- Type Column -->
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef> Type </th>
-      <td mat-cell *matCellDef="let impact"> {{impact.type}} </td>
-    </ng-container>
-
-    <!-- Date de création -->
-    <ng-container matColumnDef="createdAt">
-      <th mat-header-cell *matHeaderCellDef> Créé le </th>
-      <td mat-cell *matCellDef="let impact"> {{impact.createdAt | date:'dd/MM/yyyy'}} </td>
-    </ng-container>
-
-    <!-- Comptabilisation -->
-    <ng-container matColumnDef="comptabilisationDate">
-      <th mat-header-cell *matHeaderCellDef> Comptabilisé le </th>
-      <td mat-cell *matCellDef="let impact">
-        {{ impact.comptabilisationDate ? (impact.comptabilisationDate | date:'dd/MM/yyyy') : '—' }}
-      </td>
-    </ng-container>
-
-    <!-- Comptabilisation -->
-    <ng-container matColumnDef="fichiers">
-      <th mat-header-cell *matHeaderCellDef> Fichiers </th>
-      <td mat-cell *matCellDef="let impact">
-        <button mat-button color="primary" (click)="viewFiles(impact)">
-          Voir les fichiers
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</mat-card>

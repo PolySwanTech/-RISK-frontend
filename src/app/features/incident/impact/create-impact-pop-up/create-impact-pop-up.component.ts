@@ -15,7 +15,7 @@ import { MatTableModule } from '@angular/material/table';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ImpactService } from '../../../../core/services/impact/impact.service';
-import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { FichiersComponent } from '../../../../shared/components/fichiers/fichiers.component';
 import { FileService } from '../../../../core/services/file/file.service';
@@ -41,13 +41,13 @@ export class CreateImpactPopUpComponent implements OnInit {
     'fichiers',
   ];
 
+  goBackButtons: GoBackButton[] = [];
+
   private route = inject(ActivatedRoute);
   private dialog = inject(MatDialog);
   private impactService = inject(ImpactService);
   private confirmService = inject(ConfirmService);
   private fileService = inject(FileService);
-
-  incidentId = this.route.snapshot.params['id']
 
   impact: Impact | null = null
   selectedEntite: EntiteResponsable | undefined
@@ -55,11 +55,19 @@ export class CreateImpactPopUpComponent implements OnInit {
   entites: EntiteResponsable[] = []
   types: ImpactTypeEnum[] = [ImpactTypeEnum.PROVISION, ImpactTypeEnum.RECUPERATION];
 
+  incidentId: string = '';
+
   impacts: Impact[] = []
 
   constructor(
-    private entiteService: EntitiesService,
-  ) { }
+    private entiteService: EntitiesService, @Inject(MAT_DIALOG_DATA) public data: { incidentId: string, impact?: Impact }, private dialogRef: MatDialogRef<CreateImpactPopUpComponent>
+  ) {
+    this.incidentId = data.incidentId;
+  }
+
+  closeDialog() {
+    this.dialogRef.close();
+  }
 
   ngOnInit(): void {
     this.impact = new Impact('', 0, '', '', '', new Date(), null)
@@ -92,13 +100,15 @@ export class CreateImpactPopUpComponent implements OnInit {
           type: this.impact.type,
         };
 
+        console.log(dto)
+
         this.impactService.addImpact(dto, message).subscribe(() => {
           this.confirmService.openConfirmDialog(
             'Impact ajouté',
             "L'impact a bien été ajouté à l'incident",
             false
           );
-          this.ngOnInit();     // rafraîchir la vue
+          this.dialogRef.close();
         });
       }
       else {
@@ -115,13 +125,13 @@ export class CreateImpactPopUpComponent implements OnInit {
     
     this.dialog.open(FichiersComponent,
       {
-        width: '400px', 
-        data : {
-          files : files
+        width: '400px',
+        data: {
+          files: files
         }
       }
     )
-    
+
     console.log("Voici les fichiers")
   }
 }
