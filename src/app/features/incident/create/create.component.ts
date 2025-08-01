@@ -64,6 +64,7 @@ export class CreateComponent implements OnInit {
 
 
   incidentForm1 = this._formBuilder.group({
+    reference : [''],
     titre: ['', Validators.required],
     equipeId: ['', Validators.required],
     commentaire: ['', Validators.required],
@@ -154,6 +155,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incidentForm1.patchValue({
+        reference : incident.reference,
         titre: incident.title,
         equipeId: incident.equipeId,
         commentaire: incident.commentaire,
@@ -242,6 +244,8 @@ private loadTrees(processRootId?: string /** optionnel */) {
 
   private convertFormToIncident() {
     return {
+      reference : this.incidentForm1.value.reference || "",
+      state : "",
       title: this.incidentForm1.value.titre!,
       location: this.incidentForm1.value.location!,
       commentaire: this.incidentForm1.value.commentaire!,
@@ -261,9 +265,10 @@ private loadTrees(processRootId?: string /** optionnel */) {
   addIncident() {
 
     const incident = this.convertFormToIncident();
+    incident.state = State.SUBMIT
     console.log("Incident à ajouter :", incident);
     if(this.incidentId){
-      this.incidentService.updateIncident(this.incidentId, incident, State.SUBMIT).subscribe(
+      this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
           error: err => {
             console.error("Erreur lors de la modification de l'incident", err);
@@ -273,7 +278,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
       this.router.navigate(['incident']);
     }
     else {
-      this.incidentService.saveIncident(incident, State.SUBMIT).subscribe(
+      this.incidentService.saveIncident(incident).subscribe(
         {
           next: resp => {
             this.afterCreation("Création réussie", resp);
@@ -287,11 +292,11 @@ private loadTrees(processRootId?: string /** optionnel */) {
   }
 
   addDraft() {
-
     const incident = this.convertFormToIncident();
+    incident.state = State.DRAFT;
     console.log("Incident à sauvegarder en brouillon :", incident);
     if(this.incidentId){
-      this.incidentService.updateIncident(this.incidentId, incident, State.DRAFT).subscribe(
+      this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
           error: err => {
             console.error("Erreur lors de la modification de l'incident", err);
@@ -301,7 +306,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
       this.router.navigate(['incident']);
     }
     else{
-      this.incidentService.saveIncident(incident, State.DRAFT).subscribe(
+      this.incidentService.saveIncident(incident).subscribe(
         {
           next: resp => {
             this.afterCreation("Création réussie", resp);
