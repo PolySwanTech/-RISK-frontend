@@ -172,7 +172,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
         this.incidentForm3.patchValue({
           riskId: incident.risk,
           cause: incident.cause,
-          consequences: incident.consequences,
+          consequences: incident.consequences.map((c: any) => c.id),
           processId: incident.process,
           intervenant: incident.intervenant,
         });
@@ -330,7 +330,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
   }
 
   private toInputDate(d?: string | Date | null): string | null {
-    if (!d) return null;
+    if (!d) return '';
     return (d instanceof Date ? d : new Date(d))
           .toISOString()
           .split('T')[0];
