@@ -24,6 +24,7 @@ import { CreateActionPlanDialogComponent } from '../../action-plan/create-action
 import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
+import { ImpactService } from '../../../core/services/impact/impact.service';
 
 
 @Component({
@@ -45,6 +46,7 @@ export class ViewComponent implements OnInit {
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private entitiesService = inject(EntitiesService);
+  private impactService = inject(ImpactService);
 
   incident: Incident | undefined
   userRole: string | undefined;
@@ -57,12 +59,20 @@ export class ViewComponent implements OnInit {
 
   goBackButtons: GoBackButton[] = [];
 
+  totalAmount = 0;
+
   ngOnInit(): void {
     this.entitiesService.loadEntities().subscribe(entities => {
       this.businessUnits = entities;
     });
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident)
+
+    if (this.idIncident) {
+      this.impactService.sum(this.idIncident).subscribe(
+        result => this.totalAmount = result
+      )
+    }
   }
 
   async loadIncident(id: string) {
@@ -199,6 +209,10 @@ export class ViewComponent implements OnInit {
     const date2 = new Date(to);
     const diffTime = Math.abs(date2.getTime() - date1.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  addImpact() {
+
+    this.router.navigate(['incident', this.idIncident, 'impacts']);
   }
 
 }

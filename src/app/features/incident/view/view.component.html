@@ -4,7 +4,7 @@
         [buttons]="goBackButtons"></app-go-back>
     <div class="view-container">
         <div class="info-container">
-            <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '850px' : '820px'}">
+            <mat-card class="incident-card">
                 <mat-card-content>
                     <!-- Timeline des dates -->
                     <div class="timeline-horizontal">
@@ -102,14 +102,33 @@
 
                     <!-- Description -->
                     <div class="description-section">
-                        <h3 class="description-title">
-                            <mat-icon>description</mat-icon>
-                            Description de l'incident
-                        </h3>
-                        <div class="description-content">
-                            <p>{{ incident.commentaire }}</p>
-                        </div>
-                    </div>
+  <h3 class="description-title">
+    <mat-icon>description</mat-icon>
+    Description de l'incident
+  </h3>
+  <div class="description-content">
+    <p>{{ incident.commentaire }}</p>
+  </div>
+</div>
+
+<div>
+  <h3 class="description-title">
+    <mat-icon>assessment</mat-icon>
+    Impacts de l'incident
+  </h3>
+  <div>
+    <p>
+      Total : <strong>{{ totalAmount | currency : 'EUR' }}</strong>
+    </p>
+
+    @if(!isClosed()){
+      <button mat-raised-button class="btn-primary" (click)="addImpact()">
+        Voir les détails
+        <mat-icon>visibility</mat-icon>
+      </button>
+    }
+  </div>
+</div>
                 </mat-card-content>
             </mat-card>
 
@@ -119,10 +138,7 @@
         </div>
         <div class="info2-container" style="display: flex; gap: 20px;">
             <!-- Section Pièces jointes -->
-
             <app-list-suivi [closed]="isClosed()"></app-list-suivi>
-
-            <app-list-impact [closed]="isClosed()"></app-list-impact>
         </div>
     </div>
     }
