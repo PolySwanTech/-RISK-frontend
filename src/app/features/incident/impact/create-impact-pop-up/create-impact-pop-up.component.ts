@@ -110,6 +110,9 @@ export class CreateImpactPopUpComponent implements OnInit {
   async viewFiles(impact: Impact) {
     let files = await firstValueFrom(this.fileService.getFiles({ impactId: impact.id }))
 
+   
+    console.log(files);
+    
     this.dialog.open(FichiersComponent,
       {
         width: '400px', 

@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, Inject, inject, Input } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -12,6 +12,9 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileService } from '../../../core/services/file/file.service';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { TargetType } from '../../../core/enum/targettype.enum';
 
 export interface UploadedFile {
   id: string;
@@ -48,12 +51,24 @@ export class FichiersComponent {
 
   isDragOver = false;
 
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { files: UploadedFile[] }) {
+
+  }
+
   ngOnInit(): void {
-    this.fileService.getFiles({incidentId : this.incidentId}).subscribe(files => {
-      this.attachedFiles = files;
-      this.filteredFiles = files;
-      this.filteredFilesCount = files.length;
-    });
+
+    if (this.data && this.data.files) {
+      this.attachedFiles = this.data.files;
+      this.filteredFiles = this.data.files;
+    }
+
+    if (this.incidentId && this.incidentRef) {
+      this.fileService.getFiles({ incidentId: this.incidentId }).subscribe(files => {
+        this.attachedFiles = files;
+        this.filteredFiles = files;
+        this.filteredFilesCount = files.length;
+      });
+    }
   }
 
   formatDate(dateString: any) {
@@ -143,9 +158,24 @@ export class FichiersComponent {
   }
 
   private uploadFile(file: File): void {
+
+    if (this.data && this.data.files) {
+      this.fileService.uploadFile(file, "IMP_2025_001", "289b1b94-5fa1-49fc-bb7d-cf5024e4fdcf", TargetType.IMPACT).subscribe(
+        {
+          next: _ => {
+            this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
+            this.ngOnInit();
+          },
+          error: error => {
+            this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'ajout du fichier ${file.name}.`, false);
+          }
+        }
+      )
+    }
+
     if (!this.incidentId) return;
 
-    this.fileService.uploadFile(file, this.incidentRef, this.incidentId).subscribe(
+    this.fileService.uploadFile(file, this.incidentRef, this.incidentId, TargetType.INCIDENT).subscribe(
       {
         next: _ => {
           this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
@@ -159,34 +189,34 @@ export class FichiersComponent {
   }
 
   downloadFile(file: UploadedFile, openInBrowser: boolean = false): void {
-  const action = openInBrowser ? 'Ouverture' : 'Téléchargement';
-  this.confirmService
-    .openConfirmDialog(action, `${action} de ${file.filename} en cours...`, false)
-    .subscribe();
+    const action = openInBrowser ? 'Ouverture' : 'Téléchargement';
+    this.confirmService
+      .openConfirmDialog(action, `${action} de ${file.filename} en cours...`, false)
+      .subscribe();
 
-  this.fileService.downloadFile(file.objectKey).subscribe({
-    next: (blob: Blob) => {
-      const url = window.URL.createObjectURL(blob);
+    this.fileService.downloadFile(file.objectKey).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
 
-      if (openInBrowser) {
-        // Ouvrir dans un nouvel onglet
-        window.open(url, '_blank');
-        console.log("ici")
-      } else {
-        // Télécharger
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = file.filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        if (openInBrowser) {
+          // Ouvrir dans un nouvel onglet
+          window.open(url, '_blank');
+          console.log("ici")
+        } else {
+          // Télécharger
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = file.filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      },
+      error: (err) => {
+        console.error("Erreur lors du téléchargement :", err);
       }
-    },
-    error: (err) => {
-      console.error("Erreur lors du téléchargement :", err);
-    }
-  });
-}
+    });
+  }
 
 
   deleteFile(fileId: string): void {
@@ -267,7 +297,7 @@ export class FichiersComponent {
     this.filteredFilesCount = 0;
   }
 
-  preview(file : UploadedFile){
+  preview(file: UploadedFile) {
     this.downloadFile(file, true);
   }
 
