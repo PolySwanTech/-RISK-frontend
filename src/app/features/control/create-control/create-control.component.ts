@@ -6,9 +6,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { CommonModule } from '@angular/common';
 import { Process } from '../../../core/models/Process';
-import { Utilisateur } from '../../../core/models/Utilisateur';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
@@ -24,10 +23,12 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Type } from '../../../core/enum/controltype.enum';
 import { EnumLabels } from '../../../core/enum/enum-labels';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
+import { map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-create-control',
   imports: [
+    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -66,14 +67,24 @@ export class CreateControlComponent {
   priorities = Object.values(Priority);
   types = Object.values(Type);
   levels = Object.values(Degree);
-  entitesResponsables: EntiteResponsable[] = [/* à remplir */];
-  processes: Process[] = [/* à remplir */];
-  risks: RiskTemplate[] = [/* à remplir */];
-  responsables: Utilisateur[] = [/* à remplir */];
+  entitesResponsables$ = this.buService.loadEntities();
+  processes$: Observable<Process[]> = this.form.get('buId')!.valueChanges.pipe(
+    startWith(this.form.get('buId')!.value),
+    tap(() => this.form.get('processId')!.reset()),
+    switchMap(id => {
+      const buId = typeof id === 'string' ? id : id?.id;
+      return buId ? this.processService.getAllByEntite(buId) : of([]);
+    }),
+  ); 
+
+  risks$: Observable<RiskTemplate[]> = this.form.get('processId')!.valueChanges.pipe(
+    startWith(this.form.get('processId')!.value),
+    switchMap(id => id ? this.riskService.getAllByProcess(id).pipe(map(list => list ?? [])) : of([]))
+  );
+
+  responsables$ = this.userService.getUsers();
 
   recurences = Object.values(Recurence);
-  entiteResponsableId = ""
-  processId = "";
   
   enumLabels = EnumLabels;
 
@@ -97,17 +108,6 @@ export class CreateControlComponent {
     return this.enumLabels.reccurency[recurrence];
   }
 
-
-  ngOnInit(): void {
-    this.buService.loadEntities().subscribe(entites => {
-      this.entitesResponsables = entites;
-    });
-
-    this.userService.getUsers().subscribe(responsables => {
-      this.responsables = responsables;
-    });
-  }
-
   onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
@@ -127,27 +127,13 @@ export class CreateControlComponent {
     this.controlService.createControl(payload).subscribe({
       next : ()  => {
         this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);
+        console.log('Création réussie', payload);
         this.dialogRef.close();
       },
       error: err => console.error('Erreur création', err)
     });
   }
 
-  onEntiteResponsableChange() {
-    const entiteResponsableId = this.form.get('buId')?.value;
-    if (entiteResponsableId) {
-      this.processService.getAllByEntite(entiteResponsableId).subscribe(processes => {
-        this.processes = processes;
-      });
-    }
-  }
+  trackById = (index: number, item: {id: string}) => item.id;
 
-  onProcessChange() {
-    const processId = this.form.get('processId')?.value;
-    if (processId) {
-      this.riskService.getAllByProcess(processId).subscribe(risks => {
-        this.risks = risks;
-      });
-    }
-  }
 }

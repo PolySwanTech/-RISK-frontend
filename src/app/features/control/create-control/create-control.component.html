@@ -61,41 +61,25 @@
   <div class="row-add">
     <mat-form-field appearance="outline">
       <mat-label>Entité Responsable</mat-label>
-      <mat-select formControlName="buId" (selectionChange)="onEntiteResponsableChange()">
-        @for (bu of entitesResponsables; track bu.id) {
-        <mat-option [value]="bu.id">{{ bu.name }}</mat-option>
-        }
+      <mat-select formControlName="buId">
+        <mat-option *ngFor="let bu of entitesResponsables$ | async; trackById" [value]="bu.id">{{ bu.name }}</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
 
-  <div class="row-add">
-    @if (form.get('buId')?.value) {
-    <mat-form-field appearance="outline">
-      <mat-label>Process</mat-label>
-      <mat-select formControlName="processId" (selectionChange)="onProcessChange()">
-        @for (p of processes; track p.id) {
-        <mat-option [value]="p.id">{{ p.name }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    }
-  </div>
+  @if (form.get("buId")?.value) {
+    <div class="row-add">
+      <mat-form-field appearance="outline">
+        <mat-label>Process</mat-label>
+        <mat-select formControlName="processId" >
+          <mat-option *ngFor="let p of processes$ | async; trackById" [value]="p.id">{{ p.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  }
 
   <div class="row-add">
-    
-    @if (form.get('processId')?.value) {
-      <app-select-arborescence [id]="form.get('processId')!.value" (changeValue)="onSelectionRisk($event)" placeholder="Sélectionnez un processus"
-              [list]="risks" />
-    <!-- <mat-form-field appearance="outline">
-      <mat-label>Risk</mat-label>
-      <mat-select formControlName="taxonomie">
-        @for (r of risks; track r.id) {
-        <mat-option [value]="r">{{ r.libellePerso }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field> -->
-    }
+    <app-select-arborescence [id]="form.get('processId')!.value" (changeValue)="onSelectionRisk($event)" [list]="(risks$ | async) || []" />
   </div>
 
   <button mat-raised-button class="btn-primary" type="submit">Créer</button>

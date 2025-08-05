@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Process } from '../../models/Process';
 import { Observable } from 'rxjs/internal/Observable';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -34,11 +35,23 @@ export class ProcessService {
     return this.http.get<Process[]>(`${this.baseUrl}/tree`, options);
   }
 
-  getAllByEntite(entiteId : string){
-    let param = new HttpParams();
-    param = param.set('buId', entiteId);
-    return this.http.get<Process[]>(this.baseUrl, {params : param})
-  }
+    getAllByEntite(entiteId?: string): Observable<Process[]> {
+      let params = new HttpParams();
+      if (entiteId) {
+        params = params.set('bu', entiteId);
+      }
+      return this.http.get<{ [key: string]: Process[] }>(`${this.baseUrl}/by-bu`, { params }).pipe(
+        map(res => {
+          // Si un seul BU demandé, on récupère la bonne clé
+          if (entiteId) {
+            return res[entiteId] ?? [];
+          }
+          // Sinon on fusionne tous les tableaux pour toutes les BU
+          return Object.values(res).flat();
+        })
+      );
+    }
+
 
   getAllByRisks(riskId: string) {
     let params = new HttpParams();
