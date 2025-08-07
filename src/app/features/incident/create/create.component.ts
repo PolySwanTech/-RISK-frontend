@@ -58,13 +58,13 @@ export class CreateComponent implements OnInit {
   private confirmService = inject(ConfirmService);
   private incidentId = this.route.snapshot.queryParams['id'];
 
-  incident : Incident | null = null;
+  incident: Incident | null = null;
   selectedUser: string | null = null;
   title = "Ajout d'un incident";
 
 
   incidentForm1 = this._formBuilder.group({
-    reference : [''],
+    reference: [''],
     titre: ['', Validators.required],
     equipeId: ['', Validators.required],
     commentaire: ['', Validators.required],
@@ -83,7 +83,7 @@ export class CreateComponent implements OnInit {
     intervenant: FormControl<string | null>;
     files: FormControl<string | null>;
     cause: FormControl<Cause | null>;
-    consequences: FormControl<string[]> ;
+    consequences: FormControl<string[]>;
     processId: FormControl<string | null>;
   }>({
     riskId: new FormControl(''),
@@ -133,29 +133,29 @@ export class CreateComponent implements OnInit {
     }
   }
 
-private loadTrees(processRootId?: string /** optionnel */) {
-  /* on renvoie un Observable<void> qui émet quand tout est chargé */
-  return forkJoin({
-    processes     : this.processService.getProcessTree(processRootId),
-    risks         : this.riskService.getRisksTree(processRootId),
-    consequences  : this.consequenceService.getAll(),
-    causes        : this.causeService.getAll()
-  }).pipe(
-    tap(({ processes, risks, consequences, causes }) => {
-      this.listProcess       = processes;
-      this.listRisks         = risks;
-      this.listConsequence   = consequences;
-      this.listCauses        = causes;
-    }),
-    /* on ne renvoie plus de valeur (juste la fin du chargement) */
-    map(() => void 0)
-  );
-}
+  private loadTrees() {
+    /* on renvoie un Observable<void> qui émet quand tout est chargé */
+    return forkJoin({
+      processes: this.processService.getProcessTree(),
+      risks: this.riskService.getRisksTree(),
+      consequences: this.consequenceService.getAll(),
+      causes: this.causeService.getAll()
+    }).pipe(
+      tap(({ processes, risks, consequences, causes }) => {
+        this.listProcess = processes;
+        this.listRisks = risks;
+        this.listConsequence = consequences;
+        this.listCauses = causes;
+      }),
+      /* on ne renvoie plus de valeur (juste la fin du chargement) */
+      map(() => void 0)
+    );
+  }
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
       this.incidentForm1.patchValue({
-        reference : incident.reference,
+        reference: incident.reference,
         titre: incident.title,
         equipeId: incident.equipeId,
         commentaire: incident.commentaire,
@@ -170,7 +170,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
 
       const wantedBuId = incident.equipeId;
 
-      this.loadTrees(wantedBuId).subscribe(() => {
+      this.loadTrees().subscribe(() => {
         this.incidentForm3.patchValue({
           riskId: incident.risk,
           cause: incident.cause,
@@ -186,7 +186,6 @@ private loadTrees(processRootId?: string /** optionnel */) {
 
   onTeamChange(event: any) {
     this.listProcess = [];
-    this.listRisks = [];
     this.incidentForm3.get('processId')?.reset();
     this.incidentForm3.get('riskId')?.reset();
     this.processService.getProcessTree(event.value.id).subscribe(data => {
@@ -195,13 +194,6 @@ private loadTrees(processRootId?: string /** optionnel */) {
   }
 
   onSelectionProcess(value: Process) {
-    this.listRisks = [];
-    this.riskService.getRisksTree(value.id).subscribe(data => {
-      this.listRisks = data;
-      if (this.listRisks.length === 0) {
-        alert("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
-      }
-    });
     this.incidentForm3.get('processId')?.setValue(value.id);
   }
 
@@ -244,8 +236,8 @@ private loadTrees(processRootId?: string /** optionnel */) {
 
   private convertFormToIncident() {
     return {
-      reference : this.incidentForm1.value.reference || "",
-      state : "",
+      reference: this.incidentForm1.value.reference || "",
+      state: "",
       title: this.incidentForm1.value.titre!,
       location: this.incidentForm1.value.location!,
       commentaire: this.incidentForm1.value.commentaire!,
@@ -267,7 +259,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
     const incident = this.convertFormToIncident();
     incident.state = State.SUBMIT
     console.log("Incident à ajouter :", incident);
-    if(this.incidentId){
+    if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
           error: err => {
@@ -295,7 +287,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
     const incident = this.convertFormToIncident();
     incident.state = State.DRAFT;
     console.log("Incident à sauvegarder en brouillon :", incident);
-    if(this.incidentId){
+    if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
           error: err => {
@@ -305,7 +297,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
       );
       this.router.navigate(['incident']);
     }
-    else{
+    else {
       this.incidentService.saveIncident(incident).subscribe(
         {
           next: resp => {
@@ -337,8 +329,8 @@ private loadTrees(processRootId?: string /** optionnel */) {
   private toInputDate(d?: string | Date | null): string | null {
     if (!d) return '';
     return (d instanceof Date ? d : new Date(d))
-          .toISOString()
-          .split('T')[0];
+      .toISOString()
+      .split('T')[0];
   }
 
   onFilesChange(event: any) {
@@ -346,6 +338,6 @@ private loadTrees(processRootId?: string /** optionnel */) {
   }
 
   compareById = (a: { id: string } | null, b: { id: string } | null) =>
-  a && b ? a.id === b.id : a === b;
+    a && b ? a.id === b.id : a === b;
 
 }

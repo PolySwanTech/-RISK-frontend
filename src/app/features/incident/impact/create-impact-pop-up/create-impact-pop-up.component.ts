@@ -72,8 +72,10 @@ export class CreateImpactPopUpComponent implements OnInit {
   ngOnInit(): void {
     this.impact = new Impact('', 0, '', '', '', new Date(), null)
     const onlyBl = true
-    this.entiteService.loadEntities(onlyBl).subscribe(
-      list => this.entites = list
+    this.entiteService.loadEntities(onlyBl).subscribe(list => {
+      this.entites = list;
+      console.log("📌 Entités chargées :", this.entites);
+    }
     )
 
     this.impactService.getImpactByIncidentId(this.incidentId).subscribe(
@@ -120,9 +122,9 @@ export class CreateImpactPopUpComponent implements OnInit {
   async viewFiles(impact: Impact) {
     let files = await firstValueFrom(this.fileService.getFiles({ impactId: impact.id }))
 
-   
+
     console.log(files);
-    
+
     this.dialog.open(FichiersComponent,
       {
         width: '400px',

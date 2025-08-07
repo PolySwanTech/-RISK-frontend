@@ -36,7 +36,7 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
     MatNativeDateModule,
     FormsModule, MatButtonModule, ReactiveFormsModule,
     SelectArborescenceComponent
-],
+  ],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
 })
@@ -52,15 +52,15 @@ export class CreateControlComponent {
   private fb = inject(FormBuilder);
 
   form: FormGroup = this.fb.group({
-    libelle      : ['', Validators.required],
-    description  : ['', Validators.required],
-    frequency    : [null, Validators.required],
-    level        : [null, Validators.required],
-    type  : [null, Validators.required],
-    priority     : [null, Validators.required],
-    processId    : ['',  Validators.required],
-    taxonomie    : [null, Validators.required],
-    buId : ['', Validators.required],
+    libelle: ['', Validators.required],
+    description: ['', Validators.required],
+    frequency: [null, Validators.required],
+    level: [null, Validators.required],
+    type: [null, Validators.required],
+    priority: [null, Validators.required],
+    processId: ['', Validators.required],
+    taxonomie: [null, Validators.required],
+    buId: ['', Validators.required],
   });
 
   priorities = Object.values(Priority);
@@ -74,10 +74,10 @@ export class CreateControlComponent {
   recurences = Object.values(Recurence);
   entiteResponsableId = ""
   processId = "";
-  
+
   enumLabels = EnumLabels;
 
-  onSelectionRisk(event : RiskTemplate) {
+  onSelectionRisk(event: RiskTemplate) {
     this.form.get('taxonomie')?.setValue(event);
   }
 
@@ -106,9 +106,18 @@ export class CreateControlComponent {
     this.userService.getUsers().subscribe(responsables => {
       this.responsables = responsables;
     });
+
+    this.riskService.getAll().subscribe(risks => {
+      this.risks = risks;
+    });
   }
 
   onSubmit() {
+    console.log("Form values:", this.form.value);
+    console.log("Taxonomie ?", this.form.value.taxonomie);
+    console.log("Form valid ?", this.form.valid);
+    console.log('submit');
+
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
     const payload: ControlTemplateCreateDto = {
@@ -120,12 +129,11 @@ export class CreateControlComponent {
       level: this.form.value.level,
       priority: this.form.value.priority,
       taxonomieId: this.form.value.taxonomie.id.id,
-      taxonomieVersion: this.form.value.taxonomie.id.version,
-
+      taxonomieVersion: this.form.value.taxonomie.id.version
     };
 
     this.controlService.createControl(payload).subscribe({
-      next : ()  => {
+      next: () => {
         this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);
         this.dialogRef.close();
       },
@@ -143,11 +151,11 @@ export class CreateControlComponent {
   }
 
   onProcessChange() {
-    const processId = this.form.get('processId')?.value;
-    if (processId) {
-      this.riskService.getAllByProcess(processId).subscribe(risks => {
-        this.risks = risks;
-      });
-    }
+    // const processId = this.form.get('processId')?.value;
+    // if (processId) {
+    //   this.riskService.getAllByProcess(processId).subscribe(risks => {
+    //     this.risks = risks;
+    //   });
+    // }
   }
 }
