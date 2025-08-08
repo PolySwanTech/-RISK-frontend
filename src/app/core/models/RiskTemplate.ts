@@ -23,7 +23,6 @@ export class RiskTemplate {
   id!: RiskId;
 
   libellePerso = '';
-  libelleBalois = '';
   description = '';
 
   /** Enum à iso avec le back */
@@ -48,7 +47,7 @@ export class RiskTemplate {
 
   rpc : RPC[] = []
 
-  creator?: string; // UUID de l'utilisateur qui a créé le risque
+  creator?: BaloiseCategoryEnum; // UUID de l'utilisateur qui a créé le risque
 
   buName : string = ''
   processName: string = '';
@@ -68,7 +67,7 @@ export class RiskTemplate {
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
   libellePerso:        string;
-  libelleBalois:        string;
+  category:        BaloiseCategoryEnum;
   description: string;
   processId:   string;                 // UUID
   riskBrut:    RiskLevel;

@@ -55,6 +55,9 @@ export class CreateRisksComponent implements OnInit {
   process2: Process[] = [];
   process3: Process[] = [];
 
+  bal1: BaloiseCategoryEnum[] = [];
+  bal2: BaloiseCategoryEnum[] = [];
+
   pageTitle = 'Création d\'un risque';
   dialogLabel = { title: 'Création', message: 'création' };
 
@@ -71,7 +74,8 @@ export class CreateRisksComponent implements OnInit {
   infoForm = this.fb.group({
     parentRisk: this.fb.control<string | null>(null), // pour les risques enfants
     libellePerso: this.fb.nonNullable.control<string>(''),
-    libelleBalois: this.fb.nonNullable.control<string>(''),
+    balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
+    balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
     process1: this.fb.nonNullable.control<Process | null>(null, Validators.required),
     process2: this.fb.control<Process | null>(null),
     process3: this.fb.control<Process | null>(null)
@@ -89,6 +93,17 @@ export class CreateRisksComponent implements OnInit {
     }
     if (level === 2) {
       this.process3 = process.enfants ?? [];
+    }
+  }
+
+    onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
+    if (level === 1) {
+      this.riskCategoryService.getByParent(baloise).subscribe(
+        data => {
+          this.bal2 = data;
+          this.infoForm.patchValue({ balois2: null});
+        }
+      );
     }
   }
 
@@ -152,7 +167,7 @@ export class CreateRisksComponent implements OnInit {
 
     const payload: RiskTemplateCreateDto = {
       libellePerso: this.infoForm.get('libellePerso')!.value!,
-      libelleBalois: this.infoForm.get('libelleBalois')!.value!,
+      category: this.infoForm.get('balois2')?.value ? this.infoForm.get('balois2')?.value : this.infoForm.get('balois1')?.value,
       description: this.detailsForm.get('description')!.value!,
       processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,
