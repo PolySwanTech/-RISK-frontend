@@ -74,7 +74,7 @@ export class CreateRisksComponent implements OnInit {
   infoForm = this.fb.group({
     parentRisk: this.fb.control<string | null>(null), // pour les risques enfants
     libellePerso: this.fb.nonNullable.control<string>(''),
-    balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
+    balois1: this.fb.nonNullable.control<BaloiseCategoryEnum | null>(null, Validators.required),
     balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
     process1: this.fb.nonNullable.control<Process | null>(null, Validators.required),
     process2: this.fb.control<Process | null>(null),
@@ -113,6 +113,10 @@ export class CreateRisksComponent implements OnInit {
   ngOnInit(): void {
 
     /* --- chargements parallèles --- */
+
+
+    this.riskCategoryService.getAll().subscribe(data => this.bal1 = data);
+
     this.procSrv.getAll().subscribe(list => this.process1 = list);
 
     this.riskSrv.getAll().subscribe(risks => this.risks = risks);
@@ -136,7 +140,8 @@ export class CreateRisksComponent implements OnInit {
 
       /* pré-remplissage des formulaires */
       this.infoForm.patchValue({
-        libellePerso: this.risk.libellePerso,
+        balois1: this.risk.category ?? null,
+        balois2: this.risk.category ?? null,
         // process1: this.risk.processId,
       });
 
@@ -165,9 +170,19 @@ export class CreateRisksComponent implements OnInit {
       return;
     }
 
+    const cat1 = this.infoForm.get('balois1')?.value;
+    const cat2 = this.infoForm.get('balois2')?.value;
+    const category = cat2 ?? cat1; // cat2 si défini, sinon cat1
+
+    if (!category) {
+      // Affiche un message à l'utilisateur ou arrête la soumission
+      console.error('Catégorie obligatoire !');
+      return;
+    }
+
     const payload: RiskTemplateCreateDto = {
       libellePerso: this.infoForm.get('libellePerso')!.value!,
-      category: this.infoForm.get('balois2')?.value ? this.infoForm.get('balois2')?.value : this.infoForm.get('balois1')?.value,
+      category: category,
       description: this.detailsForm.get('description')!.value!,
       processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,
