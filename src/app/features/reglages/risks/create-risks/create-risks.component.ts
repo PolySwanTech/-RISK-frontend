@@ -24,6 +24,7 @@ import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/risk
 import { Process } from '../../../../core/models/Process';
 import { RiskCategoryService } from '../../../../core/services/risk/risk-category.service';
 import { BaloiseCategoryEnum } from '../../../../core/enum/baloisecategory.enum';
+import { DmrService } from '../../../../core/services/dmr/dmr.service';
 
 @Component({
   selector: 'app-create-risks',
@@ -48,6 +49,8 @@ export class CreateRisksComponent implements OnInit {
   private readonly riskCategoryService = inject(RiskCategoryService);
   private readonly procSrv = inject(ProcessService);
 
+  private readonly dmrSrv = inject(DmrService)
+
   /* ---------------- données ----------------- */
   risks: RiskTemplate[] = []; // liste des risques existants
 
@@ -55,7 +58,7 @@ export class CreateRisksComponent implements OnInit {
   process2: Process[] = [];
   process3: Process[] = [];
 
-  bal1: BaloiseCategoryEnum[] = [];
+  bal1: BaloiseCategoryEnum[] = [BaloiseCategoryEnum.FRAUDE_EXTERNE, BaloiseCategoryEnum.FRAUDE_INTERNE, BaloiseCategoryEnum.VOL];
   bal2: BaloiseCategoryEnum[] = [];
 
   pageTitle = 'Création d\'un risque';
@@ -167,7 +170,7 @@ export class CreateRisksComponent implements OnInit {
 
     const payload: RiskTemplateCreateDto = {
       libellePerso: this.infoForm.get('libellePerso')!.value!,
-      category: this.infoForm.get('balois2')?.value ? this.infoForm.get('balois2')?.value : this.infoForm.get('balois1')?.value,
+      category: (this.infoForm.get('balois2')?.value ?? this.infoForm.get('balois1')?.value)!,
       description: this.detailsForm.get('description')!.value!,
       processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,

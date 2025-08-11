@@ -79,6 +79,5 @@ export interface ControlTemplateCreateDto {
     controlType: Type,
     priority: Priority,
     processId: string,
-    taxonomieId: string
-    taxonomieVersion: String
+    riskId: string,
 }

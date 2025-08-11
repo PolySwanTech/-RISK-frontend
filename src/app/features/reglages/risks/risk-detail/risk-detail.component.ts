@@ -45,7 +45,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
 ];
 
   get probability() : number | string {
-    return (this.risk?.rpc[0]?.probability || 0) * 10 || '-'
+    return (this.risk?.rpc?.[0]?.probability || 0) * 10 || '-';
   }
 
   constructor(

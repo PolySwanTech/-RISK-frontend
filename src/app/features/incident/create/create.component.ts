@@ -66,7 +66,7 @@ export class CreateComponent implements OnInit {
   incidentForm1 = this._formBuilder.group({
     reference : [''],
     titre: ['', Validators.required],
-    equipeId: ['', Validators.required],
+    teamId: ['', Validators.required],
     commentaire: ['', Validators.required],
     location: ['', Validators.required],
   });
@@ -126,7 +126,7 @@ export class CreateComponent implements OnInit {
     }
     if (teamName) {
       this.hasTeam = true;
-      this.incidentForm1.patchValue({ equipeId: teamName });
+      this.incidentForm1.patchValue({ teamId: teamName });
     } else {
       this.hasTeam = false;
       this.fetchTeams();
@@ -157,7 +157,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
       this.incidentForm1.patchValue({
         reference : incident.reference,
         titre: incident.title,
-        equipeId: incident.equipeId,
+        teamId: incident.teamId,
         commentaire: incident.commentaire,
         location: incident.location
       });
@@ -168,7 +168,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
         dateDeCloture: this.toInputDate(incident.closedAt),
       });
 
-      const wantedBuId = incident.equipeId;
+      const wantedBuId = incident.teamId;
 
       this.loadTrees(wantedBuId).subscribe(() => {
         this.incidentForm3.patchValue({
@@ -197,6 +197,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
   onSelectionProcess(value: Process) {
     this.listRisks = [];
     this.riskService.getRisksTree(value.id).subscribe(data => {
+      console.log(data)
       this.listRisks = data;
       if (this.listRisks.length === 0) {
         alert("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
@@ -249,7 +250,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
       title: this.incidentForm1.value.titre!,
       location: this.incidentForm1.value.location!,
       commentaire: this.incidentForm1.value.commentaire!,
-      equipeId: this.incidentForm1.value.equipeId!,
+      teamId: this.incidentForm1.value.teamId!,
       declaredAt: new Date(this.incidentForm2.value.dateDeDeclaration!),
       survenueAt: new Date(this.incidentForm2.value.dateDeSurvenance!),
       detectedAt: new Date(this.incidentForm2.value.dateDeDetection!),

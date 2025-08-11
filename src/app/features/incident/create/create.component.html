@@ -14,13 +14,13 @@
             <ng-container *ngIf="hasTeam; else selectTeam">
               <mat-form-field>
                 <mat-label>Équipe</mat-label>
-                <input matInput formControlName="equipeId" readonly>
+                <input matInput formControlName="teamId" readonly>
               </mat-form-field>
             </ng-container>
             <ng-template #selectTeam>
               <mat-form-field>
                 <mat-label>Choisissez une équipe</mat-label>
-                <mat-select formControlName="equipeId" (selectionChange)="onTeamChange($event)">
+                <mat-select formControlName="teamId" (selectionChange)="onTeamChange($event)">
                   <mat-option *ngFor="let team of listTeams" [value]="team.id">{{ team.name }}</mat-option>
                 </mat-select>
               </mat-form-field>
