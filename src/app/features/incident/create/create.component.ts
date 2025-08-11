@@ -135,7 +135,7 @@ export class CreateComponent implements OnInit {
 private loadTrees(processRootId?: string /** optionnel */) {
   /* on renvoie un Observable<void> qui émet quand tout est chargé */
   return forkJoin({
-    processes     : this.processService.getProcessTree(processRootId),
+    processes     : processRootId ? this.processService.getProcessTree(processRootId) : this.processService.getAll(),
     risks         : this.riskService.getRisksTree(processRootId),
     consequences  : this.consequenceService.getAll(),
     causes        : this.causeService.getAll()
@@ -190,7 +190,7 @@ private loadTrees(processRootId?: string /** optionnel */) {
     this.listRisks = [];
     this.incidentForm3.get('processId')?.reset();
     this.incidentForm3.get('riskId')?.reset();
-    this.processService.getProcessTree(event.value.id).subscribe(data => {
+    this.processService.getProcessTree(event.value).subscribe(data => {
       this.listProcess = data;
     });
   }
