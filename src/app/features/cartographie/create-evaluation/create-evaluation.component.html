@@ -27,9 +27,8 @@
       <ul class="processes-list">
         <li *ngFor="let process of processes" (click)="getControlsByProcessAndRisk(process)"
           [class.selected]="process === selectedProcess" class="process-item">
-          @if(process.sum !== undefined){
-          <span class="process-name">{{ process.name }} - {{process.sum}} €</span>
-          }
+          <span class="process-name">{{ process.name }} - {{process.sum || 0}} €</span>
+          
 
           <!-- <span class="process-impact">{{ process.impact | currency:'EUR' }}</span> -->
         </li>

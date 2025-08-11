@@ -56,6 +56,6 @@ export class ProcessService {
   getAllByRisks(riskId: string) {
     let params = new HttpParams();
     params = params.append('riskId', riskId);
-    return this.http.get<Process[]>(this.baseUrl + '/by-risk', { params : params });
+    return this.http.get<Process[]>(this.baseUrl + '/by-dmr', { params : params });
   }
 }

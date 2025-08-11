@@ -102,33 +102,33 @@
 
                     <!-- Description -->
                     <div class="description-section">
-  <h3 class="description-title">
-    <mat-icon>description</mat-icon>
-    Description de l'incident
-  </h3>
-  <div class="description-content">
-    <p>{{ incident.commentaire }}</p>
-  </div>
-</div>
+                        <h3 class="description-title">
+                            <mat-icon>description</mat-icon>
+                            Description de l'incident
+                        </h3>
+                        <div class="description-content">
+                            <p>{{ incident.commentaire }}</p>
+                        </div>
+                    </div>
 
-<div>
-  <h3 class="description-title">
-    <mat-icon>assessment</mat-icon>
-    Impacts de l'incident
-  </h3>
-  <div>
-    <p>
-      Total : <strong>{{ totalAmount | currency : 'EUR' }}</strong>
-    </p>
+                    <div>
+                        <h3 class="description-title">
+                            <mat-icon>assessment</mat-icon>
+                            Impacts de l'incident
+                        </h3>
+                        <div>
+                            <p>
+                                Total : <strong>{{ totalAmount | currency : 'EUR' }}</strong>
+                            </p>
 
-    @if(!isClosed()){
-      <button mat-raised-button class="btn-primary" (click)="addImpact()">
-        Voir les détails
-        <mat-icon>visibility</mat-icon>
-      </button>
-    }
-  </div>
-</div>
+                            @if(!isClosed()){
+                            <button mat-raised-button class="btn-primary" (click)="addImpact()">
+                                Voir les détails
+                                <mat-icon>visibility</mat-icon>
+                            </button>
+                            }
+                        </div>
+                    </div>
                 </mat-card-content>
             </mat-card>
 
