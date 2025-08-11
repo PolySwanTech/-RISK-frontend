@@ -6,31 +6,8 @@
 }
 @else {
   <div class="control-details-page">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-content">
-        <div class="header-left">
-          <button class="back-button" (click)="goBack()">
-            <i class="icon-arrow-left"></i>
-          </button>
-          <div class="header-info">
-            <h1 class="page-title">Détails du Contrôle</h1>
-            <p class="page-subtitle">{{ control.reference }}</p>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button class="btn btn-secondary" (click)="exportControl()">
-            <i class="icon-download"></i>
-            Exporter
-          </button>
-          <button class="btn btn-primary" (click)="editControl()">
-            <i class="icon-edit"></i>
-            Modifier
-          </button>
-        </div>
-      </div>
-    </div>
-  
+    <app-go-back [title]="'Détails du contrôle'" [buttons]="goBackButtons"></app-go-back>
+   
     <div class="main-content">
       <div class="content-grid">
         <!-- Colonne principale -->
@@ -42,9 +19,9 @@
                 <div class="control-info">
                   <h2 class="control-title">{{ control.libelle }}</h2>
                   <div class="control-badges">
-                    <span class="badge" [ngClass]="getPriorityClass(control.priority)">
+                    <span class="badge" [ngClass]="getPriorityClass(control.execution?.priority)">
                       <i class="icon-alert-triangle"></i>
-                      Priorité {{ formatPriority(control.priority) }}
+                      Priorité {{ formatPriority(control.execution?.priority) }}
                     </span>
                     <!-- <span class="badge" [ngClass]="getStatusClass(control.lastExecution.status)">
                       <i class="icon-check-circle" *ngIf="control.lastExecution.status === ControlStatus.REALISE"></i>
@@ -88,21 +65,21 @@
                     <i class="icon-user detail-icon"></i>
                     <div class="detail-content">
                       <div class="detail-label">Créé par</div>
-                      <div class="detail-value">{{ control.creator }}</div>
+                      <div class="detail-value">{{ control.responsable }}</div>
                     </div>
                   </div>
                   <div class="detail-item">
                     <i class="icon-calendar detail-icon"></i>
                     <div class="detail-content">
                       <div class="detail-label">Dernière exécution</div>
-                      <div class="detail-value">{{ control.lastExecutionDate | date : "dd MM yyyy" }}</div>
+                      <div class="detail-value">{{ control.execution?.achievedAt | date : "dd MM yyyy" }}</div>
                     </div>
                   </div>
                   <div class="detail-item">
                     <i class="icon-users detail-icon"></i>
                     <div class="detail-content">
                       <div class="detail-label">Responsable</div>
-                      <div class="detail-value">{{ control.creator }}</div>
+                      <div class="detail-value">{{ control.responsable }}</div>
                     </div>
                   </div>
                 </div>
@@ -115,13 +92,13 @@
             <div class="card-content">
               <h3 class="card-title">Taxonomie</h3>
               <div class="taxonomie-grid">
-                <div class="taxonomie-item">
+                <!-- <div class="taxonomie-item">
                   <div class="taxonomie-label">Entité</div>
                   <div class="taxonomie-value">{{ control.buName }}</div>
-                </div>
+                </div> -->
                 <div class="taxonomie-item">
                   <div class="taxonomie-label">Processus</div>
-                  <div class="taxonomie-value">{{ control.taxonomie.processName }}</div>
+                  <div class="taxonomie-value">{{ control.processName }}</div>
                 </div>
               </div>
             </div>
@@ -166,7 +143,7 @@
                 <div class="execution-item" *ngFor="let execution of controlExecutions">
                   <div class="execution-info">
                     <div class="execution-date">{{ execution.achievedAt | date : "le dd/MM/yyyy" }}</div>
-                    <div class="execution-responsible">{{ 'par ' + execution.performedByName }}</div>
+                    <div class="execution-responsible">{{ 'par ' + execution.performedBy }}</div>
                   </div>
                   <div class="execution-status">
                     <span class="badge small" [ngClass]="getStatusClass(execution.status)">

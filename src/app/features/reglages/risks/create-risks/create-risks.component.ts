@@ -17,7 +17,7 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 import { RiskService } from '../../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
 
-import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
+import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
 import { RiskLevel, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
@@ -52,6 +52,7 @@ export class CreateRisksComponent implements OnInit {
   bal1: BaloiseCategoryEnum[] = [];
   bal2: BaloiseCategoryEnum[] = [];
   bal3: BaloiseCategoryEnum[] = [];
+  risks: RiskTemplate[] = []; // liste des risques existants
 
   process1: Process[] = [];
   process2: Process[] = [];
@@ -64,17 +65,19 @@ export class CreateRisksComponent implements OnInit {
   impactTypes = Object.values(RiskImpactType);
   riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
+  
 
   /** instance courante (vide ou chargée) */
   risk: RiskTemplate = new RiskTemplate();
 
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
+    parentRisk: this.fb.control<string | null>(null), // pour les risques enfants
     libelle: this.fb.nonNullable.control<string>(''),
     balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
     balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
     balois3: this.fb.control<BaloiseCategoryEnum | null>(null),
-    process1: this.fb.nonNullable.control<string>('', Validators.required),
+    process1: this.fb.nonNullable.control<Process | null>(null, Validators.required),
     process2: this.fb.control<Process | null>(null),
     process3: this.fb.control<Process | null>(null)
   });
@@ -82,9 +85,9 @@ export class CreateRisksComponent implements OnInit {
   detailsForm = this.fb.group({
     description: this.fb.nonNullable.control<string>(''),
     level: this.fb.nonNullable.control<RiskLevel>(RiskLevel.LOW),
-    probability: this.fb.control<number | null>(null, Validators.pattern(/^\d+(\.\d+)?$/)),
     impactType: this.fb.control<RiskImpactType | null>(null)
   });
+  
 
   onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
     if (level === 1) {
@@ -131,10 +134,13 @@ export class CreateRisksComponent implements OnInit {
 
     this.procSrv.getAll().subscribe(list => this.process1 = list);
 
+    this.riskSrv.getAll().subscribe(risks => this.risks = risks);
+
     /* --- id dans l’URL ?  => édition  ---------------------- */
     const id = this.route.snapshot.paramMap.get('id');   // id OU 'create'
     if (id && id !== 'create') {
-      this.loadRiskById(id);
+      console.log('Chargement du risque avec ID:', id);
+      // this.loadRiskById(id);
     }
   }
 
@@ -154,7 +160,7 @@ export class CreateRisksComponent implements OnInit {
         balois1: this.risk.category ?? null,
         balois2: this.risk.category ?? null,
         balois3: this.risk.category ?? null,
-        process1: this.risk.processId,
+        // process1: this.risk.processId,
 
       });
 
@@ -190,18 +196,17 @@ export class CreateRisksComponent implements OnInit {
       processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,
       category: category,
-      impactTypes: [impactType]
+      impactTypes: [impactType],
+      parent: this.infoForm.get('parentRisk')?.value // si c'est un risque enfant
     };
 
-    // Log pour débug
-
-    this.riskSrv.save(payload).subscribe(() => {
+    this.riskSrv.save(payload).subscribe((risk) => {
       this.confirm.openConfirmDialog(
         this.dialogLabel.title,
         `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
         false
       );
-      this.router.navigate(['reglages', 'risks']);
+      this.router.navigate(['reglages', 'risks', risk.id.id]);
     });
   }
 }

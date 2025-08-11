@@ -11,14 +11,16 @@ import { MatInputModule } from '@angular/material/input';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FileService } from '../../../core/services/file/file.service';
 
-interface AttachedFile {
+export interface UploadedFile {
   id: string;
-  name: string;
+  filename: string;
+  objectKey: string;
+  contentType: string;
   size: number;
-  type: string;
+  etag: string;
   uploadedAt: Date;
-  url?: string;
 }
 
 @Component({
@@ -32,67 +34,30 @@ interface AttachedFile {
 export class FichiersComponent {
 
   private confirmService = inject(ConfirmService);
+  private fileService = inject(FileService);
+
   searchQuery: string = '';
   filteredFilesCount: number = 0;
 
-  @Input() idIncident: string | null = null;
+  @Input() incidentId: string = ''
+  @Input() incidentRef: string = ''
   @Input() closed: boolean | null = null;
-  @Input() attachedFiles: AttachedFile[] = []
+  @Input() attachedFiles: UploadedFile[] = []
 
-  filteredFiles: AttachedFile[] = [];
+  filteredFiles: UploadedFile[] = [];
 
   isDragOver = false;
 
   ngOnInit(): void {
-    this.attachedFiles = [
-      {
-        id: '1',
-        name: 'rapport-incident.pdf',
-        size: 2458624, // 2.4 MB
-        type: 'application/pdf',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '2',
-        name: 'capture-ecran-serveur.png',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '3',
-        name: 'capture-ecran-serveur.docx',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '4',
-        name: 'capture-ecran-serveur.csv',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '5',
-        name: 'capture-ecran-serveur.txt',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      }
-    ];
-    this.filteredFiles = this.attachedFiles;
+    this.fileService.getFiles(this.incidentId).subscribe(files => {
+      this.attachedFiles = files;
+      this.filteredFiles = files;
+      this.filteredFilesCount = files.length;
+    });
   }
 
   formatDate(dateString: any) {
     return dateString ? dateString.toLocaleDateString("fr-FR") : null;
-  }
-
-  isNotClosed() {
-    if (this.closed) {
-      return false;
-    }
-    return true
   }
 
   normalize(str?: string): string {
@@ -178,49 +143,36 @@ export class FichiersComponent {
   }
 
   private uploadFile(file: File): void {
-    if (!this.idIncident) return;
+    if (!this.incidentId) return;
 
-    // TODO: Implémenter l'upload vers votre API
-    // const formData = new FormData();
-    // formData.append('file', file);
-    // formData.append('incidentId', this.idIncident);
-
-    // this.fileService.uploadFile(formData).subscribe({
-    //   next: (response) => {
-    //     this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
-    //     this.loadAttachedFiles(this.idIncident);
-    //   },
-    //   error: (error) => {
-    //     this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'upload de ${file.name}.`, false);
-    //   }
-    // });
-
-    // Simulation d'upload pour la démo
-    const newFile: AttachedFile = {
-      id: Date.now().toString(),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      uploadedAt: new Date()
-    };
-
-    this.attachedFiles.push(newFile);
-    this.filteredFiles = this.attachedFiles;
+    this.fileService.uploadFile(file, this.incidentRef, this.incidentId).subscribe(
+      {
+        next: _ => {
+          this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
+          this.ngOnInit();
+        },
+        error: error => {
+          this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'ajout du fichier ${file.name}.`, false);
+        }
+      }
+    )
   }
 
-  downloadFile(file: AttachedFile): void {
-    // TODO: Implémenter le téléchargement depuis votre API
-    // this.fileService.downloadFile(file.id).subscribe(blob => {
-    //   const url = window.URL.createObjectURL(blob);
-    //   const link = document.createElement('a');
-    //   link.href = url;
-    //   link.download = file.name;
-    //   link.click();
-    //   window.URL.revokeObjectURL(url);
-    // });
+  downloadFile(file: UploadedFile): void {
 
-    // Simulation pour la démo
-    this.confirmService.openConfirmDialog("Téléchargement", `Téléchargement de ${file.name} en cours...`, false);
+    this.confirmService.openConfirmDialog("Téléchargement", `Téléchargement de ${file.filename} en cours...`, false);
+
+    this.fileService.downloadFile(file.objectKey).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    });
   }
 
   deleteFile(fileId: string): void {
@@ -239,7 +191,7 @@ export class FichiersComponent {
     const file = this.attachedFiles.find(f => f.id === fileId);
     this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
     this.filteredFiles = this.attachedFiles;
-    this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.name} a été supprimé avec succès.`, false);
+    this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.filename} a été supprimé avec succès.`, false);
   }
 
   formatFileSize(bytes: number): string {
@@ -280,7 +232,7 @@ export class FichiersComponent {
       this.filteredFiles = this.attachedFiles;
     } else {
       this.filteredFiles = this.attachedFiles.filter(file => {
-        const nameMatches = file.name.toLowerCase().includes(this.searchQuery);
+        const nameMatches = file.filename.toLowerCase().includes(this.searchQuery);
 
         // Format de la date : 22/05/2025
         const date = file.uploadedAt instanceof Date ? file.uploadedAt : new Date(file.uploadedAt);

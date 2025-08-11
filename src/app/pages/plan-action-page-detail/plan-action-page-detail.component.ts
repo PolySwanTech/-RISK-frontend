@@ -50,19 +50,13 @@ export class PlanActionPageDetailComponent {
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(
       resp => {
-        this.equipeService.getById(resp.userInCharge).subscribe(
-          team => {
-            this.actionPlan = resp;
-            this.actionPlan.userInCharge = team.name;
-            if (this.actionPlan?.actions?.length) {
-              this.totalActions = this.actionPlan.actions.length;
-              this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-              this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-              this.updateStatus();
-            }
-          }
-        );
-
+        this.actionPlan = resp;
+        if (this.actionPlan?.actions?.length) {
+          this.totalActions = this.actionPlan.actions.length;
+          this.completedActions = this.getCompletedCount(this.actionPlan.actions);
+          this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
+          this.updateStatus();
+        }
       }
     )
   }

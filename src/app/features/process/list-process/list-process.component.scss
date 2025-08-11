@@ -13,7 +13,6 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 
 // Header avec glassmorphism
 .header-container {
-    max-width: 1200px;
     margin: 0 auto 32px;
 
     .header-content {
@@ -72,6 +71,8 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 
     .search-container {
         position: relative;
+        display: flex
+;
 
         .search-icon {
             position: absolute;
@@ -108,7 +109,6 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 
 // Container principal de l'arbre
 .hierarchy-container {
-    max-width: 1200px;
     margin: 0 auto;
 
     .tree-wrapper {
@@ -136,6 +136,9 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 }
 
 .process-node {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
@@ -154,7 +157,7 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
         height: 100%;
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         transition: left 0.5s ease;
-        transform: skewX(-12deg);
+        transform: skewX(-3deg);
     }
 
     &:hover .shine-effect {
@@ -203,6 +206,13 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
                         font-size: 20px;
                         width: 20px;
                         height: 20px;
+                    }
+
+                    button {
+                        mat-icon {
+                            padding: 0px;
+                            color: white;
+                        }
                     }
 
                     &.icon-bu {
@@ -428,5 +438,147 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
         right: 20px;
         width: 48px;
         height: 48px;
+    }
+}
+
+.risk-table {
+    width: 100%;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr 1fr 80px;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-row {
+    display: grid;
+    background: #f3f4f6;
+    grid-template-columns: 2fr 1fr 2fr 1fr 80px;
+    gap: 16px;
+    padding: 16px 20px;
+    border-top: 1px solid #f3f4f6;
+    align-items: center;
+}
+
+.table-row:hover {
+    background: #f9fafb;
+}
+
+.col-risque {
+    font-size: 14px;
+    color: #374151;
+}
+
+.col-controle {
+    font-size: 14px;
+    color: #374151;
+}
+
+.risk-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.risk-badge.high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.risk-badge.medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.risk-badge.low {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.btn-edit {
+    padding: 6px;
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.node-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    .node-left {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .node-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .level-badge {
+            white-space: nowrap;
+        }
+    }
+}
+
+.node-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.icon-container {
+    border-radius: 50%;
+    transition: all 0.3s ease;
+
+    mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+    }
+
+    button {
+        mat-icon {
+            padding: 0px;
+            color: white;
+        }
+    }
+
+    &.icon-bu {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    &.icon-parent {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    &.icon-child {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
     }
 }

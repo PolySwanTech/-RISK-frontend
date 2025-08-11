@@ -1,6 +1,7 @@
 <ng-container *ngIf="!loading && risk; else spinner">
   <!-- =============== CONTAINER =================== -->
-  <div class="container">
+  <div class="container body-container">
+    <app-go-back [title]="'Détails du risque'" [subtitle]="risk.reference | uppercase" [buttons]="goBackButtons"></app-go-back>
 
     <!-- ---------------- HEADER ------------------- -->
     <div class="header">
@@ -107,7 +108,7 @@
             <div *ngFor="let eval of risk.riskEvaluations" class="incident">
               <div class="incident-date">{{ eval.createdAt | date : 'dd/MM/yyyy' }}</div>
               <div class="incident-title">Score net : {{ eval.riskNet }}</div>
-              <div class="evaluateur">Evaluateur : {{ eval.evaluator }}</div>
+              <div class="evaluateur">Evaluateur : {{ eval.evaluatorUsername || eval.evaluator }}</div>
             </div>
           </div>
         </div>
@@ -121,16 +122,6 @@
             <p *ngFor="let impact of risk.impactTypes">{{ impact }}</p>
           </div>
         </div>
-      </div>
-
-      <!-- --------------- ACTIONS ----------------- -->
-      <div class="action-buttons">
-        <button mat-raised-button color="primary" (click)="onEvaluate()">
-          Évaluer ce risque
-        </button>
-        <button mat-stroked-button color="accent">
-          Générer Rapport
-        </button>
       </div>
     </div>
   </div>

@@ -1,0 +1,14 @@
+<form [formGroup]="form">
+  <mat-form-field appearance="outline">
+    <mat-label>{{label}}</mat-label>
+    <mat-date-range-input [rangePicker]="rangePicker" formGroupName="selectedRange">
+      <input matStartDate formControlName="start" placeholder="Début" />
+      <input matEndDate formControlName="end" placeholder="Fin" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-date-range-picker #rangePicker></mat-date-range-picker>
+    <button mat-icon-button matSuffix (click)="removeFieldClicked.emit()" *ngIf="removeField">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+</form>

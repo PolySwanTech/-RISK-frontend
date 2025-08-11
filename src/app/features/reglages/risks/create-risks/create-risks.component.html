@@ -1,7 +1,6 @@
-<div style="margin: 15px">
+<div class="body-container">
   <app-go-back
     previousPageName="Gestion des risques"
-    [currentPageName]="pageTitle"
   />
 
   <section>
@@ -22,6 +21,18 @@
                   formControlName="libelle"
                   placeholder="Entrez le titre du risque"
                 />
+              </mat-form-field>
+
+              <!-- Parent ----------------------------------------------------- --> 
+              <mat-form-field class="full-width">
+                <mat-label>Risque parent</mat-label>
+               <mat-select formControlName="parentRisk">
+                  <mat-option [value]="null">Aucun</mat-option>
+                  <!-- on utilise risk.id pour lier le risque parent -->
+                  <mat-option *ngFor="let r of risks" [value]="r.id.id">
+                    {{ r.libelle }}
+                  </mat-option>
+                </mat-select> 
               </mat-form-field>
 
               <!-- Catégorie L1 -------------------------------------------------- -->
@@ -50,7 +61,7 @@
               </mat-form-field>
 
               <!-- Processus ----------------------------------------------------- -->
-              <mat-form-field class="full-width">
+              <mat-form-field *ngIf="process1.length > 0" class="full-width">
                 <mat-label>Processus</mat-label>
                 <mat-select formControlName="process1" (selectionChange)="onProcessChange($event.value, 1)">
                   <mat-option

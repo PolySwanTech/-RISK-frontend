@@ -1,11 +1,10 @@
-@if(incident){
-<div style="margin: 15px;">
-    <app-go-back previousPageName="Détails de l'incident"
-        [currentPageName]="`Suivi de l'incident - ` + incident.title"></app-go-back>
+@if(history && history.length > 0) {
+<div class="body-container">
+    <app-go-back [title]="`Suivi de l'incident`"></app-go-back>
 </div>
 
 <div class="timeline-container">
-    <h2>Suivi de l’incident - {{incident.title}}</h2>
+    <!-- <h2>Suivi de l’incident - {{incident.title}}</h2> -->
 
     <div *ngIf="history.length === 0" class="empty">
         <mat-icon>history</mat-icon> Aucun historique disponible.
@@ -13,7 +12,7 @@
 
     <div class="timeline">
         <div class="timeline-item" *ngFor="let entry of history">
-            <div class="timeline-icon" [ngClass]="entry.action.toLowerCase()">
+            <!-- <div class="timeline-icon" [ngClass]="entry.action.toLowerCase()">
                 <mat-icon>
                     {{
                     entry.action === 'CREATION' ? 'add_circle' :
@@ -22,52 +21,44 @@
                     'delete'
                     }}
                 </mat-icon>
-            </div>
+            </div> -->
+
 
             <div class="timeline-content mat-elevation-z2">
                 <div class="header">
-                    <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
+                    <strong>{{ entry.action }}</strong>
                     <span class="meta">
                         Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
                     </span>
                 </div>
 
-                <div class="timeline-content mat-elevation-z2">
-                    <div class="header">
-                        <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
-                        <span class="meta">
-                            Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
-                        </span>
-                    </div>
+                <label>Commentaires : </label>
+                <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
 
-                    <div *ngIf="entry.action === 'IMPACT_ADDED' && getImpactFromHistory(entry)">
-                        <p class="impact-summary">
-                            {{ getImpactFromHistory(entry) }}
-                        </p>
-                    </div>
-
-                    <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
-
-                    <!-- <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
-                        (click)="openSnapshotDialog(entry)">
-                        <mat-icon>compare</mat-icon> Détails des changements
-                    </button> -->
-                </div>
             </div>
 
-        </div>
-        <div class="timeline-item" *ngFor="let msg of messages">
-            <div class="timeline-icon message">
-                <mat-icon>chat</mat-icon>
-            </div>
-            <div class="timeline-content mat-elevation-z2">
-                <div class="header">
-                    <strong>💬 Message ajouté</strong>
-                    <span class="meta">Par {{ msg.writter }} le {{ msg.date | date:'dd/MM/yyyy à HH:mm' }}</span>
-                </div>
-                <p class="comment">{{ msg.content }}</p>
-            </div>
         </div>
     </div>
 </div>
+
+<mat-vertical-stepper [linear]="false" #stepper>
+    <mat-step *ngFor="let entry of history">
+
+        <ng-template matStepLabel>
+            <div class="timeline-content mat-elevation-z2">
+                <div class="header">
+                    <strong>{{ entry.action }}</strong>
+                    <span class="meta">
+                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
+                    </span>
+                </div>
+
+                <label>Commentaires : </label>
+                <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
+
+            </div>
+        </ng-template>
+
+    </mat-step>
+</mat-vertical-stepper>
 }

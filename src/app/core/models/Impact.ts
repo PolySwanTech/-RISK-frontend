@@ -9,7 +9,6 @@ export class Impact{
 
     entityId : string = ''
     incidentId : string = ''
-    message: string = '';
 
     constructor(
         id : string,
@@ -33,8 +32,8 @@ export class Impact{
 // -------------  DTO -------------
 export interface ImpactCreateDto {
   montant:        number;
+  comptabilisationDate: Date | null;
   entityId: string;
   incidentId:   string; 
   type:    string;
-  message:  string;    
 }

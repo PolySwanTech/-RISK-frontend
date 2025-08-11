@@ -5,6 +5,7 @@ import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
 import { Impact, ImpactCreateDto } from '../../models/Impact';
 import { saveAs } from 'file-saver';
+import { State } from '../../enum/state.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,10 @@ export class IncidentService {
     return this.http.get<Incident[]>(this.baseUrl);
   }
 
+  deleteIncident(id: string) {
+    return this.http.delete(this.baseUrl + `/${id}`)  
+  }
+
   countIncidentsNonClotures(): Observable<number> {
     return this.http.get<number>(this.baseUrl + '/nb/cloture')
   }
@@ -27,10 +32,17 @@ export class IncidentService {
     return this.http.get<any>(this.baseUrl + '/' + id);
   }
 
-  saveIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl, incident);
+  saveIncident(incident: any, state: State): Observable<any> {
+    const params = new HttpParams().set('state', state);
+    return this.http.post(this.baseUrl, incident, { params });
   }
-  
+
+  updateIncident(id: string, incidentDto: any, state: State) {
+
+    const params = new HttpParams().set('state', state);
+    return this.http.put<void>(`${this.baseUrl}/${id}`, incidentDto, { params });
+  }
+
   draftIncident(incident: any): Observable<any> {
     return this.http.post(this.baseUrl + '/draft', incident);
   }  

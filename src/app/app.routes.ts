@@ -12,11 +12,17 @@ import { PermissionName } from './core/enum/permission.enum';
 import { actionPlanRoutes } from './features/action-plan/action-plan.routes';
 import { controlRoutes } from './features/control/control.routes';
 import { RiskPageComponent } from './pages/risk-page/risk-page.component';
+import { CartographieComponent } from './pages/cartographie/cartographie.component';
+import { CalculInputParametersComponent } from './pages/calcul-input-parameters/calcul-input-parameters.component';
+import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
   { path: 'risk', component : RiskPageComponent, canActivate : [AuthGuard] },
+  { path: 'cartographie', component : CartographieComponent, canActivate : [AuthGuard] },
+  { path: 'calcul', component : CalculInputParametersComponent, canActivate : [AuthGuard] },
+  { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard] },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },
   { path: 'incident', children: incidentRoute, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_INCIDENTS } },

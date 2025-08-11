@@ -29,6 +29,11 @@ export class ProcessService {
     return this.http.post<Process>(this.baseUrl , process)
   }
 
+  getProcessTree(buId?: string): Observable<Process[]> {
+    const options = buId ? { params: new HttpParams().set('bu', buId) } : {};
+    return this.http.get<Process[]>(`${this.baseUrl}/tree`, options);
+  }
+
   getAllByEntite(entiteId : string){
     let param = new HttpParams();
     param = param.set('buId', entiteId);

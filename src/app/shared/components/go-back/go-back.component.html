@@ -1,5 +1,29 @@
-<nav class="breadcrumb">
-    <span (click)="goBack()" class="breadcrumb-link">{{ previousPage }}</span>
-    <span class="breadcrumb-separator"> > </span>
-    <span class="breadcrumb-current">{{ currentPage }}</span>
-  </nav>
+<div class="header sticky">
+  <div class="header-content">
+    <div class="header-left">
+      <button class="back-button" (click)="goBack()">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div class="header-info">
+        <h1 class="page-title">{{ title }}</h1>
+        @if(subtitle){
+        <p class="page-subtitle">{{ subtitle }}</p>
+        }
+      </div>
+    </div>
+    <div class="header-actions">
+      @for(btn of buttons; track btn){
+      @if(btn.show){
+      <ng-container>
+        <button mat-raised-button [ngClass]="btn.class" (click)="btn.action()">
+          @if(btn.icon){
+            <mat-icon>{{ btn.icon }}</mat-icon>
+          }
+          {{ btn.label }}
+        </button>
+      </ng-container>
+      }
+      }
+    </div>
+  </div>
+</div>

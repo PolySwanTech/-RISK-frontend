@@ -1,0 +1,25 @@
+<div class="files-search-container">
+  <mat-form-field class="files-search-field" appearance="outline">
+    <mat-label>{{ placeholder }}</mat-label>
+    <div class="files-search-input-container">
+      <input
+        matInput
+        [value]="model"
+        (input)="onInput($event)"
+        placeholder="{{ placeholder }}"
+      />
+      <div class="files-search-input-actions">
+        <mat-icon matSuffix>search</mat-icon>
+        <button
+          *ngIf="(model?.length || 0) > 0"
+          matSuffix
+          mat-icon-button
+          aria-label="Effacer"
+          (click)="clear()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-form-field>
+</div>

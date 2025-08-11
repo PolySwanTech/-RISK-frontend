@@ -49,6 +49,12 @@ export class RiskTemplate {
   buName : string = ''
   processName: string = '';
 
+  parent: RiskTemplate | null = null; // pour les risques parents, sinon null
+
+  children: RiskTemplate[] = []; // pour les risques enfants
+
+  level: number = 0; // niveau de profondeur dans l'arborescence
+
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
     Object.assign(this, init);
@@ -63,4 +69,5 @@ export interface RiskTemplateCreateDto {
   riskBrut:    RiskLevel;
   category:  BaloiseCategoryEnum;      // objet complet (cf. back)
   impactTypes: RiskImpactType[];       // tableau → Set côté Java
+  parent? : string | null; // optionnel, pour les risques enfants
 }
