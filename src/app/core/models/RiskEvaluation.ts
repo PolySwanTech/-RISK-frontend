@@ -8,8 +8,7 @@ import { RiskId } from './RiskTemplate';
 export interface RiskEvaluationCreateDto {
   riskNet      : RiskLevel;
   probability ?: number | null;           // facultatif
-  /** On n’envoie que l’identifiant composite */
-  taxonomie : string;
+  commentaire : string;
 }
 
 /** --- objet retourné par l’API --- */

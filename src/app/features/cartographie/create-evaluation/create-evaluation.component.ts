@@ -9,6 +9,8 @@ import { ImpactService } from '../../../core/services/impact/impact.service';
 import { ControlService } from '../../../core/services/control/control.service';
 import { ControlTemplate } from '../../../core/models/ControlTemplate';
 import { CreateRisksEvaluationsComponent } from "../../reglages/risks/risk-evaluation/create-risks-evaluations/create-risks-evaluations.component";
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-evaluation',
@@ -20,8 +22,10 @@ export class CreateEvaluationComponent implements OnInit {
 
   private riskService = inject(RiskService);
   private processService = inject(ProcessService);
+  private evaluationSrv = inject(RiskEvaluationService);
   private impactService = inject(ImpactService);
   private controlService = inject(ControlService);
+  private router = inject(Router)
 
   risks: any[] = [];
 
@@ -51,8 +55,7 @@ export class CreateEvaluationComponent implements OnInit {
       this.processes = processes;
       this.totalImpact = 0;
       this.processes.forEach(process => {
-        this.impactService.sumByProcess(process.id).subscribe(sum => 
-          {
+        this.impactService.sumByProcess(process.id).subscribe(sum => {
           process.sum = sum
           this.totalImpact += sum;
         });
@@ -71,12 +74,20 @@ export class CreateEvaluationComponent implements OnInit {
   }
 
   submitEvaluation(data: any) {
-    // this.evaluations.push({
-    //   risk: this.selectedRisk,
-    //   process: this.selectedProcess,
-    //   control: this.selectedControl,
-    //   ...data
-    // });
-    alert('Évaluation enregistrée.');
+    console.log(data)
+
+    const payload: any = {
+      commentaire: data.commentaire!,
+      probability: data.probability!,
+      riskNet: data.riskNet!,
+      riskId: this.selectedRisk.id.id,
+    };
+
+    this.evaluationSrv.save(payload).subscribe(resp => {
+      console.log(resp)
+    },
+      error => {
+        console.error(error)
+      })
   }
 }

@@ -47,7 +47,7 @@
 
     <div class="section evaluation-section" *ngIf="selectedControl">
       <h4 class="section-title">Évaluer le contrôle : {{ selectedControl.libelle }}</h4>
-      <app-risk-evaluation [riskId]="selectedRisk.id.id"></app-risk-evaluation>
+      <app-risk-evaluation [riskId]="selectedRisk.id.id" (onSumbit)="submitEvaluation($event)" ></app-risk-evaluation>
     </div>
   </div>
 
