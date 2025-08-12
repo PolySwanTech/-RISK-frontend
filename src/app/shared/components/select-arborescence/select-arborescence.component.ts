@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldAppearance, MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Process } from '../../../core/models/Process';
 
@@ -15,6 +15,7 @@ export class SelectArborescenceComponent {
 
   @Input() list: any[] = [];
   @Input() placeholder: string = '';
+  @Input() appearance: MatFormFieldAppearance = 'fill';
   @Output() changeValue = new EventEmitter<any>();
   @Input() id: string | null = null
 
@@ -63,8 +64,7 @@ export class SelectArborescenceComponent {
         const parentMatch = group.name.toLowerCase().includes(filterValue);
         if (parentMatch || enfants.length > 0) {
           return {
-            id: group.id,
-            name: group.name,
+            ...group, 
             enfants: enfants,
           };
         }

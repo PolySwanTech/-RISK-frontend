@@ -1,4 +1,4 @@
-import { Component, Inject, inject, Input } from '@angular/core';
+import { Component, Inject, inject, Input, Optional } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -51,16 +51,14 @@ export class FichiersComponent {
 
   isDragOver = false;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { files: UploadedFile[] }) {
-
-  }
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data?: { files: UploadedFile[] }) { }
 
   ngOnInit(): void {
 
-    if (this.data && this.data.files) {
-      this.attachedFiles = this.data.files;
-      this.filteredFiles = this.data.files;
-    }
+    if (this.data?.files) {
+    this.attachedFiles = this.data.files;
+    this.filteredFiles = this.data.files;
+  }
 
     if (this.incidentId && this.incidentRef) {
       this.fileService.getFiles({ incidentId: this.incidentId }).subscribe(files => {

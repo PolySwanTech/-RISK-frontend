@@ -61,26 +61,26 @@
   <div class="row-add">
     <mat-form-field appearance="outline">
       <mat-label>Entité Responsable</mat-label>
-      <mat-select formControlName="buId">
-        <mat-option *ngFor="let bu of entitesResponsables$ | async; trackById" [value]="bu.id">{{ bu.name }}</mat-option>
+      <mat-select formControlName="buId" (selectionChange)="onTeamChange($event)">
+        <mat-option *ngFor="let bu of listEntities" [value]="bu.id">{{ bu.name }}</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
 
-  @if (form.get("buId")?.value) {
-    <div class="row-add">
-      <mat-form-field appearance="outline">
-        <mat-label>Process</mat-label>
-        <mat-select formControlName="processId" >
-          <mat-option *ngFor="let p of processes$ | async; trackById" [value]="p.id">{{ p.name }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
+  @if (listProcess.length != 0) {
+  <div class="row-add">
+    <app-select-arborescence appearance="outline" placeholder="Sélectionnez un processus" [id]="form.get('processId')!.value" (changeValue)="onSelectionProcess($event)"
+      [list]="listProcess" />
+  </div>
   }
 
+  @if (listRisks.length != 0) {
   <div class="row-add">
-    <app-select-arborescence [id]="form.get('processId')!.value" (changeValue)="onSelectionRisk($event)" [list]="(risks$ | async) || []" />
+    <app-select-arborescence appearance="outline" placeholder="Sélectionnez un risque" [id]="form.get('riskId')!.value" (changeValue)="onSelectionRisk($event)"
+      [list]="listRisks" />
   </div>
+  }
+
 
   <button mat-raised-button class="btn-primary" type="submit">Créer</button>
 </form>

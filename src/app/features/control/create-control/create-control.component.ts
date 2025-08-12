@@ -59,28 +59,44 @@ export class CreateControlComponent {
     level        : [null, Validators.required],
     type  : [null, Validators.required],
     priority     : [null, Validators.required],
-    processId    : ['',  Validators.required],
-    taxonomie    : [null, Validators.required],
+    processId    : [null,  Validators.required],
+    riskId    : ['',  Validators.required],
     buId : ['', Validators.required],
   });
+
+  
+  listProcess : any[] = [];
+  listRisks : any[] = [];
+  listEntities : any[] = [];
 
   priorities = Object.values(Priority);
   types = Object.values(Type);
   levels = Object.values(Degree);
-  entitesResponsables$ = this.buService.loadEntities();
-  processes$: Observable<Process[]> = this.form.get('buId')!.valueChanges.pipe(
-    startWith(this.form.get('buId')!.value),
-    tap(() => this.form.get('processId')!.reset()),
-    switchMap(id => {
-      const buId = typeof id === 'string' ? id : id?.id;
-      return buId ? this.processService.getAllByEntite(buId) : of([]);
-    }),
-  ); 
+  // entitesResponsables$ = this.buService.loadEntities();
+  // processes$: Observable<Process[]> = this.form.get('buId')!.valueChanges.pipe(
+  //   startWith(this.form.get('buId')!.value),
+  //   tap(() => this.form.get('processId')!.reset()),
+  //   switchMap(id => {
+  //     const buId = typeof id === 'string' ? id : id?.id;
+  //     return buId ? this.processService.getAllByEntite(buId) : of([]);
+  //   }),
+  // ); 
 
-  risks$: Observable<RiskTemplate[]> = this.form.get('processId')!.valueChanges.pipe(
-    startWith(this.form.get('processId')!.value),
-    switchMap(id => id ? this.riskService.getAllByProcess(id).pipe(map(list => list ?? [])) : of([]))
-  );
+//   risks$: Observable<RiskTemplate[]> = this.form.get('processId')!.valueChanges.pipe(
+//   startWith(this.form.get('processId')!.value),
+//   switchMap(id => id
+//     ? this.riskService.getRisksTree(id).pipe(
+//         map(list => list ?? []),
+//         tap(list => console.log('Risks fetched:', list))  // <-- ici le console.log
+//       )
+//     : of([])
+//   )
+// );
+
+get buIdValue() {
+  console.log(this.form.get('buId')?.value)
+  return this.form.get('buId')?.value;
+}
 
   responsables$ = this.userService.getUsers();
 
@@ -88,8 +104,46 @@ export class CreateControlComponent {
   
   enumLabels = EnumLabels;
 
+  ngOnInit(){
+    this.fetchTeams();
+  }
+
+  fetchTeams(): void {
+    this.buService.loadEntities().subscribe({
+      next: teams => {
+        this.listEntities = teams.filter(team => team.process && team.process.length > 0);
+      },
+      error: err => {
+        console.error("Erreur lors du chargement des équipes", err);
+      }
+    });
+  }
+
+  onTeamChange(event: any) {
+    this.listProcess = [];
+    this.listRisks = [];
+    this.form.get('processId')?.reset();
+    this.form.get('riskId')?.reset();
+    this.processService.getProcessTree(event.value.id).subscribe(data => {
+      this.listProcess = data;
+    });
+  }
+
+  onSelectionProcess(value: any) {
+    this.listRisks = [];
+    this.riskService.getRisksTree(value.id).subscribe(data => {
+      console.log(data)
+      this.listRisks = data;
+      if (this.listRisks.length === 0) {
+        alert("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
+      }
+    });
+    this.form.get('processId')?.setValue(value.id);
+  }
+
   onSelectionRisk(event : RiskTemplate) {
-    this.form.get('taxonomie')?.setValue(event);
+    console.log(event)
+    this.form.get('riskId')?.setValue(event.id);
   }
 
   getTypeLabel(type: keyof typeof EnumLabels.type): string {
@@ -119,9 +173,7 @@ export class CreateControlComponent {
       processId: this.form.value.processId,
       level: this.form.value.level,
       priority: this.form.value.priority,
-      taxonomieId: this.form.value.taxonomie.id.id,
-      taxonomieVersion: this.form.value.taxonomie.id.version,
-
+      riskId: this.form.value.riskId,
     };
 
     this.controlService.createControl(payload).subscribe({

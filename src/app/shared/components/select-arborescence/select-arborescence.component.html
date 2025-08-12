@@ -1,5 +1,5 @@
 @if(filteredOptions){
-<mat-form-field appearance="fill">
+<mat-form-field [appearance]="appearance">
     <input type="text" matInput [formControl]="searchControl" [matAutocomplete]="auto" [placeholder]="placeholder ? placeholder : 'Selectionnez une valeur'">
     <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" autoActiveFirstOption>
         @for(parent of filteredOptions; track parent){

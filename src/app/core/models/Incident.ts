@@ -21,7 +21,7 @@ export class Incident {
     riskName : string = "";
     cause : Cause;
     process: string ;
-    equipeId?: string;
+    teamId?: string;
 
     impacts: Impact[];
 
@@ -41,7 +41,7 @@ export class Incident {
         risk: string,
         cause: Cause,
         process: string,
-        equipeId?: string,
+        teamId?: string,
         impacts: Impact[] = [],
         state: State = State.DRAFT,
         consequences: string[] = [],
@@ -58,7 +58,7 @@ export class Incident {
         this.risk = risk;
         this.cause = cause;
         this.process = process;
-        this.equipeId = equipeId;
+        this.teamId = teamId;
         this.impacts = impacts;
         this.state = state;
         this.consequences = consequences;
