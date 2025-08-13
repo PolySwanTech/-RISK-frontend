@@ -11,30 +11,16 @@
         <tbody>
 
           <!-- Lignes de la matrice (impact 5→1) -->
-          <tr *ngFor="let row of reversedMatrixLevels;
-                      let rIdx = index; trackBy: trackByIdx">
-
-            <!-- label de ligne -->
+          <tr *ngFor="let row of reversedMatrixLevels; let rIdx = index; trackBy: trackByIdx">
             <th class="row-header">
-              <input class="row-input"
-                     [(ngModel)]="rowLabels[rIdx]"
-                     [placeholder]="'Ligne '+(rIdx+1)" />
+              <input class="row-input" [(ngModel)]="rowLabels[matrixLevels.length - 1 - rIdx]" />
             </th>
-
-            <!-- cellules -->
-            <td *ngFor="let lvl of row;
-                        let cIdx = index; trackBy: trackByIdx"
-                [ngStyle]="cellStyle(lvl)"
-                (click)="setColor(displayRowIdx(rIdx), cIdx)">
-
-              <!-- badge risque s’il y en a -->
-              <div class="risk-indicator"
-                   *ngIf="cellRiskInfo(displayRowIdx(rIdx),cIdx).id"
-                   (click)="onRiskClick(displayRowIdx(rIdx),cIdx)"
-                   [matTooltip]="cellRiskInfo(displayRowIdx(rIdx),cIdx).name">
-                {{ cellRiskInfo(displayRowIdx(rIdx),cIdx).id }}
+            <td *ngFor="let lvl of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(lvl)"
+              (click)="setColor(matrixLevels.length - 1 - rIdx, cIdx)">
+              <div *ngIf="cellRiskInfo(matrixLevels.length - 1 - rIdx, cIdx).id"
+                (click)="onRiskClick(matrixLevels.length - 1 - rIdx, cIdx)">
+                {{ cellRiskInfo(matrixLevels.length - 1 - rIdx, cIdx).id }}
               </div>
-
             </td>
           </tr>
 
@@ -42,9 +28,7 @@
           <tr class="column-labels-row">
             <th class="probability-header">PROBABILITÉ</th>
             <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx">
-              <input class="col-input"
-                     [(ngModel)]="colLabels[i]"
-                     [placeholder]="'Col '+(i+1)" />
+              <input class="col-input" [(ngModel)]="colLabels[i]" [placeholder]="'Col '+(i+1)" />
             </td>
           </tr>
         </tbody>
@@ -54,15 +38,16 @@
 
   <!-- ========= légende des couleurs ========= -->
   <div class="color-legend">
-    <div *ngFor="let l of colorLevels"
-         class="legend-item"
-         [class.modif]="modifPlan"
-         [class.selected]="selectedColor===l.color"
-         (click)="modifPlan ? selectedColor=l.color : null">
+    <div *ngFor="let l of colorLevels" class="legend-item" [class.modif]="modifPlan"
+      [class.selected]="selectedColor===l.color" (click)="modifPlan ? selectedColor=l.color : null">
       <div class="legend-color" [style.backgroundColor]="l.color"></div>
       <span class="legend-label">{{ l.label }}</span>
     </div>
   </div>
 
   <!-- ========= bouton sauvegarde ========= -->
+  @if(modifPlan){
+  <button mat-raised-button class="btn-primary" (click)="saveMatrix()">Sauvergarder</button>
+  }
+
 </section>

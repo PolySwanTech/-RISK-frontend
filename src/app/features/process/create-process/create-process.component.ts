@@ -14,6 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-create-process',
@@ -33,6 +34,7 @@ export class CreateProcessComponent {
   router = inject(Router);
   fb = inject(FormBuilder);
   dialogRef = inject(MatDialogRef<CreateProcessComponent>);
+  snackBarService = inject(SnackBarService);
 
   constructor(
   ) {
@@ -57,10 +59,14 @@ export class CreateProcessComponent {
     if (this.processForm.valid) {
       const { name, bu_id, parent } = this.processForm.value;
       const dto = { name, bu: bu_id, parentId: parent || null };
-      this.processService.createProcess(dto).subscribe(() => {
+      this.processService.createProcess(dto).subscribe(resp => {
+        this.snackBarService.success("Le processus a bien été créé")
         this.dialogRef.close(true);
         this.router.navigate(['reglages']);
-      });
+      },
+    error => {
+      this.snackBarService.error(error.message);
+    });
 
     }
   }

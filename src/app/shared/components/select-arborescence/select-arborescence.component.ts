@@ -4,10 +4,13 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldAppearance, MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Process } from '../../../core/models/Process';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-select-arborescence',
-  imports: [MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule],
+  imports: [MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatTooltipModule, MatButtonModule],
   templateUrl: './select-arborescence.component.html',
   styleUrl: './select-arborescence.component.scss'
 })
@@ -18,6 +21,7 @@ export class SelectArborescenceComponent {
   @Input() appearance: MatFormFieldAppearance = 'fill';
   @Output() changeValue = new EventEmitter<any>();
   @Input() id: string | null = null
+  @Input() tooltip : string = ''
 
   searchControl = new FormControl<Process | null>(null);
 

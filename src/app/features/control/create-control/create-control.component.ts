@@ -1,3 +1,4 @@
+import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,7 +24,6 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Type } from '../../../core/enum/controltype.enum';
 import { EnumLabels } from '../../../core/enum/enum-labels';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
-import { map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-create-control',
@@ -37,7 +37,7 @@ import { map, Observable, of, startWith, switchMap, tap } from 'rxjs';
     MatNativeDateModule,
     FormsModule, MatButtonModule, ReactiveFormsModule,
     SelectArborescenceComponent
-],
+  ],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
 })
@@ -50,24 +50,25 @@ export class CreateControlComponent {
   controlService = inject(ControlService);
   dialogRef = inject(MatDialogRef<CreateControlComponent>);
   confirmService = inject(ConfirmService);
+  snackBarService = inject(SnackBarService)
   private fb = inject(FormBuilder);
 
   form: FormGroup = this.fb.group({
-    libelle      : ['', Validators.required],
-    description  : ['', Validators.required],
-    frequency    : [null, Validators.required],
-    level        : [null, Validators.required],
-    type  : [null, Validators.required],
-    priority     : [null, Validators.required],
-    processId    : [null,  Validators.required],
-    riskId    : ['',  Validators.required],
-    buId : ['', Validators.required],
+    libelle: ['', Validators.required],
+    description: ['', Validators.required],
+    frequency: [null, Validators.required],
+    level: [null, Validators.required],
+    type: [null, Validators.required],
+    priority: [null, Validators.required],
+    processId: [null, Validators.required],
+    riskId: ['', Validators.required],
+    buId: ['', Validators.required],
   });
 
-  
-  listProcess : any[] = [];
-  listRisks : any[] = [];
-  listEntities : any[] = [];
+
+  listProcess: any[] = [];
+  listRisks: any[] = [];
+  listEntities: any[] = [];
 
   priorities = Object.values(Priority);
   types = Object.values(Type);
@@ -82,29 +83,29 @@ export class CreateControlComponent {
   //   }),
   // ); 
 
-//   risks$: Observable<RiskTemplate[]> = this.form.get('processId')!.valueChanges.pipe(
-//   startWith(this.form.get('processId')!.value),
-//   switchMap(id => id
-//     ? this.riskService.getRisksTree(id).pipe(
-//         map(list => list ?? []),
-//         tap(list => console.log('Risks fetched:', list))  // <-- ici le console.log
-//       )
-//     : of([])
-//   )
-// );
+  //   risks$: Observable<RiskTemplate[]> = this.form.get('processId')!.valueChanges.pipe(
+  //   startWith(this.form.get('processId')!.value),
+  //   switchMap(id => id
+  //     ? this.riskService.getRisksTree(id).pipe(
+  //         map(list => list ?? []),
+  //         tap(list => console.log('Risks fetched:', list))  // <-- ici le console.log
+  //       )
+  //     : of([])
+  //   )
+  // );
 
-get buIdValue() {
-  console.log(this.form.get('buId')?.value)
-  return this.form.get('buId')?.value;
-}
+  get buIdValue() {
+    console.log(this.form.get('buId')?.value)
+    return this.form.get('buId')?.value;
+  }
 
   responsables$ = this.userService.getUsers();
 
   recurences = Object.values(Recurence);
-  
+
   enumLabels = EnumLabels;
 
-  ngOnInit(){
+  ngOnInit() {
     this.fetchTeams();
   }
 
@@ -135,13 +136,13 @@ get buIdValue() {
       console.log(data)
       this.listRisks = data;
       if (this.listRisks.length === 0) {
-        alert("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
+        this.snackBarService.error("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
       }
     });
     this.form.get('processId')?.setValue(value.id);
   }
 
-  onSelectionRisk(event : RiskTemplate) {
+  onSelectionRisk(event: RiskTemplate) {
     console.log(event)
     this.form.get('riskId')?.setValue(event.id);
   }
@@ -177,15 +178,17 @@ get buIdValue() {
     };
 
     this.controlService.createControl(payload).subscribe({
-      next : ()  => {
-        this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);
+      next: () => {
+        this.snackBarService.success("Le contrôle a bien été ajouté");
         console.log('Création réussie', payload);
-        this.dialogRef.close();
       },
-      error: err => console.error('Erreur création', err)
+      error: err => {
+        this.snackBarService.error(err.message);
+        console.error('Erreur création', err)
+      }
     });
   }
 
-  trackById = (index: number, item: {id: string}) => item.id;
+  trackById = (index: number, item: { id: string }) => item.id;
 
 }

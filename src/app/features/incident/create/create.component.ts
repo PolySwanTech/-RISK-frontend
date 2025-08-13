@@ -26,6 +26,8 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
 import { forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @Component({
@@ -45,7 +47,9 @@ import { State } from '../../../core/enum/state.enum';
     GoBackComponent,
     NgIf,
     NgFor,
-    SelectArborescenceComponent
+    SelectArborescenceComponent,
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'

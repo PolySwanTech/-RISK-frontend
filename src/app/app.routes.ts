@@ -19,7 +19,7 @@ import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
-  { path: 'risk', component : RiskPageComponent, canActivate : [AuthGuard] },
+  { path: 'risk/:id', component : RiskPageComponent, canActivate : [AuthGuard] },
   { path: 'cartographie', component : CartographieComponent, canActivate : [AuthGuard] },
   { path: 'calcul', component : CalculInputParametersComponent, canActivate : [AuthGuard] },
   { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard] },
