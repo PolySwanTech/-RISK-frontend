@@ -18,7 +18,6 @@ import { Status } from '../../../core/enum/status.enum';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatIconModule } from '@angular/material/icon';
-import { TooltipButtonComponent } from "../../../shared/components/tooltip-button/tooltip-button.component";
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
