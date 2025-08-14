@@ -185,16 +185,16 @@
                         <div class="col-risque">{{risk.reference + ' - ' + risk.libellePerso}}</div>
                         <div class="col-risque-brut">
                             <span class="risk-badge" [ngClass]="getRiskClass(risk.riskBrut)">
-                                {{ risk.rpc?.[0]?.brutLevel }}
+                                {{ risk.dmr?.[0]?.brutLevel }}
                             </span>
                         </div>
                         <div class="col-controle"><span class="risk-badge"
-                                [ngClass]="getRiskClass(risk.rpc?.[0]?.netLevel || 'MEDIUM')">
-                                {{risk.rpc?.[0]?.controlReference || 'MEDIUM'}}
+                                [ngClass]="getRiskClass(risk.dmr?.[0]?.netLevel || 'MEDIUM')">
+                                {{risk.dmr?.[0]?.controlReference || 'MEDIUM'}}
                             </span></div>
                         <div class="col-risque-net">
-                            <span class="risk-badge" [ngClass]="getRiskClass(risk.rpc?.[0]?.netLevel || 'MEDIUM')">
-                                {{risk.rpc?.[0]?.netLevel || 'MEDIUM'}}
+                            <span class="risk-badge" [ngClass]="getRiskClass(risk.dmr?.[0]?.netLevel || 'MEDIUM')">
+                                {{risk.dmr?.[0]?.netLevel || 'MEDIUM'}}
                             </span>
                         </div>
                         <div class="col-actions">

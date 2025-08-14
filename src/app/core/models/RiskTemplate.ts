@@ -45,7 +45,7 @@ export class RiskTemplate {
   riskEvaluations?: RiskEvaluation[];
   controlTemplates?: ControlTemplate[];
 
-  rpc : RPC[] = []
+  dmr : RPC[] = []
 
   creator?: BaloiseCategoryEnum; // UUID de l'utilisateur qui a créé le risque
 

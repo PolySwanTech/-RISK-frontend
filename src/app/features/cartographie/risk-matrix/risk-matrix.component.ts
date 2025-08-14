@@ -31,7 +31,7 @@ export class RiskMatrixComponent {
   /* ----------- helpers d’affichage ----------- */
   /** Libellé lisible du niveau (High, Low, …) */
   get riskLabel(): string {
-    return RiskLevelLabels[this.riskData!.rpc[0].brutLevel as RiskLevel] ?? 'Unknown';
+    return RiskLevelLabels[this.riskData?.riskEvaluations?.[0].evaluation as RiskLevel] ?? 'Unknown';
   }
 
   get buName(): string {
@@ -44,16 +44,16 @@ export class RiskMatrixComponent {
 
   /** Classe CSS : level-low | level-high … */
   get riskClass(): string {
-    return 'level-' + (this.riskData!.rpc[0].brutLevel as string).toLowerCase();
+    return 'level-' + (this.riskData?.riskEvaluations?.[0].evaluation as string).toLowerCase();
   }
 
   get control() : string {
-    return this.riskData?.rpc[0].controlReference + ' - ' + this.riskData?.rpc[0].controlName || 'Non renseigné'
+    return this.riskData?.dmr[0].controlReference + ' - ' + this.riskData?.dmr[0].controlName || 'Non renseigné'
   }
 
   getProbabilityText(): string {
 
-  const lastEval = this.riskData?.rpc.at(-1)
+  const lastEval = this.riskData?.riskEvaluations?.[0];
 
   if (!lastEval) {
     return '—';
@@ -74,12 +74,12 @@ export class RiskMatrixComponent {
 }
 
   getImpactText(): string {
-    const lastEval = this.riskData?.rpc.at(-1);
+    const lastEval = this.riskData?.riskEvaluations?.[0];
     if (!lastEval) {                     // aucun historique
       return '—';
     }
 
-    const level  = lastEval.netLevel as RiskLevel;
+    const level  = lastEval.evaluation as RiskLevel;
     const label  = RiskLevelLabels[level] ?? 'Unknown';
     const score  = RiskLevelScores[level] ?? '∅';
 

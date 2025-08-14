@@ -17,9 +17,9 @@
             </th>
             <td *ngFor="let lvl of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(lvl)"
               (click)="setColor(matrixLevels.length - 1 - rIdx, cIdx)">
-              <div *ngIf="cellRiskInfo(matrixLevels.length - 1 - rIdx, cIdx).id"
+              <div class="risk-indicator" *ngIf="cellRiskInfo(matrixLevels.length - 1 - rIdx, cIdx).id"
                 (click)="onRiskClick(matrixLevels.length - 1 - rIdx, cIdx)">
-                {{ cellRiskInfo(matrixLevels.length - 1 - rIdx, cIdx).id }}
+                {{ concat(matrixLevels.length - 1 - rIdx, cIdx) }}
               </div>
             </td>
           </tr>

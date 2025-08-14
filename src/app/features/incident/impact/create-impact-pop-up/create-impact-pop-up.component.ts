@@ -73,7 +73,10 @@ export class CreateImpactPopUpComponent implements OnInit {
     this.impact = new Impact('', 0, '', '', '', new Date(), null)
     const onlyBl = true
     this.entiteService.loadEntities(onlyBl).subscribe(
-      list => this.entites = list
+      list => {
+        console.log(list)
+        this.entites = list
+      }
     )
 
     this.impactService.getImpactByIncidentId(this.incidentId).subscribe(

@@ -28,6 +28,7 @@ import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 
 @Component({
@@ -49,7 +50,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     NgFor,
     SelectArborescenceComponent,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDatepickerModule
   ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'

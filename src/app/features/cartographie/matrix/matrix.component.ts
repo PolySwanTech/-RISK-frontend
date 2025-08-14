@@ -90,7 +90,7 @@ export class MatrixComponent {
 
   selectedColor = '';
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog) { }
 
   private snackBarService = inject(SnackBarService);
 
@@ -169,13 +169,15 @@ export class MatrixComponent {
 
     arr.forEach(risk => {
       let impact = 0;
-      let frequency = risk.rpc.at(-1)?.probability;
+      // let frequency = risk.dmr.at(-1)?.probability;
+      let frequency = risk.riskEvaluations![0].probability;
 
       if (!impact || !frequency) {
-        const last = risk.rpc?.at(-1);
+        // const last = risk.dmr?.at(-1);
+        const last = risk.riskEvaluations![0];
         if (last) {
-          frequency = Math.ceil(last.probability / 2);
-          impact = RiskLevelScores[last.netLevel as RiskLevel];
+          frequency = Math.ceil((last.probability ?? 1) / 2);
+          impact = RiskLevelScores[last.evaluation as RiskLevel];
         }
       }
 
@@ -195,6 +197,12 @@ export class MatrixComponent {
     return Array.isArray(data)
       ? { id: '+' + data.length, name: 'Cliquez pour voir les risques' }
       : { id: data.reference, name: data.name };
+  }
+
+  concat(row: number, col: number) {
+    const id = this.cellRiskInfo(row, col).id; // ex: "CON_2025_001"
+    const afterLastUnderscore = id.split('_').pop();
+    return "R" + Number(afterLastUnderscore);
   }
 
   onRiskClick(row: number, col: number) {

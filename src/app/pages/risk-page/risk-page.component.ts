@@ -126,6 +126,7 @@ export class RiskPageComponent implements OnInit {
       next: ({ risks, bus }) => {
         /* ---------------- Pré-traitement ---------------- */
         this.risks = risks.map(risk => {
+          console.log(risks)
           const lastEval = risk.riskEvaluations?.at(-1);
 
           /* probability est sur 1-10 → on le ramène sur 1-5 */
@@ -133,7 +134,7 @@ export class RiskPageComponent implements OnInit {
 
           /* riskNet est l’enum (LOW, MEDIUM…) → on le convertit en score 1-5 */
           const impact = lastEval
-            ? RiskLevelScores[lastEval.riskNet as RiskLevel]   // ex. HIGH → 4
+            ? RiskLevelScores[lastEval.evaluation as RiskLevel]   // ex. HIGH → 4
             : null;
 
           return { ...risk, frequency, impact };
@@ -153,7 +154,7 @@ export class RiskPageComponent implements OnInit {
 
   clearFilters(): void {
     this.selectedBU = 'all';
-    this.selectedNiveau = RiskLevel.LOW;
+    this.selectedNiveau = null;
     this.applyFilters();
   }
 
@@ -176,7 +177,7 @@ export class RiskPageComponent implements OnInit {
 
     /* --- niveau --- */
     if (this.selectedNiveau) {
-      list = list.filter(r => r.riskEvaluations?.at(-1)?.riskNet == this.selectedNiveau);
+      list = list.filter(r => r.riskEvaluations?.at(-1)?.evaluation == this.selectedNiveau);
     }
 
     /* --- synchro sélection courante --- */
