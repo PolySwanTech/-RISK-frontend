@@ -52,7 +52,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatIconModule,
     MatTooltipModule,
     MatDatepickerModule
-  ],
+],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })

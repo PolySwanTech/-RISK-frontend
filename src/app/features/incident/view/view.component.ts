@@ -30,7 +30,7 @@ import { ImpactService } from '../../../core/services/impact/impact.service';
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule, ListImpactComponent,
+    MatGridListModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
     FichiersComponent, ListSuiviComponent],
   templateUrl: './view.component.html',
@@ -177,7 +177,10 @@ export class ViewComponent implements OnInit {
     let choice = confirm("Créer un plan d'action ou consulter un plan d'action existant ?")
     if (choice) {
       this.dialog.open(CreateActionPlanDialogComponent, {
-        width: '400px',
+        width: '800px !important',
+        height: '550px',
+        minWidth: '800px',
+        maxWidth: '800px',
         data: {
           incidentId: this.incident.id,
           reference: this.incident.reference

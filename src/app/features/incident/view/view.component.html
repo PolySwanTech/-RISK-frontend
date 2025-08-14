@@ -131,15 +131,16 @@
                     </div>
                 </mat-card-content>
             </mat-card>
-
-            <app-fichiers [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isClosed()"
-                style="height: 90%;"></app-fichiers>
-
+            <div style="display: flex
+;
+    gap: 20px;">
+                <app-fichiers style="flex: 3;" [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isClosed()"></app-fichiers>
+                <div style="flex: 2;" class="info2-container">
+                    <app-list-suivi [closed]="isClosed()"></app-list-suivi>
+                </div>
+            </div>
         </div>
-        <div class="info2-container" style="display: flex; gap: 20px;">
-            <!-- Section Pièces jointes -->
-            <app-list-suivi [closed]="isClosed()"></app-list-suivi>
-        </div>
+
     </div>
     }
 </div>

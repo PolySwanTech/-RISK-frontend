@@ -158,17 +158,6 @@ mat-card-content {
 }
 
 
-@media (max-width: 768px) {
-  .impacts-container {
-    flex-direction: column;
-  }
-
-  app-impact-card {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-}
-
 .info-container {
   display: flex;
   flex-direction: column;
@@ -182,25 +171,7 @@ mat-card-content {
     width: 100%;
   }
 
-  @media (max-width: 1300px) {
-    flex-direction: column;
-
-    >div {
-      height: auto;
-    }
-
-  }
-}
-
-.info2-container {
-  display: flex;
-  height: auto;
-  gap: 20px;
-
-  mat-card {
-    flex: 1;
-  }
-
+ 
 }
 
 .comment-card {
@@ -259,17 +230,6 @@ mat-card-content {
 
 .display {
   display: block;
-}
-
-@media (min-width: 1830px) {
-  .none {
-    display: block;
-  }
-
-  .display {
-    display: none;
-  }
-
 }
 
 .view-container {
