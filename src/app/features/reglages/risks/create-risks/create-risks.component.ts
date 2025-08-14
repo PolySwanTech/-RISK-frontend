@@ -74,7 +74,7 @@ export class CreateRisksComponent implements OnInit {
   infoForm = this.fb.group({
     parentRisk: this.fb.control<string | null>(null), // pour les risques enfants
     libellePerso: this.fb.nonNullable.control<string>(''),
-    balois1: this.fb.control<BaloiseCategoryEnum | null>(null, Validators.required),
+    balois1: this.fb.nonNullable.control<BaloiseCategoryEnum>(BaloiseCategoryEnum.FRAUDE_EXTERNE, Validators.required),
     balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
     process1: this.fb.nonNullable.control<Process | null>(null, Validators.required),
     process2: this.fb.control<Process | null>(null),
@@ -96,12 +96,12 @@ export class CreateRisksComponent implements OnInit {
     }
   }
 
-    onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
+  onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
     if (level === 1) {
       this.riskCategoryService.getByParent(baloise).subscribe(
         data => {
           this.bal2 = data;
-          this.infoForm.patchValue({ balois2: null});
+          this.infoForm.patchValue({ balois2: null });
         }
       );
     }
@@ -167,7 +167,7 @@ export class CreateRisksComponent implements OnInit {
 
     const payload: RiskTemplateCreateDto = {
       libellePerso: this.infoForm.get('libellePerso')!.value!,
-      category: this.infoForm.get('balois2')?.value ? this.infoForm.get('balois2')?.value : this.infoForm.get('balois1')?.value,
+      category: (this.infoForm.get('balois2')!.value ?? this.infoForm.get('balois1')!.value) as BaloiseCategoryEnum,
       description: this.detailsForm.get('description')!.value!,
       processId: (this.infoForm.get('process1')!.value as unknown as Process).id,
       riskBrut: riskLevel,
