@@ -15,7 +15,7 @@ import { RiskEvaluationCreateDto } from '../../../../../core/models/RiskEvaluati
 import { RiskId, RiskTemplate } from '../../../../../core/models/RiskTemplate';
 import { RiskEvaluationService } from '../../../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 import { RiskService } from '../../../../../core/services/risk/risk.service';
-import { EntiteResponsable } from '../../../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../../../core/models/BusinessUnit';
 import { Process } from '../../../../../core/models/Process';
 import { EntitiesService } from '../../../../../core/services/entities/entities.service';
 import { ProcessService } from '../../../../../core/services/process/process.service';

@@ -18,7 +18,7 @@ import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { State } from '../../../core/enum/state.enum';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
 import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
@@ -55,7 +55,7 @@ export class ViewComponent implements OnInit {
   idIncident: string = "";
   suivi: SuiviIncident[] = []
 
-  businessUnits: EntiteResponsable[] = [];
+  businessUnits: BusinessUnit[] = [];
 
   goBackButtons: GoBackButton[] = [];
 

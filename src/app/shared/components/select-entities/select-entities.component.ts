@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { map, Observable, startWith } from 'rxjs';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 
@@ -15,12 +15,12 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
   styleUrl: './select-entities.component.scss'
 })
 export class SelectEntitiesComponent {
-  entities: EntiteResponsable[] = []
+  entities: BusinessUnit[] = []
 
   searchQuery: string | null = null;
   stateCtrl = new FormControl('');
-  filteredStates!: Observable<EntiteResponsable[]>;
-  filteredEntities!: EntiteResponsable[];
+  filteredStates!: Observable<BusinessUnit[]>;
+  filteredEntities!: BusinessUnit[];
 
   @Input() entiteEnfantId : string = '';
 
@@ -29,7 +29,7 @@ export class SelectEntitiesComponent {
   selectedEntity: any;
   @Output() entitieSelected = new EventEmitter<any>();
 
-  aucunEntite = new EntiteResponsable('', 'Aucun', false, [], null);
+  aucunEntite = new BusinessUnit('', 'Aucun', false, [], null);
 
   constructor(
     private entitiesService: EntitiesService) {
@@ -85,7 +85,7 @@ export class SelectEntitiesComponent {
     );
   }
 
-  private _filterStates(value: any): EntiteResponsable[] {
+  private _filterStates(value: any): BusinessUnit[] {
     if (!value) return this.entities;
 
     let filterValue: string;
@@ -104,7 +104,7 @@ export class SelectEntitiesComponent {
     );
   }
 
-  displayFn = (entitie?: EntiteResponsable): string => {
+  displayFn = (entitie?: BusinessUnit): string => {
     return entitie ? entitie.name : '';
   };
 

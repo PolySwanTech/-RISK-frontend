@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileService } from '../../../core/services/file/file.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { TargetType } from '../../../core/enum/targettype.enum';
 
 export interface UploadedFile {
