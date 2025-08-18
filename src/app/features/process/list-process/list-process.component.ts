@@ -30,6 +30,7 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { MatCardModule } from '@angular/material/card';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 import { firstValueFrom } from 'rxjs';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-list-process',
@@ -54,6 +55,7 @@ export class ListProcessComponent implements OnInit {
   riskService = inject(RiskService); // Assuming you have a risk service to fetch risks
   riskEvaluationService = inject(RiskEvaluationService);
   entityService = inject(EntitiesService);
+  snackBarService = inject(SnackBarService);
 
   processes: Process[] = [];
   displayedColumns: string[] = ['name', 'niveau', 'buName', 'parentName'];
@@ -68,14 +70,15 @@ export class ListProcessComponent implements OnInit {
 
   ngOnInit(): void {
     this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
+      console.log(entities)
       this.fetchProcesses(entities);
     });
 
-    this.getEvaluationYears().then(
-      (years: number[]) => {
-        this.years = years;
-      }
-    )
+    // this.getEvaluationYears().then(
+    //   (years: number[]) => {
+    //     this.years = years;
+    //   }
+    // )
   }
 
   fetchProcesses(allEntities: EntiteResponsable[]): void {
@@ -166,7 +169,7 @@ export class ListProcessComponent implements OnInit {
       .map(entity => {
         const processes = buMap.get(entity.name) || [];
         return {
-          id: `bu-${entity.name}`,
+          id: entity.id,
           name: entity.name,
           niveau: 0,
           type: 'bu' as const,
@@ -347,8 +350,12 @@ export class ListProcessComponent implements OnInit {
           });
         }
         else {
-          this.entityService.update(entiteResponsable).subscribe(() => {
-            this.ngOnInit(); // Rafraîchir après ajout/modification
+          this.entityService.update(entiteResponsable).subscribe(
+            resp => {
+              this.snackBarService.success("L'entité a bien été crée")
+          }, error => {
+              this.snackBarService.error(error.message)
+             this.ngOnInit(); 
           });
         }
       }
@@ -357,5 +364,9 @@ export class ListProcessComponent implements OnInit {
 
   navToCreateCarto(){
     this.router.navigate(['reglages', 'evaluation', 'create'])
+  }
+
+  goToMatrixPage(buId : any){
+    this.router.navigate(['risk', buId])
   }
 }

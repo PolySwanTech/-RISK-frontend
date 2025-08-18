@@ -314,10 +314,10 @@ export class PlanActionPageComponent {
 
   add() {
     this.dialog.open(CreateActionPlanDialogComponent, {
-      width: '600px !important',
+      width: '800px !important',
       height: '550px',
-      minWidth: '600px',
-      maxWidth: '600px',
+      minWidth: '800px',
+      maxWidth: '800px',
     });
   }
 

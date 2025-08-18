@@ -1,6 +1,12 @@
 @if(filteredOptions){
 <mat-form-field [appearance]="appearance">
-    <input type="text" matInput [formControl]="searchControl" [matAutocomplete]="auto" [placeholder]="placeholder ? placeholder : 'Selectionnez une valeur'">
+    <input type="text" matInput [formControl]="searchControl" [matAutocomplete]="auto"
+        [placeholder]="placeholder ? placeholder : 'Selectionnez une valeur'">
+    @if(tooltip){
+    <button mat-icon-button matSuffix [matTooltip]="tooltip">
+        <mat-icon>info</mat-icon>
+    </button>
+    }
     <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" autoActiveFirstOption>
         @for(parent of filteredOptions; track parent){
         <ng-container>

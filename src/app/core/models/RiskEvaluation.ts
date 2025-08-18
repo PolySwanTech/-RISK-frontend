@@ -1,5 +1,6 @@
 import { RiskLevel } from "../enum/riskLevel.enum";
 import { RiskId } from './RiskTemplate';
+import { Utilisateur } from "./Utilisateur";
 /* ----------------------------------------- */
 /*  models/RiskEvaluation.ts                 */
 /* ----------------------------------------- */
@@ -14,9 +15,8 @@ export interface RiskEvaluationCreateDto {
 /** --- objet retourné par l’API --- */
 export interface RiskEvaluation {
   id           : string;      // UUID
-  riskNet      : RiskLevel;
-  evaluator    : string;      // UUID de l’évaluateur
-  evaluatorUsername?: string;
+  evaluation      : RiskLevel;
+  evaluator    : Utilisateur;      // UUID de l’évaluateur
   probability ?: number;
   createdAt    : Date;      // ISO
   riskId : string; // UUID du risque

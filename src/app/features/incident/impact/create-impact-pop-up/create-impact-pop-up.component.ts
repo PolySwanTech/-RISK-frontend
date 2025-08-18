@@ -2,7 +2,7 @@ import { Component, inject, Inject, Input, OnInit } from '@angular/core';
 import { Impact, ImpactCreateDto } from '../../../../core/models/Impact';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
-import { MatLabel } from '@angular/material/form-field';
+import { MatLabel, MatSuffix } from '@angular/material/form-field';
 import { EntitiesService } from '../../../../core/services/entities/entities.service';
 import { Process } from '../../../../core/models/Process';
 import { EntiteResponsable } from '../../../../core/models/EntiteResponsable';
@@ -20,12 +20,13 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 import { FichiersComponent } from '../../../../shared/components/fichiers/fichiers.component';
 import { FileService } from '../../../../core/services/file/file.service';
 import { firstValueFrom } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-create-impact-pop-up',
-  imports: [FormsModule, MatDialogModule, MatLabel, MatCardModule, DatePipe,
-    MatSelectModule, MatInputModule, MatButtonModule, MatTableModule, DecimalPipe,
-    GoBackComponent
+  imports: [FormsModule, MatDialogModule, MatLabel, MatCardModule,
+    MatSelectModule, MatInputModule, MatButtonModule, MatTableModule, MatIconModule, MatTooltipModule, MatSuffix
   ],
   templateUrl: './create-impact-pop-up.component.html',
   styleUrl: './create-impact-pop-up.component.scss'
@@ -73,7 +74,10 @@ export class CreateImpactPopUpComponent implements OnInit {
     this.impact = new Impact('', 0, '', '', '', new Date(), null)
     const onlyBl = true
     this.entiteService.loadEntities(onlyBl).subscribe(
-      list => this.entites = list
+      list => {
+        console.log(list)
+        this.entites = list
+      }
     )
 
     this.impactService.getImpactByIncidentId(this.incidentId).subscribe(

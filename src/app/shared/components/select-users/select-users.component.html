@@ -4,6 +4,9 @@
         <input type="text" matInput [placeholder]="placeholder" [matAutocomplete]="auto" [(ngModel)]="searchQuery"
             [formControl]="stateCtrl" (input)="filterBySearch();" (focus)="filterBySearch()"
             (keydown.enter)="filterBySearch()" />
+            <button mat-icon-button matSuffix matTooltip="Collaborateur qui aura accès à l'incident pour vous supporter">
+                <mat-icon>info</mat-icon>
+              </button>
 
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event)" [displayWith]="displayFn">
             <mat-option *ngIf="(filteredStates | async)?.length === 0" disabled class="no-results">

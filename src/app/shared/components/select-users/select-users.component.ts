@@ -8,11 +8,15 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { CommonModule } from "@angular/common";
 import { AuthService } from "../../../core/services/auth/auth.service";
 import { MatInputModule } from "@angular/material/input";
+import { MatIconModule } from "@angular/material/icon";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatButtonModule } from "@angular/material/button";
 
 
 @Component({
   selector: 'app-select-users',
-  imports: [CommonModule, MatAutocompleteModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule],
+  imports: [CommonModule, MatAutocompleteModule, MatFormFieldModule, ReactiveFormsModule,
+    MatInputModule, MatIconModule, MatTooltipModule, MatButtonModule],
   templateUrl: './select-users.component.html',
   styleUrl: './select-users.component.scss'
 })

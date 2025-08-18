@@ -3,79 +3,118 @@
 
   <form (ngSubmit)="submitActionPlan()">
 
-
-    <!-- Informations du Plan d'Action -->
-    @if(data){
-      <div>
-        <label>Référence de l'incident</label>
-        <input id="reference" [(ngModel)]="data.reference" name="reference" disabled required>
-      </div>
-    }
-
-    <div>
-      <label for="libelle">Libellé</label>
-      <input id="libelle" [(ngModel)]="actionPlan.libelle" name="libelle" required>
-    </div>
-
-    <div>
-      <label for="description">Description</label>
-      <textarea id="description" [(ngModel)]="actionPlan.description" name="description" required></textarea>
-    </div>
-
-    <div>
-      <label for="priority">Priorité</label>
-      <select id="priority" [(ngModel)]="actionPlan.priority" name="priority">
-        @for(priority of priorities; track priority) {
-        <option [value]="priority">{{ formatPriority(priority) }}</option>
-        }
-      </select>
-    </div>
-    
-    <div>
-      <label for="priority">Risk</label>
-      <select id="priority" [(ngModel)]="actionPlan.taxonomie" name="risk">
-        @for(risk of risks; track risk) {
-        <option [ngValue]="risk">{{ risk.libellePerso }}</option>
-        }
-      </select>
-
-    </div>
-
-    <div>
-      <label for="echeance">Échéance</label>
-      <input id="echeance" type="date" [(ngModel)]="actionPlan.echeance" name="echeance" required>
-    </div>
-
-
-    <mat-form-field>
-      <mat-label>Choisissez une équipe</mat-label>
-      <mat-select [(ngModel)]="actionPlan.userInCharge" [ngModelOptions]="{standalone: true}">
-        <mat-option *ngFor="let team of listTeams" [value]="team.id">
-          {{ team.name }}
-        </mat-option>
-      </mat-select>
+    <!-- Référence de l'incident -->
+    <mat-form-field appearance="outline" *ngIf="data">
+      <mat-label>Référence de l'incident</mat-label>
+      <input matInput [(ngModel)]="data.reference" name="reference" disabled required>
+      <button mat-icon-button matSuffix matTooltip="Identifiant unique lié à l'incident.">
+        <mat-icon>info</mat-icon>
+      </button>
     </mat-form-field>
 
+    <!-- Libellé -->
+    <mat-form-field appearance="outline">
+      <mat-label>Libellé</mat-label>
+      <input matInput [(ngModel)]="actionPlan.libelle" name="libelle" required>
+      <button mat-icon-button matSuffix matTooltip="Titre ou nom du plan d'action.">
+        <mat-icon>info</mat-icon>
+      </button>
+    </mat-form-field>
 
-    <!-- Liste des actions -->
+    <!-- Description -->
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput [(ngModel)]="actionPlan.description" name="description" required></textarea>
+      <button mat-icon-button matSuffix matTooltip="Détails sur le plan d'action.">
+        <mat-icon>info</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <div class="row-add">
+      <!-- Priorité -->
+      <mat-form-field appearance="outline">
+        <mat-label>Priorité</mat-label>
+        <mat-select [(ngModel)]="actionPlan.priority" name="priority">
+          <mat-option *ngFor="let priority of priorities" [value]="priority">
+            {{ formatPriority(priority) }}
+          </mat-option>
+        </mat-select>
+        <button mat-icon-button matSuffix matTooltip="Niveau d'importance de ce plan d'action.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Risk -->
+      <mat-form-field appearance="outline">
+        <mat-label>Risk</mat-label>
+        <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}">
+          <mat-option *ngFor="let risk of risks" [value]="risk">
+            {{ risk.libellePerso }}
+          </mat-option>
+        </mat-select>
+        <button mat-icon-button matSuffix matTooltip="Risque associé à ce plan d'action.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
+    <div class="row-add">
+      <!-- Échéance -->
+      <mat-form-field appearance="outline">
+        <mat-label>Échéance</mat-label>
+        <input matInput [matDatepicker]="pickerEcheance" [(ngModel)]="actionPlan.echeance" name="echeance" required>
+        <mat-datepicker-toggle matSuffix [for]="pickerEcheance"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEcheance></mat-datepicker>
+        <button mat-icon-button matSuffix matTooltip="Date limite de réalisation du plan.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Équipe -->
+      <mat-form-field appearance="outline">
+        <mat-label>Choisissez une équipe</mat-label>
+        <mat-select [(ngModel)]="actionPlan.userInCharge" [ngModelOptions]="{standalone: true}">
+          <mat-option *ngFor="let team of listTeams" [value]="team.id">
+            {{ team.name }}
+          </mat-option>
+        </mat-select>
+        <button mat-icon-button matSuffix matTooltip="Équipe responsable de l'exécution du plan.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
+    <!-- Actions -->
     <div class="actions-container">
-      <label for="actions">Actions à effectuer</label>
-      <div class="actions-list">
-        @for(action of actions; track action; let index = $index) {
-        <div class="add-action">
-          <input [(ngModel)]="action.name" [ngModelOptions]="{standalone: true}" placeholder="Entrez une action"
-            class="action-input" />
-          <button type="button" (click)="removeAction(index)" class="remove-btn">X</button>
+      <h3 class="description-cont">
+        <div class="description-title">
+          <mat-icon>description</mat-icon>
+          Actions à effectuer
         </div>
-        }
+        <div class="add-action">
+          <button mat-raised-button type="button" class="btn-green" (click)="addAction()">
+            <mat-icon>add</mat-icon>
+            Ajouter une action
+          </button>
+        </div>
+      </h3>
+    </div>
 
-        <!-- Champ d'ajout d'action -->
-        <div class="add-action">
-          <button type="button" (click)="addAction()" class="add-btn">+</button>
-        </div>
+    <div class="actions-list">
+      <div class="add-action" *ngFor="let action of actions; let i = index">
+        <mat-form-field appearance="outline" class="action-field">
+          <input matInput [(ngModel)]="action.name" [ngModelOptions]="{standalone: true}"
+            placeholder="Entrez une action">
+          <button mat-icon-button matSuffix matTooltip="Supprimer cette action" type="button" (click)="removeAction(i)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
       </div>
     </div>
 
-    <button type="submit" class="submit-btn">Créer le Plan d'Action</button>
+    <!-- Bouton -->
+    <button mat-raised-button class="btn-primary" type="submit">
+      Créer le Plan d'Action
+    </button>
   </form>
 </div>

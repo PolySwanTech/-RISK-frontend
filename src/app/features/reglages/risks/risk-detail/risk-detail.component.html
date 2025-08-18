@@ -46,19 +46,19 @@
         <div class="card">
           <h2 class="card-title">Évaluation du Risque</h2>
           <div class="risk-level">
-            @if(risk.rpc && risk.rpc.length > 0){
+            @if(risk.dmr && risk.dmr.length > 0){
             <div>
               Risque brut
-              <span class="risk-badge" [ngClass]="risk.rpc[0].brutLevel | lowercase">
-                {{ risk.rpc[0].brutLevel | lowercase }}
+              <span class="risk-badge" [ngClass]="risk.dmr[0].brutLevel | lowercase">
+                {{ risk.dmr[0].brutLevel | lowercase }}
               </span>
             </div>
             <span class="arrow">→</span>
             <div>
               Dernière évaluation
-              <span>{{ risk.rpc[0].date | date : 'dd/MM/yyyy' }}</span>
-              <span class="risk-badge" [ngClass]="risk.rpc[0].netLevel | lowercase">
-              {{ risk.rpc[0].netLevel | lowercase}}
+              <span>{{ risk.dmr[0].date | date : 'dd/MM/yyyy' }}</span>
+              <span class="risk-badge" [ngClass]="risk.dmr[0].netLevel | lowercase">
+              {{ risk.dmr[0].netLevel | lowercase}}
               </span>
             </div>
             }
@@ -96,10 +96,10 @@
         <div id="evaluations" class="tab-content" [class.active]="activeTab==='evaluations'">
           <div class="card full-width">
             <h3 class="card-title">Historique des évaluations</h3>
-            <div *ngFor="let eval of risk.rpc" class="incident">
-              <div class="incident-date">{{ eval.date | date : 'dd/MM/yyyy' }}</div>
-              <div class="incident-title">Score net : {{ eval.netLevel }}</div>
-              <div class="evaluateur">Evaluateur : {{ eval.performedBy || 'N/R' }}</div>
+            <div *ngFor="let eval of risk.riskEvaluations" class="incident">
+              <div class="incident-date">{{ eval.createdAt | date : 'dd/MM/yyyy' }}</div>
+              <div class="incident-title">Score net : {{ eval.evaluation }}</div>
+              <div class="evaluateur">Evaluateur : {{ eval.evaluator.username || 'N/R' }}</div>
             </div>
           </div>
         </div>

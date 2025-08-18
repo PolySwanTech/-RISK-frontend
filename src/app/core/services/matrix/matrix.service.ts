@@ -1,0 +1,33 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Matrix } from '../../models/Matrix';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MatrixService {
+
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl + '/matrix';
+
+  /** Récupère toutes les matrices */
+  getMatrices(): Observable<Matrix[]> {
+    return this.http.get<Matrix[]>(this.baseUrl);
+  }
+
+  /** Récupère une matrice par son id */
+  getMatriceById(id: string): Observable<Matrix> {
+    return this.http.get<Matrix>(`${this.baseUrl}/${id}`);
+  }
+
+  getMatriceByBuId(buId: string): Observable<Matrix> {
+    return this.http.get<Matrix>(`${this.baseUrl}/bu/${buId}`);
+  }
+
+  saveMatrix(matrix: any): Observable<Matrix> {
+    return this.http.post<Matrix>(`${this.baseUrl}`, matrix);
+  }
+
+}
