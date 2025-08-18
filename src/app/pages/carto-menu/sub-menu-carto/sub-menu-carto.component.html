@@ -1,0 +1,31 @@
+<section class="container">
+  <h1 class="title">Module Cartographie</h1>
+  <p class="subtitle">Choisissez une action pour la cartographie des risques.</p>
+
+  <div class="cards">
+    <article class="card accent-blue" (click)="goCreate()" tabindex="0" role="button" aria-label="Créer une cartographie">
+      <div class="card-body">
+        <h2>Créer une cartographie Brute</h2>
+        <p>Démarrer une nouvelle cartographie : périmètre, risques, impacts…</p>
+        <span class="cta">Créer</span>
+      </div>
+    </article>
+
+    <article class="card accent-green" (click)="goEval()" tabindex="0" role="button" aria-label="Evaluer une cartographie">
+      <div class="card-body">
+        <h2>Créer une cartographie Nette</h2>
+        <p>Evaluation après application des contrôles existants.</p>
+        <span class="cta">Evaluer</span>
+      </div>
+    </article>
+
+    <article class="card accent-rose" (click)="goConsult()" tabindex="0" role="button" aria-label="Consulter les cartographies">
+      <div class="card-body">
+        <h2>Consulter</h2>
+        <p>Parcourir et analyser les cartographies existantes.</p>
+        <span class="cta">Consulter</span>
+      </div>
+    </article>
+
+  </div>
+</section>

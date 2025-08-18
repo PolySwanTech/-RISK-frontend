@@ -41,7 +41,14 @@ export class IncidentService {
 
   draftIncident(incident: any): Observable<any> {
     return this.http.post(this.baseUrl + '/draft', incident);
-  }  
+  }
+
+  getIncidentByProcessAndRisk(processId: string, riskId: string): Observable<Incident[]> {
+    const params = new HttpParams()
+      .set('processId', processId)
+      .set('riskId', riskId);
+    return this.http.get<Incident[]>(this.baseUrl + '/search', { params });
+  }
 
   close(id: string) {
     return this.http.put(this.baseUrl + `/${id}/close`, null)

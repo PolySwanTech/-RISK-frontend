@@ -10,22 +10,12 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
-interface ProcessNode {
-  id: string;
-  name: string;
-  niveau: number;
-  type: 'bu' | 'parent' | 'child';
-  buName?: string;
-  parentName?: string;
-  risks?: any[]; 
-  children?: ProcessNode[];
-}
-import { Process } from '../../../core/models/Process';
+import { Process, ProcessNode } from '../../../core/models/Process';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateProcessComponent } from '../create-process/create-process.component';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { AddEntityDialogComponent } from '../../reglages/add-entity-dialog/add-entity-dialog.component';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { MatCardModule } from '@angular/material/card';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
@@ -69,8 +59,7 @@ export class ListProcessComponent implements OnInit {
   @Input() isCartographie: boolean = false;
 
   ngOnInit(): void {
-    this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
-      console.log(entities)
+    this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.fetchProcesses(entities);
     });
 
@@ -81,7 +70,7 @@ export class ListProcessComponent implements OnInit {
     // )
   }
 
-  fetchProcesses(allEntities: EntiteResponsable[]): void {
+  fetchProcesses(allEntities: BusinessUnit[]): void {
     this.processService.getAll().subscribe((data: any[]) => {
       this.processes = data;
       this.buildHierarchy(allEntities);
@@ -153,7 +142,7 @@ export class ListProcessComponent implements OnInit {
     this.router.navigate(['reglages', 'risks', id]);
   }
 
-  buildHierarchy(allEntities: EntiteResponsable[]): void {
+  buildHierarchy(allEntities: BusinessUnit[]): void {
     const buMap = new Map<string, Process[]>();
 
     this.processes.forEach(process => {
@@ -342,15 +331,15 @@ export class ListProcessComponent implements OnInit {
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     });
 
-    dialogRef.afterClosed().subscribe(entiteResponsable => {
-      if (entiteResponsable) {
-        if (entiteResponsable.id == null) {
-          this.entityService.save(entiteResponsable).subscribe(() => {
+    dialogRef.afterClosed().subscribe(BusinessUnit => {
+      if (BusinessUnit) {
+        if (BusinessUnit.id == null) {
+          this.entityService.save(BusinessUnit).subscribe(() => {
             this.ngOnInit(); // Rafraîchir après ajout/modification
           });
         }
         else {
-          this.entityService.update(entiteResponsable).subscribe(
+          this.entityService.update(BusinessUnit).subscribe(
             resp => {
               this.snackBarService.success("L'entité a bien été crée")
           }, error => {
