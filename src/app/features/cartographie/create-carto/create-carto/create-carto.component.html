@@ -1,46 +1,36 @@
-<section class="page">
-  <header class="header">
-    <h1>Créer une cartographie</h1>
-    <p>Renseignez la Business Unit et le nom de votre cartographie.</p>
-  </header>
+<app-go-back title="Module cartographie"></app-go-back>
+<br>
+<br>
+<br>
+<br>
+<mat-card>
 
-  <div class="card">
-    <div class="grid">
-      <!-- BU -->
-      <div class="field">
-        <label for="bu">Business Unit <span class="req">*</span></label>
-        <select id="bu" [(ngModel)]="selectedBuId" required>
-          <option value="" disabled>— Sélectionnez une BU —</option>
-          <option *ngFor="let bu of businessUnits" [value]="bu.id">
-            {{ bu.name }}
-          </option>
-        </select>
-        <small class="hint">Choisissez l’unité concernée par cette cartographie.</small>
-      </div>
-
-      <!-- Nom -->
-      <div class="field">
-        <label for="name">Nom de la cartographie</label>
-        <input id="name"
-               type="text"
-               maxlength="120"
-               placeholder="Ex. Carto Exercice 2025"
-               [(ngModel)]="cartoName" />
-        <small class="hint">Jusqu’à 120 caractères (optionnel).</small>
-      </div>
+  <div class="steps">
+    @for(step of steps; track step; let i = $index) {
+    <div [class.active]="i === activeStep" class="step">
+      {{ step }}
     </div>
-
-    <div class="actions">
-      <button type="button" class="btn btn-secondary" (click)="router.navigate(['/cartographie'])">
-        Annuler
-      </button>
-
-      <button type="button"
-              class="btn btn-primary"
-              [disabled]="!selectedBuId || !cartoName?.trim()"
-              (click)="createCarto()">
-        Continuer
-      </button>
-    </div>
+    }
   </div>
-</section>
+  @if(activeStep === 0) {
+  <app-choose-type-carto (nextStep)="activeStep = 1"></app-choose-type-carto>
+  }
+  @if(activeStep === 1) {
+  <!-- <app-select-mapping></app-select-mapping> -->
+  }
+  @if(activeStep === 2 || activeStep === 3) {
+    <app-create-evaluation (changeToEvaluationStep)="activeStep = 3"></app-create-evaluation>
+  }
+  @if(activeStep === 4) {
+  <!-- <app-results-mapping></app-results-mapping> -->
+  }
+  <div class="actions">
+    <button mat-raised-button color="primary" [disabled]="activeStep === 0" (click)="activeStep = activeStep > 0 ? activeStep - 1 : 0">
+      Précédent
+    </button>
+    <button mat-raised-button color="primary" [disabled]="activeStep === steps.length - 1"
+      (click)="activeStep = activeStep < steps.length - 1 ? activeStep + 1 : steps.length - 1">
+      Suivant
+    </button>
+  </div>
+</mat-card>

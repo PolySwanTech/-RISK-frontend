@@ -1,24 +1,21 @@
-import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process, ProcessNode } from '../../../core/models/Process';
-import { ImpactService } from '../../../core/services/impact/impact.service';
 import { ControlService } from '../../../core/services/control/control.service';
 import { ControlTemplate } from '../../../core/models/ControlTemplate';
-import { CreateRisksEvaluationsComponent } from "../../reglages/risks/risk-evaluation/create-risks-evaluations/create-risks-evaluations.component";
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
-import { Router } from '@angular/router';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
-import { Incident } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
+import { EvalRiskProcessComponent } from '../create-carto/eval-risk-process/eval-risk-process.component';
 
 @Component({
   selector: 'app-create-evaluation',
-  imports: [CurrencyPipe, FormsModule, CommonModule, CreateRisksEvaluationsComponent],
+  imports: [FormsModule, CommonModule, EvalRiskProcessComponent],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })
@@ -27,10 +24,12 @@ export class CreateEvaluationComponent implements OnInit {
   private riskService = inject(RiskService);
   private processService = inject(ProcessService);
   private evaluationSrv = inject(RiskEvaluationService);
-  private impactService = inject(ImpactService);
   private controlService = inject(ControlService);
   private entityService = inject(EntitiesService);
   private IncidentService = inject(IncidentService);
+
+
+  @Output() changeToEvaluationStep = new EventEmitter<void>();
 
   risks: any[] = [];
 
@@ -39,17 +38,13 @@ export class CreateEvaluationComponent implements OnInit {
   totalImpact = 0
 
   selectedRisk: any | null = null;
-  selectedProcess: ProcessNode |null = null;
+  selectedProcess: ProcessNode | null = null;
   selectedControl: ControlTemplate | null = null;
 
   processes: Process[] = [];
 
   hierarchicalProcesses: ProcessNode[] = [];
   filteredProcesses: ProcessNode[] = [];
-
-  controls: ControlTemplate[] = []
-
-  incidents: Incident[] = [];
 
   evaluations = [];
 
@@ -61,7 +56,7 @@ export class CreateEvaluationComponent implements OnInit {
     this.riskService.getAll().subscribe(risks => {
       this.risks = risks;
     });
-  
+
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -131,62 +126,21 @@ export class CreateEvaluationComponent implements OnInit {
   }
 
   getProcessByRisks(risk: RiskTemplate) {
-    console.log('Selected Risk:', risk);
+    this.selectedRisk = risk;
     this.processService.getAllByRisks(risk.id.id).subscribe(processes => {
       this.processes = processes;
       this.totalImpact = 0;
-      // this.processes.forEach(process => {
-      //   this.impactService.sumByProcess(process.id).subscribe(sum => {
-      //     process.sum = sum
-      //     this.totalImpact += sum;
-      //   });
-      // });
-      console.log('Processus:', this.processes);
-      this.selectedRisk = risk
-      if (this.selectedProcess) {
-        this.getIncidentsByProcessAndRisk(this.selectedProcess, risk);
-      }
     });
   }
 
   trackByProcessId = (_: number, p: ProcessNode) => p.id;
 
   onSelectProcess(p: ProcessNode) {
-    if (this.selectedProcess?.id !== p.id) {
-      this.getControlsByProcessAndRisk(p); // ta méthode existante
-    }
-    if (this.selectedRisk) {
-      this.getIncidentsByProcessAndRisk(p, this.selectedRisk);
-    }
-  }
-
-  getIncidentsByProcessAndRisk(process: ProcessNode, risk: RiskTemplate) {
-    if (!risk || !process) {
-      this.incidents = [];
-      return;
-    }
-    this.IncidentService.getIncidentByProcessAndRisk(process.id, risk.id.id).subscribe(
-      incidents => {
-        this.incidents = incidents;
-        console.log('Incidents:', this.incidents);
-      },
-      error => {
-        console.error('Error fetching incidents:', error);
-      }
-    );
-  }
-
-  getControlsByProcessAndRisk(process: ProcessNode) {
-    this.selectedProcess = process
-    if (this.selectedRisk && this.selectedProcess)
-      this.controlService.getAllTemplates(this.selectedProcess.id, this.selectedRisk.id.id).subscribe(
-        controls => this.controls = controls
-      )
+    this.selectedProcess = p;
+    this.changeToEvaluationStep.emit();
   }
 
   submitEvaluation(data: any) {
-    console.log(data)
-
     const payload: any = {
       commentaire: data.commentaire!,
       probability: data.probability!,
@@ -194,11 +148,14 @@ export class CreateEvaluationComponent implements OnInit {
       riskId: this.selectedRisk.id.id,
     };
 
-    this.evaluationSrv.save(payload).subscribe(resp => {
-      console.log(resp)
-    },
-      error => {
-        console.error(error)
+    this.evaluationSrv.save(payload).subscribe(
+      {
+        next: resp => {
+          console.log(resp)
+        },
+        error: err => {
+          console.error(err)
+        }
       })
   }
 }

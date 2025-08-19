@@ -26,11 +26,11 @@ export const routes: Routes = [
   { path: 'risk/:id', component : RiskPageComponent, canActivate : [AuthGuard] },
   {
     path: 'cartographie',
+    component: CreateCartoComponent,
     canActivate: [AuthGuard],
     children: [
       { path: '', pathMatch: 'full', component: SubMenuCartoComponent },
       { path: 'consulter', component: SelectCartoComponent }, // TODO : add consultation component after the selection of this carto CartographieComponent || SelectCartoComponent
-      { path: 'creer', component: CreateCartoComponent },
       { path: 'evaluation', component: CreateEvaluationComponent },
     ]
   },

@@ -46,8 +46,9 @@
     </div>
 
     <!-- Bloc évaluation -->
-    <div *ngIf="selectedRisk">
-      <div class="content-header">
+    <div *ngIf="selectedRisk && selectedProcess">
+      <app-eval-risk-process></app-eval-risk-process>
+      <!-- <div class="content-header">
         <h2 class="risk-title">{{ selectedRisk.libellePerso }}</h2>
         <div class="impact-summary">
           <span class="impact-label">Total des pertes ({{ selectedYear }}):</span>
@@ -55,34 +56,16 @@
         </div>
       </div>
 
-      <div class="section incidents-section" *ngIf="incidents?.length">
-        <h4 class="section-title">Incidents liés</h4>
-        <ul class="incidents-list">
-          <li *ngFor="let incident of incidents">
-            {{ incident.reference }} - {{ incident.declaredAt | date }}
-          </li>
-        </ul>
-      </div>
-
-      <div class="section controls-section" *ngIf="selectedProcess">
-        <h4 class="section-title">Contrôles liés</h4>
-        <ul class="controls-list">
-          <li *ngFor="let control of controls"
-              (click)="selectedControl = control"
-              [class.selected]="control === selectedControl"
-              class="control-item">
-            <span class="control-label">{{ control.libelle }}</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="section evaluation-section" *ngIf="selectedControl">
+      <div class="section evaluation-section">
         <h4 class="section-title">Évaluer le contrôle : {{ selectedControl.libelle }}</h4>
         <app-risk-evaluation
           [riskId]="selectedRisk.id.id"
           (onSumbit)="submitEvaluation($event)">
         </app-risk-evaluation>
-      </div>
+      </div> -->
+
+
+
     </div>
 
     <div class="empty-state" *ngIf="!selectedRisk">
