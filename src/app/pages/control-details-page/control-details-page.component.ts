@@ -1,14 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 
 import { Status, statusLabels } from '../../core/enum/status.enum';
-import { Priority, priorityLabels } from '../../core/enum/Priority';
-import { Degree, degreeLabels } from '../../core/enum/degree.enum';
-
 import { ControlService } from '../../core/services/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
@@ -18,7 +12,6 @@ import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/pl
 import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { PopupEvaluationControleComponent } from './popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 
-import { differenceInCalendarDays, parseISO } from 'date-fns';
 import { catchError, forkJoin, of } from 'rxjs';
 import { RecurenceLabels } from '../../core/enum/recurence.enum';
 
@@ -27,10 +20,6 @@ import { RecurenceLabels } from '../../core/enum/recurence.enum';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    RouterModule,
-    MatButtonModule,
-    MatIconModule,
     PlanifierExecutionPopupComponent,
     GoBackComponent,
     PopupEvaluationControleComponent
@@ -43,37 +32,20 @@ export class ControlDetailsPageComponent implements OnInit {
   private controlService = inject(ControlService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-
-  activeTab = 'details';
+  
 
   control: ControlTemplate | null = null;
-  controlExecutions: ControlExecution[] = [];
-
-  // Enums pour le template
+  controlExecutions: ControlExecution[] | null = null;
   ControlStatus = Status;
-  Priority = Priority;
-  ControlLevel = Degree;
-
   showPopup = false;
   currentUsername = '';
-
   showEvaluationPopup = false;
   selectedExecutionId: string | null = null;
-
   recurenceLabels = { ...RecurenceLabels };
   selectedExecutionToEdit: ControlExecution | null = null;
-
-  blockers: ControlExecution[] = [];
-  showBlockersPopup = false;
-
-  showEvalDetailsPopup = false;
-  evalDetails?: ControlEvaluationView;
-
-  reviewComment = '';
-
-  // Cache: executionId -> evaluation
+  selectedExecId: string | null = null;
+  forceDetails: boolean = false;
   evaluationCache: Record<string, ControlEvaluationView | null> = {};
-
   goBackButtons = [
     {
       label: 'Exporter',
@@ -90,6 +62,7 @@ export class ControlDetailsPageComponent implements OnInit {
       action: () => this.editControl()
     }
   ];
+
 
   ngOnInit(): void {
     this.currentUsername = this.getUsernameFromToken() || '';
@@ -146,25 +119,17 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   markAsRealized(): void {
-    const latest = this.getLatestExecution();
-    if (!latest) return;
+    const target = this.selectedExec;
+    if (!target) return;
+    this.forceDetails = false;
+    this.selectedExecutionId = target.id;
+    this.showEvaluationPopup = true;
+  }
 
-    this.controlService.getBlockers(latest.id).subscribe({
-      next: (res) => {
-        this.blockers = res || [];
-        if (this.blockers.length > 0) {
-          this.showBlockersPopup = true;
-          this.showEvaluationPopup = false;
-        } else {
-          this.selectedExecutionId = latest.id;
-          this.showEvaluationPopup = true;
-        }
-      },
-      error: () => {
-        this.blockers = [];
-        this.showBlockersPopup = false;
-      }
-    });
+  openEvaluationDetailsPopup(executionId: string): void {
+    this.forceDetails = true;
+    this.selectedExecutionId = executionId;
+    this.showEvaluationPopup = true;
   }
 
   scheduleExecution(): void { this.showPopup = true; }
@@ -192,20 +157,16 @@ export class ControlDetailsPageComponent implements OnInit {
     } catch { return null; }
   }
 
-  private getLatestExecution(): ControlExecution | null {
-    return this.controlExecutions?.[0] ?? null;
-  }
-
   canMarkAsRealized(): boolean {
-    const latest = this.getLatestExecution();
-    if (!latest || !this.currentUsername) return false;
+    const ex = this.selectedExec;
+    if (!ex || !this.currentUsername) return false;
 
-    if (latest.performedBy !== this.currentUsername) return false;
-    
-    if (latest.status === Status.ACHIEVED) return false;
+    if (ex.performedBy !== this.currentUsername) return false;
 
-    const latestEval = this.evaluationCache[latest.id];
-    if (latestEval?.reviewStatus === 'PENDING') return false;
+    if (ex.status === Status.ACHIEVED) return false;
+
+    const view = this.evaluationCache[ex.id];
+    if (view?.reviewStatus === 'PENDING') return false;
 
     return true;
   }
@@ -219,36 +180,7 @@ export class ControlDetailsPageComponent implements OnInit {
     this.selectedExecutionToEdit = execution;
     this.showPopup = true;
   }
-
-  openEvaluationFor(executionId: string): void {
-    this.selectedExecutionId = executionId;
-    this.showBlockersPopup = false;
-    this.showEvaluationPopup = true;
-  }
-
-  // isLate(e: ControlExecution): boolean {
-  //   if (!e.achievedAt || !e.plannedAt) return false;
-  //   const a = typeof e.achievedAt === 'string' ? parseISO(e.achievedAt) : new Date(e.achievedAt);
-  //   const p = typeof e.plannedAt === 'string' ? parseISO(e.plannedAt) : new Date(e.plannedAt);
-  //   return differenceInCalendarDays(a, p) > 0;
-  // }
-
-  // delayDays(e: ControlExecution): number {
-  //   if (!e.achievedAt || !e.plannedAt) return 0;
-  //   const a = typeof e.achievedAt === 'string' ? parseISO(e.achievedAt) : new Date(e.achievedAt);
-  //   const p = typeof e.plannedAt === 'string' ? parseISO(e.plannedAt) : new Date(e.plannedAt);
-  //   return Math.max(0, differenceInCalendarDays(a, p));
-  // }
-
-  openEvalDetails(execution: ControlExecution): void {
-    const cached = this.evaluationCache[execution.id];
-    if (cached) { this.evalDetails = cached; this.showEvalDetailsPopup = true; return; }
-    this.controlService.getEvaluationByExecution(execution.id).subscribe({
-      next: (res: any) => { this.evalDetails = res as ControlEvaluationView; this.showEvalDetailsPopup = true; },
-      error: () => { alert('Cette exécution n’a pas encore d’évaluation soumise.'); }
-    });
-  }
-
+  
   hasEvaluation(exeId: string): boolean { return !!this.evaluationCache[exeId]; }
   getReviewStatus(exeId: string): 'PENDING' | 'APPROVED' | 'REEXAM_REQUESTED' | null {
     return (this.evaluationCache[exeId]?.reviewStatus ?? null) as any;
@@ -269,27 +201,7 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   isValidator(): boolean { return this.hasRole('VALIDATEUR'); }
-  pendingReview(): boolean { return !!this.evalDetails && this.evalDetails.reviewStatus === 'PENDING'; }
 
-  approveEvaluation(): void {
-    if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
-    this.controlService.reviewEvaluationApprove(this.evalDetails.id, this.reviewComment).subscribe(() => {
-      this.showEvalDetailsPopup = false;
-      this.reviewComment = '';
-      if (this.control) this.loadControlExecutions(this.control.id.id);
-    });
-  }
-
-  requestReexam(): void {
-    if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
-    this.controlService.reviewEvaluationReexam(this.evalDetails.id, this.reviewComment).subscribe(() => {
-      this.showEvalDetailsPopup = false;
-      this.reviewComment = '';
-      if (this.control) this.loadControlExecutions(this.control.id.id);
-    });
-  }
 
   get lastEvaluation(): ControlEvaluationView | null {
     if (!this.controlExecutions?.length) return null;
@@ -309,18 +221,6 @@ export class ControlDetailsPageComponent implements OnInit {
     return withEval[0].view;
   }
 
-  getReviewChipClass(s: 'PENDING' | 'APPROVED' | 'REEXAM_REQUESTED' | null | undefined): string {
-    if (s === 'APPROVED') return 'pill-success';
-    if (s === 'REEXAM_REQUESTED') return 'pill-warning';
-    return 'pill-default';
-  }
-
-  getReviewChipLabel(s: 'PENDING' | 'APPROVED' | 'REEXAM_REQUESTED' | null | undefined): string {
-    if (s === 'APPROVED') return 'Validée';
-    if (s === 'REEXAM_REQUESTED') return 'Réexamen demandé';
-    return 'En attente de validation';
-  }
-
   getCycleNo(executionId: string): number {
     return this.evaluationCache[executionId]?.cycleNo ?? 1;
   }
@@ -328,6 +228,23 @@ export class ControlDetailsPageComponent implements OnInit {
   getReexamIndex(executionId: string): number {
     const n = this.getCycleNo(executionId);
     return n > 1 ? n - 1 : 0;
+  }
+
+  get selectedExec(): ControlExecution | null {
+    if (!this.controlExecutions) return null;
+    return this.controlExecutions.find(e => e.id === this.selectedExecId) ?? null;
+  }
+
+  toggleSelection(id: string) {
+    if (this.selectedExecId === id) {
+      this.selectedExecId = null;
+    } else {
+      this.selectedExecId = id;
+    }
+  }
+
+  get currentOrLatestExecution(): ControlExecution | null {
+    return this.selectedExec ?? (this.controlExecutions?.[0] ?? null);
   }
 
 }

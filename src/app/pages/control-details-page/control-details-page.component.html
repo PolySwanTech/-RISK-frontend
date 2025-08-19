@@ -10,13 +10,10 @@
 
   <div class="main-content">
     <div class="content-grid">
-      <!-- Colonne principale -->
       <div class="main-column">
-        <!-- Informations générales : HERO -->
         <div class="card card-overview hero control-hero">
           <div class="card-content">
 
-            <!-- Titre + sous-titre -->
             <div class="hero-head">
               <h2 class="hero-title">
                 <span class="hero-emoji">📊</span>
@@ -28,7 +25,6 @@
               </div>
             </div>
 
-            <!-- Grille des champs (copie du 3e screen) -->
             <div class="hero-grid">
               <div class="field">
                 <label>Nom du contrôle</label>
@@ -57,37 +53,34 @@
 
               <div class="field">
                 <label>Date planifiée</label>
-                <div class="value">{{ control.execution?.plannedAt ? (control.execution?.plannedAt | date:'dd/MM/yyyy')
-                  : '—' }}
+                <div class="value"> {{ currentOrLatestExecution?.plannedAt ? (currentOrLatestExecution?.plannedAt |
+                  date:'dd/MM/yyyy') : '—' }}
                 </div>
               </div>
 
               <div class="field">
                 <label>Date de réalisation</label>
-                <div class="value">{{ control.execution?.achievedAt ? (control.execution?.achievedAt |
-                  date:'dd/MM/yyyy')
-                  : '—' }}</div>
+                <div class="value"> {{ currentOrLatestExecution?.achievedAt ? (currentOrLatestExecution?.achievedAt |
+                  date:'dd/MM/yyyy') : '—' }}
+                </div>
               </div>
 
               <div class="field">
                 <label>Statut</label>
                 <div class="status-pill" [ngClass]="getStatusClass(control.execution?.status)">
-                  {{ control.execution?.status ? formatStatus(control!.execution!.status) : '—' }}
+                  {{ currentOrLatestExecution?.status ? formatStatus(currentOrLatestExecution!.status) : '—' }}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Carte “Résultats & observations” (dernière évaluation) -->
         <app-popup-evaluation-controle [showAsCard]="true" [evaluationView]="lastEvaluation">
         </app-popup-evaluation-controle>
 
       </div>
 
-      <!-- Sidebar -->
       <div class="sidebar">
-        <!-- Historique des exécutions -->
         <div class="card">
           <div class="card-content">
             <h3 class="card-title">
@@ -101,34 +94,35 @@
                      'item-inprogress': execution.status === ControlStatus.IN_PROGRESS,
                      'item-achieved': execution.status === ControlStatus.ACHIEVED,
                      'item-notachieved': execution.status === ControlStatus.NOT_ACHIEVED,
-                     'is-active': hasEvaluation(execution.id) && getReviewStatus(execution.id) === 'PENDING'
+                     'is-active': hasEvaluation(execution.id) && getReviewStatus(execution.id) === 'PENDING',
+                     'is-selected': selectedExecId === execution.id
                    }">
 
+                <div class="execution-select" (click)="$event.stopPropagation()">
+                  <label class="radio-wrap"
+                    [attr.aria-label]="'Sélectionner l\'exécution du ' + (execution.plannedAt | date:'dd/MM/yyyy')">
+                    <input type="radio" name="execSel" [value]="execution.id"
+                      [checked]="selectedExecId === execution.id" (click)="toggleSelection(execution.id)" />
+                    <span class="dot" aria-hidden="true"></span>
+                  </label>
+                </div>
+
                 <div class="execution-info">
-                  <!-- Ligne 1 : planification -->
                   <div class="execution-date clickable" role="button" tabindex="0" (click)="editExecution(execution)"
                     (keydown.enter)="editExecution(execution)" (keydown.space)="editExecution(execution)">
                     <i class="icon-calendar"></i>
                     <strong>Planifiée le {{ execution.plannedAt | date : "dd/MM/yyyy" }}</strong>
                   </div>
 
-                  <!-- Ligne 2 : attribution (personne assignée) -->
                   <div class="execution-responsible">
                     Attribuée à {{ execution.performedBy }}
                   </div>
 
-                  <!-- Retard (seulement si validée et en retard) -->
-                  <!-- <div class="execution-late" *ngIf="execution.status === ControlStatus.ACHIEVED && isLate(execution)">
-                    <i class="icon-alert-triangle"></i>
-                    Retard de {{ delayDays(execution) }} jours
-                  </div> -->
-
-                  <!-- Ligne 3 : info évaluation si existante -->
                   <div class="execution-eval" *ngIf="hasEvaluation(execution.id)">
                     <div class="eval-line">
                       📋 Évaluer le {{ getEvaluatedAt(execution.id) | date : "dd/MM/yyyy" }}
                       <span *ngIf="getReexamIndex(execution.id) > 0" class="rv-chip rv-chip--secondary"
-                        style="margin-left:8px;">
+                        style="margin-left:8px; display: block;">
                         Réexamen n°{{ getReexamIndex(execution.id) }}
                       </span>
                     </div>
@@ -139,14 +133,12 @@
                       <span *ngSwitchCase="'REEXAM_REQUESTED'" class="rv-chip rv-chip--info">RÉEXAMEN DEMANDÉ</span>
                     </ng-container>
 
-                    <!-- APPROVED -->
                     <div class="eval-review-meta"
                       *ngIf="getReviewStatus(execution.id) === 'APPROVED' && getReviewedAt(execution.id)">
                       <div class="eval-line">✔ Validée le {{ getReviewedAt(execution.id) | date : 'dd/MM/yyyy' }}</div>
                       <div *ngIf="getReviewedBy(execution.id)">par {{ getReviewedBy(execution.id) }}</div>
                     </div>
 
-                    <!-- REEXAM_REQUESTED -->
                     <div class="eval-review-meta"
                       *ngIf="getReviewStatus(execution.id) === 'REEXAM_REQUESTED' && getReviewedAt(execution.id)">
                       <div class="eval-line">Réexamen demandé le {{ getReviewedAt(execution.id) | date : 'dd/MM/yyyy' }}
@@ -162,7 +154,7 @@
                   </span>
 
                   <button class="btn-link btn-détail" *ngIf="hasEvaluation(execution.id)"
-                    (click)="openEvalDetails(execution)">
+                    (click)="openEvaluationDetailsPopup(execution.id)">
                     Détails
                   </button>
                 </div>
@@ -177,12 +169,12 @@
           </div>
         </div>
 
-        <!-- Actions rapides -->
         <div class="card">
           <div class="card-content">
             <h3 class="card-title">Actions rapides</h3>
             <div class="quick-actions">
-              <button class="btn btn-outline full-width" *ngIf="canMarkAsRealized()" (click)="markAsRealized()">
+              <button class="btn btn-outline full-width" *ngIf="selectedExec && canMarkAsRealized()"
+                (click)="markAsRealized()">
                 <i class="icon-check-circle"></i>
                 Marquer comme réalisé
               </button>
@@ -200,152 +192,18 @@
       </div>
     </div>
   </div>
-
-  <ng-container *ngIf="showBlockersPopup">
-    <div class="popup-overlay">
-      <div class="popup-container">
-        <h2>Évaluations en attente</h2>
-        <p>Vous devez d’abord évaluer les exécutions précédentes :</p>
-
-        <div class="list">
-          <div class="item" *ngFor="let b of blockers">
-            <div class="left">
-              <div class="date">Planifiée le {{ b.plannedAt | date: 'dd/MM/yyyy' }}</div>
-              <div class="who">Attribuée à {{ b.performedBy }}</div>
-              <span class="badge small" [ngClass]="getStatusClass(b.status)">
-                {{ formatStatus(b.status) }}
-              </span>
-            </div>
-            <div class="right">
-              <button class="btn btn-primary" (click)="openEvaluationFor(b.id)">Évaluer maintenant</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="popup-actions">
-          <button class="btn btn-secondary" (click)="showBlockersPopup = false">Fermer</button>
-        </div>
-      </div>
-    </div>
-  </ng-container>
-
-  <ng-container *ngIf="showEvalDetailsPopup && evalDetails">
-    <div class="popup-overlay" (click)="showEvalDetailsPopup = false">
-      <div class="rv-modal" (click)="$event.stopPropagation()">
-
-        <div class="rv-modal__header">
-          <div class="rv-modal__title">
-            <span class="rv-emoji">🧾</span>
-            Détail de l’évaluation
-          </div>
-          <button class="rv-iconbtn" (click)="showEvalDetailsPopup = false" aria-label="Fermer">×</button>
-        </div>
-
-        <div class="rv-modal__body">
-
-          <div class="rv-meta-grid">
-            <div class="rv-field">
-              <label>Réalisateur</label>
-              <div class="rv-val">{{ evalDetails.performedBy || '—' }}</div>
-            </div>
-
-            <div class="rv-field">
-              <label>Planifié le</label>
-              <div class="rv-val">
-                {{ evalDetails.plannedAt ? (evalDetails.plannedAt | date:'dd/MM/yyyy') : '—' }}
-              </div>
-            </div>
-
-            <div class="rv-field">
-              <label>Évalué le</label>
-              <div class="rv-val">
-                {{ evalDetails.evaluatedAt ? (evalDetails.evaluatedAt | date:'dd/MM/yyyy') : '—' }}
-              </div>
-            </div>
-
-            <div class="rv-field">
-              <label>Évaluation</label>
-              <div class="pill" [ngClass]="{
-              'pill-success': (evalDetails.evaluation || '').toUpperCase().includes('CONFORME') && !(evalDetails.evaluation || '').toUpperCase().includes('PARTIEL'),
-              'pill-warning': (evalDetails.evaluation || '').toUpperCase().includes('PARTIEL'),
-              'pill-danger':  (evalDetails.evaluation || '').toUpperCase().includes('NON')
-            }">
-                {{ (evalDetails.evaluation || '—') | uppercase }}
-              </div>
-            </div>
-
-            <div class="rv-field">
-              <label>Statut de revue</label>
-              <div class="chip" [ngClass]="getReviewChipClass(evalDetails.reviewStatus)">
-                {{ getReviewChipLabel(evalDetails.reviewStatus) }}
-              </div>
-            </div>
-
-            <div class="rv-field" *ngIf="evalDetails.reviewedAt || evalDetails.reviewedBy">
-              <label>Mise à jour</label>
-              <div class="rv-val meta">
-                <ng-container *ngIf="evalDetails.reviewedAt">
-                  le {{ evalDetails.reviewedAt | date:'dd/MM/yyyy' }}
-                </ng-container>
-                <ng-container *ngIf="evalDetails.reviewedBy">
-                  <span *ngIf="evalDetails.reviewedAt">&nbsp;•&nbsp;</span>par {{ evalDetails.reviewedBy }}
-                </ng-container>
-              </div>
-            </div>
-          </div>
-
-          <hr class="rv-sep">
-
-          <div class="rv-section">
-            <div class="rv-section__label">Résumé</div>
-            <div class="rv-box rv-text">{{ evalDetails.resume || '—' }}</div>
-          </div>
-
-          <div class="rv-section" *ngIf="evalDetails.comments">
-            <div class="rv-section__label">Commentaires</div>
-            <div class="rv-box rv-text">{{ evalDetails.comments }}</div>
-          </div>
-
-          <div class="rv-section" *ngIf="isValidator() && pendingReview()">
-            <div class="rv-section__label">Votre retour (obligatoire)</div>
-            <textarea [(ngModel)]="reviewComment" class="rv-textarea" rows="3"
-              placeholder="Votre avis / décision..."></textarea>
-          </div>
-        </div>
-
-        <div class="rv-modal__footer">
-          <div class="rv-actions" *ngIf="isValidator(); else footerCloseOnly">
-            <button class="btn btn-primary" [disabled]="pendingReview() && !reviewComment.trim()"
-              (click)="approveEvaluation()">
-              ✅ Valider
-            </button>
-            <button class="btn btn-outline warning" [disabled]="pendingReview() && !reviewComment.trim()"
-              (click)="requestReexam()">
-              🔄 Demander un réexamen
-            </button>
-            <button class="btn btn-secondary" (click)="showEvalDetailsPopup = false">Fermer</button>
-          </div>
-          <ng-template #footerCloseOnly>
-            <div class="rv-actions">
-              <button class="btn btn-secondary" (click)="showEvalDetailsPopup = false">Fermer</button>
-            </div>
-          </ng-template>
-        </div>
-
-      </div>
-    </div>
-  </ng-container>
-
-
 </div>
 
 <app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id.id" [controlVersion]="control!.id.version"
   [frequence]="control!.frequency" [isEditing]="selectedExecutionToEdit !== null"
   [executionToEdit]="selectedExecutionToEdit!" (close)="showPopup = false; selectedExecutionToEdit = null"
-  (planifier)="handlePlanification($event)">
+  (planifier)="handlePlanification($event)" [lastPlannedAt]="controlExecutions?.[0]?.plannedAt">
 </app-planifier-execution-popup>
 
-<app-popup-evaluation-controle *ngIf="showEvaluationPopup" [executionId]="selectedExecutionId!"
-  (close)="showEvaluationPopup = false" (submitted)="handleEvaluationSubmitted()">
+<app-popup-evaluation-controle *ngIf="showEvaluationPopup && selectedExecutionId" [executionId]="selectedExecutionId!"
+  [initialMode]="forceDetails ? 'DETAILS' : undefined" [canValidate]="isValidator()"
+  (submitted)="handleEvaluationSubmitted()" (reviewed)="handleEvaluationSubmitted()"
+  (close)="showEvaluationPopup = false">
 </app-popup-evaluation-controle>
+
 }

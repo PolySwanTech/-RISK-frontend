@@ -28,6 +28,7 @@ export class PlanifierExecutionPopupComponent {
   @Input() frequence!: string;
   @Input() isEditing = false;
   @Input() executionToEdit?: ControlExecution;
+  @Input() lastPlannedAt?: string | Date | null;
 
   form: FormGroup;
   utilisateurs: Utilisateur[] = [];
@@ -88,10 +89,8 @@ export class PlanifierExecutionPopupComponent {
   }
 
   initFormForCreation() {
-    const defaultDate = this.calculerDatePlanifieeParDefaut(
-      new Date(this.controlVersion),
-      this.frequence
-    );
+    const base = this.lastPlannedAt ? new Date(this.lastPlannedAt) : new Date();
+    const defaultDate = this.calculerDatePlanifieeParDefaut(base, this.frequence);
     this.form.patchValue({ plannedAt: defaultDate });
   }
 
@@ -106,11 +105,13 @@ export class PlanifierExecutionPopupComponent {
 
   emitCreatePayload() {
     const { evaluator, plannedAt, priority } = this.form.getRawValue();
+    const [y, m, d] = plannedAt.split('-').map(Number);
+    const safe = new Date(y, m - 1, d, 12, 0, 0);
     this.planifier.emit({
       controlTemplateId: this.controlId,
       controlTemplateVersion: this.controlVersion,
       evaluator,
-      plannedAt: new Date(plannedAt).toISOString(),
+      plannedAt: safe.toISOString(),
       priority
     });
   }
@@ -120,7 +121,7 @@ export class PlanifierExecutionPopupComponent {
     if (!freq) return date.toISOString().substring(0, 10);
 
     const d = {
-      DAILY: addDays(date, 1),
+      DAILY: addDays(date, 0),
       WEEKLY: addWeeks(date, 1),
       MONTHLY: addMonths(date, 1),
       QUARTERLY: addMonths(date, 3),
