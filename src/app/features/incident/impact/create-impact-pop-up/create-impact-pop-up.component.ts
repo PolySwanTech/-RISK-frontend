@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatLabel, MatSuffix } from '@angular/material/form-field';
 import { EntitiesService } from '../../../../core/services/entities/entities.service';
 import { Process } from '../../../../core/models/Process';
-import { EntiteResponsable } from '../../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../../core/models/BusinessUnit';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { ImpactTypeEnum } from '../../../../core/enum/impactType.enum';
@@ -51,9 +51,9 @@ export class CreateImpactPopUpComponent implements OnInit {
   private fileService = inject(FileService);
 
   impact: Impact | null = null
-  selectedEntite: EntiteResponsable | undefined
+  selectedEntite: BusinessUnit | undefined
   processes: Process[] = []
-  entites: EntiteResponsable[] = []
+  entites: BusinessUnit[] = []
   types: ImpactTypeEnum[] = [ImpactTypeEnum.PROVISION, ImpactTypeEnum.RECUPERATION];
 
   incidentId: string = '';
@@ -85,7 +85,7 @@ export class CreateImpactPopUpComponent implements OnInit {
     )
   }
 
-  setEntite(entite: EntiteResponsable) {
+  setEntite(entite: BusinessUnit) {
     if (this.impact) {
       this.impact.entityId = entite.id
     }

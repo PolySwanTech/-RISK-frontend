@@ -2,7 +2,7 @@ import { Component, Input, OnInit, Optional } from '@angular/core';
 import { MatDialogRef, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
@@ -26,8 +26,8 @@ export class CategorySelectionComponent implements OnInit {
 
   @Input() settings: boolean = true;
 
-  entities: EntiteResponsable[] = [];
-  filteredEntities: EntiteResponsable[] = [];
+  entities: BusinessUnit[] = [];
+  filteredEntities: BusinessUnit[] = [];
 
   constructor(
     private entityService: EntitiesService,
@@ -40,9 +40,9 @@ export class CategorySelectionComponent implements OnInit {
     this.getEntities();
   }
 
-  childrenAccessor = (node: EntiteResponsable) => node.children ?? [];
+  childrenAccessor = (node: BusinessUnit) => node.children ?? [];
 
-  hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
+  hasChild = (_: number, node: BusinessUnit) => !!node.children && node.children.length > 0;
 
   getEntities() {
     this.entityService.loadEntitiesTree().subscribe((res: any) => {
@@ -51,7 +51,7 @@ export class CategorySelectionComponent implements OnInit {
     });
   }
 
-  openEntityDialog(entite?: EntiteResponsable, event?: Event) {
+  openEntityDialog(entite?: BusinessUnit, event?: Event) {
     if (event) {
       event.stopPropagation(); // Empêche la propagation du clic
     }
@@ -61,15 +61,15 @@ export class CategorySelectionComponent implements OnInit {
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     });
 
-    dialogRef.afterClosed().subscribe(entiteResponsable => {
-      if (entiteResponsable) {
-        if (entiteResponsable.id == null) {
-          this.entityService.save(entiteResponsable).subscribe(() => {
+    dialogRef.afterClosed().subscribe(BusinessUnit => {
+      if (BusinessUnit) {
+        if (BusinessUnit.id == null) {
+          this.entityService.save(BusinessUnit).subscribe(() => {
             this.ngOnInit(); // Rafraîchir après ajout/modification
           });
         }
         else {
-          this.entityService.update(entiteResponsable).subscribe(() => {
+          this.entityService.update(BusinessUnit).subscribe(() => {
             this.ngOnInit(); // Rafraîchir après ajout/modification
           });
         }
@@ -82,7 +82,7 @@ export class CategorySelectionComponent implements OnInit {
     this.filteredEntities = this.filterNodes(this.entities, filterValue);
   }
 
-  private filterNodes(nodes: EntiteResponsable[], filter: string): EntiteResponsable[] {
+  private filterNodes(nodes: BusinessUnit[], filter: string): BusinessUnit[] {
     return nodes
       .map(node => {
         const filteredChildren = node.children ? this.filterNodes(node.children, filter) : [];
@@ -97,7 +97,7 @@ export class CategorySelectionComponent implements OnInit {
         }
         return null;
       })
-      .filter((node): node is EntiteResponsable => node !== null);
+      .filter((node): node is BusinessUnit => node !== null);
   }
 
   confirmSelection() {
