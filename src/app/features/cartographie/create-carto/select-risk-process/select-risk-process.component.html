@@ -5,7 +5,8 @@
 
         <div class="choice-grid">
             <!-- Option: Vierge -->
-            <button type="button" class="choice-tile" [class.active]="mode === 'blank'" (click)="mode = 'blank'">
+            <button type="button" class="choice-tile" [class.active]="mode === 'blank'"
+                (click)="mode = 'blank'; displayForm = true">
                 <div class="tile-title">Créer une cartographie vierge</div>
                 <div class="tile-desc">Commencer de zéro avec un nom et une BU.</div>
             </button>
@@ -31,6 +32,7 @@
     </div>
 
     <!-- Carte FORMULAIRE principale -->
+    @if(displayForm){
     <div class="card">
         <header class="header">
             <h1>Créer une cartographie</h1>
@@ -64,5 +66,11 @@
                 <input id="name" [(ngModel)]="cartoName" type="text" maxlength="120" />
             </div>
         </div>
+
+        <div class="actions">
+            <button type="button" class="btn btn-primary" (click)="createCarto()">Créer la cartographie</button>
+            <!-- <button type="button" class="btn btn-secondary" (click)="resetForm()">Réinitialiser</button> -->
+        </div>
     </div>
+    }
 </section>

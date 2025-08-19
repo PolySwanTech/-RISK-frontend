@@ -32,7 +32,7 @@ export class SelectRiskProcessComponent {
   selectedSourceCartoId: string | null = null;
   selectedYear: number | null = null;
   cartoName: string = '';
-
+  displayForm  = false;
 
   ngOnInit() {
     const currentYear = new Date().getFullYear();
@@ -68,6 +68,7 @@ export class SelectRiskProcessComponent {
       this.selectedBuId = carto.buId || null;
       this.selectedYear = carto.exerciceYear + 1;
       this.cartoName = `Copie de ${carto.name}`;
+      this.displayForm = true;
     }
   }
 
