@@ -56,9 +56,9 @@ export class FichiersComponent {
   ngOnInit(): void {
 
     if (this.data?.files) {
-    this.attachedFiles = this.data.files;
-    this.filteredFiles = this.data.files;
-  }
+      this.attachedFiles = this.data.files;
+      this.filteredFiles = this.data.files;
+    }
 
     if (this.incidentId && this.incidentRef) {
       this.fileService.getFiles({ incidentId: this.incidentId }).subscribe(files => {
@@ -112,13 +112,16 @@ export class FichiersComponent {
     }
   }
 
-  private handleFiles(files: File[]): void {
+  private async handleFiles(files: File[]) {
     const validFiles: File[] = [];
 
-    files.forEach(file => {
+    // On prépare toutes les promesses d'upload
+    const uploadPromises: Promise<void>[] = [];
+
+    for (const file of files) {
       if (this.isValidFile(file)) {
-        this.uploadFile(file);
         validFiles.push(file);
+        uploadPromises.push(this.uploadFile(file)); // on stocke la promesse
       } else {
         this.confirmService.openConfirmDialog(
           "Fichier non supporté",
@@ -126,16 +129,30 @@ export class FichiersComponent {
           false
         );
       }
-    });
+    }
 
     if (validFiles.length > 0) {
-      const fileNames = validFiles.map(f => f.name).join(", ");
-      const message = validFiles.length === 1
-        ? `Le fichier ${fileNames} a été ajouté avec succès.`
-        : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
+      try {
+        // attendre que TOUS les fichiers soient uploadés
+        await Promise.all(uploadPromises);
 
-      this.confirmService.openConfirmDialog("Fichier(s) ajouté(s)", message, false);
+        const fileNames = validFiles.map(f => f.name).join(", ");
+        const message =
+          validFiles.length === 1
+            ? `Le fichier ${fileNames} a été ajouté avec succès.`
+            : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
+
+        this.confirmService.openConfirmDialog("Fichier(s) ajouté(s)", message, false);
+        this.ngOnInit();
+      } catch (error) {
+        this.confirmService.openConfirmDialog(
+          "Erreur",
+          "Une erreur est survenue lors de l'upload d'un ou plusieurs fichiers.",
+          false
+        );
+      }
     }
+
   }
 
   private isValidFile(file: File): boolean {
@@ -155,35 +172,24 @@ export class FichiersComponent {
     return validTypes.includes(file.type);
   }
 
-  private uploadFile(file: File): void {
+  private async uploadFile(file: File): Promise<void> {
 
     if (this.data && this.data.files) {
       this.fileService.uploadFile(file, "IMP_2025_001", "289b1b94-5fa1-49fc-bb7d-cf5024e4fdcf", TargetType.IMPACT).subscribe(
         {
           next: _ => {
             this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
-            this.ngOnInit();
           },
-          error: error => {
+          error: (err) => {
             this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'ajout du fichier ${file.name}.`, false);
           }
         }
       )
     }
+    else {
+      this.fileService.uploadFile(file, this.incidentRef, this.incidentId, TargetType.INCIDENT).subscribe()
+    }
 
-    if (!this.incidentId) return;
-
-    this.fileService.uploadFile(file, this.incidentRef, this.incidentId, TargetType.INCIDENT).subscribe(
-      {
-        next: _ => {
-          this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
-          this.ngOnInit();
-        },
-        error: error => {
-          this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'ajout du fichier ${file.name}.`, false);
-        }
-      }
-    )
   }
 
   downloadFile(file: UploadedFile, openInBrowser: boolean = false): void {
