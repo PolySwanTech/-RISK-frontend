@@ -139,7 +139,7 @@ export class CreateControlComponent {
         this.snackBarService.error("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
       }
     });
-    this.form.get('processId')?.setValue(value.id);
+    this.form.value.processId = value.id;
   }
 
   onSelectionRisk(event: RiskTemplate) {
