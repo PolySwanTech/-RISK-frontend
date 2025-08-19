@@ -3,11 +3,14 @@ import { ChooseTypeCartoComponent } from '../choose-type-carto/choose-type-carto
 import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { MatCardModule } from '@angular/material/card';
 import { CreateEvaluationComponent } from '../../create-evaluation/create-evaluation.component';
+import { SelectRiskProcessComponent } from '../select-risk-process/select-risk-process.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-create-carto',
   standalone: true,
-  imports: [ChooseTypeCartoComponent, GoBackComponent, MatCardModule, CreateEvaluationComponent],
+  imports: [ChooseTypeCartoComponent, GoBackComponent, SelectRiskProcessComponent,
+    MatCardModule, CreateEvaluationComponent],
   templateUrl: './create-carto.component.html',
   styleUrl: './create-carto.component.scss'
 })

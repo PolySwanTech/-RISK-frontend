@@ -7,10 +7,12 @@ export interface Cartography {
     buId: string;
     buName: string;
     date: Date;
+    exerciceYear: number;
     evaluationAggregation: RiskLevel | null;
 }
 
 export interface CreateCarto {
     name: string;
     buId: string;
+    exerciceYear: number;
 }

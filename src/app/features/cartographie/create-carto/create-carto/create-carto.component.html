@@ -16,16 +16,18 @@
   <app-choose-type-carto (nextStep)="activeStep = 1"></app-choose-type-carto>
   }
   @if(activeStep === 1) {
+    <app-select-risk-process></app-select-risk-process>
   <!-- <app-select-mapping></app-select-mapping> -->
   }
   @if(activeStep === 2 || activeStep === 3) {
-    <app-create-evaluation (changeToEvaluationStep)="activeStep = 3"></app-create-evaluation>
+  <app-create-evaluation (changeToEvaluationStep)="activeStep = 3"></app-create-evaluation>
   }
   @if(activeStep === 4) {
   <!-- <app-results-mapping></app-results-mapping> -->
   }
   <div class="actions">
-    <button mat-raised-button color="primary" [disabled]="activeStep === 0" (click)="activeStep = activeStep > 0 ? activeStep - 1 : 0">
+    <button mat-raised-button color="primary" [disabled]="activeStep === 0"
+      (click)="activeStep = activeStep > 0 ? activeStep - 1 : 0">
       Précédent
     </button>
     <button mat-raised-button color="primary" [disabled]="activeStep === steps.length - 1"
