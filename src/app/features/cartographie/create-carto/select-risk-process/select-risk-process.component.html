@@ -1,38 +1,6 @@
 <section class="page">
-    <!-- Carte de CHOIX en haut -->
-    <div class="choice-card">
-        <h2>Comment souhaitez-vous démarrer ?</h2>
-
-        <div class="choice-grid">
-            <!-- Option: Vierge -->
-            <button type="button" class="choice-tile" [class.active]="mode === 'blank'"
-                (click)="mode = 'blank'; displayForm = true">
-                <div class="tile-title">Créer une cartographie vierge</div>
-                <div class="tile-desc">Commencer de zéro avec un nom et une BU.</div>
-            </button>
-
-            <!-- Option: Charger -->
-            <button type="button" class="choice-tile" [class.active]="mode === 'fromExisting'"
-                (click)="mode = 'fromExisting'">
-                <div class="tile-title">Charger une cartographie existante</div>
-                <div class="tile-desc">Utiliser une cartographie comme point de départ.</div>
-            </button>
-        </div>
-
-        <!-- Partie CHARGER -->
-        <div *ngIf="mode === 'fromExisting'" class="loader-row">
-            <label for="source">Cartographie à charger <span class="req">*</span></label>
-            <select id="source" [(ngModel)]="selectedSourceCartoId" (change)="onSourceCartoChange()" required>
-                <option value="" disabled selected>— Sélectionnez une cartographie —</option>
-                <option *ngFor="let c of existingCartos" [value]="c.id">
-                    BU: {{ c.buName }} - {{ c.reference }} {{ c.name }}
-                </option>
-            </select>
-        </div>
-    </div>
 
     <!-- Carte FORMULAIRE principale -->
-    @if(displayForm){
     <div class="card">
         <header class="header">
             <h1>Créer une cartographie</h1>
@@ -72,5 +40,38 @@
             <!-- <button type="button" class="btn btn-secondary" (click)="resetForm()">Réinitialiser</button> -->
         </div>
     </div>
-    }
+
+    <!-- Carte de CHOIX en haut -->
+    <div class="choice-card">
+        <h2>Comment souhaitez-vous démarrer ?</h2>
+
+        <div class="choice-grid">
+            <!-- Option: Vierge -->
+            <button type="button" class="choice-tile" [class.active]="mode === 'blank'"
+                (click)="mode = 'blank'; displayForm = true">
+                <div class="tile-title">Créer une cartographie vierge</div>
+                <div class="tile-desc">Commencer de zéro avec un nom et une BU.</div>
+            </button>
+
+            <!-- Option: Charger -->
+            <button type="button" class="choice-tile" [class.active]="mode === 'fromExisting'"
+                (click)="mode = 'fromExisting'">
+                <div class="tile-title">Charger une cartographie existante</div>
+                <div class="tile-desc">Utiliser une cartographie comme point de départ.</div>
+            </button>
+        </div>
+
+        <!-- Partie CHARGER -->
+        <div *ngIf="mode === 'fromExisting'" class="loader-row">
+            <label for="source">Cartographie à charger <span class="req">*</span></label>
+            <select id="source" [(ngModel)]="selectedSourceCartoId" (change)="onSourceCartoChange()" required>
+                <option value="" disabled selected>— Sélectionnez une cartographie —</option>
+                <option *ngFor="let c of existingCartos" [value]="c.id">
+                    BU: {{ c.buName }} - {{ c.reference }} {{ c.name }}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    
 </section>

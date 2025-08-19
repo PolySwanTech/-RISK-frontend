@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { BusinessUnit } from '../../../../core/models/BusinessUnit';
 import { Cartography } from '../../../../core/models/Cartography';
@@ -22,6 +22,8 @@ export class SelectRiskProcessComponent {
   private cartoService = inject(CartoService);
   router = inject(Router);
   private businessUnitService = inject(EntitiesService);
+
+  @Output() cartoCreated = new EventEmitter<void>();
 
   businessUnits: BusinessUnit[] = [];
   years: number[] = [];
@@ -53,7 +55,7 @@ export class SelectRiskProcessComponent {
     if (!this.selectedBuId || !name) return;
     const payload = { name, buId: this.selectedBuId, exerciceYear: this.selectedYear! };
     this.cartoService.create(payload).subscribe({
-      next: () => this.router.navigate(['/cartographie/evaluation']),
+      next: () => this.cartoCreated.emit(),
       error: (err) => console.error('Erreur création carto', err),
     });
   }

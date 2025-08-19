@@ -15,7 +15,6 @@ import { RiskPageComponent } from './pages/risk-page/risk-page.component';
 import { CartographieComponent } from './pages/cartographie/cartographie.component';
 import { CalculInputParametersComponent } from './pages/calcul-input-parameters/calcul-input-parameters.component';
 import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
-import { SubMenuCartoComponent } from './pages/carto-menu/sub-menu-carto/sub-menu-carto.component';
 import { CreateEvaluationComponent } from './features/cartographie/create-evaluation/create-evaluation.component';
 import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
 import { CreateCartoComponent } from './features/cartographie/create-carto/create-carto/create-carto.component';
@@ -24,16 +23,10 @@ export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
   { path: 'risk/:id', component : RiskPageComponent, canActivate : [AuthGuard] },
-  {
-    path: 'cartographie',
-    component: CreateCartoComponent,
-    canActivate: [AuthGuard],
-    children: [
-      { path: '', pathMatch: 'full', component: SubMenuCartoComponent },
-      { path: 'consulter', component: SelectCartoComponent }, // TODO : add consultation component after the selection of this carto CartographieComponent || SelectCartoComponent
-      { path: 'evaluation', component: CreateEvaluationComponent },
-    ]
-  },
+  { path: 'cartographie', component: CartographieComponent, canActivate: [AuthGuard]},
+  { path: 'cartographie/create', component: CreateCartoComponent, canActivate: [AuthGuard] },
+  { path: 'cartographie/consulter', component: SelectCartoComponent, canActivate: [AuthGuard] },
+  { path: 'cartographie/evaluation', component: CreateEvaluationComponent, canActivate: [AuthGuard] },
   { path: 'calcul', component : CalculInputParametersComponent, canActivate : [AuthGuard] },
   { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard] },
   { path: 'auth', children: authRoutes },
@@ -44,6 +37,4 @@ export const routes: Routes = [
   { path: 'organigramme', children: organigrammeRoutes, canActivate: [AuthGuard] },
   { path: 'action-plan', children: actionPlanRoutes, canActivate: [AuthGuard] },
   { path: 'control', children: controlRoutes, canActivate: [AuthGuard] },
-  
-
 ];

@@ -47,7 +47,7 @@
 
     <!-- Bloc évaluation -->
     <div *ngIf="selectedRisk && selectedProcess">
-      <app-eval-risk-process></app-eval-risk-process>
+      <app-eval-risk-process (evaluationSaved)="onSaveEvaluation()"></app-eval-risk-process>
       <!-- <div class="content-header">
         <h2 class="risk-title">{{ selectedRisk.libellePerso }}</h2>
         <div class="impact-summary">

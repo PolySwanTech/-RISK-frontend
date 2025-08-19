@@ -1,0 +1,40 @@
+.container{
+    width : 95%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card{ border-radius:12px; }
+.header{
+  display:flex; align-items:center; gap:8px; padding:8px 4px 16px;
+}
+.header h2{ font-weight:600; margin:0; }
+.spacer{ flex:1; }
+
+.table-wrap{ overflow:auto; }
+.fullwidth{ width:100%; }
+
+.link{ color:#0d6efd; cursor:pointer; text-decoration:none; }
+.link:hover{ text-decoration:underline; }
+
+tr.row:hover{ background:#fafafa; }
+
+th.mat-header-cell{ color:#59616a; font-weight:600; }
+td.mat-cell, th.mat-header-cell{ padding:14px 12px; }
+
+/* Chips niveaux */
+.chip{
+  display:inline-block; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:600;
+  border:1px solid transparent;
+}
+.chip-green{ background:#e8f5e9; color:#1b5e20; }
+.chip-yellow{ background:#fff3cd; color:#7a5b00; }
+.chip-orange{ background:#ffe0b2; color:#8a4b00; }
+.chip-red{ background:#f8d7da; color:#7a1f27; }
+.chip-grey{ background:#f1f3f5; color:#495057; border-color:#dee2e6; }
+
+.foot-note{ margin-top:10px; color:#6c757d; font-size:12px; }
+.loading{ padding:24px; color:#6c757d; }
