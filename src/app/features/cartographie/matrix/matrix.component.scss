@@ -290,3 +290,25 @@ table th {
 table td {
   padding: 6px !important;
 }
+
+td {
+  position: relative;
+  width: 80px;   /* ajuste selon ta matrice */
+  height: 80px;
+  text-align: center;
+  vertical-align: middle;
+  border : 1px solid #ddd;
+}
+
+.risk-indicator {
+  display: inline-block;
+  background: white;
+  border-radius: 50%;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

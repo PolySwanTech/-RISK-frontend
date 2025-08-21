@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -24,6 +24,11 @@ export class MatrixService {
 
   getMatriceByBuId(buId: string): Observable<Matrix> {
     return this.http.get<Matrix>(`${this.baseUrl}/bu/${buId}`);
+  }
+
+  getDefaultMatrix(buId: string): Observable<Matrix> {
+    const params = new HttpParams().set("buId", buId);
+    return this.http.get<Matrix>(`${this.baseUrl}/default`, { params : params });
   }
 
   saveMatrix(matrix: any): Observable<Matrix> {

@@ -101,13 +101,21 @@ export class RiskPageComponent implements OnInit {
 
     this.entitiesSrv.findById(this.buId).subscribe(resp => this.buName = resp.name)
 
-    this.matrixService.getMatriceByBuId(this.buId).subscribe(resp => {
-      this.matrixData = resp
-      console.log(this.matrixData)
-    },
-      error => {
-        console.error(error)
-      })
+
+    this.matrixService.getDefaultMatrix(this.buId).subscribe(
+      resp => {
+        this.matrixData = resp
+        console.log(this.matrixData)
+      }
+    )
+
+    // this.matrixService.getMatriceByBuId(this.buId).subscribe(resp => {
+    //   this.matrixData = resp
+    //   console.log(this.matrixData)
+    // },
+    //   error => {
+    //     console.error(error)
+    //   })
 
     this.processService.getAll().subscribe(list => {
       this.processMap = list.reduce<Record<string, Process>>(
@@ -126,7 +134,6 @@ export class RiskPageComponent implements OnInit {
       next: ({ risks, bus }) => {
         /* ---------------- Pré-traitement ---------------- */
         this.risks = risks.map(risk => {
-          console.log(risks)
           const lastEval = risk.riskEvaluations?.at(-1);
 
           /* probability est sur 1-10 → on le ramène sur 1-5 */

@@ -9,22 +9,21 @@
     <div class="matrix-wrapper">
       <table class="risk-matrix">
         <tbody>
-
-          <!-- Lignes de la matrice (impact 5→1) -->
-          <tr *ngFor="let row of reversedMatrixLevels; let rIdx = index; trackBy: trackByIdx">
+          <tr *ngFor="let row of matrixLevels.reverse(); let rIdx = index; trackBy: trackByIdx">
             <th class="row-header">
               <input class="row-input" [(ngModel)]="rowLabels[matrixLevels.length - 1 - rIdx]" />
             </th>
-            <td *ngFor="let lvl of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(lvl)"
-              (click)="setColor(matrixLevels.length - 1 - rIdx, cIdx)">
-              <div class="risk-indicator" *ngIf="cellRiskInfo(matrixLevels.length - 1 - rIdx, cIdx).id"
-                (click)="onRiskClick(matrixLevels.length - 1 - rIdx, cIdx)">
-                {{ concat(matrixLevels.length - 1 - rIdx, cIdx) }}
+
+            <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
+              (click)="onRiskClick(cell)">
+              <div class="risk-indicator" *ngIf="cell.id">
+                <!-- exemple d’affichage -->
+                {{ cell?.severite?.libelle }} / {{ cell?.frequence?.libelle }}
               </div>
             </td>
           </tr>
 
-          <!-- ========== ligne d’en-tête PROBABILITÉ ========== -->
+          <!-- ligne d’entête des colonnes PROBABILITÉ -->
           <tr class="column-labels-row">
             <th class="probability-header">PROBABILITÉ</th>
             <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx">
@@ -37,13 +36,13 @@
   </div>
 
   <!-- ========= légende des couleurs ========= -->
-  <div class="color-legend">
+  <!-- <div class="color-legend">
     <div *ngFor="let l of colorLevels" class="legend-item" [class.modif]="modifPlan"
       [class.selected]="selectedColor===l.color" (click)="modifPlan ? selectedColor=l.color : null">
       <div class="legend-color" [style.backgroundColor]="l.color"></div>
       <span class="legend-label">{{ l.label }}</span>
     </div>
-  </div>
+  </div> -->
 
   <!-- ========= bouton sauvegarde ========= -->
   @if(modifPlan){
