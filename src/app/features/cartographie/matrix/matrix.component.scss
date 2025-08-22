@@ -312,3 +312,21 @@ td {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.color-overlay {
+  position: fixed; /* important ! fixe par rapport à l’écran */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}

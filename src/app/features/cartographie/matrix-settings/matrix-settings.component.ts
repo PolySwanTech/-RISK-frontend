@@ -3,6 +3,7 @@ import { Component, inject, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
+import { RiskLevel, RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
 
 export interface Range {
   libelle: string;
@@ -22,6 +23,9 @@ export class MatrixSettingsComponent {
 
   @Input() list!: Range[];
   @Input() type!: RangeType;
+
+
+  riskLevels = RiskLevelLabels;
 
   private settingSrv = inject(MatrixService);
 

@@ -15,10 +15,15 @@
             </th>
 
             <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
-              (click)="onRiskClick(cell)">
-              <!-- <div class="risk-indicator" *ngIf="cell.id">
-                {{ cell?.severite?.libelle }} / {{ cell?.frequence?.libelle }}
-              </div> -->
+              (click)="openColorOverlay($event, cell)" class="matrix-cell">
+
+              <!-- Overlay de sélection de couleur -->
+              <div *ngIf="activeCell === cell" class="color-overlay" [ngStyle]="overlayPosition">
+                <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
+                  (click)="selectColor(cell, risk.color)">
+                </div>
+              </div>
+
             </td>
           </tr>
 
@@ -35,13 +40,15 @@
   </div>
 
   <!-- ========= légende des couleurs ========= -->
-  <!-- <div class="color-legend">
-    <div *ngFor="let l of colorLevels" class="legend-item" [class.modif]="modifPlan"
-      [class.selected]="selectedColor===l.color" (click)="modifPlan ? selectedColor=l.color : null">
+  <div class="color-legend">
+    <!-- <div *ngFor="let l of riskLevels" class="legend-item" 
+      [class.modif]="modifPlan"
+      [class.selected]="selectedColor===l.color" 
+      (click)="modifPlan ? selectedColor=l.color : null">
       <div class="legend-color" [style.backgroundColor]="l.color"></div>
       <span class="legend-label">{{ l.label }}</span>
-    </div>
-  </div> -->
+    </div> -->
+  </div>
 
   <!-- ========= bouton sauvegarde ========= -->
   @if(modifPlan){

@@ -1,11 +1,9 @@
-import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
-import { MatrixService } from './../../../core/services/matrix/matrix.service';
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RiskLevel, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
@@ -28,8 +26,35 @@ export class MatrixComponent {
   rowLabels: Range[] = [];
   colLabels: Range[] = [];
 
+  riskLevels: Set<any> = new Set();
+
   _matrixData: any;
   matrixLevels: any;
+
+  activeCell: any = null;
+  overlayPosition: any = {};
+
+  openColorOverlay(event: MouseEvent, cell: any) {
+    event.stopPropagation(); // éviter fermeture immédiate
+    this.activeCell = cell;
+
+    // Positionner l’overlay exactement là où la souris a cliqué
+    this.overlayPosition = {
+      top: `${event.clientY - 50}px`,
+      left: `${event.clientX}px`,
+    };
+  }
+
+  selectColor(cell: any, color: string) {
+    cell.riskLevel.color = color;
+    this.activeCell = null; // ferme l’overlay
+  }
+
+  // ferme overlay si on clique en dehors
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    this.activeCell = null;
+  }
 
   @Input() set matrixData(value: any) {
 
@@ -41,7 +66,7 @@ export class MatrixComponent {
   private dialog = inject(MatDialog);
 
   @Output() selectedRiskEvent = new EventEmitter<any>();
-  
+
   selectedColor = '';
 
   private buildMatrixFromCells(cells: any[]) {
@@ -66,7 +91,13 @@ export class MatrixComponent {
     this.rowLabels = Array(maxImpact).fill('');
     this.colLabels = Array(maxProb).fill('');
 
+    const riskMap = new Map<string, {color: string, level: string}>();
+
     cells.forEach(cell => {
+      const key = `${cell.riskLevel.color}|${cell.riskLevel.level}`;
+      if (!riskMap.has(key)) {
+        riskMap.set(key, cell.riskLevel);
+      }
       // ⚠️ swap : rowIndex = impact (col), colIndex = probabilité (row)
       const rowIdx = (cell.position.col ?? 1) - 1; // lignes = IMPACT
       const colIdx = (cell.position.row ?? 1) - 1; // colonnes = PROBABILITÉ
@@ -79,9 +110,7 @@ export class MatrixComponent {
       }
     });
 
-    console.log(this.rowLabels)
-    console.log(this.colLabels)
-
+    this.riskLevels = new Set(riskMap.values());
     this.matrixLevels = matrix.reverse();
   }
 
