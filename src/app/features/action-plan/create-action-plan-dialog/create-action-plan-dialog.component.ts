@@ -1,13 +1,13 @@
 import { Component, Inject, inject, OnInit } from '@angular/core';
 import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/ActionPlan';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { Priority, priorityLabels } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -17,6 +17,8 @@ import { Router } from '@angular/router';
 import { Status } from '../../../core/enum/status.enum';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { RiskService } from '../../../core/services/risk/risk.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -28,7 +30,8 @@ import { RiskService } from '../../../core/services/risk/risk.service';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule, MatButtonModule, ReactiveFormsModule],
+    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule
+],
   templateUrl: './create-action-plan-dialog.component.html',
   styleUrl: './create-action-plan-dialog.component.scss'
 })

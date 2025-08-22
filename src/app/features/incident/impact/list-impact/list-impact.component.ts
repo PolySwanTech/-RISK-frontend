@@ -150,8 +150,6 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
         }
       }
     )
-
-    console.log("Voici les fichiers")
   }
 
   handleFiltersChanged(filters: any) {
@@ -204,14 +202,12 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
 
   onSearchFiles(query: string) {
     const lowerQuery = query.toLowerCase();
-    console.log(this.impacts)
     this.dataSource.data = this.impacts.filter(impact =>
       Object.entries(impact).some(([key, value]) => {
         if (key === 'id' || key === 'entityId') return false;
 
         if (key === 'createdAt') {
           const formattedDate = this.datePipe.transform(value, 'dd/MM/yyyy') || '';
-          console.log(lowerQuery, formattedDate)
           return formattedDate.toLowerCase().includes(lowerQuery);
         }
 

@@ -10,26 +10,17 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
-interface ProcessNode {
-  id: string;
-  name: string;
-  niveau: number;
-  type: 'bu' | 'parent' | 'child';
-  buName?: string;
-  parentName?: string;
-  risks?: any[]; 
-  children?: ProcessNode[];
-}
-import { Process } from '../../../core/models/Process';
+import { Process, ProcessNode } from '../../../core/models/Process';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateProcessComponent } from '../create-process/create-process.component';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { AddEntityDialogComponent } from '../../reglages/add-entity-dialog/add-entity-dialog.component';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { MatCardModule } from '@angular/material/card';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 import { firstValueFrom } from 'rxjs';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-list-process',
@@ -54,6 +45,7 @@ export class ListProcessComponent implements OnInit {
   riskService = inject(RiskService); // Assuming you have a risk service to fetch risks
   riskEvaluationService = inject(RiskEvaluationService);
   entityService = inject(EntitiesService);
+  snackBarService = inject(SnackBarService);
 
   processes: Process[] = [];
   displayedColumns: string[] = ['name', 'niveau', 'buName', 'parentName'];
@@ -67,18 +59,18 @@ export class ListProcessComponent implements OnInit {
   @Input() isCartographie: boolean = false;
 
   ngOnInit(): void {
-    this.entityService.loadEntities().subscribe((entities: EntiteResponsable[]) => {
+    this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.fetchProcesses(entities);
     });
 
-    this.getEvaluationYears().then(
-      (years: number[]) => {
-        this.years = years;
-      }
-    )
+    // this.getEvaluationYears().then(
+    //   (years: number[]) => {
+    //     this.years = years;
+    //   }
+    // )
   }
 
-  fetchProcesses(allEntities: EntiteResponsable[]): void {
+  fetchProcesses(allEntities: BusinessUnit[]): void {
     this.processService.getAll().subscribe((data: any[]) => {
       this.processes = data;
       this.buildHierarchy(allEntities);
@@ -150,7 +142,7 @@ export class ListProcessComponent implements OnInit {
     this.router.navigate(['reglages', 'risks', id]);
   }
 
-  buildHierarchy(allEntities: EntiteResponsable[]): void {
+  buildHierarchy(allEntities: BusinessUnit[]): void {
     const buMap = new Map<string, Process[]>();
 
     this.processes.forEach(process => {
@@ -166,7 +158,7 @@ export class ListProcessComponent implements OnInit {
       .map(entity => {
         const processes = buMap.get(entity.name) || [];
         return {
-          id: `bu-${entity.name}`,
+          id: entity.id,
           name: entity.name,
           niveau: 0,
           type: 'bu' as const,
@@ -339,16 +331,20 @@ export class ListProcessComponent implements OnInit {
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     });
 
-    dialogRef.afterClosed().subscribe(entiteResponsable => {
-      if (entiteResponsable) {
-        if (entiteResponsable.id == null) {
-          this.entityService.save(entiteResponsable).subscribe(() => {
+    dialogRef.afterClosed().subscribe(BusinessUnit => {
+      if (BusinessUnit) {
+        if (BusinessUnit.id == null) {
+          this.entityService.save(BusinessUnit).subscribe(() => {
             this.ngOnInit(); // Rafraîchir après ajout/modification
           });
         }
         else {
-          this.entityService.update(entiteResponsable).subscribe(() => {
-            this.ngOnInit(); // Rafraîchir après ajout/modification
+          this.entityService.update(BusinessUnit).subscribe(
+            resp => {
+              this.snackBarService.success("L'entité a bien été crée")
+          }, error => {
+              this.snackBarService.error(error.message)
+             this.ngOnInit(); 
           });
         }
       }
@@ -357,5 +353,9 @@ export class ListProcessComponent implements OnInit {
 
   navToCreateCarto(){
     this.router.navigate(['reglages', 'evaluation', 'create'])
+  }
+
+  goToMatrixPage(buId : any){
+    this.router.navigate(['risk', buId])
   }
 }

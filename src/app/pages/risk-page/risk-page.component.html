@@ -1,31 +1,21 @@
-<section class="dashboard-container">
-  <!-- En-tête avec titre et boutons d'action -->
-  <mat-card class="dashboard-header-card">
-    <mat-card-content class="dashboard-header">
-      <h1>Analyse et évaluation des risques</h1>
-      <div class="header-controls">
-        <button mat-raised-button class="btn-primary add-button" (click)="goToAddRisk()">
-          <mat-icon>add</mat-icon>
-          Ajouter un risque
-        </button>
-        <button mat-raised-button class="btn-green">
-          <mat-icon>file_download</mat-icon>
-          Exporter
-        </button>
-        <button (click)="refreshData()" mat-raised-button class="btn-primary">
-          <mat-icon>refresh</mat-icon>
-          Actualiser
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
+@if(buName){
+
+
+<section  class="dashboard-container">
+  <app-go-back [title]="`Analyse et évaluation des risques de l'entité : ` +  buName" [buttons]="goBackButtons"></app-go-back>
 
   <!-- Section des filtres -->
   <mat-card class="filters-card">
     <mat-card-content class="dashboard-header">
       <div class="filters-section">
+        <div class="filters-header">
+                    <div>
+                        <mat-icon>filter_alt</mat-icon>
+                        <span class="filters-title">Filtres</span>
+                    </div>
+                </div>
         <div class="filters-row">
-          <div class="filter-group">
+          <!-- <div class="filter-group">
             <mat-form-field appearance="outline" class="filter-field">
               <mat-label>Business Unit</mat-label>
               <mat-select [(ngModel)]="selectedBU" (selectionChange)="applyFilters()">
@@ -35,7 +25,7 @@
                 }
               </mat-select>
             </mat-form-field>
-          </div>
+          </div> -->
 
           <div class="filter-group">
             <mat-form-field appearance="outline" class="filter-field">
@@ -67,7 +57,7 @@
           </div>
         </div>
 
-        <app-matrix [risks]="filteredRisks" (selectedRiskEvent)="selectedRisk = $event"></app-matrix>
+        <app-matrix [risks]="filteredRisks" [matrixData]="matrixData" (selectedRiskEvent)="selectedRisk = $event"></app-matrix>
       </mat-card-content>
     </mat-card>
 
@@ -169,3 +159,4 @@
   </div>
 
 </section>
+}

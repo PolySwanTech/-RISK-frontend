@@ -15,12 +15,25 @@ import { RiskPageComponent } from './pages/risk-page/risk-page.component';
 import { CartographieComponent } from './pages/cartographie/cartographie.component';
 import { CalculInputParametersComponent } from './pages/calcul-input-parameters/calcul-input-parameters.component';
 import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
+import { SubMenuCartoComponent } from './pages/carto-menu/sub-menu-carto/sub-menu-carto.component';
+import { CreateEvaluationComponent } from './features/cartographie/create-evaluation/create-evaluation.component';
+import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
+import { CreateCartoComponent } from './features/cartographie/create-carto/create-carto/create-carto.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
-  { path: 'risk', component : RiskPageComponent, canActivate : [AuthGuard] },
-  { path: 'cartographie', component : CartographieComponent, canActivate : [AuthGuard] },
+  { path: 'risk/:id', component : RiskPageComponent, canActivate : [AuthGuard] },
+  {
+    path: 'cartographie',
+    component: CreateCartoComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', pathMatch: 'full', component: SubMenuCartoComponent },
+      { path: 'consulter', component: SelectCartoComponent }, // TODO : add consultation component after the selection of this carto CartographieComponent || SelectCartoComponent
+      { path: 'evaluation', component: CreateEvaluationComponent },
+    ]
+  },
   { path: 'calcul', component : CalculInputParametersComponent, canActivate : [AuthGuard] },
   { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard] },
   { path: 'auth', children: authRoutes },

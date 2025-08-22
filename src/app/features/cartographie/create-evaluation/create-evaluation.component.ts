@@ -1,18 +1,21 @@
-import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { ProcessService } from '../../../core/services/process/process.service';
-import { Process } from '../../../core/models/Process';
-import { ImpactService } from '../../../core/services/impact/impact.service';
+import { Process, ProcessNode } from '../../../core/models/Process';
 import { ControlService } from '../../../core/services/control/control.service';
 import { ControlTemplate } from '../../../core/models/ControlTemplate';
-import { CreateRisksEvaluationsComponent } from "../../reglages/risks/risk-evaluation/create-risks-evaluations/create-risks-evaluations.component";
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { IncidentService } from '../../../core/services/incident/incident.service';
+import { EvalRiskProcessComponent } from '../create-carto/eval-risk-process/eval-risk-process.component';
 
 @Component({
   selector: 'app-create-evaluation',
-  imports: [CurrencyPipe, FormsModule, CommonModule, CreateRisksEvaluationsComponent],
+  imports: [FormsModule, CommonModule, EvalRiskProcessComponent],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })
@@ -20,8 +23,13 @@ export class CreateEvaluationComponent implements OnInit {
 
   private riskService = inject(RiskService);
   private processService = inject(ProcessService);
-  private impactService = inject(ImpactService);
+  private evaluationSrv = inject(RiskEvaluationService);
   private controlService = inject(ControlService);
+  private entityService = inject(EntitiesService);
+  private IncidentService = inject(IncidentService);
+
+
+  @Output() changeToEvaluationStep = new EventEmitter<void>();
 
   risks: any[] = [];
 
@@ -30,53 +38,124 @@ export class CreateEvaluationComponent implements OnInit {
   totalImpact = 0
 
   selectedRisk: any | null = null;
-  selectedProcess: Process | null = null;
+  selectedProcess: ProcessNode | null = null;
   selectedControl: ControlTemplate | null = null;
 
   processes: Process[] = [];
 
-  controls: ControlTemplate[] = []
+  hierarchicalProcesses: ProcessNode[] = [];
+  filteredProcesses: ProcessNode[] = [];
 
   evaluations = [];
 
   ngOnInit(): void {
+    this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
+      this.fetchProcesses(entities);
+    });
+
     this.riskService.getAll().subscribe(risks => {
       this.risks = risks;
     });
+
   }
 
-  getProcessByRisks(risk: RiskTemplate) {
-    console.log('Selected Risk:', risk);
-    this.processService.getAllByRisks(risk.id.id).subscribe(processes => {
-      this.processes = processes;
-      this.totalImpact = 0;
-      this.processes.forEach(process => {
-        this.impactService.sumByProcess(process.id).subscribe(sum => 
-          {
-          process.sum = sum
-          this.totalImpact += sum;
-        });
-      });
-      console.log('Processus:', this.processes);
-      this.selectedRisk = risk
+  fetchProcesses(allEntities: BusinessUnit[]): void {
+    this.processService.getAll().subscribe((data: any[]) => {
+      this.processes = data;
+      this.buildHierarchy(allEntities);
+      this.filteredProcesses = [...this.hierarchicalProcesses];
     });
   }
 
-  getControlsByProcessAndRisk(process: Process) {
-    this.selectedProcess = process
-    if (this.selectedRisk && this.selectedProcess)
-      this.controlService.getAllTemplates(this.selectedProcess.id, this.selectedRisk.id.id).subscribe(
-        controls => this.controls = controls
-      )
+  buildHierarchy(allEntities: BusinessUnit[]): void {
+    const buMap = new Map<string, Process[]>();
+
+    this.processes.forEach(process => {
+      const buName = process.buName;
+      if (!buMap.has(buName)) {
+        buMap.set(buName, []);
+      }
+      buMap.get(buName)!.push(process);
+    });
+
+    this.hierarchicalProcesses = allEntities
+      .map(entity => {
+        const processes = buMap.get(entity.name) || [];
+        return {
+          id: `bu-${entity.name}`,
+          name: entity.name,
+          niveau: 0,
+          type: 'bu' as const,
+          children: this.buildBUChildren(processes)
+        };
+      });
+  }
+
+  private buildBUChildren(processes: any[]): ProcessNode[] {
+    // Séparer les parents (pas de parentName) des enfants
+    const parents = processes.filter(p => !p.parentName);
+    const children = processes.filter(p => p.parentName);
+
+    return parents.map(parent => ({
+      id: parent.id,
+      name: parent.name,
+      niveau: parent.niveau,
+      type: this.determineNodeType(parent),
+      buName: parent.buName,
+      parentName: parent.parentName,
+      children: this.findChildren(parent.name, children)
+    }));
+  }
+
+  private findChildren(parentName: string, allChildren: any[]): ProcessNode[] {
+    const directChildren = allChildren.filter(child => child.parentName === parentName);
+
+    return directChildren.map(child => ({
+      id: child.id,
+      name: child.name,
+      niveau: child.niveau,
+      type: this.determineNodeType(child),
+      buName: child.buName,
+      parentName: child.parentName,
+      children: this.findChildren(child.name, allChildren.filter(c => c.id !== child.id))
+    }));
+  }
+
+  private determineNodeType(process: any): 'parent' | 'child' {
+    return process.parentName ? 'child' : 'parent';
+  }
+
+  getProcessByRisks(risk: RiskTemplate) {
+    this.selectedRisk = risk;
+    this.processService.getAllByRisks(risk.id.id).subscribe(processes => {
+      this.processes = processes;
+      this.totalImpact = 0;
+    });
+  }
+
+  trackByProcessId = (_: number, p: ProcessNode) => p.id;
+
+  onSelectProcess(p: ProcessNode) {
+    this.selectedProcess = p;
+    this.changeToEvaluationStep.emit();
   }
 
   submitEvaluation(data: any) {
-    // this.evaluations.push({
-    //   risk: this.selectedRisk,
-    //   process: this.selectedProcess,
-    //   control: this.selectedControl,
-    //   ...data
-    // });
-    alert('Évaluation enregistrée.');
+    const payload: any = {
+      commentaire: data.commentaire!,
+      probability: data.probability!,
+      riskNet: data.riskNet!,
+      riskId: this.selectedRisk.id.id,
+    };
+
+    this.evaluationSrv.save(payload).subscribe(
+      {
+        next: resp => {
+          console.log(resp)
+        },
+        error: err => {
+          console.error(err)
+        }
+      })
   }
 }

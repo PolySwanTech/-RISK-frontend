@@ -20,6 +20,7 @@ export class ControlService {
 
 
   createControl(control: ControlTemplateCreateDto) {
+    console.log(control)
     return this.http.post<ControlTemplateCreateDto>(`${this.baseUrlTemp}`, control);
   }
 

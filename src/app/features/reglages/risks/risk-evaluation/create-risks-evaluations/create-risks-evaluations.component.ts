@@ -1,19 +1,21 @@
-import { Component, inject, Input, OnInit }           from '@angular/core';
-import { Router, ActivatedRoute }              from '@angular/router';
-import { CommonModule }                        from '@angular/common';
-import { FormBuilder, ReactiveFormsModule,
-         Validators }                          from '@angular/forms';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder, ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
-import { MatFormFieldModule }  from '@angular/material/form-field';
-import { MatSelectModule }     from '@angular/material/select';
-import { MatInputModule }      from '@angular/material/input';
-import { MatButtonModule }     from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 import { RiskLevel, RiskLevelLabels } from '../../../../../core/enum/riskLevel.enum';
 import { RiskEvaluationCreateDto } from '../../../../../core/models/RiskEvaluation';
 import { RiskId, RiskTemplate } from '../../../../../core/models/RiskTemplate';
 import { RiskEvaluationService } from '../../../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 import { RiskService } from '../../../../../core/services/risk/risk.service';
-import { EntiteResponsable } from '../../../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../../../core/models/BusinessUnit';
 import { Process } from '../../../../../core/models/Process';
 import { EntitiesService } from '../../../../../core/services/entities/entities.service';
 import { ProcessService } from '../../../../../core/services/process/process.service';
@@ -23,49 +25,50 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 // src/app/reglages/risks/risk-evaluation/risk-evaluation.component.ts
 @Component({
-  selector   : 'app-risk-evaluation',
-  standalone : true,
-    imports     : [
+  selector: 'app-risk-evaluation',
+  standalone: true,
+  imports: [
     CommonModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule,
     MatSelectModule, MatDatepickerModule,
     MatNativeDateModule, MatButtonModule
   ],
   templateUrl: './create-risks-evaluations.component.html',
-  styleUrls  : ['./create-risks-evaluations.component.scss'],
+  styleUrls: ['./create-risks-evaluations.component.scss'],
 })
 /* … imports inchangés, sauf qu’on peut retirer EntitiesService & ProcessService */
 
 export class CreateRisksEvaluationsComponent implements OnInit {
 
-  private fb            = inject(FormBuilder);
+  private fb = inject(FormBuilder);
   private evaluationSrv = inject(RiskEvaluationService);
-  private route         = inject(ActivatedRoute);
-  private router        = inject(Router);
-  private riskSrv       = inject(RiskService);      // ← garde le service en secours
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private riskSrv = inject(RiskService);      // ← garde le service en secours
 
   riskLevels = Object.values(RiskLevel);
   riskLabels = RiskLevelLabels;
 
-  @Input() riskId : string = '';
+  @Input() riskId: string = '';
+  @Output() onSumbit = new EventEmitter<any>();
 
   currentRisk?: RiskTemplate;
 
   form = this.fb.group({
-    probability : [null as number | null, Validators.required],
-    riskNet     : [null as RiskLevel | null, Validators.required],
-    riskId      : ['', Validators.required],
-    comment     : ['']
+    probability: [null as number | null, Validators.required],
+    riskNet: [null as RiskLevel | null, Validators.required],
+    riskId: ['', Validators.required],
+    comment: ['']
   });
 
   /* -------------------------------------------------------------- */
   ngOnInit(): void {
 
     /* 1. — essayer de récupérer le risque depuis navigation.state */
-    const nav      = this.router.getCurrentNavigation();
-    const navRisk  = nav?.extras.state?.['risk'] as RiskTemplate | undefined;
-    
-    
+    const nav = this.router.getCurrentNavigation();
+    const navRisk = nav?.extras.state?.['risk'] as RiskTemplate | undefined;
+
+
 
     if (navRisk) {
       this.currentRisk = navRisk;
@@ -74,7 +77,7 @@ export class CreateRisksEvaluationsComponent implements OnInit {
     }
 
     /* 2. — sinon fallback : queryParams → appel REST */
-    const riskId  = this.route.snapshot.queryParamMap.get('id')! ? this.route.snapshot.queryParamMap.get('id')! : this.riskId;
+    const riskId = this.route.snapshot.queryParamMap.get('id')! ? this.route.snapshot.queryParamMap.get('id')! : this.riskId;
     const version = this.route.snapshot.queryParamMap.get('version');
 
     this.form.patchValue({ riskId });
@@ -92,15 +95,20 @@ export class CreateRisksEvaluationsComponent implements OnInit {
     }
 
     const payload: RiskEvaluationCreateDto = {
-      taxonomie   : this.form.value.riskId!,
-      probability : this.form.value.probability!,
-      riskNet     : this.form.value.riskNet!,
+      commentaire: this.form.value.comment!,
+      probability: this.form.value.probability!,
+      riskNet: this.form.value.riskNet!,
     };
 
-    this.evaluationSrv.save(payload).subscribe({
-      next : () => this.router.navigate(
-               ['/reglages/risks', payload.taxonomie]),
-      error: err => console.error('Erreur création évaluation', err)
-    });
+    if (this.riskId) {
+      this.onSumbit.emit(payload);
+    }
+    else {
+      this.evaluationSrv.save(payload).subscribe({
+        next: () => this.router.navigate(
+          ['/reglages/risks', this.form.value.riskId!]),
+        error: err => console.error('Erreur création évaluation', err)
+      });
+    }
   }
 }

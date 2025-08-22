@@ -1,4 +1,4 @@
-import { Component, inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -18,26 +18,23 @@ import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { State } from '../../../core/enum/state.enum';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
 import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
 import { ImpactService } from '../../../core/services/impact/impact.service';
-
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule, ListImpactComponent,
+    MatGridListModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
     FichiersComponent, ListSuiviComponent],
   templateUrl: './view.component.html',
-  styleUrl: './view.component.scss',
-  // providers: [
-  //   { provide: LOCALE_ID, useValue: 'fr' }
-  // ]
+  styleUrl: './view.component.scss'
 })
 export class ViewComponent implements OnInit {
   private incidentService = inject(IncidentService);
@@ -48,6 +45,7 @@ export class ViewComponent implements OnInit {
   private entitiesService = inject(EntitiesService);
   private impactService = inject(ImpactService);
 
+
   incident: Incident | undefined
   userRole: string | undefined;
   userTeam: string | undefined;
@@ -55,7 +53,7 @@ export class ViewComponent implements OnInit {
   idIncident: string = "";
   suivi: SuiviIncident[] = []
 
-  businessUnits: EntiteResponsable[] = [];
+  businessUnits: BusinessUnit[] = [];
 
   goBackButtons: GoBackButton[] = [];
 
@@ -87,11 +85,18 @@ export class ViewComponent implements OnInit {
         action: () => this.addActionPlan()
       },
       {
-        label: 'Exporter',
+        label: 'Export Excel',
         icon: 'file_download',
         class: 'btn-green',
         show: true,
         action: () => this.downloadExport()
+      },
+      {
+        label: 'Fiche Incident (PDF)',
+        icon: 'description',
+        class: 'btn-green',
+        show: true,
+        action: () => this.downloadPDF()
       },
       {
         label: 'Clôturer',
@@ -99,7 +104,8 @@ export class ViewComponent implements OnInit {
         class: 'btn-red',
         show: this.canClose(),
         action: () => this.closeIncident()
-      }
+      },
+
     ];
   }
 
@@ -177,7 +183,10 @@ export class ViewComponent implements OnInit {
     let choice = confirm("Créer un plan d'action ou consulter un plan d'action existant ?")
     if (choice) {
       this.dialog.open(CreateActionPlanDialogComponent, {
-        width: '400px',
+        width: '800px !important',
+        height: '550px',
+        minWidth: '800px',
+        maxWidth: '800px',
         data: {
           incidentId: this.incident.id,
           reference: this.incident.reference
@@ -210,9 +219,21 @@ export class ViewComponent implements OnInit {
     const diffTime = Math.abs(date2.getTime() - date1.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
-  addImpact() {
 
+  addImpact() {
     this.router.navigate(['incident', this.idIncident, 'impacts']);
+  }
+
+  downloadPDF(): void {
+    if (!this.incident?.id) return;
+    this.incidentService.downloadPDF(this.incident.id).subscribe({
+      next: (blob) => {
+        const ref = this.incident?.reference ?? this.incident?.id;
+        const pdf = new Blob([blob], { type: 'application/pdf' });
+        saveAs(pdf, `FICHE_INCIDENT_${ref}.pdf`);
+      },
+      error: (err) => console.error('Erreur export PDF :', err)
+    });
   }
 
 }
