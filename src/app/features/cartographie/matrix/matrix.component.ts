@@ -8,36 +8,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RiskLevel, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
-
-
-/** Couleur à afficher pour chaque RiskLevel */
-const COLOR_MAP: Record<RiskLevel, string> = {
-  [RiskLevel.LOW]: '#F5F8FA',       // Très faible / Faible
-  [RiskLevel.MEDIUM]: '#FFA500',    // Moyen
-  [RiskLevel.HIGH]: '#FF4500',      // Élevé
-  [RiskLevel.VERY_HIGH]: '#8B0000', // Critique
-};
-
-const RISK_LABEL_MAP: Record<RiskLevel, string> = {
-  [RiskLevel.LOW]: 'Très faible',
-  [RiskLevel.MEDIUM]: 'Moyen',
-  [RiskLevel.HIGH]: 'Élevé',
-  [RiskLevel.VERY_HIGH]: 'Critique',
-};
-
-/** Matrice par défaut (5x5) */
-const DEFAULT_MATRIX_LEVELS: RiskLevel[][] = [
-  [RiskLevel.LOW, RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.MEDIUM, RiskLevel.HIGH],
-  [RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.HIGH],
-  [RiskLevel.MEDIUM, RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.HIGH, RiskLevel.VERY_HIGH],
-  [RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.HIGH, RiskLevel.VERY_HIGH, RiskLevel.VERY_HIGH],
-  [RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.VERY_HIGH, RiskLevel.VERY_HIGH, RiskLevel.VERY_HIGH],
-];
+import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
+import { Range } from '../matrix-settings/matrix-settings.component';
 
 @Component({
   selector: 'app-matrix',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatTooltipModule],
+  imports: [CommonModule, FormsModule, MatTooltipModule, MatrixSettingsComponent],
   templateUrl: './matrix.component.html',
   styleUrls: ['./matrix.component.scss']
 })
@@ -48,52 +25,24 @@ export class MatrixComponent {
     this._risks = this.arrayToMatrixMap(value);
   }
 
-  rowLabels: string[] = [];
-  colLabels: string[] = [];
+  rowLabels: Range[] = [];
+  colLabels: Range[] = [];
 
   _matrixData: any;
   matrixLevels: any;
-
-  private matrixService = inject(MatrixService);
 
   @Input() set matrixData(value: any) {
 
     this._matrixData = value;
 
-    // if (value.cells) {
-    //   value.cells.forEach(
-    //     (cell : any) => {
-    //       console.log(cell)
-    //     }
-    //   )
-    //   this.rowLabels = value.cells
-    //     .filter((c) => c.libelle === 'row')
-    //     .sort((a: any, b: any) => b.position - a.position)
-    //     .map((l: any) => l.label);
-
-    //   this.colLabels = value.labels
-    //     .filter((l: { labelType: string }) => l.labelType === 'col')
-    //     .sort((a: any, b: any) => a.position - b.position)
-    //     .map((l: any) => l.label);
-    // }
-
     this.buildMatrixFromCells(value.cells || []);
   }
 
+  private dialog = inject(MatDialog);
+
   @Output() selectedRiskEvent = new EventEmitter<any>();
-
-  /** légende dynamique */
-  // readonly colorLevels = Object.entries(COLOR_MAP).map(([lvl, color]) => ({
-  //   level: lvl as RiskLevel,
-  //   label: RISK_LABEL_MAP[lvl as RiskLevel],
-  //   color
-  // }));
-
+  
   selectedColor = '';
-
-  constructor(private dialog: MatDialog) { }
-
-  private snackBarService = inject(SnackBarService);
 
   private buildMatrixFromCells(cells: any[]) {
     if (!cells?.length) {
@@ -125,12 +74,15 @@ export class MatrixComponent {
       if (rowIdx >= 0 && rowIdx < maxImpact && colIdx >= 0 && colIdx < maxProb) {
         matrix[rowIdx][colIdx] = cell;
         // Remplir les labels si absents
-        if (!this.rowLabels[rowIdx]) this.rowLabels[rowIdx] = cell.severite?.libelle ?? '';
-        if (!this.colLabels[colIdx]) this.colLabels[colIdx] = cell.frequence?.libelle ?? '';
+        if (!this.rowLabels[rowIdx]) this.rowLabels[rowIdx] = cell.severite ?? '';
+        if (!this.colLabels[colIdx]) this.colLabels[colIdx] = cell.frequence ?? '';
       }
     });
 
-    this.matrixLevels = matrix;
+    console.log(this.rowLabels)
+    console.log(this.colLabels)
+
+    this.matrixLevels = matrix.reverse();
   }
 
   /* ===================== HELPERS ===================== */

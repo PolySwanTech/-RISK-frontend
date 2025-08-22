@@ -9,17 +9,16 @@
     <div class="matrix-wrapper">
       <table class="risk-matrix">
         <tbody>
-          <tr *ngFor="let row of matrixLevels.reverse(); let rIdx = index; trackBy: trackByIdx">
+          <tr *ngFor="let row of matrixLevels; let rIdx = index; trackBy: trackByIdx">
             <th class="row-header">
-              <input class="row-input" [(ngModel)]="rowLabels[matrixLevels.length - 1 - rIdx]" />
+              <label class="row-input">{{rowLabels[matrixLevels.length - 1 - rIdx].libelle}}</label>
             </th>
 
             <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
               (click)="onRiskClick(cell)">
-              <div class="risk-indicator" *ngIf="cell.id">
-                <!-- exemple d’affichage -->
+              <!-- <div class="risk-indicator" *ngIf="cell.id">
                 {{ cell?.severite?.libelle }} / {{ cell?.frequence?.libelle }}
-              </div>
+              </div> -->
             </td>
           </tr>
 
@@ -27,7 +26,7 @@
           <tr class="column-labels-row">
             <th class="probability-header">PROBABILITÉ</th>
             <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx">
-              <input class="col-input" [(ngModel)]="colLabels[i]" [placeholder]="'Col '+(i+1)" />
+              <label class="col-input">{{colLabels[i].libelle}}</label>
             </td>
           </tr>
         </tbody>
@@ -50,3 +49,8 @@
   }
 
 </section>
+
+<h2>⚙️ Paramétrage des Sévérités</h2>
+<app-matrix-settings [list]="rowLabels" [type]="'SEVERITY'"></app-matrix-settings>
+<h2>⚙️ Paramétrage des Fréquences</h2>
+<app-matrix-settings [list]="colLabels" [type]="'FREQUENCY'"></app-matrix-settings>
