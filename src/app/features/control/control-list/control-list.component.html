@@ -57,9 +57,9 @@
 
             <!-- Si c'est une colonne badge, on affiche un span avec la classe correspondante -->
             <ng-container *ngIf="column.isBadge; else plainCell">
-              <span class="badge" [ngClass]="getBadgeClass(column.isBadge, column.cell(row))">
+              <!-- <span class="badge" [ngClass]="getBadgeClass(column.isBadge, column.cell(row))">
                 {{ column.cell(row) }}
-              </span>
+              </span> -->
             </ng-container>
 
             <!-- Sinon affichage simple -->
