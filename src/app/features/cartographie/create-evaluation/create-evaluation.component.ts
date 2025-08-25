@@ -35,11 +35,8 @@ export class CreateEvaluationComponent implements OnInit {
 
   selectedYear = new Date().getFullYear();
 
-  totalImpact = 0
-
   selectedRisk: any | null = null;
   selectedProcess: ProcessNode | null = null;
-  selectedControl: ControlTemplate | null = null;
 
   processes: Process[] = [];
 
@@ -129,7 +126,6 @@ export class CreateEvaluationComponent implements OnInit {
     this.selectedRisk = risk;
     this.processService.getAllByRisks(risk.id.id).subscribe(processes => {
       this.processes = processes;
-      this.totalImpact = 0;
     });
   }
 
@@ -157,5 +153,10 @@ export class CreateEvaluationComponent implements OnInit {
           console.error(err)
         }
       })
+  }
+
+  onSaveEvaluation(){
+    this.selectedProcess = null;
+    this.selectedRisk = null;
   }
 }

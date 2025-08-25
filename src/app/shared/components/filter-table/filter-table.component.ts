@@ -54,7 +54,6 @@ export class FilterTableComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log(this.availableOptions);
     if (changes['availableFilters']) {
       const group: any = {};
       this.availableFilters.forEach(f => group[f.key] = ['']);

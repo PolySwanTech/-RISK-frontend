@@ -1,42 +1,20 @@
-import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
-import { MatrixService } from './../../../core/services/matrix/matrix.service';
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RiskLevel, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
-
-/** Couleur à afficher pour chaque RiskLevel */
-const COLOR_MAP: Record<RiskLevel, string> = {
-  [RiskLevel.LOW]: '#F5F8FA',       // Très faible / Faible
-  [RiskLevel.MEDIUM]: '#FFA500',    // Moyen
-  [RiskLevel.HIGH]: '#FF4500',      // Élevé
-  [RiskLevel.VERY_HIGH]: '#8B0000', // Critique
-};
-
-const RISK_LABEL_MAP: Record<RiskLevel, string> = {
-  [RiskLevel.LOW]: 'Très faible',
-  [RiskLevel.MEDIUM]: 'Moyen',
-  [RiskLevel.HIGH]: 'Élevé',
-  [RiskLevel.VERY_HIGH]: 'Critique',
-};
-
-/** Matrice par défaut (5x5) */
-const DEFAULT_MATRIX_LEVELS: RiskLevel[][] = [
-  [RiskLevel.LOW, RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.MEDIUM, RiskLevel.HIGH],
-  [RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.HIGH],
-  [RiskLevel.MEDIUM, RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.HIGH, RiskLevel.VERY_HIGH],
-  [RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.HIGH, RiskLevel.VERY_HIGH, RiskLevel.VERY_HIGH],
-  [RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.VERY_HIGH, RiskLevel.VERY_HIGH, RiskLevel.VERY_HIGH],
-];
+import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
+import { Range } from '../matrix-settings/matrix-settings.component';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { MatrixService } from '../../../core/services/matrix/matrix.service';
 
 @Component({
   selector: 'app-matrix',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatTooltipModule],
+  imports: [CommonModule, FormsModule, MatTooltipModule, MatrixSettingsComponent],
   templateUrl: './matrix.component.html',
   styleUrls: ['./matrix.component.scss']
 })
@@ -47,67 +25,100 @@ export class MatrixComponent {
     this._risks = this.arrayToMatrixMap(value);
   }
 
-  rowLabels: string[] = ['Catastrophique', 'Majeur', 'Modéré', 'Mineur', 'Insignifiant'];
-  colLabels: string[] = ['Très rare', 'Rare', 'Occasionnel', 'Fréquent', 'Très fréquent'];
+  rowLabels: Range[] = [];
+  colLabels: Range[] = [];
+
+  updatedCells: any[] = [];
+
+  riskLevels: Set<any> = new Set();
 
   _matrixData: any;
-  matrixLevels: RiskLevel[][] = [];
+  matrixLevels: any;
 
-  private matrixService = inject(MatrixService);
+  activeCell: any = null;
+  overlayPosition: any = {};
+
+  openColorOverlay(event: MouseEvent, cell: any) {
+    event.stopPropagation(); // éviter fermeture immédiate
+    this.activeCell = cell;
+
+    // Positionner l’overlay exactement là où la souris a cliqué
+    this.overlayPosition = {
+      top: `${event.clientY - 50}px`,
+      left: `${event.clientX}px`,
+    };
+  }
+
+  selectColor(cell: any, risk: any) {
+    cell.riskLevel = risk;
+    this.updatedCells.push({ id: cell.id, riskLevel: { name: cell.riskLevel.name, color: cell.riskLevel.color } });
+    this.activeCell = null; // ferme l’overlay
+  }
+
+  // ferme overlay si on clique en dehors
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    this.activeCell = null;
+  }
 
   @Input() set matrixData(value: any) {
-    if (!value) {
-      this._matrixData = { labels: this.buildLabels(''), cells: [] };
-      this.initMatrix();
-      return;
-    }
 
     this._matrixData = value;
-
-    if (value.labels) {
-      this.rowLabels = value.labels
-        .filter((l: { labelType: string }) => l.labelType === 'row')
-        .sort((a: any, b: any) => b.position - a.position)
-        .map((l: any) => l.label);
-
-      this.colLabels = value.labels
-        .filter((l: { labelType: string }) => l.labelType === 'col')
-        .sort((a: any, b: any) => a.position - b.position)
-        .map((l: any) => l.label);
-    }
 
     this.buildMatrixFromCells(value.cells || []);
   }
 
-  @Output() selectedRiskEvent = new EventEmitter<any>();
+  private dialog = inject(MatDialog);
+  private snackBarService = inject(SnackBarService);
+  private matrixService = inject(MatrixService);
 
-  /** légende dynamique */
-  readonly colorLevels = Object.entries(COLOR_MAP).map(([lvl, color]) => ({
-    level: lvl as RiskLevel,
-    label: RISK_LABEL_MAP[lvl as RiskLevel],
-    color
-  }));
+  @Output() selectedRiskEvent = new EventEmitter<any>();
 
   selectedColor = '';
 
-  constructor(private dialog: MatDialog) { }
-
-  private snackBarService = inject(SnackBarService);
-
-  /* ===================== INIT ===================== */
-  private initMatrix() {
-    this.matrixLevels = DEFAULT_MATRIX_LEVELS.map(row => [...row]);
-  }
-
   private buildMatrixFromCells(cells: any[]) {
-    this.initMatrix();
+    if (!cells?.length) {
+      this.matrixLevels = [];
+      this.rowLabels = [];
+      this.colLabels = [];
+      return;
+    }
+
+    // Nombre de lignes = nb niveaux d'IMPACT = max(position.col)
+    const maxImpact = Math.max(...cells.map(c => c.position?.col ?? 1));
+    // Nombre de colonnes = nb niveaux de PROBABILITÉ = max(position.row)
+    const maxProb = Math.max(...cells.map(c => c.position?.row ?? 1));
+
+    // Matrice (on stocke l'objet cell complet)
+    const matrix: any[][] = Array.from({ length: maxImpact }, () =>
+      Array.from({ length: maxProb }, () => null)
+    );
+
+    // Labels
+    this.rowLabels = Array(maxImpact).fill('');
+    this.colLabels = Array(maxProb).fill('');
+
+    const riskMap = new Map<string, {color: string, level: string}>();
+
     cells.forEach(cell => {
-      const rowIdx = cell.rowPosition - 1;
-      const colIdx = cell.colPosition - 1;
-      if (rowIdx >= 0 && rowIdx < 5 && colIdx >= 0 && colIdx < 5) {
-        this.matrixLevels[rowIdx][colIdx] = cell.riskLevel as RiskLevel;
+      const key = `${cell.riskLevel.color}|${cell.riskLevel.level}`;
+      if (!riskMap.has(key)) {
+        riskMap.set(key, cell.riskLevel);
+      }
+      // ⚠️ swap : rowIndex = impact (col), colIndex = probabilité (row)
+      const rowIdx = (cell.position.col ?? 1) - 1; // lignes = IMPACT
+      const colIdx = (cell.position.row ?? 1) - 1; // colonnes = PROBABILITÉ
+
+      if (rowIdx >= 0 && rowIdx < maxImpact && colIdx >= 0 && colIdx < maxProb) {
+        matrix[rowIdx][colIdx] = cell;
+        // Remplir les labels si absents
+        if (!this.rowLabels[rowIdx]) this.rowLabels[rowIdx] = cell.severite ?? '';
+        if (!this.colLabels[colIdx]) this.colLabels[colIdx] = cell.frequence ?? '';
       }
     });
+
+    this.riskLevels = new Set(riskMap.values());
+    this.matrixLevels = matrix.reverse();
   }
 
   /* ===================== HELPERS ===================== */
@@ -132,33 +143,22 @@ export class MatrixComponent {
     ];
   }
 
-  private colorToLevel(color: string): RiskLevel {
-    return (Object.entries(COLOR_MAP).find(([_, c]) => c === color)?.[0] as RiskLevel) ?? RiskLevel.MEDIUM;
-  }
-
-  private levelToColor(level: RiskLevel): string {
-    return COLOR_MAP[level];
-  }
-
-  /* ===================== TEMPLATE ===================== */
-  get reversedMatrixLevels() {
-    return [...this.matrixLevels].reverse();
-  }
-
-  cellStyle(lvl: RiskLevel) {
+  cellStyle(cell: any) {
+    // si le backend t’envoie déjà la couleur (ex: cell.riskLevel.color), utilise-la :
+    const bg = cell.riskLevel.color;
     return {
-      backgroundColor: this.levelToColor(lvl),
+      backgroundColor: bg,
       border: '1px solid #ccc',
       width: '60px',
       height: '60px',
+      position: 'relative',
       cursor: this.modifPlan ? 'pointer' : 'default',
-      position: 'relative'
     };
   }
 
-  setColor(row: number, col: number) {
+  setColor(cell: any) {
     if (!this.modifPlan || !this.selectedColor) return;
-    this.matrixLevels[row][col] = this.colorToLevel(this.selectedColor);
+    this.matrixLevels[cell.position.row][cell.position.col] = null;
   }
 
   /* ===================== RISKS ===================== */
@@ -205,8 +205,8 @@ export class MatrixComponent {
     return "R" + Number(afterLastUnderscore);
   }
 
-  onRiskClick(row: number, col: number) {
-    const data = this._risks[this.cellKey(row, col)];
+  onRiskClick(cell: any) {
+    const data = this._risks[this.cellKey(cell.position.row, cell.position.col)];
     if (!data) return;
 
     if (Array.isArray(data)) {
@@ -224,25 +224,29 @@ export class MatrixComponent {
 
   /* ===================== SAVE ===================== */
   saveMatrix() {
-    const matrixId = this._matrixData.id || '';
-    const labels = this.buildLabels(matrixId);
-
-    const cells = this.matrixLevels.flatMap((row, rowIdx) =>
-      row.map((riskLevel, colIdx) => ({
-        matrix: matrixId,
-        rowPosition: rowIdx + 1,
-        colPosition: colIdx + 1,
-        riskLevel,
-        colorHex: this.levelToColor(riskLevel)
-      }))
-    );
-
-    const payload = { id: matrixId, labels, cells };
-
-    this.matrixService.saveMatrix(payload).subscribe({
-      next: resp => this.snackBarService.success("La matrice a bien été sauvegardée"),
-      error: err => this.snackBarService.error("Une erreur est survenu")
+    console.log(this.updatedCells);
+    this.matrixService.updateCells(this.updatedCells).subscribe(_ => {
+      this.snackBarService.success("La matrice a bien été mise à jour");
     });
+    // const matrixId = this._matrixData.id || '';
+    // const labels = this.buildLabels(matrixId);
+
+    // const cells = this.matrixLevels.flatMap((row, rowIdx) =>
+    //   row.map((riskLevel, colIdx) => ({
+    //     matrix: matrixId,
+    //     rowPosition: rowIdx + 1,
+    //     colPosition: colIdx + 1,
+    //     riskLevel,
+    //     colorHex: this.levelToColor(riskLevel)
+    //   }))
+    // );
+
+    // const payload = { id: matrixId, labels, cells };
+
+    // this.matrixService.saveMatrix(payload).subscribe({
+    //   next: resp => this.snackBarService.success("La matrice a bien été sauvegardée"),
+    //   error: err => this.snackBarService.error("Une erreur est survenu")
+    // });
   }
 
   /* ===================== TRACKERS ===================== */

@@ -11,6 +11,7 @@ export class ControlExecution {
     usedData : string;
     controlData : string;
     achievedAt: Date | null;
+    plannedAt: Date | null;
     performedBy: string;
     status: Status
     evaluation: Evaluation;
@@ -24,6 +25,7 @@ export class ControlExecution {
         usedData: string,
         controlData: string,
         achievedAt: Date | null,
+        plannedAt: Date | null,
         performedBy: string,
         status: Status,
         evaluation: Evaluation,
@@ -36,6 +38,7 @@ export class ControlExecution {
         this.usedData = usedData;
         this.controlData = controlData;
         this.achievedAt = achievedAt;
+        this.plannedAt = plannedAt;
         this.performedBy = performedBy;
         this.status = status;
         this.evaluation = evaluation;

@@ -20,7 +20,7 @@ export class IncidentService {
   }
 
   deleteIncident(id: string) {
-    return this.http.delete(this.baseUrl + `/${id}`)  
+    return this.http.delete(this.baseUrl + `/${id}`)
   }
 
   countIncidentsNonClotures(): Observable<number> {
@@ -66,6 +66,11 @@ export class IncidentService {
         console.error("Erreur lors du téléchargement de l’export :", error);
       }
     );
-  }  
-  
+  }
+
+  downloadPDF(incidentId: string) {
+    const url = `${this.baseUrl}/${incidentId}/pdf`;
+    return this.http.get(url, { responseType: 'blob' });
+  }
+
 }
