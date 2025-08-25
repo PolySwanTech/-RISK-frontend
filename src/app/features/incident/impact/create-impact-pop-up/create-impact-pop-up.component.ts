@@ -75,7 +75,7 @@ export class CreateImpactPopUpComponent implements OnInit {
     const onlyBl = true
     this.entiteService.loadEntities(onlyBl).subscribe(
       list => {
-        console.log(list)
+        console.log("entités",list)
         this.entites = list
       }
     )

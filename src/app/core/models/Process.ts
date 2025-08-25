@@ -10,7 +10,8 @@ export class Process {
     enfants: Process[] = []
     risks: RiskTemplate[] = []
 
-    buName : string = ''
+    buName : string = '';
+    niveau?: number;
     sum = 0;
 
     constructor(

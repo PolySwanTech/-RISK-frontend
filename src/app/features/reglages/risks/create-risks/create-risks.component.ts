@@ -99,12 +99,12 @@ export class CreateRisksComponent implements OnInit {
     }
   }
 
-    onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
+  onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
     if (level === 1) {
       this.riskCategoryService.getByParent(baloise).subscribe(
         data => {
           this.bal2 = data;
-          this.infoForm.patchValue({ balois2: null});
+          this.infoForm.patchValue({ balois2: null });
         }
       );
     }

@@ -1,4 +1,4 @@
-import { Component, inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -25,7 +25,7 @@ import { ListImpactComponent } from '../impact/list-impact/list-impact.component
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
 import { ImpactService } from '../../../core/services/impact/impact.service';
-
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-view',
@@ -34,10 +34,7 @@ import { ImpactService } from '../../../core/services/impact/impact.service';
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
     FichiersComponent, ListSuiviComponent],
   templateUrl: './view.component.html',
-  styleUrl: './view.component.scss',
-  // providers: [
-  //   { provide: LOCALE_ID, useValue: 'fr' }
-  // ]
+  styleUrl: './view.component.scss'
 })
 export class ViewComponent implements OnInit {
   private incidentService = inject(IncidentService);
@@ -47,6 +44,7 @@ export class ViewComponent implements OnInit {
   private router = inject(Router);
   private entitiesService = inject(EntitiesService);
   private impactService = inject(ImpactService);
+
 
   incident: Incident | undefined
   userRole: string | undefined;
@@ -87,11 +85,18 @@ export class ViewComponent implements OnInit {
         action: () => this.addActionPlan()
       },
       {
-        label: 'Exporter',
+        label: 'Export Excel',
         icon: 'file_download',
         class: 'btn-green',
         show: true,
         action: () => this.downloadExport()
+      },
+      {
+        label: 'Fiche Incident (PDF)',
+        icon: 'description',
+        class: 'btn-green',
+        show: true,
+        action: () => this.downloadPDF()
       },
       {
         label: 'Clôturer',
@@ -99,7 +104,8 @@ export class ViewComponent implements OnInit {
         class: 'btn-red',
         show: this.canClose(),
         action: () => this.closeIncident()
-      }
+      },
+
     ];
   }
 
@@ -213,9 +219,21 @@ export class ViewComponent implements OnInit {
     const diffTime = Math.abs(date2.getTime() - date1.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
-  addImpact() {
 
+  addImpact() {
     this.router.navigate(['incident', this.idIncident, 'impacts']);
+  }
+
+  downloadPDF(): void {
+    if (!this.incident?.id) return;
+    this.incidentService.downloadPDF(this.incident.id).subscribe({
+      next: (blob) => {
+        const ref = this.incident?.reference ?? this.incident?.id;
+        const pdf = new Blob([blob], { type: 'application/pdf' });
+        saveAs(pdf, `FICHE_INCIDENT_${ref}.pdf`);
+      },
+      error: (err) => console.error('Erreur export PDF :', err)
+    });
   }
 
 }
