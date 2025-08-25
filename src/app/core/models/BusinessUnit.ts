@@ -9,6 +9,7 @@ export class BusinessUnit {
     parent : BusinessUnit | null = null
     parentId : string | null = null
     process: Process[] = []
+    niveau?: number
 
     constructor(
         id : string,

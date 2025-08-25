@@ -160,7 +160,7 @@ export class ListProcessComponent implements OnInit {
         return {
           id: entity.id,
           name: entity.name,
-          niveau: 0,
+          niveau: (entity as any).niveau ?? 1,
           type: 'bu' as const,
           children: this.buildBUChildren(processes)
         };
@@ -172,7 +172,7 @@ export class ListProcessComponent implements OnInit {
         this.hierarchicalProcesses.push({
           id: `bu-no-bu`,
           name: 'Sans BU',
-          niveau: 0,
+          niveau: 1,
           type: 'bu' as const,
           children: this.buildBUChildren(orphanProcesses)
         });

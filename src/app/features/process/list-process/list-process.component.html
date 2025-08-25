@@ -54,7 +54,7 @@
                 <div class="node-container" [ngClass]="'level-' + node.niveau">
 
                     <!-- Ligne de connexion -->
-                    <div class="connection-line" *ngIf="node.niveau > 0"></div>
+                    <div class="connection-line" *ngIf="node.niveau > 1"></div>
 
                     <!-- Node principal -->
                     <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
@@ -121,10 +121,10 @@
 
     <!-- Template récursif pour les enfants -->
     <ng-template #nodeTemplate let-node>
-        <div class="node-container" [ngClass]="'level-' + node.level">
+        <div class="node-container" [ngClass]="'level-' + node.niveau">
 
             <!-- Ligne de connexion -->
-            <div class="connection-line" *ngIf="node.level > 0"></div>
+            <div class="connection-line" *ngIf="node.niveau > 1"></div>
 
             <!-- Node principal -->
             <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
