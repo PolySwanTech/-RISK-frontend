@@ -93,21 +93,10 @@ export class RiskPageComponent implements OnInit {
       bus: this.entitiesSrv.loadEntities()
     }).subscribe({
       next: ({ risks, bus }) => {
-        /* ---------------- Pré-traitement ---------------- */
-        this.risks = risks.map(risk => {
-          const lastEval = risk.riskEvaluations?.at(-1);
-
-          /* probability est sur 1-10 → on le ramène sur 1-5 */
-          const frequency = lastEval && lastEval.probability !== undefined ? Math.ceil(lastEval.probability / 2) : null;
-
-          /* riskNet est l’enum (LOW, MEDIUM…) → on le convertit en score 1-5 */
-          const impact = lastEval
-            ? RiskLevelScores[lastEval.evaluation as RiskLevel]   // ex. HIGH → 4
-            : null;
-
-          return { ...risk, frequency, impact };
-        });
-        this.filteredRisks = [...risks];
+        // Pas de calcul de frequency (plus de probability)
+        // On garde la liste telle quelle
+        this.risks = risks ?? [];
+        this.filteredRisks = [...this.risks];
         this.buNameList = bus.map(b => b.name);
       },
       error: err => console.error('Erreur chargement page risques', err)
