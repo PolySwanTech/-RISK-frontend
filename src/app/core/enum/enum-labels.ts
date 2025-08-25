@@ -26,9 +26,9 @@ export const EnumLabels = {
     [RiskLevelLabels.VERY_HIGH]: 'Critique',
   },
   degres: {
-    [Degree.LEVEL_1]: '2.1',
-    [Degree.LEVEL_2]: '2.2',
-    [Degree.LEVEL_3]: '2.3',
+    [Degree.LEVEL_1]: '1',
+    [Degree.LEVEL_2]: '2',
+    [Degree.LEVEL_3]: '3',
   },
   priority: {
     [Priority.MINIMAL]: 'Basse',

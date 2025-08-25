@@ -9,7 +9,7 @@
       @if (risk) {
         <mat-stepper [linear]="false" #stepper>
           <!-- ───────────────────── 1. Informations de base ───────────────────── -->
-          <mat-step [stepControl]="infoForm" label="Informations de base">
+          <mat-step [stepControl]="infoForm">
             <form [formGroup]="infoForm">
               <!-- Titre --------------------------------------------------------- -->
               <mat-form-field class="full-width">
@@ -50,7 +50,7 @@
               <mat-form-field class="full-width">
                 <mat-label>Risque parent</mat-label>
                <mat-select formControlName="parentRisk">
-                  <mat-option [value]="null">Aucun</mat-option>
+                <mat-option [value]="undefined">Aucun</mat-option>
                   <!-- on utilise risk.id pour lier le risque parent -->
                   <mat-option *ngFor="let r of risks" [value]="r.id.id">
                     {{ r.libellePerso }}
@@ -58,80 +58,10 @@
                 </mat-select> 
               </mat-form-field>
 
-              <!-- Processus ----------------------------------------------------- -->
-              <mat-form-field *ngIf="process1.length > 0" class="full-width">
-                <mat-label>Processus</mat-label>
-                <mat-select formControlName="process1" (selectionChange)="onProcessChange($event.value, 1)">
-                  <mat-option
-                    *ngFor="let p of process1"
-                    [value]="p"
-                  >
-                    {{ p.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Sous-processus L2 -------------------------------------------- -->
-              <mat-form-field class="full-width" *ngIf="process2.length > 0">
-                <mat-label>Sous-process&nbsp;</mat-label>
-                <mat-select formControlName="process2" (selectionChange)="onProcessChange($event.value, 2)">
-                  <!-- on envoie ici l’OBJET L2 complet,
-                       car risk.categoryL2 est de type BaloiseCategoryL2 -->
-                  <mat-option
-                    *ngFor="let sub of process2"
-                    [value] = "sub"
-                  >
-                    {{ sub.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <div class="actions">
-                <button
-                  mat-raised-button
-                  class="btn-primary"
-                  matStepperNext
-                  [disabled]="infoForm.invalid"
-                >
-                  Suivant
-                </button>
-              </div>
-            </form>
-          </mat-step>
-
-          <!-- ───────────────────────── 2. Autres infos ───────────────────────── -->
-          <mat-step [stepControl]="detailsForm" label="Autres info">
-            <form [formGroup]="detailsForm">
-              <!-- Type d’impact ----------------------------------------------- -->
-              <mat-form-field>
-                <mat-label>Type d'impact</mat-label>
-                <mat-select
-                  formControlName="impactType"
-                  placeholder="Choisissez un type d'impact"
-                  required
-                >
-                  @for (impact of impactTypes; track impact) {
-                    <mat-option [value]="impact">
-                      {{ impactLabels[impact] }}
-                    </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Niveau brut --------------------------------------------------- -->
-              <mat-form-field>
-                <mat-label>Niveau</mat-label>
-                <mat-select
-                  formControlName="level"
-                  placeholder="Choisissez un niveau de risque"
-                  required
-                >
-                  <mat-option *ngFor="let level of riskLevels"
-                    [value]="level">          <!-- ← enum, pas string -->
-                    {{ riskLabels[level] }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+              <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length"
+                [id]="infoForm.get('processId')!.value" (changeValue)="onProcessSelected($event)"
+                placeholder="Sélectionnez un processus" [list]="listProcess" >
+              </app-select-arborescence>
 
               <!-- Description --------------------------------------------------- -->
               <mat-form-field class="full-width">
@@ -142,26 +72,28 @@
                   placeholder="Entrez la description"
                 ></textarea>
               </mat-form-field>
+
+              <div class="actions">
+
+                <button
+                  mat-raised-button
+                  class="btn-red"
+                  matStepperPrevious
+                  *ngIf="risk.id"
+                >
+                  Annuler
+                </button>
+
+                <button
+                  mat-raised-button
+                  class="btn-primary"
+                  (click)="submit()"
+                  [disabled]="infoForm.invalid"
+                >
+                  Soumettre
+                </button>
+              </div>
             </form>
-
-            <div class="actions">
-              <button
-                mat-raised-button
-                class="btn-red"
-                matStepperPrevious
-              >
-                Retour
-              </button>
-
-              <button
-                mat-raised-button
-                class="btn-primary"
-                (click)="submit()"
-                [disabled]="infoForm.invalid || detailsForm.invalid"
-              >
-                Soumettre
-              </button>
-            </div>
           </mat-step>
         </mat-stepper>
       }

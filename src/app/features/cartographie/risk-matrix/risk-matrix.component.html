@@ -20,8 +20,8 @@
     </div>
 
     <div class="info-row">
-      <span class="label">Libellé (Balois) :</span>
-      <span class="value">{{ riskData.libellePerso }}</span>
+      <span class="label">Catégorie Bâloise :</span>
+      <span class="value">{{ riskData.category }}</span>
     </div>
 
     <div class="info-row">
@@ -37,18 +37,18 @@
     </div>
 
     <div class="info-row">
-      <span class="label">Probabilité :</span>
-      <span class="value probability">{{ getProbabilityText() }}</span>
+      <span class="label">Fréquence :</span>
+      <span class="value probability">{{ getFrequency() }}</span>
     </div>
 
     <div class="info-row">
       <span class="label">Risque inhérent :</span>
-      <span class="value badge" [ngClass]="riskClass">{{ riskLabel }}</span>
+      <span class="value badge" [ngClass]="riskBrut">{{ riskBrut }}</span>
     </div>
 
     <div class="info-row">
       <span class="label">Risque résiduel :</span>
-      <span class="value impact">{{ getImpactText() }}</span>
+      <span class="value badge" [ngClass]="riskNet">{{ riskNet }}</span>
     </div>
   </div>
 

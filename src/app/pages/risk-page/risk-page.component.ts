@@ -37,16 +37,15 @@ import { GoBackComponent } from "../../shared/components/go-back/go-back.compone
   templateUrl: './risk-page.component.html',
   styleUrl: './risk-page.component.scss'
 })
-export class RiskPageComponent implements OnInit {
+// ...imports inchangés...
 
-  /* -------------------------- filtres -------------------------- */
-  selectedNiveau: RiskLevel | null = null
+export class RiskPageComponent implements OnInit {
+  selectedNiveau: RiskLevel | null = null;
   selectedBU: string | 'all' = 'all';
 
-  /* ------------------------- données --------------------------- */
-  risks: RiskTemplate[] = [];   // liste complète
-  filteredRisks: RiskTemplate[] = [];   // après filtrage
-  buNameList: string[] = [];   // liste dynamique des BUs
+  risks: RiskTemplate[] = [];
+  filteredRisks: RiskTemplate[] = [];
+  buNameList: string[] = [];
 
   selectedRisk: RiskTemplate | null = null;
   processMap: Record<string, Process> = {};
@@ -54,102 +53,59 @@ export class RiskPageComponent implements OnInit {
   levels = Object.values(RiskLevel);
 
   matrixData: any = null;
-
   buId: string = '';
-
   buName: string = '';
-
   goBackButtons: GoBackButton[] = [];
 
-  /* ------------------ services / navigation -------------------- */
   private riskService = inject(RiskService);
   private entitiesSrv = inject(EntitiesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private matrixService = inject(MatrixService)
-  processService: ProcessService = inject(ProcessService);
+  private matrixService = inject(MatrixService);
+  private processService: ProcessService = inject(ProcessService);
 
-  /* ============================================================= */
   ngOnInit(): void {
     this.goBackButtons = [
-      {
-        label: 'Ajouter un impact',
-        icon: 'add',
-        class: 'btn-primary',
-        action: () => this.goToAddRisk(),
-        show: true
-      },
-      {
-        label: 'Exporter',
-        icon: 'file_download',
-        class: 'btn-green',
-        action: () => this.exportData(),
-        show: true
-      },
-      {
-        label: 'Actualiser',
-        icon: 'refresh',
-        class: 'btn-primary',
-        action: () => this.refreshData(),
-        show: true
-      }
+      { label: 'Ajouter un Risque', icon: 'add', class: 'btn-primary', action: () => this.goToAddRisk(), show: true },
+      { label: 'Exporter', icon: 'file_download', class: 'btn-green', action: () => this.exportData(), show: true },
+      { label: 'Actualiser', icon: 'refresh', class: 'btn-primary', action: () => this.refreshData(), show: true }
     ];
 
     this.buId = this.route.snapshot.paramMap.get('id')!;
+    this.entitiesSrv.findById(this.buId).subscribe(resp => this.buName = resp.name);
 
-    console.log(this.buId)
-
-    this.entitiesSrv.findById(this.buId).subscribe(resp => this.buName = resp.name)
-
-    this.matrixService.getMatriceByBuId(this.buId).subscribe(resp => {
-      this.matrixData = resp
-      console.log(this.matrixData)
-    },
-      error => {
-        console.error(error)
-      })
-
-    this.processService.getAll().subscribe(list => {
-      this.processMap = list.reduce<Record<string, Process>>(
-        (acc, p) => ({ ...acc, [p.id]: p }),
-        {}
-      );
-
-      this.filteredRisks = [...this.risks];   // ou ton chargement réel
+    this.matrixService.getMatriceByBuId(this.buId).subscribe({
+      next: resp => this.matrixData = resp,
+      error: err => console.error(err)
     });
 
-    /* On charge les risques ET les BUs en parallèle */
+    // Construire une map des process (pour fallback BU si besoin)
+    this.processService.getAll().subscribe(list => {
+      this.processMap = list.reduce<Record<string, Process>>((acc, p) => {
+        acc[p.id] = p;
+        return acc;
+      }, {});
+    });
+
+    // Charger risques + BU en parallèle
     forkJoin({
-      risks: this.riskService.getAll(),
+      risks: this.riskService.getAll(),     // <-- doit renvoyer RiskTemplate[] (mappés)
       bus: this.entitiesSrv.loadEntities()
     }).subscribe({
       next: ({ risks, bus }) => {
-        /* ---------------- Pré-traitement ---------------- */
-        this.risks = risks.map(risk => {
-          console.log(risks)
-          const lastEval = risk.riskEvaluations?.at(-1);
-
-          /* probability est sur 1-10 → on le ramène sur 1-5 */
-          const frequency = lastEval && lastEval.probability !== undefined ? Math.ceil(lastEval.probability / 2) : null;
-
-          /* riskNet est l’enum (LOW, MEDIUM…) → on le convertit en score 1-5 */
-          const impact = lastEval
-            ? RiskLevelScores[lastEval.evaluation as RiskLevel]   // ex. HIGH → 4
-            : null;
-
-          return { ...risk, frequency, impact };
-        });
-        this.filteredRisks = [...risks];
+        // Pas de calcul de frequency (plus de probability)
+        // On garde la liste telle quelle
+        this.risks = risks ?? [];
+        this.filteredRisks = [...this.risks];
         this.buNameList = bus.map(b => b.name);
       },
       error: err => console.error('Erreur chargement page risques', err)
     });
   }
 
-  /* ============================================================= */
   refreshData(): void {
-    this.ngOnInit();              // re-charge tout
-    this.clearFilters();          // optionnel : réinitialise les filtres
+    this.ngOnInit();
+    this.clearFilters();
   }
 
   clearFilters(): void {
@@ -159,36 +115,34 @@ export class RiskPageComponent implements OnInit {
   }
 
   exportData(): void {
-    alert("fonctionnalité non implémenté")
+    alert("fonctionnalité non implémentée");
   }
 
-  /* ------------------------- filtrage -------------------------- */
   applyFilters(): void {
-
     let list = [...this.risks];
 
-    /* --- BU --- */
+    // --- Filtre BU ---
     if (this.selectedBU !== 'all') {
-      list.forEach(r => {
-        r.buName = this.processMap[r.processId].buName
-      })
-      list = list.filter(r => r.buName === this.selectedBU);
+      list = list.filter(r => {
+        // Priorité au buName déjà envoyé par le back
+        const bu = r.buName || (r.processId ? this.processMap[r.processId]?.buName : undefined);
+        return bu === this.selectedBU;
+      });
     }
 
-    /* --- niveau --- */
+    // --- Filtre niveau (sur le dernier NET) ---
     if (this.selectedNiveau) {
-      list = list.filter(r => r.riskEvaluations?.at(-1)?.evaluation == this.selectedNiveau);
+      list = list.filter(r => (r.riskNet?.at(-1)?.evaluation ?? null) === this.selectedNiveau);
     }
 
-    /* --- synchro sélection courante --- */
-    if (this.selectedRisk && !list.some(r => r.id === this.selectedRisk!.id)) {
+    // --- Sync sélection ---
+    if (this.selectedRisk && !list.some(r => r.id.id === this.selectedRisk!.id.id && r.id.version === this.selectedRisk!.id.version)) {
       this.selectedRisk = null;
     }
 
     this.filteredRisks = list;
   }
 
-  /* ------------------------- actions --------------------------- */
   onSelectRisk(risk: RiskTemplate): void {
     this.selectedRisk = risk;
   }

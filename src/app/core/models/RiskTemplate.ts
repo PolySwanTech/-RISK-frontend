@@ -1,6 +1,7 @@
 import { BaloiseCategoryEnum } from "../enum/baloisecategory.enum";
 import { RiskImpactType } from "../enum/riskImpactType.enum";
 import { RiskLevel } from "../enum/riskLevel.enum";
+import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
 import { RPC } from "./RPC";
@@ -15,6 +16,12 @@ export interface RiskId {
   version: string;
 }
 
+export interface Dmr {
+  controls: ControlTemplate[];
+  attenuationMetrics: AttenuationMetrics[];
+}
+
+
 
 // -------------  MODÈLE PRINCIPAL -------------
 export class RiskTemplate {
@@ -22,41 +29,43 @@ export class RiskTemplate {
   /** Identifiant composite (UUID + version) */
   id!: RiskId;
 
+  reference = '';
   libellePerso = '';
   description = '';
-
-  /** Enum à iso avec le back */
-  riskBrut: RiskLevel = RiskLevel.LOW;
-
-  /** UUID du process concerné */
-  processId = '';
-
-  reference = '';
-
-  category?: BaloiseCategoryEnum;
-
-  /** Set côté back → tableau côté front  */
-  // impactTypes: RiskImpactType[] = [];
 
   /** actif par défaut */
   active = true;
 
-  /* relations */
-  riskEvaluations?: RiskEvaluation[];
-  controlTemplates?: ControlTemplate[];
+  /** UUID du créateur */
+  creator!: string;
 
-  dmr : RPC[] = []
+  category?: BaloiseCategoryEnum;
 
-  creator?: BaloiseCategoryEnum; // UUID de l'utilisateur qui a créé le risque
-
-  buName : string = ''
+  /** nom de la BU et du process (injectés par le back) */
+  buName: string = '';
   processName: string = '';
+  processId?: string; // UUID du process
 
-  parent: RiskTemplate | null = null; // pour les risques parents, sinon null
+  /** relations */
+  parent: RiskTemplate | null = null; 
+  children: RiskTemplate[] = []; 
 
-  children: RiskTemplate[] = []; // pour les risques enfants
+  riskNet?: RiskEvaluation[];
+  riskBrut?: RiskEvaluation[];
 
-  level: number = 0; // niveau de profondeur dans l'arborescence
+  /** champ dérivé côté back (@Transient) */
+  dmr?: Dmr;
+
+  // Accès pratiques (si tu veux manipuler sans repasser par dmr?.)
+  get controls(): ControlTemplate[] {
+    return this.dmr?.controls ?? [];
+  }
+  get attenuationMetrics(): AttenuationMetrics[] {
+    return this.dmr?.attenuationMetrics ?? [];
+  }
+
+  /** profondeur dans l’arborescence */
+  level: number = 0;
 
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
@@ -70,7 +79,5 @@ export interface RiskTemplateCreateDto {
   category:        BaloiseCategoryEnum;
   description: string;
   processId:   string;                 // UUID
-  riskBrut:    RiskLevel;
-  impactTypes: RiskImpactType[];       // tableau → Set côté Java
   parent? : string | null; // optionnel, pour les risques enfants
 }

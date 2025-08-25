@@ -44,9 +44,9 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   }
 ];
 
-  get probability() : number | string {
-    return (this.risk?.dmr?.[0]?.probability || 0) * 10 || '-';
-  }
+  // get frequency() : number | string {
+  //   return (this.risk?.dmr?.[0]?.probability || 0) * 10 || '-';
+  // }
 
   constructor(
     private route: ActivatedRoute,
@@ -64,9 +64,9 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
         next: (risk) => {
           this.risk = risk;
           console.log(this.risk)
-          if (risk.riskEvaluations?.length) {
-            this.lastEvaluation = risk.riskEvaluations[risk.riskEvaluations.length - 1];
-          }
+          // if (risk.riskEvaluations?.length) {
+          //   this.lastEvaluation = risk.riskEvaluations[risk.riskEvaluations.length - 1];
+          // }
           this.loading = false;
         },
         error: () => {
@@ -91,7 +91,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   
   activeTab = 'controls';
 
-  selectTab(tab: 'controls' | 'evaluations' | 'impacts') {
+  selectTab(tab: 'controls' | 'evaluations') {
     this.activeTab = tab;
   }
 }

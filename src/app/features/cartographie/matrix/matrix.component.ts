@@ -170,11 +170,11 @@ export class MatrixComponent {
     arr.forEach(risk => {
       let impact = 0;
       // let frequency = risk.dmr.at(-1)?.probability;
-      let frequency = risk.riskEvaluations![0].probability;
+      let frequency = risk.riskBrut![0].probability;
 
       if (!impact || !frequency) {
         // const last = risk.dmr?.at(-1);
-        const last = risk.riskEvaluations![0];
+        const last = risk.riskBrut![0];
         if (last) {
           frequency = Math.ceil((last.probability ?? 1) / 2);
           impact = RiskLevelScores[last.evaluation as RiskLevel];

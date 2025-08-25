@@ -121,6 +121,10 @@ export class CreateControlComponent {
   }
 
   onTeamChange(event: any) {
+    const buId: string = event.value;
+    this.form.get('buId')?.setValue(buId);
+    this.form.get('buId')?.markAsDirty();
+
     this.listProcess = [];
     this.listRisks = [];
     this.form.get('processId')?.reset();
@@ -131,6 +135,10 @@ export class CreateControlComponent {
   }
 
   onSelectionProcess(value: any) {
+    this.form.get('processId')?.setValue(value.id);
+    this.form.get('processId')?.markAsDirty();
+    this.form.get('processId')?.updateValueAndValidity();
+
     this.listRisks = [];
     this.riskService.getRisksTree(value.id).subscribe(data => {
       console.log(data)
@@ -143,8 +151,9 @@ export class CreateControlComponent {
   }
 
   onSelectionRisk(event: RiskTemplate) {
-    console.log(event)
     this.form.get('riskId')?.setValue(event.id);
+    this.form.get('riskId')?.markAsDirty();
+    this.form.get('riskId')?.updateValueAndValidity();
   }
 
   getTypeLabel(type: keyof typeof EnumLabels.type): string {
@@ -164,6 +173,7 @@ export class CreateControlComponent {
   }
 
   onSubmit() {
+    console.log(this.form.value);
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
     const payload: ControlTemplateCreateDto = {
