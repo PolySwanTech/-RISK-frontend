@@ -30,18 +30,22 @@ export class MatrixService {
 
   getDefaultMatrix(buId: string): Observable<Matrix> {
     const params = new HttpParams().set("buId", buId);
-    return this.http.get<Matrix>(this.baseUrl, { params : params });
+    return this.http.get<Matrix>(this.baseUrl, { params: params });
   }
 
   saveMatrix(matrix: any): Observable<Matrix> {
     return this.http.post<Matrix>(`${this.baseUrl}`, matrix);
   }
 
-  saveScale(list : Range[], rangeType : RangeType): Observable<any> {
-    list.forEach((item : any) => {
+  updateCells(cells: any[]): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/cells`, cells);
+  }
+
+  saveScale(list: Range[], rangeType: RangeType): Observable<any> {
+    list.forEach((item: any) => {
       item.type = rangeType;
     });
-    return this.http.post<any>(`${this.baseUrl}/scale`, { scales : list, type : rangeType });
+    return this.http.post<any>(`${this.baseUrl}/scale`, { scales: list, type: rangeType });
   }
 
 }

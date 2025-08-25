@@ -8,6 +8,8 @@ import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-sele
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
 import { Range } from '../matrix-settings/matrix-settings.component';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { MatrixService } from '../../../core/services/matrix/matrix.service';
 
 @Component({
   selector: 'app-matrix',
@@ -25,6 +27,8 @@ export class MatrixComponent {
 
   rowLabels: Range[] = [];
   colLabels: Range[] = [];
+
+  updatedCells: any[] = [];
 
   riskLevels: Set<any> = new Set();
 
@@ -45,8 +49,9 @@ export class MatrixComponent {
     };
   }
 
-  selectColor(cell: any, color: string) {
-    cell.riskLevel.color = color;
+  selectColor(cell: any, risk: any) {
+    cell.riskLevel = risk;
+    this.updatedCells.push({ id: cell.id, riskLevel: { name: cell.riskLevel.name, color: cell.riskLevel.color } });
     this.activeCell = null; // ferme l’overlay
   }
 
@@ -64,6 +69,8 @@ export class MatrixComponent {
   }
 
   private dialog = inject(MatDialog);
+  private snackBarService = inject(SnackBarService);
+  private matrixService = inject(MatrixService);
 
   @Output() selectedRiskEvent = new EventEmitter<any>();
 
@@ -217,8 +224,12 @@ export class MatrixComponent {
 
   /* ===================== SAVE ===================== */
   saveMatrix() {
-    const matrixId = this._matrixData.id || '';
-    const labels = this.buildLabels(matrixId);
+    console.log(this.updatedCells);
+    this.matrixService.updateCells(this.updatedCells).subscribe(_ => {
+      this.snackBarService.success("La matrice a bien été mise à jour");
+    });
+    // const matrixId = this._matrixData.id || '';
+    // const labels = this.buildLabels(matrixId);
 
     // const cells = this.matrixLevels.flatMap((row, rowIdx) =>
     //   row.map((riskLevel, colIdx) => ({
