@@ -21,6 +21,7 @@
               <div *ngIf="activeCell === cell" class="color-overlay" [ngStyle]="overlayPosition">
                 <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
                   (click)="selectColor(cell, risk)">
+                  {{ risk.name }}
                 </div>
               </div>
 
