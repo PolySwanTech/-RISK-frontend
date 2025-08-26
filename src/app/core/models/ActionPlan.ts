@@ -27,13 +27,10 @@ export class Action {
     }
 }
 
-export interface ActionPlanId{
-    id: string;
-    version: Date;
-}
 
 export class ActionPlan {
-    actionPlanId: ActionPlanId;
+    id: string;
+    reference: string;
     libelle: string;
     description: string;
     status: Status;
@@ -47,11 +44,11 @@ export class ActionPlan {
 
     actions: Action[] = [];
 
-    reference : string = "";
+    incidentRef : string = "";
 
     constructor(
         id: string,
-        version: Date,
+        reference: string,
         libelle: string,
         description: string,
         status: Status,
@@ -62,7 +59,8 @@ export class ActionPlan {
         incidentId: string,
         echeance: Date
     ) {
-        this.actionPlanId = { id, version };
+        this.id = id;
+        this.reference = reference;
         this.libelle = libelle;
         this.description = description;
         this.status = status;

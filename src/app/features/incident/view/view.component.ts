@@ -180,22 +180,36 @@ export class ViewComponent implements OnInit {
       return;
     }
 
-    let choice = confirm("Créer un plan d'action ou consulter un plan d'action existant ?")
-    if (choice) {
-      this.dialog.open(CreateActionPlanDialogComponent, {
-        width: '800px !important',
-        height: '550px',
-        minWidth: '800px',
-        maxWidth: '800px',
-        data: {
-          incidentId: this.incident.id,
-          reference: this.incident.reference
-        }
-      })
-    }
-    else {
-      this.router.navigate(['action-plan', 'create', this.incident.id]);
-    }
+    this.incidentService.hasActionPlan(this.incident.id).subscribe(hasPlan => {
+      if (hasPlan) {
+        this.confirmService.openConfirmDialog("Plan d'action existant", "Un plan d'action existe déjà pour cet incident.", true).subscribe(
+          value => {
+            if (value) {
+              this.router.navigate(['action-plan', 'view', hasPlan]);
+            }
+          }
+        );
+      }
+      else {
+        this.confirmService.openConfirmDialog("Plan d'action inexistant", "Aucun plan d'action n'existe pour cet incident.", true).subscribe(
+          value => {
+            if (value) {
+              if (this.incident) {
+                this.dialog.open(CreateActionPlanDialogComponent, {
+                  width: '800px !important',
+                  height: '550px',
+                  minWidth: '800px',
+                  maxWidth: '800px',
+                  data: {
+                    incidentId: this.incident.id,
+                    reference: this.incident.reference
+                  }
+                })
+              }
+            }
+          });
+      }
+    });
   }
 
   getLineColor(from: Date | string, to: Date | string): string {

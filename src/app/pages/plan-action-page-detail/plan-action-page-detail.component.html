@@ -1,14 +1,15 @@
 <div class="body-container">
     @if(actionPlan){
-        <app-go-back [title]="`Détails d'un plan d'action`" [subtitle]="actionPlan.reference" [buttons]="goBackButtons"></app-go-back>
+    <app-go-back [title]="`Détails d'un plan d'action`" [subtitle]="actionPlan.reference"
+        [buttons]="goBackButtons"></app-go-back>
 
     <div class="plan-detail-container">
         <mat-card class="action-plan-card">
             <mat-card-header>
                 <mat-card-title>
                     <span>{{ actionPlan.reference }} - {{ actionPlan.libelle }}
-                        @if(actionPlan.incidentId){
-                        (Ref incident : {{ actionPlan.incidentId }} )
+                        @if(actionPlan.incidentRef){
+                        (Ref incident : {{ actionPlan.incidentRef }} )
                         }
                     </span>
                 </mat-card-title>
@@ -57,6 +58,21 @@
                             <label>Risk</label>
                             <span class="badge status" [ngClass]="actionPlan.riskName.toLowerCase()">
                                 {{ actionPlan.riskName }}
+                            </span>
+                        </div>
+                    </div>
+                    }
+
+                    @if(actionPlan.incidentRef){
+                    <div class="info-block">
+                        <mat-icon>check_circle</mat-icon>
+                        <div class="info-text">
+                            <label>Incident</label>
+                            <span class="badge status" [ngClass]="actionPlan.incidentRef.toLowerCase()">
+                                {{ actionPlan.incidentRef }}
+                                <button (click)="goToIncident()">
+                                    Accéder
+                                </button>
                             </span>
                         </div>
                     </div>

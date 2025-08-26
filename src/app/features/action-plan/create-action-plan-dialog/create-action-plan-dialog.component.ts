@@ -31,7 +31,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDatepickerModule,
     MatNativeDateModule,
     FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule
-],
+  ],
   templateUrl: './create-action-plan-dialog.component.html',
   styleUrl: './create-action-plan-dialog.component.scss'
 })
@@ -45,7 +45,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private router = inject(Router);
   priorities = Object.values(Priority);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference : string }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference: string }
   ) { }
 
   listTeams: Equipe[] = [];
@@ -53,9 +53,8 @@ export class CreateActionPlanDialogComponent implements OnInit {
   risks: RiskTemplate[] = [];
 
   actionPlan: ActionPlan = new ActionPlan(
-    '', new Date(), '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', null, '', new Date()
-  );
+    '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
+    '', '', null, '', new Date());
 
   actions: Action[] = []
 
@@ -65,6 +64,11 @@ export class CreateActionPlanDialogComponent implements OnInit {
   }
 
   getRisk() {
+    if (this.data.incidentId) {
+      this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
+        this.actionPlan.riskName = risk.libellePerso;
+      });
+    }
     this.riskService.getAll().subscribe(data => {
       this.risks = data;
     });
@@ -107,13 +111,13 @@ export class CreateActionPlanDialogComponent implements OnInit {
     const incidentId = this.data?.incidentId ?? undefined;
 
     const dto: ActionPlanCreateDto = {
-      libelle      : this.actionPlan.libelle,
-      description  : this.actionPlan.description,
-      status       : this.actionPlan.status,
-      priority     : this.actionPlan.priority,
-      echeance     : this.actionPlan.echeance,
-      userInCharge : this.actionPlan.userInCharge,
-      taxonomieId  : this.actionPlan.taxonomie?.id.id ?? null,
+      libelle: this.actionPlan.libelle,
+      description: this.actionPlan.description,
+      status: this.actionPlan.status,
+      priority: this.actionPlan.priority,
+      echeance: this.actionPlan.echeance,
+      userInCharge: this.actionPlan.userInCharge,
+      taxonomieId: this.actionPlan.taxonomie?.id.id ?? null,
       incidentId               // undefined si pas d’incident
     };
 
