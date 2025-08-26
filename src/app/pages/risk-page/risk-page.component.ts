@@ -74,7 +74,7 @@ export class RiskPageComponent implements OnInit {
     this.buId = this.route.snapshot.paramMap.get('id')!;
     this.entitiesSrv.findById(this.buId).subscribe(resp => this.buName = resp.name);
 
-    this.matrixService.getMatriceByBuId(this.buId).subscribe({
+    this.matrixService.getDefaultMatrix(this.buId).subscribe({
       next: resp => this.matrixData = resp,
       error: err => console.error(err)
     });
