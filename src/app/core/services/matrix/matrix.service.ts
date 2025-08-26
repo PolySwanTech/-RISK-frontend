@@ -24,10 +24,6 @@ export class MatrixService {
     return this.http.get<Matrix>(`${this.baseUrl}/${id}`);
   }
 
-  getMatriceByBuId(buId: string): Observable<Matrix> {
-    return this.http.get<Matrix>(`${this.baseUrl}/bu/${buId}`);
-  }
-
   getDefaultMatrix(buId: string): Observable<Matrix> {
     const params = new HttpParams().set("buId", buId);
     return this.http.get<Matrix>(this.baseUrl, { params: params });
