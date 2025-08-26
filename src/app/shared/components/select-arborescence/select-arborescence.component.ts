@@ -33,6 +33,7 @@ export class SelectArborescenceComponent {
 
   ngOnInit() {
     this.filteredOptions = this.list;
+
     if (this.id) {
       const selectedItem = this.list
         .flatMap(group => [group, ...(group.enfants || [])])
@@ -62,7 +63,7 @@ export class SelectArborescenceComponent {
 
     return this.list
       .map(group => {
-        const enfants = group.enfants.filter((child: { name: string; }) =>
+        const enfants = group.enfants?.filter((child: { name: string; }) =>
           child.name.toLowerCase().includes(filterValue)
         );
         const parentMatch = group.name.toLowerCase().includes(filterValue);
