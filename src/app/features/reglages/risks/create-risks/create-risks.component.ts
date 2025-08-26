@@ -107,8 +107,8 @@ export class CreateRisksComponent implements OnInit {
 
   onProcessSelected(process: Process) {
     this.infoForm.get('processId')?.setValue(process.id);
-    this.infoForm.get('processId')?.markAsDirty();
-    this.infoForm.get('processId')?.updateValueAndValidity();
+    // this.infoForm.get('processId')?.markAsDirty();
+    // this.infoForm.get('processId')?.updateValueAndValidity();
   }
 
 
