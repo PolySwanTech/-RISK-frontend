@@ -5,11 +5,37 @@
 <br />
 <br />
 <div class="container">
-  <mat-card class="card">
+
+  <div class="grid">
+            <!-- BU -->
+            <div class="field">
+                <label for="bu">Business Unit <span class="req">*</span></label>
+                <select id="bu" [(ngModel)]="selectedBuId" required>
+                    <option value="" disabled selected>— Sélectionnez une BU —</option>
+                    <option *ngFor="let bu of businessUnits" [value]="bu.id">
+                        {{ bu.name }}
+                    </option>
+                </select>
+            </div>
+
+            <!-- Année -->
+            <div class="field">
+                <label for="year">Date d'Exercice <span class="req">*</span></label>
+                <select id="year" [(ngModel)]="selectedYear" required>
+                    <option value="" disabled>— Sélectionnez une année d'exercice —</option>
+                    <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary" [disabled]="!selectedYear || !selectedBuId" 
+             (click)="viewCarto()"> 
+              Voir la cartographie
+            </button>
+        </div>
+  <!-- <mat-card class="card">
     <div class="table-wrap" *ngIf="!loading; else skeleton">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z0 fullwidth">
 
-        <!-- Nom -->
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef> Nom </th>
           <td mat-cell *matCellDef="let row">
@@ -17,31 +43,26 @@
           </td>
         </ng-container>
 
-        <!-- Exercice -->
         <ng-container matColumnDef="exerciceYear">
           <th mat-header-cell *matHeaderCellDef> Exercice </th>
           <td mat-cell *matCellDef="let row"> {{ row.exerciceYear }} </td>
         </ng-container>
 
-        <!-- Référence -->
         <ng-container matColumnDef="reference">
           <th mat-header-cell *matHeaderCellDef> Référence </th>
           <td mat-cell *matCellDef="let row"> {{ row.reference }} </td>
         </ng-container>
 
-        <!-- BU -->
         <ng-container matColumnDef="bu">
           <th mat-header-cell *matHeaderCellDef> BU </th>
           <td mat-cell *matCellDef="let row"> {{ row.buName }} </td>
         </ng-container>
 
-        <!-- Date -->
         <ng-container matColumnDef="date">
           <th mat-header-cell *matHeaderCellDef> Date </th>
           <td mat-cell *matCellDef="let row"> {{ row.date | date:'dd/MM/yyyy' }} </td>
         </ng-container>
 
-        <!-- Agrégation -->
         <ng-container matColumnDef="aggregation">
           <th mat-header-cell *matHeaderCellDef> Agrégation </th>
           <td mat-cell *matCellDef="let row">
@@ -51,7 +72,6 @@
           </td>
         </ng-container>
 
-        <!-- Actions -->
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef> </th>
           <td mat-cell *matCellDef="let row" class="text-right">
@@ -86,5 +106,5 @@
     <ng-template #skeleton>
       <div class="loading">Chargement…</div>
     </ng-template>
-  </mat-card>
+  </mat-card> -->
 </div>

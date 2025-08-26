@@ -17,7 +17,9 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 import { RiskService } from '../../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
 
-import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
+import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
+import { RiskLevel, RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
+import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
 import { Process } from '../../../../core/models/Process';
 import { RiskCategoryService } from '../../../../core/services/risk/risk-category.service';
@@ -56,6 +58,13 @@ export class CreateRisksComponent implements OnInit {
   pageTitle = 'Création d\'un risque';
   dialogLabel = { title: 'Création', message: 'création' };
 
+  riskLevels = Object.values(RiskLevelEnum);
+  impactTypes = Object.values(RiskImpactType);
+  riskLabels = RiskLevelLabels;
+  impactLabels = RiskImpactTypeLabels;
+
+
+  /** instance courante (vide ou chargée) */
   risk: RiskTemplate = new RiskTemplate();
 
   /* -------------   reactive forms ------------- */
@@ -66,6 +75,8 @@ export class CreateRisksComponent implements OnInit {
     balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
     processId: this.fb.control<string | null>(null, Validators.required),
     description: this.fb.nonNullable.control<string>(''),
+    level: this.fb.nonNullable.control<RiskLevelEnum>(RiskLevelEnum.LOW),
+    impactType: this.fb.control<RiskImpactType | null>(null)
   });
 
   ngOnInit(): void {

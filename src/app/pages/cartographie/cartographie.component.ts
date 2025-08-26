@@ -12,30 +12,29 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { BusinessUnit } from '../../core/models/BusinessUnit';
+import { EntitiesService } from '../../core/services/entities/entities.service';
 
 @Component({
   selector: 'app-cartographie',
-  imports: [MatCardModule, CommonModule, FormsModule, GoBackComponent, 
+  imports: [MatCardModule, CommonModule, FormsModule, GoBackComponent,
     MatPaginatorModule, RouterModule,
     MatIconModule, MatTableModule, MatButtonModule, MatMenuModule],
   templateUrl: './cartographie.component.html',
   styleUrls: ['./cartographie.component.scss']
 })
-export class CartographieComponent implements OnInit, AfterViewInit {
+export class CartographieComponent implements OnInit {
 
-  displayedColumns = [
-    'name', 'exerciceYear', 'reference', 'bu', 'date', 'aggregation', 'actions'
-  ];
-  dataSource = new MatTableDataSource<Cartography>([]);
   loading = false;
-  
+
   private router = inject(Router);
-  private service = inject(CartoService);
-  private dialog = inject(MatDialog);
+  private businessUnitService = inject(EntitiesService);
 
+  selectedYear: number | null = null;
+  selectedBuId: string | null = null;
 
-  @ViewChild(MatMenuTrigger) contextMenu?: MatMenuTrigger;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  businessUnits: BusinessUnit[] = [];
+  years: number[] = [];
 
   goBackButtons = [
     {
@@ -43,7 +42,7 @@ export class CartographieComponent implements OnInit, AfterViewInit {
       icon: 'refresh',
       class: 'btn-primary',
       show: true,
-      action: () => this.fetch()
+      action: () => this.ngOnInit()
     },
     {
       label: 'Créer une cartographie',
@@ -54,30 +53,13 @@ export class CartographieComponent implements OnInit, AfterViewInit {
     }
   ];
 
-  constructor(
-  ) { }
-
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-  }
-
   ngOnInit(): void {
-    this.fetch();
-  }
-
-  fetch() {
-    this.loading = true;
-    this.service.getAll().subscribe({
-      next: rows => {
-        this.dataSource.data = rows;
-        this.loading = false;
-      },
-      error: _ => this.loading = false
+    const currentYear = new Date().getFullYear();
+    this.years = Array.from({ length: 6 }, (_, i) => currentYear - i);
+    this.businessUnitService.loadEntities().subscribe({
+      next: (data) => this.businessUnits = data,
+      error: (error) => console.error('Error fetching business units:', error)
     });
-  }
-
-  openDetails(row: Cartography) {
-    this.router.navigate(['/carto', row.id]); // route consultation
   }
 
   openDuplicate(row: Cartography) {
@@ -96,14 +78,8 @@ export class CartographieComponent implements OnInit, AfterViewInit {
     // });
   }
 
-  levelChipClass(level?: string) {
-    switch ((level || '').toUpperCase()) {
-      case 'FAIBLE': return 'chip chip-green';
-      case 'MOYEN': return 'chip chip-yellow';
-      case 'ELEVE': return 'chip chip-orange';
-      case 'CRITIQUE': return 'chip chip-red';
-      default: return 'chip chip-grey';
-    }
+  viewCarto() {
+    alert(`Consultation de la carto ${this.selectedBuId} - ${this.selectedYear}`);
   }
 
   addCarto() {

@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RiskLevelLabels, RiskLevel, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { RiskLevelLabels, RiskLevel } from '../../../core/enum/riskLevel.enum';
 import { Process } from '../../../core/models/Process';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 
@@ -41,7 +41,7 @@ export class RiskMatrixComponent {
   /** Libellé lisible du niveau (High, Low, …) */
   get riskBrut(): string {
     const level = this.lastEvalBrute?.evaluation as RiskLevel | undefined;
-    return level ? RiskLevelLabels[level] ?? 'Unknown' : 'N/R';
+    return level ? RiskLevelLabels[level.name] ?? 'Unknown' : 'N/R';
   }
 
   get buName(): string {
