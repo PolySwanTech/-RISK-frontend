@@ -10,15 +10,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { RiskLevel, RiskLevelLabels } from '../../../../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelEnum, RiskLevelLabels } from '../../../../../core/enum/riskLevel.enum';
 import { RiskEvaluationCreateDto } from '../../../../../core/models/RiskEvaluation';
-import { RiskId, RiskTemplate } from '../../../../../core/models/RiskTemplate';
+import { RiskTemplate } from '../../../../../core/models/RiskTemplate';
 import { RiskEvaluationService } from '../../../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 import { RiskService } from '../../../../../core/services/risk/risk.service';
-import { BusinessUnit } from '../../../../../core/models/BusinessUnit';
-import { Process } from '../../../../../core/models/Process';
-import { EntitiesService } from '../../../../../core/services/entities/entities.service';
-import { ProcessService } from '../../../../../core/services/process/process.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
@@ -46,7 +42,7 @@ export class CreateRisksEvaluationsComponent implements OnInit {
   private router = inject(Router);
   private riskSrv = inject(RiskService);      // ← garde le service en secours
 
-  riskLevels = Object.values(RiskLevel);
+  riskLevels = Object.values(RiskLevelEnum);
   riskLabels = RiskLevelLabels;
 
   @Input() riskId: string = '';

@@ -20,7 +20,7 @@ import { RiskMatrixComponent } from '../../features/cartographie/risk-matrix/ris
 import { RiskTemplate } from '../../core/models/RiskTemplate';
 import { Process } from '../../core/models/Process';
 import { ProcessService } from '../../core/services/process/process.service';
-import { RiskLevelScores, RiskLevel } from '../../core/enum/riskLevel.enum';
+import { RiskLevelScores, RiskLevel, RiskLevelEnum } from '../../core/enum/riskLevel.enum';
 import { MatrixService } from '../../core/services/matrix/matrix.service';
 import { GoBackComponent } from "../../shared/components/go-back/go-back.component";
 
@@ -50,7 +50,7 @@ export class RiskPageComponent implements OnInit {
   selectedRisk: RiskTemplate | null = null;
   processMap: Record<string, Process> = {};
 
-  levels = Object.values(RiskLevel);
+  levels = Object.values(RiskLevelEnum);
 
   matrixData: any = null;
   buId: string = '';

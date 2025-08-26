@@ -27,6 +27,7 @@ import { Filter } from '../../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
 import { filter } from 'rxjs';
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
+import { RiskLevel } from '../../../core/enum/riskLevel.enum';
 
 @Component({
   selector: 'app-control-list',
@@ -91,7 +92,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'riskLevel',
       header: 'Degré de risque',
-      cell: (e: any) => this.getRiskLabel(e.riskLevel),
+      cell: (e: ControlTemplate) => this.getRiskLabel(e.riskLevel.name),
       isBadge: 'risk',
       filterType: 'select',
       options: Object.keys(EnumLabels.risk).map(key => ({
@@ -194,14 +195,14 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     return EnumLabels?.risk?.[risk] ?? risk;
   }
 
-  getBadgeClass(type: string, value: string) {
+  getBadgeClass(type: string, value: any) {
     switch (type) {
       case 'type':
         return 'badge-type';
       case 'risk':
-        if (value.toLowerCase().includes('faible')) return 'badge-risque-faible';
-        if (value.toLowerCase().includes('moyen')) return 'badge-risque-moyen';
-        if (value.toLowerCase().includes('élevé') || value.toLowerCase().includes('eleve')) return 'badge-risque-eleve';
+        if (value.toLowerCase().includes('low')) return 'badge-risque-faible';
+        if (value.toLowerCase().includes('medium')) return 'badge-risque-moyen';
+        if (value.toLowerCase().includes('high') || value.toLowerCase().includes('very_high')) return 'badge-risque-élevé';
         return '';
       case 'control':
         if (value === '2.1') return 'badge-controle-faible';
@@ -301,7 +302,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         (c.responsable?.toLowerCase().includes(query) || '') ||
         (c.creator?.toLowerCase().includes(query) || '') ||
         this.getTypeLabel(c.controlType as keyof typeof this.enumLabels.type).toLowerCase().includes(query) ||
-        this.getRiskLabel(c.riskLevel as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
+        this.getRiskLabel(c.riskLevel.name as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
         this.getDegresLabel(c.controlLevel as keyof typeof this.enumLabels.degres).toLowerCase().includes(query) ||
         this.getRecurrenceLabel(c.frequency as keyof typeof this.enumLabels.reccurency).toLowerCase().includes(query) ||
         (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
@@ -362,7 +363,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         }
 
         if (key === 'riskLevel') {
-          return this.getRiskLabel(control.riskLevel).toLowerCase() === this.getRiskLabel(value).toLowerCase();
+          return this.getRiskLabel(control.riskLevel.name).toLowerCase() === this.getRiskLabel(value).toLowerCase();
         }
 
         if (key === 'controlLevel') {

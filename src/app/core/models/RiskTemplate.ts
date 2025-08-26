@@ -1,6 +1,6 @@
 import { BaloiseCategoryEnum } from "../enum/baloisecategory.enum";
 import { RiskImpactType } from "../enum/riskImpactType.enum";
-import { RiskLevel } from "../enum/riskLevel.enum";
+import { RiskLevelEnum } from "../enum/riskLevel.enum";
 import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
@@ -32,6 +32,9 @@ export class RiskTemplate {
   reference = '';
   libellePerso = '';
   description = '';
+
+  /** Set côté back → tableau côté front  */
+  // impactTypes: RiskImpactType[] = [];
 
   /** actif par défaut */
   active = true;

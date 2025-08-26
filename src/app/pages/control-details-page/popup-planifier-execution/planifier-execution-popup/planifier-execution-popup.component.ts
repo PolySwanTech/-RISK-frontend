@@ -7,7 +7,6 @@ import { Priority } from '../../../../core/enum/Priority';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Recurence } from '../../../../core/enum/recurence.enum';
 import { addDays, addMonths, addWeeks } from 'date-fns';
 import { ControlExecution } from '../../../../core/models/ControlExecution';
 
