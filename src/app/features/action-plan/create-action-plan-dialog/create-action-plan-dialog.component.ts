@@ -64,15 +64,20 @@ export class CreateActionPlanDialogComponent implements OnInit {
   }
 
   getRisk() {
-    if (this.data.incidentId) {
-      this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
-        this.actionPlan.riskName = risk.libellePerso;
-      });
-    }
+  if (this.data.incidentId) {
+    // Récupère le risque de l'incident
+    this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
+      this.actionPlan.taxonomie = risk;
+      // Ici, on met à jour la liste des risques pour afficher l'élément de l'incident
+      this.risks = [risk]; // Si tu veux que la liste contienne uniquement ce risque
+    });
+  } else {
+    // Si pas d'incident, récupère tous les risques
     this.riskService.getAll().subscribe(data => {
       this.risks = data;
     });
   }
+}
 
 
   fetchTeams(): void {

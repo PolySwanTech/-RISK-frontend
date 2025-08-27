@@ -46,7 +46,7 @@ export class RiskService {
 
   getRiskOfIncident(incidentId: string) {
     const params = new HttpParams().set('incidentId', incidentId);
-    return this.http.get<RiskTemplate>(`${this.baseUrl}/incident/`, {params : params});
+    return this.http.get<RiskTemplate>(`${this.baseUrl}/incident`, {params : params});
   }
   
 }

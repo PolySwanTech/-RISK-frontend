@@ -172,7 +172,7 @@ export class PlanActionPageDetailComponent {
   }
 
   goToIncident(){
-    this.router.navigate([`/incidents/${this.actionPlan?.incidentId}`]);
+    this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
   }
 
 }

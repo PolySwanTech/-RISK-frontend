@@ -47,7 +47,8 @@
       <!-- Risk -->
       <mat-form-field appearance="outline">
         <mat-label>Risk</mat-label>
-        <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}">
+        <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}"
+          [disabled]="data.incidentId">
           <mat-option *ngFor="let risk of risks" [value]="risk">
             {{ risk.libellePerso }}
           </mat-option>
