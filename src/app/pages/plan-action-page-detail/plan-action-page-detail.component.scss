@@ -204,5 +204,13 @@ mat-card-content {
       color: #222;
       font-weight: 500;
     }
+
+
+  }
+
+  .incident {
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
   }
 }

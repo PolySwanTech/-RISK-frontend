@@ -68,12 +68,14 @@
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Incident</label>
-                            <span class="badge status" [ngClass]="actionPlan.incidentRef.toLowerCase()">
-                                {{ actionPlan.incidentRef }}
-                                <button (click)="goToIncident()">
+                            <div  class="incident">
+                                <span class="badge status" [ngClass]="actionPlan.incidentRef.toLowerCase()">
+                                    {{ actionPlan.incidentRef }}
+                                </span>
+                                <button mat-raised-button class="btn-primary" (click)="goToIncident()">
                                     Accéder
                                 </button>
-                            </span>
+                            </div>
                         </div>
                     </div>
                     }
