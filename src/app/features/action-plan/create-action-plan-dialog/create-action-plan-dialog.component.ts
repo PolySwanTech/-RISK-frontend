@@ -64,7 +64,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   }
 
   getRisk() {
-  if (this.data.incidentId) {
+  if (this.data && this.data.incidentId) {
     // Récupère le risque de l'incident
     this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
       this.actionPlan.taxonomie = risk;

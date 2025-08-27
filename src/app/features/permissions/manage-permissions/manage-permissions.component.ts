@@ -120,7 +120,7 @@ export class ManagePermissionsComponent implements OnInit {
             this.roles.push(role);
             this.filteredRoles.push(role);
             this.selectedRole = role;
-            this.confirmService.openConfirmDialog('Création réussie', `Rôle ${role.name} créé avec succès.`)
+            this.confirmService.openConfirmDialog('Création réussie', 'Rôle créé avec succès.')
           });
         }
       });
