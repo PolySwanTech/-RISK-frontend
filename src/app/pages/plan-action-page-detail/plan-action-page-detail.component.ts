@@ -4,7 +4,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -32,7 +32,7 @@ export class PlanActionPageDetailComponent {
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
-  private equipeService = inject(EquipeService);
+  private router = inject(Router);
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -169,6 +169,10 @@ export class PlanActionPageDetailComponent {
   }
 
   export(){
+  }
+
+  goToIncident(){
+    this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
   }
 
 }

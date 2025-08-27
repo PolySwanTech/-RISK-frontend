@@ -19,8 +19,8 @@ export class ImpactService {
     return this.http.get<number>(this.baseUrl + '/sum', { params: params })
   }
 
-  addImpact(impact: ImpactCreateDto, message : string) {
-    return this.http.post(this.baseUrl, { impact, message })
+  addImpact(operatingLoss: ImpactCreateDto, message : string) {
+    return this.http.post(this.baseUrl, { operatingLoss, message })
   }
 
   getImpactByIncidentId(id: string) {

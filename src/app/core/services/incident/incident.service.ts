@@ -73,4 +73,8 @@ export class IncidentService {
     return this.http.get(url, { responseType: 'blob' });
   }
 
+  hasActionPlan(incidentId: string): Observable<string | null> {
+    return this.http.get<string | null>(`${this.baseUrl}/${incidentId}/action-plan`);
+  }
+
 }

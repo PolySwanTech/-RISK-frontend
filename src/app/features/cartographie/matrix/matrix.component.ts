@@ -177,7 +177,7 @@ export class MatrixComponent {
         const last = risk.riskBrut![0];
         if (last) {
           frequency = Math.ceil((last.probability ?? 1) / 2);
-          impact = RiskLevelScores[last.evaluation as RiskLevel];
+          impact = RiskLevelScores[last.evaluation.name];
         }
       }
 

@@ -28,21 +28,21 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   goBackButtons = [
-  {
-    label: 'Évaluer ce risque',
-    icon: '', // pas d’icône ici, ou ajoute-en si tu veux (ex: 'assessment')
-    class: 'mat-primary', // ou remplace par 'btn-primary' si tu utilises des classes
-    show: true,
-    action: () => this.onEvaluate()
-  },
-  {
-    label: 'Générer Rapport',
-    icon: '', // idem
-    class: 'mat-accent outlined', // à styliser si tu veux un style stroked
-    show: true,
-    action: () => {} // à ajouter si fonction disponible
-  }
-];
+    // {
+    //   label: 'Évaluer ce risque',
+    //   icon: '', // pas d’icône ici, ou ajoute-en si tu veux (ex: 'assessment')
+    //   class: 'mat-primary', // ou remplace par 'btn-primary' si tu utilises des classes
+    //   show: true,
+    //   action: () => this.onEvaluate()
+    // },
+    // {
+    //   label: 'Générer Rapport',
+    //   icon: '', // idem
+    //   class: 'mat-accent outlined', // à styliser si tu veux un style stroked
+    //   show: true,
+    //   action: () => {} // à ajouter si fonction disponible
+    // }
+    ];
 
   // get frequency() : number | string {
   //   return (this.risk?.dmr?.[0]?.probability || 0) * 10 || '-';
@@ -52,7 +52,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private riskService: RiskService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.paramMap
@@ -88,7 +88,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  
+
   activeTab = 'controls';
 
   selectTab(tab: 'controls' | 'evaluations') {

@@ -49,8 +49,8 @@
             @if(risk.riskBrut && risk.riskBrut.length){
             <div>
               Risque brut
-              <span class="risk-badge" [ngClass]="risk.riskBrut[0].evaluation| lowercase">
-                {{ risk.riskBrut[0].evaluation | lowercase }}
+              <span class="risk-badge" [ngClass]="risk.riskBrut[0].evaluation.name | lowercase">
+                {{ risk.riskBrut[0].evaluation.name | lowercase }}
               </span>
             </div>
             <span class="arrow">→</span>

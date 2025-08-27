@@ -26,6 +26,8 @@ import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
 import { ImpactService } from '../../../core/services/impact/impact.service';
 import { saveAs } from 'file-saver';
+import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
+import { error } from 'jquery';
 
 @Component({
   selector: 'app-view',
@@ -38,6 +40,7 @@ import { saveAs } from 'file-saver';
 })
 export class ViewComponent implements OnInit {
   private incidentService = inject(IncidentService);
+  private actionPlanService = inject(ActionPlanService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService);
@@ -180,22 +183,40 @@ export class ViewComponent implements OnInit {
       return;
     }
 
-    let choice = confirm("Créer un plan d'action ou consulter un plan d'action existant ?")
-    if (choice) {
-      this.dialog.open(CreateActionPlanDialogComponent, {
-        width: '800px !important',
-        height: '550px',
-        minWidth: '800px',
-        maxWidth: '800px',
-        data: {
-          incidentId: this.incident.id,
-          reference: this.incident.reference
+    this.actionPlanService.getActionPlanByIncident(this.incident.id).subscribe(
+      {
+        next: actionPlan => {
+          if (actionPlan) {
+            this.confirmService.openConfirmDialog("Plan d'action existant", "Un plan d'action existe déjà pour cet incident.", true).subscribe(
+              value => {
+                if (value) {
+                  this.router.navigate(['action-plan', actionPlan.id]);
+                }
+              }
+            );
+          }
+        },
+        error: _ => {
+          this.confirmService.openConfirmDialog("Créer un plan d'action", "Voulez-vous créer un plan d'action pour cet incident ?", true).subscribe(
+            value => {
+              if (value) {
+                if (this.incident) {
+                  this.dialog.open(CreateActionPlanDialogComponent, {
+                    width: '800px !important',
+                    height: '550px',
+                    minWidth: '800px',
+                    maxWidth: '800px',
+                    data: {
+                      incidentId: this.incident.id,
+                      reference: this.incident.reference
+                    }
+                  })
+                }
+              }
+            }
+          );
         }
-      })
-    }
-    else {
-      this.router.navigate(['action-plan', 'create', this.incident.id]);
-    }
+      });
   }
 
   getLineColor(from: Date | string, to: Date | string): string {

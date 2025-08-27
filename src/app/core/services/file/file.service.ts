@@ -15,8 +15,8 @@ export class FileService {
   uploadFile(file: File, id : string, ref : string, typeObject : TargetType) {
     const formData = new FormData();
     formData.append('file', file);
-    const keyReference = typeObject == TargetType.IMPACT ? "impactId" : "incidentId";
-    const keyId = typeObject == TargetType.IMPACT ? "impactRef" : "incidentRef";
+    const keyReference = "incidentRef";
+    const keyId = typeObject == TargetType.IMPACT ? "impactId" : "incidentId";
     formData.append(keyReference, ref);
     formData.append(keyId, id);
     return this.http.post(`${this.baseUrl}/upload`, formData);
