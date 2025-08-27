@@ -30,6 +30,7 @@ export class ControlTemplate {
     actif : boolean = false;
     riskLevel : RiskLevel;
     creator: string;
+    riskName: string;
 
     constructor
         (
@@ -49,7 +50,8 @@ export class ControlTemplate {
             nextExecution: string,
             actif: boolean,
             riskLevel: RiskLevel,
-            creator: string
+            creator: string,
+            riskName: string
         ) {
         this.id = { id, version };
         this.reference = reference;
@@ -66,6 +68,7 @@ export class ControlTemplate {
         this.actif = actif;
         this.riskLevel = riskLevel;
         this.creator = creator;
+        this.riskName = riskName;
     }
 
 }

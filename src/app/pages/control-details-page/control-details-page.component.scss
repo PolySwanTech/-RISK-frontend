@@ -8,6 +8,7 @@ $gray-700: #374151;
 $gray-800: #111827;
 $slate-900: #0f172a;
 $brand: #2563eb;
+$gray-600: #475569;
 
 @mixin chip($bg, $c, $bd: transparent) {
   background: $bg;
@@ -52,6 +53,7 @@ $brand: #2563eb;
 .control-details-page {
   min-height: 100vh;
   background: $gray-50;
+  
 
   .main-content {
     max-width: 1280px;
@@ -474,3 +476,451 @@ $brand: #2563eb;
 .icon-check-circle::before {
   content: '✓'
 }
+
+/* ========= Layout sans sidebar ========= *
+
+/* ========= Carousel ========= */
+.carousel {
+  @extend %card;
+}
+
+.carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0.5rem;
+}
+
+.carousel-title {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.carousel-nav {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+
+  .car-btn {
+    @include btn-base;
+    padding: .35rem .6rem;
+    min-width: 36px;
+    font-weight: 700;
+  }
+
+  .dots {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin: 0 .25rem;
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid $gray-300;
+      background: #fff;
+      cursor: pointer;
+      transition: all .15s ease;
+
+      &.active {
+        background: $brand;
+        border-color: $brand;
+      }
+    }
+  }
+}
+
+// .carousel-track {
+//   display: flex;
+//   transition: transform .35s ease;
+//   will-change: transform;
+//   // width: 96.8%;
+// }
+
+.carousel-slide {
+  min-width: 100%;
+
+  .slide-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+
+    .meta-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .meta-line {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .meta-date {
+        font-size: .9rem;
+        color: $gray-700;
+      }
+
+      .meta-sub {
+        font-size: .85rem;
+        color: $gray-500;
+      }
+    }
+  }
+}
+
+/* Badge compact réutilisé */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: .2rem .6rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+/* Empty state */
+.empty-state {
+  @extend %card;
+  text-align: center;
+
+  .card-content {
+    padding: 1.5rem !important;
+  }
+
+  .empty-title {
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: .35rem;
+  }
+
+  .empty-sub {
+    color: $gray-600;
+  }
+}
+
+/* Actions à droite du bandeau méta */
+.carousel-slide .slide-meta .meta-right {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+
+  .btn {
+    padding: .4rem .75rem;
+  }
+}
+
+/* --------- Carousel container (centré & moins large) --------- */
+.carousel {
+  @extend %card;
+  width: 100%;
+  max-width: 980px;
+  /* <-- réduit la largeur perçue */
+  margin: 0 auto;
+  /* centre dans la colonne */
+}
+
+/* Header + dots */
+.carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem 0.4rem;
+}
+
+.carousel-title {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.dots {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    border: 1px solid $gray-300;
+    background: #fff;
+    cursor: pointer;
+    transition: all .15s ease;
+
+    &.active {
+      background: $brand;
+      border-color: $brand;
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* Viewport/track/slide */
+.carousel-viewport {
+  position: relative;
+  overflow: hidden;
+  /* empêche tout débordement (bouton qui “dépasse”) */
+  padding: .25rem 0 1rem;
+  /* respiration interne */
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.carousel-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 0;
+  transition: transform .28s ease;
+  will-change: transform;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  /* IMPORTANT: empêche le débordement dû au padding */
+  box-sizing: border-box;
+  padding: 0 16px 16px;
+}
+
+/* Métadonnées du slide */
+.slide-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 2px 10px;
+
+  .meta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .meta-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .meta-date {
+      font-size: .9rem;
+      color: $gray-700;
+    }
+
+    .meta-sub {
+      font-size: .85rem;
+      color: $gray-500;
+    }
+  }
+
+  .meta-right {
+    flex: 0 0 auto;
+
+    .btn {
+      padding: .42rem .8rem;
+    }
+  }
+}
+
+
+/* Fades latéraux pour bien détacher le contenu et les flèches */
+// .carousel-viewport::before,
+// .carousel-viewport::after {
+//   content: "";
+//   position: absolute;
+//   top: 0; bottom: 0;
+//   width: 56px;
+//   pointer-events: none;
+//   z-index: 3;
+// }
+// .carousel-viewport::before {
+//   left: 0;
+//   background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+// }
+// .carousel-viewport::after {
+//   right: 0;
+//   background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
+// }
+
+/* Flèches flottantes – très visibles */
+.car-fab {
+  position: absolute;
+  top: calc(67% + 8px);
+  /* centre verticalement par rapport au viewport */
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: $brand;
+  color: #fff;
+  border: 0;
+  box-shadow:
+    0 10px 24px rgba(37, 99, 235, .35),
+    0 0 0 4px rgba(255, 255, 255, .9);
+  z-index: 1;
+  /* assez haut pour la carte, mais ne recouvre pas les sections suivantes */
+}
+
+.car-fab.prev {
+  left: 70px;
+}
+
+/* sort à gauche */
+.car-fab.next {
+  right: 70px;
+}
+
+/* ----- Carte méta (ligne "Clôturé • Planifiée… • … • Attribuée…") ----- */
+.meta-card {
+  @extend %card;                 /* même base que les autres cartes */
+  position: relative;            /* nécessaire pour le bandeau */
+  overflow: hidden;              /* pour respecter les arrondis */
+  margin: 0 2px 12px;            /* compact comme Évaluation/Validation */
+  background: #fbfdff;           /* léger ton bleuté déjà utilisé */
+  border-color: $gray-200;
+
+  /* Bandeau couleur à gauche (état) */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 8px;                 /* épaisseur du bandeau */
+    height: 100%;
+    background: $gray-200;       /* neutre par défaut */
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+  }
+  &.stripe--success::before { background: #22c55e; }  /* Clôturé (vert) */
+  &.stripe--pending::before { background: #93c5fd; }  /* En attente (bleu ciel) */
+  &.stripe--danger::before  { background: #ef4444; }  /* En cours / Réexamen (rouge) */
+  &.stripe--neutral::before { background: #e5e7eb; }  /* Par défaut */
+
+  .card-content.meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;          /* compacité */
+  }
+
+  .meta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .meta-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .meta-date {
+      font-size: .9rem;
+      color: $gray-700;
+    }
+
+    .meta-sub {
+      font-size: .85rem;
+      color: $gray-500;
+    }
+  }
+
+  .meta-right {
+    flex: 0 0 auto;
+
+    .btn {
+      padding: .42rem .8rem;     /* même gabarit que les CTA des cartes */
+    }
+  }
+}
+
+/* Optionnel : harmonise le badge statut avec tes chips */
+.meta-card .badge {
+  @extend .badge;
+  border-color: transparent;     /* comme les autres */
+}
+
+.field.full-width {
+  grid-column: span 2;   /* prend toute la largeur */
+}
+
+/* Sur mobile: un poil plus petites et plus proches des bords */
+@media (max-width: 768px) {
+  .carousel-viewport {
+    padding: .25rem 46px 1rem;
+  }
+
+  .car-fab {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .car-fab.prev {
+    left: 4px;
+  }
+
+  .car-fab.next {
+    right: 4px;
+  }
+}
+
+/* === Ajoutez ce CSS à votre fichier SCSS === */
+
+/* Section des deux cartes côte à côte */
+.hero-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Carte héro plus large, méthodologie plus petite */
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media(max-width: 1024px) {
+    grid-template-columns: 1fr; /* Sur mobile : une seule colonne */
+  }
+}
+
+.hero-section .control-hero {
+  margin-bottom: 0;
+}
+
+.methodology-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Prend toute la hauteur disponible */
+  
+  /* Assure-toi que la carte méthodologie prend la même hauteur */
+  app-methodology-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    /* Si la carte methodology a une classe CSS spécifique, force sa hauteur */
+    .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      
+      .card-content {
+        flex: 1; /* Prend tout l'espace disponible */
+      }
+    }
+  }
+}
+.control-details-page .content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+

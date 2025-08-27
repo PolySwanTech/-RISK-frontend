@@ -11,199 +11,167 @@
   <div class="main-content">
     <div class="content-grid">
       <div class="main-column">
-        <div class="card card-overview hero control-hero">
-          <div class="card-content">
+        <div class="hero-section">
+          <!-- === Carte héro (inchangée) === -->
+          <div class="card card-overview hero control-hero">
+            <div class="card-content">
 
-            <div class="hero-head">
-              <h2 class="hero-title">
-                <span class="hero-emoji">📊</span>
-                Évaluation d'un contrôle
-              </h2>
-              <div class="hero-sub">
-                Module de gestion du risque opérationnel —
-                <span>Contrôle ID: {{ control.reference }}</span>
-              </div>
-            </div>
-
-            <div class="hero-grid">
-              <div class="field">
-                <label>Nom du contrôle</label>
-                <div class="value">{{ control.libelle || '—' }}</div>
-              </div>
-
-              <div class="field">
-                <label>Processus concerné</label>
-                <div class="value">{{ control.processName || '—' }}</div>
-              </div>
-
-              <div class="field field--textarea">
-                <label>Objectif du contrôle</label>
-                <div class="value multiline">{{ control.description || '—' }}</div>
-              </div>
-
-              <div class="field">
-                <label>Responsable du contrôle</label>
-                <div class="value">{{ control.responsable || control.creator || '—' }}</div>
-              </div>
-
-              <div class="field">
-                <label>Périodicité</label>
-                <div class="value">{{ control ? recurenceLabels[control.frequency] : '—' }}</div>
-              </div>
-
-              <div class="field">
-                <label>Date planifiée</label>
-                <div class="value"> {{ currentOrLatestExecution?.plannedAt ? (currentOrLatestExecution?.plannedAt |
-                  date:'dd/MM/yyyy') : '—' }}
+              <div class="hero-head">
+                <h2 class="hero-title">
+                  <span class="hero-emoji">📊</span>
+                  Évaluation d'un contrôle
+                </h2>
+                <div class="hero-sub">
+                  Module de gestion du risque opérationnel —
+                  <span>Contrôle ID: {{ control.reference }}</span>
                 </div>
               </div>
 
-              <div class="field">
-                <label>Date de réalisation</label>
-                <div class="value"> {{ currentOrLatestExecution?.achievedAt ? (currentOrLatestExecution?.achievedAt |
-                  date:'dd/MM/yyyy') : '—' }}
+              <div class="hero-grid">
+                <div class="field">
+                  <label>Nom du contrôle</label>
+                  <div class="value">{{ control.libelle || '—' }}</div>
                 </div>
-              </div>
 
-              <div class="field">
-                <label>Statut</label>
-                <div class="status-pill" [ngClass]="getStatusClass(control.execution?.status)">
-                  {{ currentOrLatestExecution?.status ? formatStatus(currentOrLatestExecution!.status) : '—' }}
+                <div class="field">
+                  <label>Processus concerné</label>
+                  <div class="value">{{ control.processName || '—' }}</div>
+                </div>
+
+                <div class="field">
+                  <label>Risque couvert</label>
+                  <div class="value">{{ control.riskName || '—' }}</div>
+                </div>
+
+                <div class="field">
+                  <label>Responsable du contrôle</label>
+                  <div class="value">{{ control.responsable || control.creator || '—' }}</div>
+                </div>
+
+                <div class="field">
+                  <label>Périodicité</label>
+                  <div class="value">{{ control ? recurenceLabels[control.frequency] : '—' }}</div>
+                </div>
+
+                <div class="field">
+                  <label>Date planifiée</label>
+                  <div class="value">
+                    {{ currentOrLatestExecution?.plannedAt ? (currentOrLatestExecution?.plannedAt | date:'dd/MM/yyyy') :
+                    '—' }}
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Date de réalisation</label>
+                  <div class="value">
+                    {{ currentOrLatestExecution?.achievedAt ? (currentOrLatestExecution?.achievedAt | date:'dd/MM/yyyy')
+                    :
+                    '—' }}
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Statut</label>
+                  <div class="status-pill" [ngClass]="getStatusClass(currentOrLatestExecution?.status)">
+                    {{ currentOrLatestExecution?.status ? formatStatus(currentOrLatestExecution!.status) : '—' }}
+                  </div>
+                </div>
+
+                <div class="field full-width">
+                  <label>Objectif du contrôle</label>
+                  <div class="value">{{ control.description || '—' }}</div>
                 </div>
               </div>
             </div>
           </div>
+
+          <div class="methodology-wrapper">
+            <app-methodology-card *ngIf="control" [controlId]="control.id.id" [controlVersion]="control.id.version">
+            </app-methodology-card>
+          </div>
         </div>
 
-        <app-popup-evaluation-controle [showAsCard]="true" [evaluationView]="lastEvaluation">
-        </app-popup-evaluation-controle>
+        <!-- === Carrousel des exécutions récentes (remplace l'historique + actions rapides) === -->
+        <div class="carousel" *ngIf="slides.length; else emptyState">
+          <div class="carousel-header">
+            <h3 class="carousel-title">🕒 Exécutions récentes</h3>
 
-      </div>
+            <!-- Dots minimalistes (nav secondaire) -->
+            <div class="dots">
+              <button class="dot" *ngFor="let s of slides; let i = index" [class.active]="i === currentSlide"
+                (click)="goTo(i)" [attr.aria-label]="'Aller à la slide ' + (i + 1)"></button>
+            </div>
+          </div>
+          <div class="carousel-body">
+            <!-- Viewport + drag souris/doigt -->
+            <div class="carousel-viewport" tabindex="0" (keydown)="onKeydown($event)"
+              (pointerdown)="onDragStart($event)" (pointermove)="onDragMove($event)" (pointerup)="onDragEnd($event)"
+              (pointerleave)="onDragEnd($event)" (touchstart)="onDragStart($event)" (touchmove)="onDragMove($event)"
+              (touchend)="onDragEnd($event)" [class.is-dragging]="isDragging">
 
-      <div class="sidebar">
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">
-              <i class="icon-activity"></i>
-              Historique des exécutions
-            </h3>
-
-            <div class="executions-list">
-              <div class="execution-item" *ngFor="let execution of controlExecutions"
-                [class.disabled]="execution.status === ControlStatus.ACHIEVED" [ngClass]="{
-                     'item-inprogress': execution.status === ControlStatus.IN_PROGRESS,
-                     'item-achieved': execution.status === ControlStatus.ACHIEVED,
-                     'item-notachieved': execution.status === ControlStatus.NOT_ACHIEVED,
-                     'is-active': hasEvaluation(execution.id) && getReviewStatus(execution.id) === 'PENDING',
-                     'is-selected': selectedExecId === execution.id
-                   }">
-
-                <div class="execution-select" (click)="$event.stopPropagation()">
-                  <label class="radio-wrap"
-                    [attr.aria-label]="'Sélectionner l\'exécution du ' + (execution.plannedAt | date:'dd/MM/yyyy')">
-                    <input type="radio" name="execSel" [value]="execution.id"
-                      [checked]="selectedExecId === execution.id" (click)="toggleSelection(execution.id)" />
-                    <span class="dot" aria-hidden="true"></span>
-                  </label>
-                </div>
-
-                <div class="execution-info">
-                  <div class="execution-date clickable" role="button" tabindex="0" (click)="editExecution(execution)"
-                    (keydown.enter)="editExecution(execution)" (keydown.space)="editExecution(execution)">
-                    <i class="icon-calendar"></i>
-                    <strong>Planifiée le {{ execution.plannedAt | date : "dd/MM/yyyy" }}</strong>
-                  </div>
-
-                  <div class="execution-responsible">
-                    Attribuée à {{ execution.performedBy }}
-                  </div>
-
-                  <div class="execution-eval" *ngIf="hasEvaluation(execution.id)">
-                    <div class="eval-line">
-                      📋 Évaluer le {{ getEvaluatedAt(execution.id) | date : "dd/MM/yyyy" }}
-                      <span *ngIf="getReexamIndex(execution.id) > 0" class="rv-chip rv-chip--secondary"
-                        style="margin-left:8px; display: block;">
-                        Réexamen n°{{ getReexamIndex(execution.id) }}
-                      </span>
-                    </div>
-
-                    <ng-container [ngSwitch]="getReviewStatus(execution.id)">
-                      <span *ngSwitchCase="'PENDING'" class="rv-chip rv-chip--warning">EN ATTENTE DE VALIDATION</span>
-                      <span *ngSwitchCase="'APPROVED'" class="rv-chip rv-chip--success">VALIDÉE</span>
-                      <span *ngSwitchCase="'REEXAM_REQUESTED'" class="rv-chip rv-chip--info">RÉEXAMEN DEMANDÉ</span>
-                    </ng-container>
-
-                    <div class="eval-review-meta"
-                      *ngIf="getReviewStatus(execution.id) === 'APPROVED' && getReviewedAt(execution.id)">
-                      <div class="eval-line">✔ Validée le {{ getReviewedAt(execution.id) | date : 'dd/MM/yyyy' }}</div>
-                      <div *ngIf="getReviewedBy(execution.id)">par {{ getReviewedBy(execution.id) }}</div>
-                    </div>
-
-                    <div class="eval-review-meta"
-                      *ngIf="getReviewStatus(execution.id) === 'REEXAM_REQUESTED' && getReviewedAt(execution.id)">
-                      <div class="eval-line">Réexamen demandé le {{ getReviewedAt(execution.id) | date : 'dd/MM/yyyy' }}
+              <div class="carousel-track"
+                [style.transform]="'translateX(calc(' + (-currentSlide*100) + '% + ' + dragOffsetPx + 'px))'">
+                <div class="carousel-slide" *ngFor="let s of slides">
+                  <!-- Bandeau méta -->
+                  <div class="meta-card card" [ngClass]="computeMetaStripe(s)">
+                    <div class="card-content meta">
+                      <div class="meta-left">
+                        <div class="meta-line">
+                          <span class="badge" [ngClass]="getStatusClass(s.exec.status)">{{ formatStatus(s.exec.status)
+                            }}</span>
+                          <span class="meta-date">Planifiée le {{ s.exec.plannedAt | date:'dd/MM/yyyy' }}</span>
+                          <span class="meta-date" *ngIf="s.view?.evaluatedAt">• Évaluée le {{ s.view?.evaluatedAt |
+                            date:'dd/MM/yyyy' }}</span>
+                          <span class="meta-date" *ngIf="s.view?.reviewedAt">• Validée le {{ s.view?.reviewedAt |
+                            date:'dd/MM/yyyy' }}</span>
+                        </div>
+                        <div class="meta-sub">Attribuée à {{ s.exec.performedBy || '—' }}</div>
                       </div>
-                      <div *ngIf="getReviewedBy(execution.id)">par {{ getReviewedBy(execution.id) }}</div>
+
+                      <div class="meta-right">
+                        <button class="btn btn-primary" *ngIf="!s.view"
+                          (click)="evaluateExec(s.exec.id)">Évaluer</button>
+                      </div>
                     </div>
                   </div>
+
+                  <!-- Cartes visibles seulement quand il y a des données -->
+                  <ng-container *ngIf="s.view">
+                    <app-popup-evaluation-controle [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true"
+                      (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id)">
+                    </app-popup-evaluation-controle>
+                  </ng-container>
                 </div>
-
-                <div class="execution-status" (click)="$event.stopPropagation()">
-                  <span class="badge small" [ngClass]="getStatusClass(execution.status)">
-                    {{ formatStatus(execution.status) }}
-                  </span>
-
-                  <button class="btn-link btn-détail" *ngIf="hasEvaluation(execution.id)"
-                    (click)="openEvaluationDetailsPopup(execution.id)">
-                    Détails
-                  </button>
-                </div>
-
               </div>
             </div>
-            <div class="btn-history">
-              <button class="btn-link full-width" (click)="viewFullHistory()">
-                Voir tout l'historique
-              </button>
-            </div>
+
+            <button class="car-fab prev" title="Plus ancien" (click)="prevSlide()" [disabled]="!hasPrev()">‹</button>
+            <button class="car-fab next" title="Plus récent" (click)="nextSlide()" [disabled]="!hasNext()">›</button>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">Actions rapides</h3>
-            <div class="quick-actions">
-              <button class="btn btn-outline full-width" *ngIf="selectedExec && canMarkAsRealized()"
-                (click)="markAsRealized()">
-                <i class="icon-check-circle"></i>
-                Marquer comme réalisé
-              </button>
-              <button class="btn btn-outline full-width" (click)="scheduleExecution()">
-                <i class="icon-calendar"></i>
-                Planifier exécution
-              </button>
-              <button class="btn btn-outline full-width" (click)="addNote()">
-                <i class="icon-file-text"></i>
-                Ajouter une note
-              </button>
-            </div>
+
+        <ng-template #emptyState>
+          <div class="empty-state">
+            <div class="empty-title">Aucune exécution pour le moment</div>
+            <div class="empty-sub">Planifiez une première exécution pour démarrer le cycle.</div>
+            <!-- Le bouton principal est déjà en haut dans goBackButtons -->
           </div>
-        </div>
+        </ng-template>
+
       </div>
     </div>
   </div>
 </div>
 
+<!-- Popups -->
 <app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id.id" [controlVersion]="control!.id.version"
-  [frequence]="control!.frequency" [isEditing]="selectedExecutionToEdit !== null"
-  [executionToEdit]="selectedExecutionToEdit!" (close)="showPopup = false; selectedExecutionToEdit = null"
+  [frequence]="control!.frequency" [isEditing]="false" (close)="showPopup = false"
   (planifier)="handlePlanification($event)" [lastPlannedAt]="controlExecutions?.[0]?.plannedAt">
 </app-planifier-execution-popup>
 
 <app-popup-evaluation-controle *ngIf="showEvaluationPopup && selectedExecutionId" [executionId]="selectedExecutionId!"
-  [initialMode]="forceDetails ? 'DETAILS' : undefined" [canValidate]="isValidator()"
-  (submitted)="handleEvaluationSubmitted()" (reviewed)="handleEvaluationSubmitted()"
-  (close)="showEvaluationPopup = false">
+  [initialMode]="forceDetails ? 'DETAILS' : undefined" [canValidate]="true" (submitted)="handleEvaluationSubmitted()"
+  (reviewed)="handleEvaluationSubmitted()" (close)="showEvaluationPopup = false">
 </app-popup-evaluation-controle>
-
 }

@@ -7,6 +7,8 @@ import { RiskTemplate } from '../../models/RiskTemplate';
 import { Process } from '../../models/Process';
 import { ControlEvaluation } from '../../models/ControlEvaluation';
 import { Observable } from 'rxjs';
+import { ControlMethodology, ControlMethodologyCreateDto } from '../../models/ControlMethodology';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,7 @@ export class ControlService {
   baseUrlTemp = environment.apiUrl + '/controls/templates';
   baseUrlExec = environment.apiUrl + '/controls/executions';
   baseUrlEval = environment.apiUrl + '/controls/evaluations';
+  baseUrlMeth = environment.apiUrl + '/controls/methodologies';
 
 
   createControl(control: ControlTemplateCreateDto) {
@@ -79,5 +82,14 @@ export class ControlService {
       decision: 'REEXAM',
       comment
     });
+  }
+
+  getMethodology(controlId: string) {
+    return this.http.get(`${this.baseUrlMeth}/${controlId}`, { observe: 'response' })
+      .pipe(map(res => res.status === 204 ? null : (res.body as ControlMethodology)));
+  }
+
+  createMethodology(data: ControlMethodologyCreateDto) {
+    return this.http.post(`${this.baseUrlMeth}`, data);
   }
 }

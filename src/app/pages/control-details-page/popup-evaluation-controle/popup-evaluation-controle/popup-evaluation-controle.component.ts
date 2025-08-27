@@ -31,6 +31,12 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   @Output() submitted = new EventEmitter<void>();
   @Output() reviewed = new EventEmitter<void>();
 
+  @Output() evaluateRequested = new EventEmitter<void>();
+  @Output() openDetailsRequested = new EventEmitter<void>();
+
+  @Input() showNoEvalText = false;
+  @Input() showEvaluateButton = true;
+
   mode: PopupMode = 'FORM';
   blockers: ControlExecution[] = [];
   evalDetails?: ControlEvaluationView;

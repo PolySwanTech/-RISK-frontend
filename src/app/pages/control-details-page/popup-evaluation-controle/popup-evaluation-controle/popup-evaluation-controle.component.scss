@@ -82,7 +82,7 @@
 }
 
 .rv-actions {
-    display: flex;
+    // display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
@@ -381,6 +381,7 @@
     position: relative;
     overflow: hidden;
     margin-top: 14px;
+    width: 100%;
 
     &:before {
         content: '';
@@ -575,4 +576,12 @@
     .rv-modal--details {
         width: 96vw;
     }
+}
+
+.rv-actions-inline {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+
+  .btn { padding: .5rem .9rem; }
 }
