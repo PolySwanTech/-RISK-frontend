@@ -195,7 +195,7 @@ export class CreateComponent implements OnInit {
     this.listRisks = [];
     this.incidentForm3.get('processId')?.reset();
     this.incidentForm3.get('riskId')?.reset();
-    this.processService.getProcessTree(event.value.id).subscribe(data => {
+    this.processService.getProcessTree(event.value).subscribe(data => {
       this.listProcess = data;
     });
   }
