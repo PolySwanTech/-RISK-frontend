@@ -138,8 +138,6 @@ export class PlanActionPageDetailComponent {
 
   async viewFiles() {
     var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
-
-    console.log(this.actionPlan)
     let files = await firstValueFrom(this.fileService.getFiles(targetType, this.idPlanAction ))
 
     this.dialog.open(FichiersComponent,
