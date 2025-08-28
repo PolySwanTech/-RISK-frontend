@@ -21,7 +21,6 @@ import { State } from '../../../core/enum/state.enum';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
-import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
 import { ImpactService } from '../../../core/services/impact/impact.service';
@@ -37,6 +36,7 @@ import { saveAs } from 'file-saver';
   styleUrl: './view.component.scss'
 })
 export class ViewComponent implements OnInit {
+[x: string]: any;
   private incidentService = inject(IncidentService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);

@@ -132,7 +132,8 @@
                 </mat-card-content>
             </mat-card>
             <div style="display: flex; gap: 20px;">
-                <app-fichiers style="flex: 3;" [incidentId]="incident.id" [incidentRef]="incident.reference" [closed]="isClosed()"></app-fichiers>
+                
+                <app-fichiers style="flex: 3;" [targetId]="idIncident" [closed]="isClosed()"></app-fichiers>
                 <div style="flex: 2;" class="info2-container">
                     <app-list-suivi [closed]="isClosed()"></app-list-suivi>
                 </div>

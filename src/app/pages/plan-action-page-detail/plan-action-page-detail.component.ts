@@ -18,6 +18,11 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
+import { firstValueFrom } from 'rxjs';
+import { TargetType } from '../../core/enum/targettype.enum';
+import { FichiersComponent } from '../../shared/components/fichiers/fichiers.component';
+import { FileService } from '../../core/services/file/file.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -33,6 +38,8 @@ export class PlanActionPageDetailComponent {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
   private equipeService = inject(EquipeService);
+  private fileService = inject(FileService);
+  private dialog = inject(MatDialog);
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -129,10 +136,22 @@ export class PlanActionPageDetailComponent {
     }
   }
 
-  openFileUpload(): void {
-    // Déclencher le clic sur l'input file caché
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    fileInput?.click();
+  async viewFiles() {
+    var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
+
+    console.log(this.actionPlan)
+    let files = await firstValueFrom(this.fileService.getFiles(targetType, this.idPlanAction ))
+
+    this.dialog.open(FichiersComponent,
+      {
+        width: '400px',
+        data: {
+          files: files,
+          targetType: targetType,
+          targetId: this.idPlanAction
+        }
+      }
+    )
   }
 
   getPriorityBarHtml(priority: Priority): string {
