@@ -60,7 +60,7 @@ export class ControlDetailsPageComponent implements OnInit {
   goBackButtons = [
     {
       label: 'Planifier exécution',
-      icon: 'calendar',
+      icon: 'calendar_today',
       class: 'btn-primary',
       show: true,
       action: () => this.scheduleExecution()
@@ -121,10 +121,10 @@ export class ControlDetailsPageComponent implements OnInit {
     this.slides = this.controlExecutions
       .map(e => ({ exec: e, view: this.evaluationCache[e.id] ?? null }))
       .sort((a, b) =>
-        new Date(b.exec.plannedAt as any).getTime() - new Date(a.exec.plannedAt as any).getTime()
+        new Date(a.exec.plannedAt as any).getTime() - new Date(b.exec.plannedAt as any).getTime()
       )
       .slice(0, 4);
-    this.currentSlide = 0;
+    this.currentSlide =  Math.max(0, this.slides.length - 1);
   }
 
   // === Helpers affichage ===
