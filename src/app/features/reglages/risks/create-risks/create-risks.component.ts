@@ -38,6 +38,7 @@ import { SelectArborescenceComponent } from '../../../../shared/components/selec
   styleUrl: './create-risks.component.scss'
 })
 export class CreateRisksComponent implements OnInit {
+  
   /* ---------------- services ---------------- */
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
