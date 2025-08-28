@@ -4,7 +4,7 @@
     <div class="card is-yellow">
       <div class="card-header">
         <h3><span class="dot"></span> Méthodologie appliquée</h3>
-        <small class="sub">Aucune méthodologie enregistrée — créez la première.</small>
+        <small class="sub">Aucune méthodologie enregistrée — veuillez en créer une.</small>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()" class="card-content form-grid">
@@ -63,7 +63,7 @@
 
       <div class="card-content details-grid">
         <div class="field">
-          <label>Nature du contrôle</label>
+          <label>Type du contrôle</label>
           <div class="value">{{ methodology?.controlNature || '—' }}</div>
         </div>
 
@@ -73,12 +73,12 @@
         </div>
 
         <div class="field full">
-          <label>Périmètre</label>
+          <label>Données utilisées</label>
           <div class="value">{{ methodology?.scope || '—' }}</div>
         </div>
 
         <div class="field full">
-          <label>Échantillonnage</label>
+          <label>Échantillon contrôlé</label>
           <div class="value">{{ methodology?.sampling || '—' }}</div>
         </div>
       </div>

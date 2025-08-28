@@ -170,16 +170,16 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   hasPrev(): boolean {
-    return this.currentSlide < Math.max(0, this.slides.length - 1);
-  }
-  hasNext(): boolean {
     return this.currentSlide > 0;
   }
+  hasNext(): boolean {
+    return this.currentSlide < Math.max(0, this.slides.length - 1);
+  }
   prevSlide(): void {
-    if (this.hasPrev()) this.currentSlide++;
+    if (this.hasPrev()) this.currentSlide -= 1;
   }
   nextSlide(): void {
-    if (this.hasNext()) this.currentSlide--;
+    if (this.hasNext()) this.currentSlide += 1;
   }
   goTo(i: number): void { if (i >= 0 && i < this.slides.length) this.currentSlide = i; }
 
@@ -215,8 +215,8 @@ export class ControlDetailsPageComponent implements OnInit {
     const delta = this.lastX - this.dragStartX;
 
     if (Math.abs(delta) > this.dragThreshold) {
-      if (delta < 0) this.prevSlide();
-      else this.nextSlide();
+      if (delta < 0) this.nextSlide();
+      else this.prevSlide();
     }
     this.isDragging = false;
     this.dragStartedInside = false;

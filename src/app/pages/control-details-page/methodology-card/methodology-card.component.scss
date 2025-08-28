@@ -25,7 +25,7 @@
     }
 
     .card-header {
-        margin-bottom: 18px;
+        margin-bottom: 28px;
         padding: 20px 24px 0;
         flex-shrink: 0;
 
@@ -153,12 +153,12 @@
         }
 
         label {
-            font-size: 11px;
-            color: #6b7280;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            margin-bottom: 2px;
+            font-size: 0.9rem;
+            color: #0f172a;
+            font-weight: 800;
+            // text-transform: uppercase;
+            /* letter-spacing: 0.5px; */
+            margin-bottom: 6px;
         }
 
         .value {
