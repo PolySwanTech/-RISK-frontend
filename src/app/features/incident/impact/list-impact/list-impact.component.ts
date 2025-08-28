@@ -27,6 +27,7 @@ import { buildFilterFromColumn } from '../../../../shared/utils/filter-builder.u
 import { firstValueFrom } from 'rxjs';
 import { MatPaginator } from "@angular/material/paginator";
 import { ImpactTypeEnum } from '../../../../core/enum/impactType.enum';
+import { TargetType } from '../../../../core/enum/targettype.enum';
 
 @Component({
   selector: 'app-list-impact',
@@ -140,13 +141,15 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
   }
 
   async viewFiles(impact: Impact) {
-    let files = await firstValueFrom(this.fileService.getFiles({ impactId: impact.id }))
+    let files = await firstValueFrom(this.fileService.getFiles(TargetType.IMPACT, impact.id ))
 
     this.dialog.open(FichiersComponent,
       {
         width: '400px',
         data: {
-          files: files
+          files: files,
+          targetType: TargetType.IMPACT,
+          targetId: impact.id
         }
       }
     )

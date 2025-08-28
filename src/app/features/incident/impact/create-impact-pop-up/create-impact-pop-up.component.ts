@@ -22,6 +22,7 @@ import { FileService } from '../../../../core/services/file/file.service';
 import { firstValueFrom } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TargetType } from '../../../../core/enum/targettype.enum';
 
 @Component({
   selector: 'app-create-impact-pop-up',
@@ -122,7 +123,7 @@ export class CreateImpactPopUpComponent implements OnInit {
   }
 
   async viewFiles(impact: Impact) {
-    let files = await firstValueFrom(this.fileService.getFiles({ impactId: impact.id }))
+    let files = await firstValueFrom(this.fileService.getFiles(TargetType.IMPACT, impact.id))
 
    
     console.log(files);

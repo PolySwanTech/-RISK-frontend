@@ -1,5 +1,4 @@
 import { Component, Inject, inject, Input, Optional } from '@angular/core';
-import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,7 +12,6 @@ import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileService } from '../../../core/services/file/file.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { TargetType } from '../../../core/enum/targettype.enum';
 
 export interface UploadedFile {
@@ -42,6 +40,9 @@ export class FichiersComponent {
   searchQuery: string = '';
   filteredFilesCount: number = 0;
 
+  @Input() targetType: TargetType = TargetType.INCIDENT; // défaut
+  @Input() targetId: string = '';                        // id incident OU impact
+
   @Input() incidentId: string = ''
   @Input() incidentRef: string = ''
   @Input() closed: boolean | null = null;
@@ -51,17 +52,27 @@ export class FichiersComponent {
 
   isDragOver = false;
 
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data?: { files: UploadedFile[] }) { }
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data?: {
+    files?: UploadedFile[];
+    targetType?: TargetType;
+    targetId?: string; 
+  }) { }
 
   ngOnInit(): void {
+    // Data du dialog > Inputs si fournis
+    if (this.data?.targetType) this.targetType = this.data.targetType;
+    if (this.data?.targetId) this.targetId = this.data.targetId;
 
-    if (this.data?.files) {
+    // Si des fichiers sont déjà fournis (dialog)
+    if (this.data?.files?.length) {
       this.attachedFiles = this.data.files;
       this.filteredFiles = this.data.files;
+      this.filteredFilesCount = this.filteredFiles.length;
     }
 
-    if (this.incidentId && this.incidentRef) {
-      this.fileService.getFiles({ incidentId: this.incidentId }).subscribe(files => {
+    // Sinon on charge depuis l’API si on a le contexte
+    if (!this.attachedFiles.length && this.targetId) {
+      this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
         this.attachedFiles = files;
         this.filteredFiles = files;
         this.filteredFilesCount = files.length;
@@ -173,23 +184,28 @@ export class FichiersComponent {
   }
 
   private async uploadFile(file: File): Promise<void> {
-
-    if (this.data && this.data.files) {
-      this.fileService.uploadFile(file, "IMP_2025_001", "289b1b94-5fa1-49fc-bb7d-cf5024e4fdcf", TargetType.IMPACT).subscribe(
-        {
-          next: _ => {
-            this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
-          },
-          error: (err) => {
-            this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'ajout du fichier ${file.name}.`, false);
-          }
-        }
-      )
-    }
-    else {
-      this.fileService.uploadFile(file, this.incidentRef, this.incidentId, TargetType.INCIDENT).subscribe()
+    if (!this.targetId) {
+      this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
+      return;
     }
 
+    this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
+      next: _ => {
+        // Refresh la liste
+        this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+          this.attachedFiles = files;
+          this.filteredFiles = files;
+          this.filteredFilesCount = files.length;
+        });
+      },
+      error: _ => {
+        this.confirmService.openConfirmDialog(
+          "Erreur",
+          `Erreur lors de l'ajout du fichier ${file.name}.`,
+          false
+        );
+      }
+    });
   }
 
   downloadFile(file: UploadedFile, openInBrowser: boolean = false): void {
