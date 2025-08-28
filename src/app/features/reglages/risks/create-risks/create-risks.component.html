@@ -1,7 +1,5 @@
 <div class="body-container">
-  <app-go-back
-    previousPageName="Gestion des risques"
-  />
+  <app-go-back [title]="'Création d\'un risque'" />
 
   <section>
     <div class="form-container">
@@ -9,163 +7,74 @@
 
       <!-- le stepper n’est affiché que lorsque l’objet risk est prêt -->
       @if (risk) {
-        <mat-stepper [linear]="false" #stepper>
-          <!-- ───────────────────── 1. Informations de base ───────────────────── -->
-          <mat-step [stepControl]="infoForm" label="Informations de base">
-            <form [formGroup]="infoForm">
-              <!-- Titre --------------------------------------------------------- -->
-              <mat-form-field class="full-width">
-                <mat-label>Titre du risque</mat-label>
-                <input
-                  matInput
-                  formControlName="libelle"
-                  placeholder="Entrez le titre du risque"
-                />
-              </mat-form-field>
+      <mat-stepper [linear]="false" #stepper>
+        <!-- ───────────────────── 1. Informations de base ───────────────────── -->
+        <mat-step [stepControl]="infoForm">
+          <form [formGroup]="infoForm">
+            <!-- Titre --------------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Titre du risque</mat-label>
+              <input matInput formControlName="libellePerso" placeholder="Entrez le titre du risque" />
+            </mat-form-field>
 
-              <!-- Parent ----------------------------------------------------- --> 
-              <mat-form-field class="full-width">
-                <mat-label>Risque parent</mat-label>
-               <mat-select formControlName="parentRisk">
-                  <mat-option [value]="null">Aucun</mat-option>
-                  <!-- on utilise risk.id pour lier le risque parent -->
-                  <mat-option *ngFor="let r of risks" [value]="r.id.id">
-                    {{ r.libelle }}
-                  </mat-option>
-                </mat-select> 
-              </mat-form-field>
+            <!-- Catégorie L1 -------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Catégorie&nbsp;Bâloise</mat-label>
+              <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
+                <mat-option *ngFor="let cat of bal1" [value]="cat">
+                  {{ cat }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
 
-              <!-- Catégorie L1 -------------------------------------------------- -->
-              <mat-form-field class="full-width">
-                <mat-label>Catégorie&nbsp;Bâloise</mat-label>
-                <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
-                  <mat-option *ngFor="let cat of bal1" [value]="cat">
-                    {{ cat }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Sous-catégorie L2 -------------------------------------------- -->
-              <mat-form-field class="full-width" *ngIf="bal2.length > 0">
-                <mat-label>Sous-catégorie&nbsp;Bâloise</mat-label>
-                <mat-select formControlName="balois2" (selectionChange)="onCategoryChange($event.value, 2)">
-                  <!-- on envoie ici l’OBJET L2 complet,
+            <!-- Sous-catégorie L2 -------------------------------------------- -->
+            <mat-form-field class="full-width" *ngIf="bal2.length > 0">
+              <mat-label>Sous-catégorie&nbsp;Bâloise</mat-label>
+              <mat-select formControlName="balois2" (selectionChange)="onCategoryChange($event.value, 2)">
+                <!-- on envoie ici l’OBJET L2 complet,
                        car risk.categoryL2 est de type BaloiseCategoryL2 -->
-                  <mat-option
-                    *ngFor="let sub of bal2"
-                    [value] = "sub"
-                  >
-                    {{ sub }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+                <mat-option *ngFor="let sub of bal2" [value]="sub">
+                  {{ sub }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
 
-              <!-- Processus ----------------------------------------------------- -->
-              <mat-form-field *ngIf="process1.length > 0" class="full-width">
-                <mat-label>Processus</mat-label>
-                <mat-select formControlName="process1" (selectionChange)="onProcessChange($event.value, 1)">
-                  <mat-option
-                    *ngFor="let p of process1"
-                    [value]="p"
-                  >
-                    {{ p.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+            <!-- Parent ----------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Risque parent</mat-label>
+              <mat-select formControlName="parentRisk">
+                <mat-option [value]="undefined">Aucun</mat-option>
+                <!-- on utilise risk.id pour lier le risque parent -->
+                <mat-option *ngFor="let r of risks" [value]="r.id.id">
+                  {{ r.libellePerso }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
 
-              <!-- Sous-processus L2 -------------------------------------------- -->
-              <mat-form-field class="full-width" *ngIf="process2.length > 0">
-                <mat-label>Sous-process&nbsp;</mat-label>
-                <mat-select formControlName="process2" (selectionChange)="onProcessChange($event.value, 2)">
-                  <!-- on envoie ici l’OBJET L2 complet,
-                       car risk.categoryL2 est de type BaloiseCategoryL2 -->
-                  <mat-option
-                    *ngFor="let sub of process2"
-                    [value] = "sub"
-                  >
-                    {{ sub.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+            <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length && listProcess.length > 0"
+              [id]="infoForm.get('processId')!.value" (changeValue)="onProcessSelected($event)"
+              placeholder="Sélectionnez un processus" [list]="listProcess">
+            </app-select-arborescence>
 
-              <div class="actions">
-                <button
-                  mat-raised-button
-                  class="btn-primary"
-                  matStepperNext
-                  [disabled]="infoForm.invalid"
-                >
-                  Suivant
-                </button>
-              </div>
-            </form>
-          </mat-step>
-
-          <!-- ───────────────────────── 2. Autres infos ───────────────────────── -->
-          <mat-step [stepControl]="detailsForm" label="Autres info">
-            <form [formGroup]="detailsForm">
-              <!-- Type d’impact ----------------------------------------------- -->
-              <mat-form-field>
-                <mat-label>Type d'impact</mat-label>
-                <mat-select
-                  formControlName="impactType"
-                  placeholder="Choisissez un type d'impact"
-                  required
-                >
-                  @for (impact of impactTypes; track impact) {
-                    <mat-option [value]="impact">
-                      {{ impactLabels[impact] }}
-                    </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Niveau brut --------------------------------------------------- -->
-              <mat-form-field>
-                <mat-label>Niveau</mat-label>
-                <mat-select
-                  formControlName="level"
-                  placeholder="Choisissez un niveau de risque"
-                  required
-                >
-                  <mat-option *ngFor="let level of riskLevels"
-                    [value]="level">          <!-- ← enum, pas string -->
-                    {{ riskLabels[level] }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- Description --------------------------------------------------- -->
-              <mat-form-field class="full-width">
-                <mat-label>Description du risque</mat-label>
-                <textarea
-                  matInput
-                  formControlName="description"
-                  placeholder="Entrez la description"
-                ></textarea>
-              </mat-form-field>
-            </form>
+            <!-- Description --------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Description du risque</mat-label>
+              <textarea matInput formControlName="description" placeholder="Entrez la description"></textarea>
+            </mat-form-field>
 
             <div class="actions">
-              <button
-                mat-raised-button
-                class="btn-red"
-                matStepperPrevious
-              >
-                Retour
+
+              <button mat-raised-button class="btn-red" matStepperPrevious *ngIf="risk.id">
+                Annuler
               </button>
 
-              <button
-                mat-raised-button
-                class="btn-primary"
-                (click)="submit()"
-                [disabled]="infoForm.invalid || detailsForm.invalid"
-              >
+              <button mat-raised-button class="btn-primary" (click)="submit()" [disabled]="infoForm.invalid">
                 Soumettre
               </button>
             </div>
-          </mat-step>
-        </mat-stepper>
+          </form>
+        </mat-step>
+      </mat-stepper>
       }
     </div>
   </section>

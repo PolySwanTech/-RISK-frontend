@@ -1,24 +1,50 @@
-<mat-card class="state-card">
-    <mat-card-header>
-        <mat-card-title>
-            <span>Impacts -
-                <strong>
-                    Total : {{ totalAmount | currency : 'EUR' }}
-                </strong>
-            </span>
-            @if(!closed){
-            <button mat-raised-button class="btn-primary" (click)="addImpact()">
-                Ajouter
-                <mat-icon>add</mat-icon>
-            </button>
-            }
-        </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <div class="impacts-container">
-            @for(impact of impacts; track impact.id){
-            <app-impact-card [impact]="impact"></app-impact-card>
-            }
+<app-go-back [title]="'Liste des impacts'" [buttons]="goBackButtons" />
+
+<section class="dashboard-container">
+    <mat-card class="filters-card">
+        <mat-card-content class="dashboard-header">
+            <div class="filters-section" style="width: 100%;">
+                <div class="filters-header">
+                    <div>
+                        <mat-icon>filter_alt</mat-icon>
+                        <span class="filters-title">Filtres</span>
+                    </div>
+                    <mat-button-toggle-group [(ngModel)]="filterMode" exclusive>
+                        <mat-button-toggle value="general">Mode général</mat-button-toggle>
+                        <mat-button-toggle value="detailed">Filtres détaillés</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </div>
+
+                <app-filter-table *ngIf="filterMode === 'detailed'" [availableFilters]="filtersConfig"
+                    (filtersChanged)="handleFiltersChanged($event)">
+                </app-filter-table>
+                <app-global-search-bar *ngIf="filterMode === 'general'" [(model)]="searchQuery"
+                    [placeholder]="'Rechercher des impacts'" (modelChange)="onSearchFiles($event)"
+                    (cleared)="clearSearch()" />
+            </div>
+        </mat-card-content>
+    </mat-card>
+<div class="table-container">
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+            <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ column.header }}</th>
+                <td mat-cell *matCellDef="let row" [innerHTML]="column.cell(row)"></td>
+            </ng-container>
+
+            <ng-container matColumnDef="fichiers">
+                <th mat-header-cell *matHeaderCellDef> Fichiers </th>
+                <td mat-cell *matCellDef="let impact">
+                    <button mat-button color="primary" (click)="viewFiles(impact)">
+                        Voir les fichiers
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
         </div>
-    </mat-card-content>
-</mat-card>
+</section>

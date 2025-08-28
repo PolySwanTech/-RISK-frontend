@@ -1,3 +1,4 @@
+import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,9 +7,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { CommonModule } from '@angular/common';
 import { Process } from '../../../core/models/Process';
-import { Utilisateur } from '../../../core/models/Utilisateur';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
@@ -23,17 +23,20 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Type } from '../../../core/enum/controltype.enum';
 import { EnumLabels } from '../../../core/enum/enum-labels';
+import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 
 @Component({
   selector: 'app-create-control',
   imports: [
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule, MatButtonModule, ReactiveFormsModule
+    FormsModule, MatButtonModule, ReactiveFormsModule,
+    SelectArborescenceComponent
   ],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
@@ -47,34 +50,111 @@ export class CreateControlComponent {
   controlService = inject(ControlService);
   dialogRef = inject(MatDialogRef<CreateControlComponent>);
   confirmService = inject(ConfirmService);
+  snackBarService = inject(SnackBarService)
   private fb = inject(FormBuilder);
 
   form: FormGroup = this.fb.group({
-    libelle      : ['', Validators.required],
-    description  : ['', Validators.required],
-    frequency    : [null, Validators.required],
-    level        : [null, Validators.required],
-    type  : [null, Validators.required],
-    priority     : [null, Validators.required],
-    processId    : ['',  Validators.required],
-    taxonomie    : [null, Validators.required],
-    buId : ['', Validators.required],
-
+    libelle: ['', Validators.required],
+    description: ['', Validators.required],
+    frequency: [null, Validators.required],
+    level: [null, Validators.required],
+    type: [null, Validators.required],
+    priority: [null, Validators.required],
+    processId: [null, Validators.required],
+    riskId: ['', Validators.required],
+    buId: ['', Validators.required],
   });
+
+
+  listProcess: any[] = [];
+  listRisks: any[] = [];
+  listEntities: any[] = [];
 
   priorities = Object.values(Priority);
   types = Object.values(Type);
   levels = Object.values(Degree);
-  entitesResponsables: EntiteResponsable[] = [/* à remplir */];
-  processes: Process[] = [/* à remplir */];
-  risks: RiskTemplate[] = [/* à remplir */];
-  responsables: Utilisateur[] = [/* à remplir */];
+  // entitesResponsables$ = this.buService.loadEntities();
+  // processes$: Observable<Process[]> = this.form.get('buId')!.valueChanges.pipe(
+  //   startWith(this.form.get('buId')!.value),
+  //   tap(() => this.form.get('processId')!.reset()),
+  //   switchMap(id => {
+  //     const buId = typeof id === 'string' ? id : id?.id;
+  //     return buId ? this.processService.getAllByEntite(buId) : of([]);
+  //   }),
+  // ); 
+
+  //   risks$: Observable<RiskTemplate[]> = this.form.get('processId')!.valueChanges.pipe(
+  //   startWith(this.form.get('processId')!.value),
+  //   switchMap(id => id
+  //     ? this.riskService.getRisksTree(id).pipe(
+  //         map(list => list ?? []),
+  //         tap(list => console.log('Risks fetched:', list))  // <-- ici le console.log
+  //       )
+  //     : of([])
+  //   )
+  // );
+
+  get buIdValue() {
+    console.log(this.form.get('buId')?.value)
+    return this.form.get('buId')?.value;
+  }
+
+  responsables$ = this.userService.getUsers();
 
   recurences = Object.values(Recurence);
-  entiteResponsableId = ""
-  processId = "";
-  
+
   enumLabels = EnumLabels;
+
+  ngOnInit() {
+    this.fetchTeams();
+  }
+
+  fetchTeams(): void {
+    this.buService.loadEntities().subscribe({
+      next: teams => {
+        this.listEntities = teams.filter(team => team.process && team.process.length > 0);
+      },
+      error: err => {
+        console.error("Erreur lors du chargement des équipes", err);
+      }
+    });
+  }
+
+  onTeamChange(event: any) {
+    const buId: string = event.value;
+    this.form.get('buId')?.setValue(buId);
+    this.form.get('buId')?.markAsDirty();
+
+    this.listProcess = [];
+    this.listRisks = [];
+    this.form.get('processId')?.reset();
+    this.form.get('riskId')?.reset();
+    this.processService.getProcessTree(event.value.id).subscribe(data => {
+      this.listProcess = data;
+    });
+  }
+
+  onSelectionProcess(value: any) {
+    this.form.get('processId')?.setValue(value.id);
+    this.form.get('processId')?.markAsDirty();
+    this.form.get('processId')?.updateValueAndValidity();
+
+    this.listRisks = [];
+    this.riskService.getRisksTree(value.id).subscribe(data => {
+      console.log(data)
+      this.listRisks = data;
+      if (this.listRisks.length === 0) {
+        this.snackBarService.error("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
+      }
+    });
+    this.form.value.processId = value.id;
+  }
+
+  onSelectionRisk(event: RiskTemplate) {
+    this.form.get('riskId')?.setValue(event.id);
+    this.form.get('riskId')?.markAsDirty();
+    this.form.get('riskId')?.updateValueAndValidity();
+  }
 
   getTypeLabel(type: keyof typeof EnumLabels.type): string {
     return this.enumLabels.type[type];
@@ -92,18 +172,8 @@ export class CreateControlComponent {
     return this.enumLabels.reccurency[recurrence];
   }
 
-
-  ngOnInit(): void {
-    this.buService.loadEntities().subscribe(entites => {
-      this.entitesResponsables = entites;
-    });
-
-    this.userService.getUsers().subscribe(responsables => {
-      this.responsables = responsables;
-    });
-  }
-
   onSubmit() {
+    console.log(this.form.value);
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
     const payload: ControlTemplateCreateDto = {
@@ -114,35 +184,21 @@ export class CreateControlComponent {
       processId: this.form.value.processId,
       level: this.form.value.level,
       priority: this.form.value.priority,
-      taxonomieId: this.form.value.taxonomie.id.id,
-      taxonomieVersion: this.form.value.taxonomie.id.version,
-
+      riskId: this.form.value.riskId,
     };
 
     this.controlService.createControl(payload).subscribe({
-      next : ()  => {
-        this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);
-        this.dialogRef.close();
+      next: () => {
+        this.snackBarService.success("Le contrôle a bien été ajouté");
+        console.log('Création réussie', payload);
       },
-      error: err => console.error('Erreur création', err)
+      error: err => {
+        this.snackBarService.error(err.message);
+        console.error('Erreur création', err)
+      }
     });
   }
 
-  onEntiteResponsableChange() {
-    const entiteResponsableId = this.form.get('buId')?.value;
-    if (entiteResponsableId) {
-      this.processService.getAllByEntite(entiteResponsableId).subscribe(processes => {
-        this.processes = processes;
-      });
-    }
-  }
+  trackById = (index: number, item: { id: string }) => item.id;
 
-  onProcessChange() {
-    const processId = this.form.get('processId')?.value;
-    if (processId) {
-      this.riskService.getAllByProcess(processId).subscribe(risks => {
-        this.risks = risks;
-      });
-    }
-  }
 }

@@ -136,3 +136,12 @@ button[mat-menu-item] {
 .filter-field {
   width: auto;
 }
+
+.number-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.number-input {
+  width: 120px;
+}

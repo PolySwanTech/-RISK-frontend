@@ -1,207 +1,255 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialog }  from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RiskLevel, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
+import { Range } from '../matrix-settings/matrix-settings.component';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { MatrixService } from '../../../core/services/matrix/matrix.service';
 
-/** Couleur à afficher pour chaque RiskLevel */
-const COLOR_MAP: Record<RiskLevel,string> = {
-  [RiskLevel.LOW]       : '#F5F8FA',  // Très faible / Faible
-  [RiskLevel.MEDIUM]    : '#FFA500',  // Moyen
-  [RiskLevel.HIGH]      : '#FF4500',  // Élevé
-  [RiskLevel.VERY_HIGH] : '#8B0000',  // Critique
-};
-
-/** Grille 5 × 5 : pour chaque (impact,probabilité) on détermine le RiskLevel */
-const MATRIX_LEVELS: RiskLevel[][] = [
-  /* IMPACT 5 ― Catastrophique */ [
-    RiskLevel.MEDIUM,    // Prob 1  (Très rare)
-    RiskLevel.HIGH,
-    RiskLevel.VERY_HIGH,
-    RiskLevel.VERY_HIGH,
-    RiskLevel.VERY_HIGH  // Prob 5  (Très fréquent)
-  ],
-  /* IMPACT 4 ― Majeur */ [
-    RiskLevel.MEDIUM,
-    RiskLevel.HIGH,
-    RiskLevel.HIGH,
-    RiskLevel.VERY_HIGH,
-    RiskLevel.VERY_HIGH
-  ],
-  /* IMPACT 3 ― Modéré */ [
-    RiskLevel.MEDIUM,
-    RiskLevel.MEDIUM,
-    RiskLevel.HIGH,
-    RiskLevel.HIGH,
-    RiskLevel.VERY_HIGH
-  ],
-  /* IMPACT 2 ― Mineur */ [
-    RiskLevel.LOW,
-    RiskLevel.MEDIUM,
-    RiskLevel.MEDIUM,
-    RiskLevel.HIGH,
-    RiskLevel.HIGH
-  ],
-  /* IMPACT 1 ― Insignifiant */ [
-    RiskLevel.LOW,
-    RiskLevel.LOW,
-    RiskLevel.MEDIUM,
-    RiskLevel.MEDIUM,
-    RiskLevel.HIGH
-  ]
-];
-
-/* -------------------------------------------------------------- */
 @Component({
-  selector   : 'app-matrix',
-  standalone : true,
-  imports    : [CommonModule, FormsModule, MatTooltipModule],
+  selector: 'app-matrix',
+  standalone: true,
+  imports: [CommonModule, FormsModule, MatTooltipModule, MatrixSettingsComponent],
   templateUrl: './matrix.component.html',
-  styleUrls  : ['./matrix.component.scss']
+  styleUrls: ['./matrix.component.scss']
 })
 export class MatrixComponent {
+  @Input() modifPlan = true;
 
-  /* ========== Entrées / sorties ========== */
-  /** mode édition (true → on peut cliquer pour recolorer la matrice) */
-  @Input() modifPlan = false;
-
-  /** tableau de risques réels (impact 1-5, frequency 1-5, id, name…) */
-  @Input() set risks(value: any[]) {
+  @Input() set risks(value: RiskTemplate[]) {
     this._risks = this.arrayToMatrixMap(value);
   }
-  @Output() selectedRiskEvent = new EventEmitter<any>();
 
-  /* ========== données “vivantes” ========== */
-  rowLabels: string[] = [
-    'Catastrophique', 'Majeur', 'Modéré',
-    'Mineur', 'Insignifiant'
-  ];
-  colLabels: string[] = [
-    'Très rare', 'Rare', 'Occasionnel',
-    'Fréquent',  'Très fréquent'
-  ];
+  rowLabels: Range[] = [];
+  colLabels: Range[] = [];
 
-  /** Couleur cliquée dans la légende (mode édition) */
-  selectedColor = '';
+  updatedCells: any[] = [];
 
-  /** légende construite dynamiquement à partir de COLOR_MAP */
-  readonly colorLevels = Object.entries(COLOR_MAP).map(
-    ([lvl, color]) => ({
-      level : lvl as RiskLevel,
-      label : RiskLevelLabels[lvl as RiskLevel],
-      color
-    })
-  );
+  riskLevels: Set<any> = new Set();
 
-  /* ========== matrices prêtes à l’emploi dans le template ========== */
-  readonly matrixLevels = MATRIX_LEVELS;               // enum
-  readonly matrixColors = MATRIX_LEVELS.map(row =>     // hexa
-    row.map(lvl => COLOR_MAP[lvl])
-  );
+  _matrixData: any;
+  matrixLevels: any;
 
-  get reversedMatrixLevels() {         // pour affichage (impact 5 ↘︎ 1)
-    return [...this.matrixLevels];
-  }
-  get reversedMatrixColors() {
-    return [...this.matrixColors];
-  }
+  activeCell: any = null;
+  overlayPosition: any = {};
 
-  /* ================================================================ */
-  constructor(private dialog: MatDialog) {}
+  openColorOverlay(event: MouseEvent, cell: any) {
+    event.stopPropagation(); // éviter fermeture immédiate
+    this.activeCell = cell;
 
-  /** renvoie les styles d’une cellule */
-  cellStyle(lvl: RiskLevel){
-    return {
-      backgroundColor : COLOR_MAP[lvl],
-      border          : '1px solid #ccc',
-      width           : '60px',
-      height          : '60px',
-      cursor          : this.modifPlan ? 'pointer' : 'default',
-      position        : 'relative'
+    // Positionner l’overlay exactement là où la souris a cliqué
+    this.overlayPosition = {
+      top: `${event.clientY - 50}px`,
+      left: `${event.clientX}px`,
     };
   }
 
-  /** clic sur une cellule (édition de la couleur) */
-  setColor(row:number,col:number){
-    if (!this.modifPlan || !this.selectedColor) { return; }
-    const lvl = this.colorToLevel(this.selectedColor);
-    this.matrixLevels[row][col]  = lvl;
-    this.matrixColors[row][col]  = this.selectedColor;
+  selectColor(cell: any, risk: any) {
+    cell.riskLevel = risk;
+    this.updatedCells.push({ id: cell.id, riskLevel: { name: cell.riskLevel.name, color: cell.riskLevel.color } });
+    this.activeCell = null; // ferme l’overlay
   }
 
-  /** petite aide pour convertir couleur → enum */
-  private colorToLevel(color:string):RiskLevel{
-    return (Object.entries(COLOR_MAP)
-           .find(([_,c])=>c===color)?.[0] as RiskLevel) ?? RiskLevel.MEDIUM;
+  // ferme overlay si on clique en dehors
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    this.activeCell = null;
   }
 
-  /* ========== Gestion des risques contenus dans les cellules ========== */
-  /** stockage :  "row,col"  →  risk | risk[] */
-  private _risks: Record<string, any|any[]> = {};
+  @Input() set matrixData(value: any) {
 
-  private arrayToMatrixMap(arr:any[]){
-    const map: Record<string, any|any[]> = {};
+    this._matrixData = value;
+
+    this.buildMatrixFromCells(value.cells || []);
+  }
+
+  private dialog = inject(MatDialog);
+  private snackBarService = inject(SnackBarService);
+  private matrixService = inject(MatrixService);
+
+  @Output() selectedRiskEvent = new EventEmitter<any>();
+
+  selectedColor = '';
+
+  private buildMatrixFromCells(cells: any[]) {
+    if (!cells?.length) {
+      this.matrixLevels = [];
+      this.rowLabels = [];
+      this.colLabels = [];
+      return;
+    }
+
+    // Nombre de lignes = nb niveaux d'IMPACT = max(position.col)
+    const maxImpact = Math.max(...cells.map(c => c.position?.col ?? 1));
+    // Nombre de colonnes = nb niveaux de PROBABILITÉ = max(position.row)
+    const maxProb = Math.max(...cells.map(c => c.position?.row ?? 1));
+
+    // Matrice (on stocke l'objet cell complet)
+    const matrix: any[][] = Array.from({ length: maxImpact }, () =>
+      Array.from({ length: maxProb }, () => null)
+    );
+
+    // Labels
+    this.rowLabels = Array(maxImpact).fill('');
+    this.colLabels = Array(maxProb).fill('');
+
+    const riskMap = new Map<string, {color: string, level: string}>();
+
+    cells.forEach(cell => {
+      const key = `${cell.riskLevel.color}|${cell.riskLevel.level}`;
+      if (!riskMap.has(key)) {
+        riskMap.set(key, cell.riskLevel);
+      }
+      // ⚠️ swap : rowIndex = impact (col), colIndex = probabilité (row)
+      const rowIdx = (cell.position.col ?? 1) - 1; // lignes = IMPACT
+      const colIdx = (cell.position.row ?? 1) - 1; // colonnes = PROBABILITÉ
+
+      if (rowIdx >= 0 && rowIdx < maxImpact && colIdx >= 0 && colIdx < maxProb) {
+        matrix[rowIdx][colIdx] = cell;
+        // Remplir les labels si absents
+        if (!this.rowLabels[rowIdx]) this.rowLabels[rowIdx] = cell.severite ?? '';
+        if (!this.colLabels[colIdx]) this.colLabels[colIdx] = cell.frequence ?? '';
+      }
+    });
+
+    this.riskLevels = new Set(riskMap.values());
+    this.matrixLevels = matrix.reverse();
+  }
+
+  /* ===================== HELPERS ===================== */
+  private cellKey(row: number, col: number): string {
+    return `${row},${col}`;
+  }
+
+  private buildLabels(matrixId: string) {
+    return [
+      ...this.rowLabels.map((label, i) => ({
+        label,
+        labelType: 'row',
+        matrix: matrixId,
+        position: this.rowLabels.length - i
+      })),
+      ...this.colLabels.map((label, i) => ({
+        label,
+        labelType: 'col',
+        matrix: matrixId,
+        position: i + 1
+      }))
+    ];
+  }
+
+  cellStyle(cell: any) {
+    // si le backend t’envoie déjà la couleur (ex: cell.riskLevel.color), utilise-la :
+    const bg = cell.riskLevel.color;
+    return {
+      backgroundColor: bg,
+      border: '1px solid #ccc',
+      width: '60px',
+      height: '60px',
+      position: 'relative',
+      cursor: this.modifPlan ? 'pointer' : 'default',
+    };
+  }
+
+  setColor(cell: any) {
+    if (!this.modifPlan || !this.selectedColor) return;
+    this.matrixLevels[cell.position.row][cell.position.col] = null;
+  }
+
+  /* ===================== RISKS ===================== */
+  private _risks: Record<string, any | any[]> = {};
+
+  private arrayToMatrixMap(arr: RiskTemplate[]) {
+    const map: Record<string, any | any[]> = {};
 
     arr.forEach(risk => {
-      // S’il n’a pas .impact /.frequency on regarde la dernière évaluation
-      let impact    = risk.impact;
-      let frequency = risk.frequency;
+      let impact = 0;
+      // let frequency = risk.dmr.at(-1)?.probability;
+      let frequency = risk.riskBrut![0].probability;
 
       if (!impact || !frequency) {
-        const last = risk.riskEvaluations?.at(-1);
+        // const last = risk.dmr?.at(-1);
+        const last = risk.riskBrut![0];
         if (last) {
-          frequency = Math.ceil(last.probability / 2);             // 1-5
-          impact    = RiskLevelScores[last.riskNet as RiskLevel];  // 1-5
+          frequency = Math.ceil((last.probability ?? 1) / 2);
+          impact = RiskLevelScores[last.evaluation.name];
         }
       }
 
       if (impact && frequency) {
-        const key = `${impact-1},${frequency-1}`;
-        map[key] = map[key]
-          ? ([] as any[]).concat(map[key]).concat(risk)
-          : risk;
+        const key = this.cellKey(impact - 1, frequency - 1);
+        map[key] = map[key] ? ([] as any[]).concat(map[key], risk) : risk;
       }
     });
 
     return map;
   }
 
-  /** retourne { id , name } ou  { id:"+3" , name:"Cliquez…" } */
-  cellRiskInfo(row:number,col:number){
-    const key = `${row},${col}`;
-    const data = this._risks[key];
-    if (!data) { return { id:'', name:'' }; }
+  cellRiskInfo(row: number, col: number) {
+    const data = this._risks[this.cellKey(row, col)];
+    if (!data) return { id: '', name: '' };
 
-    if (Array.isArray(data)){
-      return { id:'+'+data.length, name:'Cliquez pour voir les risques' };
-    }
-    return { id:data.reference , name:data.name };
+    return Array.isArray(data)
+      ? { id: '+' + data.length, name: 'Cliquez pour voir les risques' }
+      : { id: data.reference, name: data.name };
   }
 
-  /** clic sur le “badge” d’une cellule */
-  onRiskClick(row:number,col:number){
-    const key = `${row},${col}`;
-    const data = this._risks[key];
-    if (!data) { return; }
+  concat(row: number, col: number) {
+    const id = this.cellRiskInfo(row, col).id; // ex: "CON_2025_001"
+    const afterLastUnderscore = id.split('_').pop();
+    return "R" + Number(afterLastUnderscore);
+  }
 
-    if (Array.isArray(data)){
-      /* ouvre la boîte de dialogue pour choisir un risque */
-      const ref = this.dialog.open(RiskSelectionDialogComponent,{
-        width:'400px',
-        data : { risks: data }
+  onRiskClick(cell: any) {
+    const data = this._risks[this.cellKey(cell.position.row, cell.position.col)];
+    if (!data) return;
+
+    if (Array.isArray(data)) {
+      const ref = this.dialog.open(RiskSelectionDialogComponent, {
+        width: '400px',
+        data: { risks: data }
       });
-      ref.afterClosed().subscribe(risk=>{
-        if (risk){ this.selectedRiskEvent.emit(risk); }
+      ref.afterClosed().subscribe(risk => {
+        if (risk) this.selectedRiskEvent.emit(risk);
       });
     } else {
       this.selectedRiskEvent.emit(data);
     }
   }
 
-  /* ========== utilitaires de gabarit ========== */
-/** TrackBy qui se contente de retourner l’index */
-  trackByIdx = (index: number, _item: any): number => index;
-  displayRowIdx = (i:number)=> this.matrixLevels.length-1-i;
+  /* ===================== SAVE ===================== */
+  saveMatrix() {
+    console.log(this.updatedCells);
+    this.matrixService.updateCells(this.updatedCells).subscribe(_ => {
+      this.snackBarService.success("La matrice a bien été mise à jour");
+    });
+    // const matrixId = this._matrixData.id || '';
+    // const labels = this.buildLabels(matrixId);
+
+    // const cells = this.matrixLevels.flatMap((row, rowIdx) =>
+    //   row.map((riskLevel, colIdx) => ({
+    //     matrix: matrixId,
+    //     rowPosition: rowIdx + 1,
+    //     colPosition: colIdx + 1,
+    //     riskLevel,
+    //     colorHex: this.levelToColor(riskLevel)
+    //   }))
+    // );
+
+    // const payload = { id: matrixId, labels, cells };
+
+    // this.matrixService.saveMatrix(payload).subscribe({
+    //   next: resp => this.snackBarService.success("La matrice a bien été sauvegardée"),
+    //   error: err => this.snackBarService.error("Une erreur est survenu")
+    // });
+  }
+
+  /* ===================== TRACKERS ===================== */
+  trackByIdx = (index: number): number => index;
+  displayRowIdx = (i: number) => this.matrixLevels.length - 1 - i;
 }

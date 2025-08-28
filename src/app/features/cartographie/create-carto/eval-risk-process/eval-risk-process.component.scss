@@ -1,0 +1,121 @@
+.impact-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Cartes */
+.card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.big-card {
+  background: #f5f9ff; /* bleu clair */
+}
+
+.big-card h3 {
+  margin-bottom: 16px;
+}
+
+.levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.level {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.level select {
+  margin-top: 6px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* Badges */
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.faible { background: #d4f8e8; color: #1c8a4a; }
+.modéré { background: #fff3cd; color: #856404; }
+.significatif { background: #ffe0b2; color: #d35400; }
+.élevé { background: #f8d7da; color: #a71d2a; }
+.critique { background: #f5b7b1; color: #7b241c; }
+
+/* Petites cartes */
+.grid {
+  display: flex;
+  gap: 16px;
+}
+
+.small-card {
+  flex: 1;
+  padding: 16px;
+}
+
+.small-card h4 {
+  margin-bottom: 12px;
+}
+
+.small-card label {
+  font-size: 13px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  display: block;
+  color: #555;
+}
+
+.small-card select {
+  width: 100%;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* Couleurs */
+.purple { background: #f9f4ff; }
+.yellow { background: #fff8e6; }
+.red { background: #fff1f1; }
+
+/* Boutons */
+.actions {
+  display: flex;
+  justify-content: right;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.prev {
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.btn.save {
+  background: #28a745;
+  color: #fff;
+}
+
+.btn.save:hover {
+  background: #218838;
+}

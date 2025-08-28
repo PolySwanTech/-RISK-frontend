@@ -4,61 +4,40 @@
 </div>
 
 <div class="timeline-container">
-    <!-- <h2>Suivi de l’incident - {{incident.title}}</h2> -->
 
-    <div *ngIf="history.length === 0" class="empty">
-        <mat-icon>history</mat-icon> Aucun historique disponible.
-    </div>
+    <mat-vertical-stepper [linear]="false" #stepper>
+        <mat-step *ngFor="let entry of history" [completed]="true" [editable]="false">
 
-    <div class="timeline">
-        <div class="timeline-item" *ngFor="let entry of history">
-            <!-- <div class="timeline-icon" [ngClass]="entry.action.toLowerCase()">
-                <mat-icon>
-                    {{
-                    entry.action === 'CREATION' ? 'add_circle' :
-                    entry.action === 'MODIFICATION' ? 'edit' :
-                    entry.action === 'IMPACT_ADDED' ? 'track_changes' :
-                    'delete'
-                    }}
-                </mat-icon>
-            </div> -->
+            <ng-template matStepLabel>
+                <div class="timeline-content mat-elevation-z2">
+                    <!-- Icône personnalisée -->
 
 
-            <div class="timeline-content mat-elevation-z2">
-                <div class="header">
-                    <strong>{{ entry.action }}</strong>
-                    <span class="meta">
-                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
-                    </span>
+                    <div class="header">
+                        <mat-icon class="timeline-icon">
+                            {{
+                            entry.action.toLowerCase().includes("création") ? 'add_circle' :
+                            entry.action.toLowerCase().includes("modi") ? 'edit' :
+                            entry.action.toLowerCase().includes("ajouté") ? 'track_changes' :
+                            entry.action.toLowerCase().includes("message") ? 'message' :
+                            'delete'
+                            }}
+                        </mat-icon>
+                        <span class="meta">
+                            Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
+                        </span>
+                    </div>
+                    <div class="header">
+                        <strong>{{ entry.action }}</strong>
+                    </div>
+
+                    <label>Commentaires : </label>
+                    <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
                 </div>
+            </ng-template>
 
-                <label>Commentaires : </label>
-                <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
+        </mat-step>
+    </mat-vertical-stepper>
 
-            </div>
-
-        </div>
-    </div>
 </div>
-
-<mat-vertical-stepper [linear]="false" #stepper>
-    <mat-step *ngFor="let entry of history">
-
-        <ng-template matStepLabel>
-            <div class="timeline-content mat-elevation-z2">
-                <div class="header">
-                    <strong>{{ entry.action }}</strong>
-                    <span class="meta">
-                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
-                    </span>
-                </div>
-
-                <label>Commentaires : </label>
-                <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
-
-            </div>
-        </ng-template>
-
-    </mat-step>
-</mat-vertical-stepper>
 }

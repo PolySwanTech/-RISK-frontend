@@ -202,7 +202,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     /* empêche le retour à la ligne */
-    justify-content: space-between;
+    justify-content: start;
     gap: 15px;
     margin-top: 10px;
     overflow-x: auto;

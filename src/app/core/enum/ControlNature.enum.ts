@@ -1,0 +1,5 @@
+export enum ControlNature {
+  DOCUMENTAIRE = 'DOCUMENTAIRE',
+  PHYSIQUE = 'PHYSIQUE',
+  AUTOMATISE = 'AUTOMATISE'
+}

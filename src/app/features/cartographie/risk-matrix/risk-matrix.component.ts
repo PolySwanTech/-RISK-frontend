@@ -1,96 +1,81 @@
-import { CommonModule }           from '@angular/common';
-import { Component, Input, Output,
-         EventEmitter, 
-         OnChanges,
-         SimpleChanges}           from '@angular/core';
-import { MatCardModule }          from '@angular/material/card';
-import { MatButtonModule }        from '@angular/material/button';
-import { MatIconModule }          from '@angular/material/icon';
-import { RiskLevelLabels, RiskLevel, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { RiskLevelLabels, RiskLevel } from '../../../core/enum/riskLevel.enum';
 import { Process } from '../../../core/models/Process';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 
-
 @Component({
-  selector   : 'app-risk-matrix',
-  standalone : true,
-  imports    : [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  selector: 'app-risk-matrix',
+  standalone: true,
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
   templateUrl: './risk-matrix.component.html',
-  styleUrls  : ['./risk-matrix.component.scss']
+  styleUrls: ['./risk-matrix.component.scss']
 })
 export class RiskMatrixComponent {
-  
+
   /* ----------- entrée/sortie ----------- */
-  @Input()  riskData: RiskTemplate | null = null;  
-  @Input() processMap: Record<string,Process> = {};
+  @Input() riskData: RiskTemplate | null = null;
+  @Input() processMap: Record<string, Process> = {};
   @Output() onModify = new EventEmitter<string>();
-  
+
   /* ----------- actions ----------- */
   onModifyClick(): void {
-    this.onModify.emit(this.riskData!.id.id);
+    if (this.riskData?.id?.id) {
+      this.onModify.emit(this.riskData.id.id);
+    }
   }
 
   /* ----------- helpers d’affichage ----------- */
-  /** Libellé lisible du niveau (High, Low, …) */
-  get riskLabel(): string {
-    return RiskLevelLabels[this.riskData!.riskBrut as RiskLevel] ?? 'Unknown';
+  /** Dernière évaluation brute */
+  private get lastEvalBrute() {
+    return this.riskData?.riskBrut?.at(-1) ?? null;
   }
 
-  get process(): Process | undefined {
-    return this.processMap[this.riskData!.processId];
+   private get lastEvalNette() {
+    return this.riskData?.riskNet?.at(-1) ?? null;
+  }
+
+  /** Libellé lisible du niveau (High, Low, …) */
+  get riskBrut(): string {
+    const level = this.lastEvalBrute?.evaluation as RiskLevel | undefined;
+    return level ? RiskLevelLabels[level.name] ?? 'Unknown' : 'N/R';
   }
 
   get buName(): string {
-    return this.process?.buName ?? 'Inconnu';
+    return this.riskData?.buName ?? 'Inconnu';
   }
 
   get processName(): string {
-    return this.process?.name ?? 'Inconnu';
+    return this.riskData?.processName ?? 'Inconnu';
   }
 
   /** Classe CSS : level-low | level-high … */
-  get riskClass(): string {
-    return 'level-' + (this.riskData!.riskBrut as string).toLowerCase();
+  get riskNet(): string {
+    this.riskData?.riskNet?.at(-1)
+    const level = this.lastEvalNette?.evaluation as string | undefined;
+    return level ? 'level-' + level.toLowerCase() : 'N/R';
   }
 
-  getProbabilityText(): string {
-
-  const lastEval = this.riskData!.riskEvaluations?.at(-1);
-
-  if (!lastEval) {
-    return '—';
-  }
-
-  let prob = 0
-  
-  if(lastEval.probability! % 2 != 0){
-    prob = (lastEval.probability! + 1)/ 2;
-  }
-  else{
-    prob = lastEval.probability! / 2;
-  }
-  
-  const label = this.frequencyLabel(prob);
-
-  return `${label} (${prob}/5)`;
-}
-
-  getImpactText(): string {
-    const lastEval = this.riskData!.riskEvaluations?.at(-1);
-    if (!lastEval) {                     // aucun historique
-      return '—';
+  /** Premier contrôle si dispo */
+  get control(): string {
+    if (this.riskData?.dmr?.controls && this.riskData.dmr.controls.length > 0) {
+      const c = this.riskData.dmr.controls[0];
+      return `${c.reference} - ${c.libelle}`;
     }
-
-    const level  = lastEval.riskNet as RiskLevel;
-    const label  = RiskLevelLabels[level] ?? 'Unknown';
-    const score  = RiskLevelScores[level] ?? '∅';
-
-    return `${label} (${score}/5)`;
+    return 'Non renseigné';
   }
+
+  getFrequency(): string {
+    return '—'; // il faut recalculer à partir des incidents qui ont eu ce risque ? 
+  }
+
 
   /* ----------- mapping internes ----------- */
-  private frequencyLabel(v:number){
-    switch (v){
+  private frequencyLabel(v: number) {
+    switch (v) {
       case 1: return 'Très rare';
       case 2: return 'Rare';
       case 3: return 'Occasionnel';
@@ -99,8 +84,9 @@ export class RiskMatrixComponent {
       default: return 'Inconnu';
     }
   }
-  private impactLabel(v:number){
-    switch (v){
+
+  private impactLabel(v: number) {
+    switch (v) {
       case 1: return 'Insignifiant';
       case 2: return 'Mineur';
       case 3: return 'Modéré';

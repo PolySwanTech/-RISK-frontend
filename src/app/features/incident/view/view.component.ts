@@ -1,4 +1,4 @@
-import { Component, inject, Input, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -7,60 +7,47 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateImpactPopUpComponent } from '../impact/create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
-import { Impact, ImpactCreateDto } from '../../../core/models/Impact';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
+import { CommonModule, DatePipe } from '@angular/common';
 import { SuiviIncident } from '../../../core/models/SuiviIncident';
-import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { State } from '../../../core/enum/state.enum';
-import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
-import { ImpactService } from '../../../core/services/impact/impact.service';
-import { ImpactCardComponent } from '../impact/impact-card/impact-card.component';
-import { ListImpactComponent } from '../impact/list-impact/list-impact.component';
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
-
-// Interface pour les fichiers attachés
-interface AttachedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  uploadedAt: Date;
-  url?: string;
-}
+import { ImpactService } from '../../../core/services/impact/impact.service';
+import { saveAs } from 'file-saver';
+import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
+import { error } from 'jquery';
 
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule, ListImpactComponent,
+    MatGridListModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
     FichiersComponent, ListSuiviComponent],
   templateUrl: './view.component.html',
-  styleUrl: './view.component.scss',
-  providers: [
-    { provide: LOCALE_ID, useValue: 'fr' }
-  ]
+  styleUrl: './view.component.scss'
 })
 export class ViewComponent implements OnInit {
+[x: string]: any;
   private incidentService = inject(IncidentService);
+  private actionPlanService = inject(ActionPlanService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private entitiesService = inject(EntitiesService);
+  private impactService = inject(ImpactService);
+
 
   incident: Incident | undefined
   userRole: string | undefined;
@@ -69,13 +56,11 @@ export class ViewComponent implements OnInit {
   idIncident: string = "";
   suivi: SuiviIncident[] = []
 
-  // Propriétés pour la gestion des fichiers
-  attachedFiles: AttachedFile[] = [];
-  isDragOver = false;
-
-  businessUnits: EntiteResponsable[] = [];
+  businessUnits: BusinessUnit[] = [];
 
   goBackButtons: GoBackButton[] = [];
+
+  totalAmount = 0;
 
   ngOnInit(): void {
     this.entitiesService.loadEntities().subscribe(entities => {
@@ -83,6 +68,12 @@ export class ViewComponent implements OnInit {
     });
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident)
+
+    if (this.idIncident) {
+      this.impactService.sum(this.idIncident).subscribe(
+        result => this.totalAmount = result
+      )
+    }
   }
 
   async loadIncident(id: string) {
@@ -97,11 +88,18 @@ export class ViewComponent implements OnInit {
         action: () => this.addActionPlan()
       },
       {
-        label: 'Exporter',
+        label: 'Export Excel',
         icon: 'file_download',
         class: 'btn-green',
         show: true,
         action: () => this.downloadExport()
+      },
+      {
+        label: 'Fiche Incident (PDF)',
+        icon: 'description',
+        class: 'btn-green',
+        show: true,
+        action: () => this.downloadPDF()
       },
       {
         label: 'Clôturer',
@@ -109,7 +107,8 @@ export class ViewComponent implements OnInit {
         class: 'btn-red',
         show: this.canClose(),
         action: () => this.closeIncident()
-      }
+      },
+
     ];
   }
 
@@ -184,19 +183,78 @@ export class ViewComponent implements OnInit {
       return;
     }
 
-    let choice = confirm("Créer un plan d'action ou consulter un plan d'action existant ?")
-    if (choice) {
-      this.dialog.open(CreateActionPlanDialogComponent, {
-        width: '400px',
-        data: {
-          incidentId: this.incident.id,
-          reference: this.incident.reference
+    this.actionPlanService.getActionPlanByIncident(this.incident.id).subscribe(
+      {
+        next: actionPlan => {
+          if (actionPlan) {
+            this.confirmService.openConfirmDialog("Plan d'action existant", "Un plan d'action existe déjà pour cet incident.", true).subscribe(
+              value => {
+                if (value) {
+                  this.router.navigate(['action-plan', actionPlan.id]);
+                }
+              }
+            );
+          }
+        },
+        error: _ => {
+          this.confirmService.openConfirmDialog("Créer un plan d'action", "Voulez-vous créer un plan d'action pour cet incident ?", true).subscribe(
+            value => {
+              if (value) {
+                if (this.incident) {
+                  this.dialog.open(CreateActionPlanDialogComponent, {
+                    width: '800px !important',
+                    height: '550px',
+                    minWidth: '800px',
+                    maxWidth: '800px',
+                    data: {
+                      incidentId: this.incident.id,
+                      reference: this.incident.reference
+                    }
+                  })
+                }
+              }
+            }
+          );
         }
-      })
+      });
+  }
+
+  getLineColor(from: Date | string, to: Date | string): string {
+    const date1 = new Date(from);
+    const date2 = new Date(to);
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 30) {
+      return 'green';
+    } else if (diffDays < 60) {
+      return 'orange';
+    } else {
+      return 'red';
     }
-    else {
-      this.router.navigate(['action-plan', 'create', this.incident.id]);
-    }
+  }
+
+  getDaysDiff(from: Date | string, to: Date | string): number {
+    const date1 = new Date(from);
+    const date2 = new Date(to);
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  addImpact() {
+    this.router.navigate(['incident', this.idIncident, 'impacts']);
+  }
+
+  downloadPDF(): void {
+    if (!this.incident?.id) return;
+    this.incidentService.downloadPDF(this.incident.id).subscribe({
+      next: (blob) => {
+        const ref = this.incident?.reference ?? this.incident?.id;
+        const pdf = new Blob([blob], { type: 'application/pdf' });
+        saveAs(pdf, `FICHE_INCIDENT_${ref}.pdf`);
+      },
+      error: (err) => console.error('Erreur export PDF :', err)
+    });
   }
 
 }

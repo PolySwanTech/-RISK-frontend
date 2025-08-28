@@ -55,6 +55,13 @@ export class PlanActionPageComponent {
     icon: 'tag' // 🏷️
   },
   {
+    columnDef: 'ref_incident',
+    header: 'Référence Incident',
+    cell: (element: ActionPlan) => `${element.incidentRef ?? 'N/A'}`,
+    filterType: 'text',
+    icon: 'tag' // 🏷️
+  },
+  {
     columnDef: 'libelle',
     header: 'Titre',
     cell: (element: ActionPlan) => `${element.libelle}`,
@@ -232,7 +239,7 @@ export class PlanActionPageComponent {
 
   // This method will be triggered when a row is clicked
   onRowClick(actionPlan: ActionPlan) {
-    this.router.navigate(['action-plan', actionPlan.actionPlanId.id]);
+    this.router.navigate(['action-plan', actionPlan.id]);
   }
 
   applyAllFilters(): void {
@@ -314,10 +321,10 @@ export class PlanActionPageComponent {
 
   add() {
     this.dialog.open(CreateActionPlanDialogComponent, {
-      width: '600px !important',
+      width: '800px !important',
       height: '550px',
-      minWidth: '600px',
-      maxWidth: '600px',
+      minWidth: '800px',
+      maxWidth: '800px',
     });
   }
 

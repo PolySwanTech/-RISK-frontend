@@ -8,7 +8,7 @@ import { Impact, ImpactCreateDto } from '../../models/Impact';
 })
 export class ImpactService {
 
- baseUrl = environment.apiUrl + '/incidents'
+ baseUrl = environment.apiUrl + '/impacts'
 
   http = inject(HttpClient);
 
@@ -16,14 +16,18 @@ export class ImpactService {
   sum(id: string) {
     let params = new HttpParams();
     params = params.set("incidentId", id);
-    return this.http.get<number>(this.baseUrl + '/impact/sum', { params: params })
+    return this.http.get<number>(this.baseUrl + '/sum', { params: params })
   }
 
-  addImpact(impact: ImpactCreateDto, message : string) {
-    return this.http.post(this.baseUrl + '/impact', { impact, message })
+  addImpact(operatingLoss: ImpactCreateDto, message : string) {
+    return this.http.post(this.baseUrl, { operatingLoss, message })
   }
 
   getImpactByIncidentId(id: string) {
-    return this.http.get<Impact[]>(`${this.baseUrl}/impact`, { params: { incidentId: id } });
+    return this.http.get<Impact[]>(`${this.baseUrl}`, { params: { incidentId: id } });
+  }
+
+  sumByProcess(processId : string){
+    return this.http.get<number>(`${this.baseUrl}/sum`, { params: { processId: processId } })
   }
 }

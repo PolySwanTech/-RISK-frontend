@@ -9,7 +9,7 @@ import { Consequence } from '../../models/Consequence';
 })
 export class ConsequenceService {
   private http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/incidents/consequences';
+  private baseUrl = `${environment.apiUrl}/consequences`;
 
   getAll(): Observable<Consequence[]> {
     return this.http.get<Consequence[]>(this.baseUrl);

@@ -10,7 +10,7 @@ import { BaloiseCategoryEnum } from '../../enum/baloisecategory.enum';
 
 export class RiskCategoryService {
   private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}/risks/categories`;
+  private baseUrl = `${environment.apiUrl}/categories`;
 
   getAll(): Observable<BaloiseCategoryEnum[]> {
     return this.http.get<BaloiseCategoryEnum[]>(this.baseUrl);

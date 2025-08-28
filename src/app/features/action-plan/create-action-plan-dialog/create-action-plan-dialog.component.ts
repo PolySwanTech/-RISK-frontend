@@ -1,13 +1,13 @@
 import { Component, Inject, inject, OnInit } from '@angular/core';
 import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/ActionPlan';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { Priority, priorityLabels } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -17,6 +17,8 @@ import { Router } from '@angular/router';
 import { Status } from '../../../core/enum/status.enum';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { RiskService } from '../../../core/services/risk/risk.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -28,7 +30,8 @@ import { RiskService } from '../../../core/services/risk/risk.service';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule, MatButtonModule, ReactiveFormsModule],
+    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule
+  ],
   templateUrl: './create-action-plan-dialog.component.html',
   styleUrl: './create-action-plan-dialog.component.scss'
 })
@@ -42,7 +45,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private router = inject(Router);
   priorities = Object.values(Priority);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference : string }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference: string }
   ) { }
 
   listTeams: Equipe[] = [];
@@ -50,9 +53,8 @@ export class CreateActionPlanDialogComponent implements OnInit {
   risks: RiskTemplate[] = [];
 
   actionPlan: ActionPlan = new ActionPlan(
-    '', new Date(), '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', null, '', new Date()
-  );
+    '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
+    '', '', null, '', new Date());
 
   actions: Action[] = []
 
@@ -62,10 +64,20 @@ export class CreateActionPlanDialogComponent implements OnInit {
   }
 
   getRisk() {
+  if (this.data && this.data.incidentId) {
+    // Récupère le risque de l'incident
+    this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
+      this.actionPlan.taxonomie = risk;
+      // Ici, on met à jour la liste des risques pour afficher l'élément de l'incident
+      this.risks = [risk]; // Si tu veux que la liste contienne uniquement ce risque
+    });
+  } else {
+    // Si pas d'incident, récupère tous les risques
     this.riskService.getAll().subscribe(data => {
       this.risks = data;
     });
   }
+}
 
 
   fetchTeams(): void {
@@ -104,13 +116,13 @@ export class CreateActionPlanDialogComponent implements OnInit {
     const incidentId = this.data?.incidentId ?? undefined;
 
     const dto: ActionPlanCreateDto = {
-      libelle      : this.actionPlan.libelle,
-      description  : this.actionPlan.description,
-      status       : this.actionPlan.status,
-      priority     : this.actionPlan.priority,
-      echeance     : this.actionPlan.echeance,
-      userInCharge : this.actionPlan.userInCharge,
-      taxonomieId  : this.actionPlan.taxonomie?.id.id ?? null,
+      libelle: this.actionPlan.libelle,
+      description: this.actionPlan.description,
+      status: this.actionPlan.status,
+      priority: this.actionPlan.priority,
+      echeance: this.actionPlan.echeance,
+      userInCharge: this.actionPlan.userInCharge,
+      taxonomieId: this.actionPlan.taxonomie?.id.id ?? null,
       incidentId               // undefined si pas d’incident
     };
 

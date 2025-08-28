@@ -11,7 +11,7 @@ import { Role } from '../../models/TeamMember';
 export class RoleService {
 
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl + '/users/roles';
+  private baseUrl = environment.apiUrl + '/roles';
 
   getAllRoles(): Observable<Role[]> {
     return this.http.get<Role[]>(`${this.baseUrl}`);

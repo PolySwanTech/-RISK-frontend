@@ -158,17 +158,6 @@ mat-card-content {
 }
 
 
-@media (max-width: 768px) {
-  .impacts-container {
-    flex-direction: column;
-  }
-
-  app-impact-card {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-}
-
 .info-container {
   display: flex;
   flex-direction: column;
@@ -182,25 +171,7 @@ mat-card-content {
     width: 100%;
   }
 
-  @media (max-width: 1300px) {
-    flex-direction: column;
-
-    >div {
-      height: auto;
-    }
-
-  }
-}
-
-.info2-container {
-  display: flex;
-  height: auto;
-  gap: 20px;
-
-  mat-card {
-    flex: 1;
-  }
-
+ 
 }
 
 .comment-card {
@@ -259,17 +230,6 @@ mat-card-content {
 
 .display {
   display: block;
-}
-
-@media (min-width: 1830px) {
-  .none {
-    display: block;
-  }
-
-  .display {
-    display: none;
-  }
-
 }
 
 .view-container {
@@ -407,10 +367,18 @@ mat-card-content {
   .line-gradient {
     flex: 1;
     height: 4px;
-    background: linear-gradient(to right, red, orange, green);
     border-radius: 2px;
-    min-width: 60px;
-    max-width: 150px;
+    width: 150px;
+    transition: background 0.3s ease;
+  }
+
+  .days-diff {
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom : 5px;
+    color: #555;
   }
 }
 
@@ -437,7 +405,7 @@ mat-card-content {
 }
 
 .description-content {
-  background: #f8f9fa;
+  background: white;
   padding: 20px;
   height: 50%;
   border-radius: 8px;
@@ -451,4 +419,28 @@ mat-card-content {
   line-height: 1.6;
   color: #495057;
   white-space: pre-wrap;
+}
+
+.general-info-card{
+  background-color: white;
+}
+
+// Ajoutez ces styles à votre fichier view.component.scss existant
+
+.btn-orange {
+  background-color: #ff9800 !important;
+  color: white !important;
+  
+  &:hover {
+    background-color: #f57c00 !important;
+  }
+}
+
+.btn-green {
+  background-color: #4caf50 !important;
+  color: white !important;
+  
+  &:hover {
+    background-color: #388e3c !important;
+  }
 }
