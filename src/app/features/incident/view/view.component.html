@@ -73,17 +73,17 @@
                             <div class="info-pairs-grid">
                                 <div class="info-field">
                                     <label>Localisation</label>
-                                    <div class="info-box">{{ incident.location }}</div>
+                                    <div class="info-box">{{ incident.location ? incident.location : 'N/R' }}</div>
                                 </div>
 
                                 <div class="info-field">
                                     <label>Cause</label>
-                                    <div class="info-box">{{ incident.cause.name }}</div>
+                                    <div class="info-box">{{ incident.cause ? incident.cause.name : 'N/R' }}</div>
                                 </div>
 
                                 <div class="info-field">
                                     <label>Type de risque</label>
-                                    <div class="info-box">{{ incident.riskName }}</div>
+                                    <div class="info-box">{{ incident.riskName ? incident.riskName : 'N/R' }}</div>
                                 </div>
 
                                 <div class="info-field">
@@ -94,6 +94,11 @@
                                 <div class="info-field">
                                     <label>Libellé</label>
                                     <div class="info-box">{{ incident.title }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Entité Responsable</label>
+                                    <div class="info-box">{{ incident.teamName }}</div>
                                 </div>
                             </div>
                         </mat-card-content>

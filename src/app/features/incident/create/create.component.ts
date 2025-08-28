@@ -23,7 +23,7 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
-import { forkJoin, map, tap } from 'rxjs';
+import { firstValueFrom, forkJoin, map, Subscription, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
@@ -121,21 +121,20 @@ export class CreateComponent implements OnInit {
   processService = inject(ProcessService);
 
 
-  ngOnInit(): void {
-    const teamName = this.getUserTeamFromToken();
+  async ngOnInit(): Promise<void> {
+    this.hasTeam = false;
 
+    
+    // D'abord charger les équipes
+    await this.fetchTeams();
+    
+    // Ensuite charger l'incident ou l'arbre
     if (this.incidentId) {
       this.title = "Modification d'un incident";
       this.loadIncident(this.incidentId);
+      console.log()
     } else {
       this.loadTrees().subscribe();
-    }
-    if (teamName) {
-      this.hasTeam = true;
-      this.incidentForm1.patchValue({ teamId: teamName });
-    } else {
-      this.hasTeam = false;
-      this.fetchTeams();
     }
   }
 
@@ -160,6 +159,8 @@ export class CreateComponent implements OnInit {
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
+      console.log(incident)
+      console.log(this.listTeams)
       this.incidentForm1.patchValue({
         reference: incident.reference,
         titre: incident.title,
@@ -212,15 +213,10 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('riskId')?.setValue(value.id);
   }
 
-  fetchTeams(): void {
-    this.equipeService.getAllEquipes().subscribe({
-      next: teams => {
-        this.listTeams = teams.filter(team => team.process && team.process.length > 0);
-      },
-      error: err => {
-        console.error("Erreur lors du chargement des équipes", err);
-      }
-    });
+  fetchTeams(): Promise<any> {
+    return firstValueFrom(this.equipeService.getAllEquipes().pipe(
+      tap((teams) => this.listTeams = teams)
+    ));
   }
 
   getUserTeamFromToken(): string | null {

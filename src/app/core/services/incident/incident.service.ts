@@ -28,7 +28,7 @@ export class IncidentService {
   }
 
   getIncidentById(id: string): Observable<Incident> {
-    return this.http.get<any>(this.baseUrl + '/' + id);
+    return this.http.get<Incident>(this.baseUrl + '/' + id);
   }
 
   saveIncident(incident: any): Observable<any> {

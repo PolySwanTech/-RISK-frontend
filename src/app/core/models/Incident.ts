@@ -22,6 +22,7 @@ export class Incident {
     cause : Cause;
     process: string ;
     teamId?: string;
+    teamName?: string;
 
     impacts: Impact[];
 
