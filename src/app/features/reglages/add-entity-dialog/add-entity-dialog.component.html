@@ -12,7 +12,7 @@
       <mat-slide-toggle formControlName="lm" />
     </div>
   </form>
-  <app-select-entities [entiteEnfantId]=" data ? data.id : ''" [selectId]="entiteResponsable.parentId ? entiteResponsable.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>
+  <app-select-entities [entiteEnfantId]=" data ? data.id : ''" [selectId]="BusinessUnit.parentId ? BusinessUnit.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>
   <div class="actions">
     <button mat-raised-button class="btn-red" (click)="goBack()">Retour</button>
     <button mat-raised-button class="btn-primary" [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>

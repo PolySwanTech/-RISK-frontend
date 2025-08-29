@@ -2,11 +2,14 @@ import { NgFor } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CalculService } from '../../core/services/calcul/calcul.service';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-calcul-input-parameters',
   standalone: true,
-  imports: [FormsModule, NgFor],
+  imports: [FormsModule, NgFor, NgChartsModule, MatInputModule],
   templateUrl: './calcul-input-parameters.component.html',
   styleUrl: './calcul-input-parameters.component.scss'
 })
@@ -26,6 +29,7 @@ export class CalculInputParametersComponent {
     { name: 'resultat_net_portefeuille_negociation', label: "Résultat net portefeuille négociation" },
     { name: 'resultat_net_portefeuille_bancaire', label: "Résultat net portefeuille bancaire" },
   ];
+
   years = Array.from({ length: 10 }, (_, i) => 2015 + i);
 
   formData: any = {
@@ -33,6 +37,41 @@ export class CalculInputParametersComponent {
     ratio_cet1: 8.0,
     exemption_ilm: false
   };
+
+  // Configuration du graphique
+  lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: this.years.map(String),
+    datasets: [
+      {
+        label: 'Pertes annuelles (€)',
+        data: [],
+        borderColor: '#3f51b5',
+        backgroundColor: 'rgba(63,81,181,0.3)',
+        fill: true,
+        tension: 0.3
+      }
+    ]
+  };
+
+  lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: { display: true }
+    }
+  };
+
+  updateChart() {
+  // On crée une nouvelle référence pour déclencher le redraw
+  this.lineChartData = {
+    ...this.lineChartData,
+    datasets: [
+      {
+        ...this.lineChartData.datasets[0],
+        data: this.years.map(year => this.formData.pertes_annuelles[year] || 0)
+      }
+    ]
+  };
+}
 
   importData() {
     alert("Import de données pas encore implémenté");
@@ -46,7 +85,7 @@ export class CalculInputParametersComponent {
     this.calculService.getLosses().subscribe({
       next: (data: any) => {
         this.formData.pertes_annuelles = data;
-        console.log('Pertes récupérées:', data);
+        this.updateChart();
       },
       error: (err: any) => {
         console.error('Erreur lors du chargement des pertes', err);
@@ -60,19 +99,18 @@ export class CalculInputParametersComponent {
       ratio_cet1: 8.0,
       exemption_ilm: false
     };
+    this.updateChart();
   }
 
   onSubmit() {
     const dataToSubmit = {
-  ...this.formData,
-  ratio_cet1: this.formData.ratio_cet1 / 100,
-  pertes_annuelles: Object.values(this.formData.pertes_annuelles || {}).map(val => parseFloat(val as string) || 0)
-};
-console.log('Données à soumettre:', dataToSubmit);
+      ...this.formData,
+      ratio_cet1: this.formData.ratio_cet1 / 100,
+      pertes_annuelles: Object.values(this.formData.pertes_annuelles || {}).map(val => parseFloat(val as string) || 0)
+    };
 
     this.calculService.submitFormData(dataToSubmit).subscribe({
       next: (res) => {
-        console.log('Données envoyées avec succès :', res);
         alert('Formulaire soumis avec succès !');
       },
       error: (err) => {

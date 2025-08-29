@@ -1,13 +1,16 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldAppearance, MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Process } from '../../../core/models/Process';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-select-arborescence',
-  imports: [MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule],
+  imports: [MatFormFieldModule, MatInputModule, MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatTooltipModule, MatButtonModule],
   templateUrl: './select-arborescence.component.html',
   styleUrl: './select-arborescence.component.scss'
 })
@@ -15,8 +18,10 @@ export class SelectArborescenceComponent {
 
   @Input() list: any[] = [];
   @Input() placeholder: string = '';
+  @Input() appearance: MatFormFieldAppearance = 'fill';
   @Output() changeValue = new EventEmitter<any>();
   @Input() id: string | null = null
+  @Input() tooltip : string = ''
 
   searchControl = new FormControl<Process | null>(null);
 
@@ -28,6 +33,7 @@ export class SelectArborescenceComponent {
 
   ngOnInit() {
     this.filteredOptions = this.list;
+
     if (this.id) {
       const selectedItem = this.list
         .flatMap(group => [group, ...(group.enfants || [])])
@@ -57,14 +63,13 @@ export class SelectArborescenceComponent {
 
     return this.list
       .map(group => {
-        const enfants = group.enfants.filter((child: { name: string; }) =>
+        const enfants = group.enfants?.filter((child: { name: string; }) =>
           child.name.toLowerCase().includes(filterValue)
         );
         const parentMatch = group.name.toLowerCase().includes(filterValue);
         if (parentMatch || enfants.length > 0) {
           return {
-            id: group.id,
-            name: group.name,
+            ...group, 
             enfants: enfants,
           };
         }

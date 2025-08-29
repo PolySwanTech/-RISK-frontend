@@ -1,21 +1,22 @@
 import { Process } from "./Process"
 
-export class EntiteResponsable {
+export class BusinessUnit {
     id : string
     name : string
     lm : boolean // make cash
-    children : EntiteResponsable[] = []
+    children : BusinessUnit[] = []
     childrenVisible = false
-    parent : EntiteResponsable | null = null
+    parent : BusinessUnit | null = null
     parentId : string | null = null
     process: Process[] = []
+    niveau?: number
 
     constructor(
         id : string,
         name : string, 
         lm : boolean,
-        children : EntiteResponsable[] = [],
-        parent : EntiteResponsable | null = null,
+        children : BusinessUnit[] = [],
+        parent : BusinessUnit | null = null,
         process: Process[] = []
     ){
         this.id = id;

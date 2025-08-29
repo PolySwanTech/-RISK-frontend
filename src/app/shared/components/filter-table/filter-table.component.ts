@@ -35,7 +35,7 @@ export class FilterTableComponent implements OnChanges {
   @Input() availableFilters: {
     key: string;
     label: string;
-    type: 'text' | 'select' | 'number' | 'date';
+    type: 'text' | 'select' | 'number' | 'date' | 'numberRange';
     icon?: string;
     options?: (string | { value: string, label: string })[];
   }[] = [];
@@ -54,7 +54,6 @@ export class FilterTableComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log(this.availableOptions);
     if (changes['availableFilters']) {
       const group: any = {};
       this.availableFilters.forEach(f => group[f.key] = ['']);
@@ -108,4 +107,15 @@ export class FilterTableComponent implements OnChanges {
   getFilterLabel(key: string): string {
     return this.getFilterMeta(key)?.label ?? key;
   }
+
+  onNumberRangeChange(key: string, bound: 'min' | 'max', value: number) {
+  const current = this.filtersForm.get(key)?.value || {};
+  const updated = { ...current, [bound]: value };
+  this.filtersForm.get(key)?.setValue(updated);
+}
+
+getValueAsNumber(event: Event): number {
+  const input = event.target as HTMLInputElement;
+  return input.valueAsNumber;
+}
 }

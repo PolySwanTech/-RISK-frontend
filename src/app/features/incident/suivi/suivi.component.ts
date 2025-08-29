@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { IncidentHistory } from '../../../core/models/IncidentHistory';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -55,6 +55,7 @@ export class SuiviComponent implements OnInit {
     this.suiviIncidentService.getIncidentHistory(id).subscribe({
       next: (data) => {
         this.history = data;
+        console.log(this.history)
         this.isLoading = false;
       },
       error: (err) => {

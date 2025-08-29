@@ -6,6 +6,8 @@ import { ViewComponent } from './view/view.component';
 import { PermissionGuard } from '../../core/guards/permission.guard';
 import { SuiviComponent } from './suivi/suivi.component';
 import { PermissionName } from '../../core/enum/permission.enum';
+import { CreateImpactPopUpComponent } from './impact/create-impact-pop-up/create-impact-pop-up.component';
+import { ListImpactComponent } from './impact/list-impact/list-impact.component';
 
 export const incidentRoute: Routes = [
   { path: '', component:  ListComponent},
@@ -13,4 +15,5 @@ export const incidentRoute: Routes = [
   { path: ':id', component:  ViewComponent},
   // { path: ':id/history', component: HistoryComponent },
   { path: ':id/suivi', component:  SuiviComponent},
+  { path: ':id/impacts', component:  ListImpactComponent},
 ];

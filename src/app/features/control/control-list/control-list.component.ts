@@ -27,6 +27,7 @@ import { Filter } from '../../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
 import { filter } from 'rxjs';
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
+import { RiskLevel } from '../../../core/enum/riskLevel.enum';
 
 @Component({
   selector: 'app-control-list',
@@ -35,7 +36,6 @@ import { FilterTableComponent } from "../../../shared/components/filter-table/fi
     MatSelectModule, CommonModule, MatCardModule, MatPaginatorModule,
     MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule,
     MatIconModule, MatTooltipModule, FormsModule, MatButtonToggleModule,
-    DateRangePickerComponent,
     GlobalSearchBarComponent,
     FilterTableComponent
   ],
@@ -92,7 +92,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'riskLevel',
       header: 'Degré de risque',
-      cell: (e: any) => this.getRiskLabel(e.riskLevel),
+      cell: (e: ControlTemplate) => this.getRiskLabel(e.riskLevel.name),
       isBadge: 'risk',
       filterType: 'select',
       options: Object.keys(EnumLabels.risk).map(key => ({
@@ -128,9 +128,9 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     },
 
     {
-      columnDef: 'creatorName',
+      columnDef: 'creator',
       header: 'Responsable',
-      cell: (e: any) => e.creatorName,
+      cell: (e: any) => e.creator,
       filterType: 'text',
       icon: 'person' // 👤
     },
@@ -169,8 +169,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   router = inject(Router);
   dialog = inject(MatDialog);
 
-  controls: any[] = [];
-  listUsers: any[] = [];
+  controls: ControlTemplate[] = [];
 
   searchQuery: string = '';
 
@@ -196,14 +195,14 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     return EnumLabels?.risk?.[risk] ?? risk;
   }
 
-  getBadgeClass(type: string, value: string) {
+  getBadgeClass(type: string, value: any) {
     switch (type) {
       case 'type':
         return 'badge-type';
       case 'risk':
-        if (value.toLowerCase().includes('faible')) return 'badge-risque-faible';
-        if (value.toLowerCase().includes('moyen')) return 'badge-risque-moyen';
-        if (value.toLowerCase().includes('élevé') || value.toLowerCase().includes('eleve')) return 'badge-risque-eleve';
+        if (value.toLowerCase().includes('low')) return 'badge-risque-faible';
+        if (value.toLowerCase().includes('medium')) return 'badge-risque-moyen';
+        if (value.toLowerCase().includes('high') || value.toLowerCase().includes('very_high')) return 'badge-risque-élevé';
         return '';
       case 'control':
         if (value === '2.1') return 'badge-controle-faible';
@@ -238,20 +237,15 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   }
 
   getUsersAndControls() {
-    this.userService.getUsers().subscribe(users => {
-      this.listUsers = users;
-      this.controlService.getAllTemplates().subscribe(resp => {
-        this.controls = resp.map(control => {
-          const creator = this.listUsers.find(u => u.id === control.creator);
-          return {
-            ...control,
-            creatorName: creator ? creator.username : 'Utilisateur inconnu'
-          };
-        });
-        this.dataSource.data = this.controls;
-        console.log('Contrôles récupérés avec succès', this.controls);
-      }, err => console.error('Erreur lors de la récupération des contrôles', err));
-    }, err => console.error('Erreur lors de la récupération des utilisateurs', err));
+    this.controlService.getAllTemplates().subscribe(
+      {
+        next: resp => {
+          this.controls = resp;
+          this.dataSource.data = this.controls;
+        },
+        error: err => console.error('Erreur lors de la récupération des contrôles', err)
+      }
+    )
   }
 
   onRowClick(control: ControlTemplate) {
@@ -305,9 +299,10 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         (c.reference?.toLowerCase().includes(query) || '') ||
         (c.libelle?.toLowerCase().includes(query) || '') ||
         (c.processName?.toLowerCase().includes(query) || '') ||
-        (c.creatorName?.toLowerCase().includes(query) || '') ||
+        (c.responsable?.toLowerCase().includes(query) || '') ||
+        (c.creator?.toLowerCase().includes(query) || '') ||
         this.getTypeLabel(c.controlType as keyof typeof this.enumLabels.type).toLowerCase().includes(query) ||
-        this.getRiskLabel(c.riskLevel as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
+        this.getRiskLabel(c.riskLevel.name as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
         this.getDegresLabel(c.controlLevel as keyof typeof this.enumLabels.degres).toLowerCase().includes(query) ||
         this.getRecurrenceLabel(c.frequency as keyof typeof this.enumLabels.reccurency).toLowerCase().includes(query) ||
         (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
@@ -339,7 +334,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       if (value === null || value === '') continue;
 
       filtered = filtered.filter(control => {
-        const fieldValue = control[key];
+        const fieldValue = (control as any)[key];
 
         // ✅ Filtrage par plage de dates
         if (value.start instanceof Date && value.end instanceof Date) {
@@ -368,7 +363,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         }
 
         if (key === 'riskLevel') {
-          return this.getRiskLabel(control.riskLevel).toLowerCase() === this.getRiskLabel(value).toLowerCase();
+          return this.getRiskLabel(control.riskLevel.name).toLowerCase() === this.getRiskLabel(value).toLowerCase();
         }
 
         if (key === 'controlLevel') {

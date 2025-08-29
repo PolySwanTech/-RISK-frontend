@@ -1,45 +1,59 @@
-<h2>Nouvelle évaluation de risque</h2>
+<div class="container">
 
-<form [formGroup]="form" (ngSubmit)="submit()">
+  @if(!riskId){
+  <h2>Nouvelle évaluation de risque</h2>
+  }
 
   <!-- ───────── Risque sélectionné (affiché, non modifiable) ───────── -->
   <div class="row-add">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Risque évalué</mat-label>
-      <input matInput [value]="currentRisk?.libelle"
+      <input matInput [value]="currentRisk?.libellePerso"
              placeholder="-" disabled>
     </mat-form-field>
     
   </div>
+  <form [formGroup]="form" (ngSubmit)="submit()">
 
-  <!-- ───────── ligne : probabilité + niveau net ────────── -->
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Probabilité (1-10)</mat-label>
-      <input matInput type="number"
-             formControlName="probability"
-             min="1" max="10">
-    </mat-form-field>
+    <!-- ───────── Risque sélectionné (affiché, non modifiable) ───────── -->
+    @if(!riskId){
+    <div class="row-add">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Risque évalué</mat-label>
+        <input matInput [value]="currentRisk?.libellePerso" placeholder="-" disabled>
+      </mat-form-field>
+    </div>
+    }
 
-    <mat-form-field appearance="outline">
-      <mat-label>Niveau net</mat-label>
-      <mat-select formControlName="riskNet">
-        <mat-option *ngFor="let lvl of riskLevels" [value]="lvl">
-          {{ riskLabels[lvl] }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
 
-  <!-- Commentaire libre -->
-  <div class="row-add">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Commentaire</mat-label>
-      <textarea matInput formControlName="comment" rows="3"></textarea>
-    </mat-form-field>
-  </div>
+    <!-- ───────── ligne : probabilité + niveau net ────────── -->
+    <div class="row-add">
+      <mat-form-field appearance="outline">
+        <mat-label>Probabilité (1-10)</mat-label>
+        <input matInput type="number" formControlName="probability" min="1" max="10">
+      </mat-form-field>
 
-  <button mat-raised-button color="primary" type="submit">
-    Enregistrer
-  </button>
-</form>
+      <mat-form-field appearance="outline">
+        <mat-label>Niveau net</mat-label>
+        <mat-select formControlName="riskNet">
+          <mat-option *ngFor="let lvl of riskLevels" [value]="lvl">
+            {{ riskLabels[lvl] }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Commentaire libre -->
+    <div class="row-add">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput formControlName="comment" rows="3"></textarea>
+      </mat-form-field>
+    </div>
+
+    <button mat-raised-button class="btn-primary" type="submit">
+      Enregistrer
+    </button>
+  </form>
+
+</div>

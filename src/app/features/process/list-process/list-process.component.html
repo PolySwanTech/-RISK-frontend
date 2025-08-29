@@ -4,9 +4,15 @@
         <mat-card-content class="dashboard-header">
             <h1>{{ isCartographie ? 'Cartographie' : 'Gestion des Processus' }}</h1>
             <div class="header-controls">
+                @if(isCartographie){
+                <button mat-raised-button (click)="navToCreateCarto()" class="btn-green">
+                    <mat-icon>add</mat-icon>
+                    Nouvelle Cartographie
+                </button>
+                }
                 <button mat-raised-button (click)="add()" class="btn-green">
                     <mat-icon>add</mat-icon>
-                Nouveau Processus
+                    Nouveau Processus
                 </button>
                 <button mat-raised-button class="btn-primary">
                     <mat-icon>refresh</mat-icon>
@@ -14,10 +20,10 @@
                 </button>
             </div>
         </mat-card-content>
-    </mat-card>    
+    </mat-card>
     <!-- Header avec glassmorphism -->
     <div class="header-container">
-      
+
 
         <!-- Barre de recherche -->
         <div class="search-container" style="margin-top: 20px;">
@@ -27,9 +33,20 @@
         </div>
     </div>
 
+    <div class="year-selection" *ngIf="isCartographie" style="margin: 20px 0; display: flex; gap: 10px;">
+        <ng-container *ngFor="let year of years">
+            <button mat-raised-button [color]="selectedYear === year ? 'accent' : ''"
+                [class.selected]="selectedYear === year" (click)="selectYear(year)">
+                <mat-icon *ngIf="selectedYear === year">check_circle</mat-icon>
+                {{ 'Cartographie ' + year }}
+            </button>
+        </ng-container>
+    </div>
+
     <!-- Arbre hiérarchique -->
     <div class="hierarchy-container">
-        <button *ngIf="!isCartographie" class="btn-primary" style="margin-bottom: 20px;" mat-raised-button (click)="openEntityDialog()">
+        <button *ngIf="!isCartographie" class="btn-primary" style="margin-bottom: 20px;" mat-raised-button
+            (click)="openEntityDialog()">
             <mat-icon>add</mat-icon><span>Ajouter une entité</span>
         </button>
         <div class="tree-wrapper">
@@ -37,7 +54,7 @@
                 <div class="node-container" [ngClass]="'level-' + node.niveau">
 
                     <!-- Ligne de connexion -->
-                    <div class="connection-line" *ngIf="node.niveau > 0"></div>
+                    <div class="connection-line" *ngIf="node.niveau > 1"></div>
 
                     <!-- Node principal -->
                     <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
@@ -72,6 +89,11 @@
                                 <div class="icon-container" [ngClass]="'icon-' + node.type">
                                     <button *ngIf="!isCartographie" (click)="openEntityDialog(node, $event)"
                                         mat-icon-button><mat-icon>edit</mat-icon></button>
+
+                                </div>
+                                <div class="icon-container" [ngClass]="'icon-' + node.type">
+                                    <button  (click)="goToMatrixPage(node.id)"
+                                        mat-icon-button><mat-icon>grid_on</mat-icon></button>
                                 </div>
                             </div>
 
@@ -99,10 +121,10 @@
 
     <!-- Template récursif pour les enfants -->
     <ng-template #nodeTemplate let-node>
-        <div class="node-container" [ngClass]="'level-' + node.level">
+        <div class="node-container" [ngClass]="'level-' + node.niveau">
 
             <!-- Ligne de connexion -->
-            <div class="connection-line" *ngIf="node.level > 0"></div>
+            <div class="connection-line" *ngIf="node.niveau > 1"></div>
 
             <!-- Node principal -->
             <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
@@ -160,17 +182,19 @@
 
                     <div *ngFor="let risk of node.risks; let i = index" (click)="navToRisk(risk.id.id)"
                         class="table-row">
-                        <div class="col-risque">{{risk.libelle}}</div>
+                        <div class="col-risque">{{risk.reference + ' - ' + risk.libellePerso}}</div>
                         <div class="col-risque-brut">
                             <span class="risk-badge" [ngClass]="getRiskClass(risk.riskBrut)">
-                                {{risk.riskBrut}}
+                                {{ risk.dmr?.[0]?.brutLevel }}
                             </span>
                         </div>
-                        <div class="col-controle">controle</div>
+                        <div class="col-controle"><span class="risk-badge"
+                                [ngClass]="getRiskClass(risk.dmr?.[0]?.netLevel || 'MEDIUM')">
+                                {{risk.dmr?.[0]?.controlReference || 'MEDIUM'}}
+                            </span></div>
                         <div class="col-risque-net">
-                            <span class="risk-badge"
-                                [ngClass]="getRiskClass(risk.riskEvaluations[0]?.riskNet || 'MEDIUM')">
-                                {{risk.riskEvaluations[0]?.riskNet || 'MEDIUM'}}
+                            <span class="risk-badge" [ngClass]="getRiskClass(risk.dmr?.[0]?.netLevel || 'MEDIUM')">
+                                {{risk.dmr?.[0]?.netLevel || 'MEDIUM'}}
                             </span>
                         </div>
                         <div class="col-actions">

@@ -248,25 +248,6 @@ mat-card-content {
 }
 
 
-
- .none{
-    display: none;
-  }
-
-  .display{
-    display: block;
-  }
-@media (min-width: 1830px) {
-  .none{
-    display: block;
-  }
-
-  .display{
-    display: none;
-  }
- 
-}
-
 .view-container {
   display: flex; 
   gap: 20px; 

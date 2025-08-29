@@ -1,13 +1,18 @@
-<h2 mat-dialog-title>Ajouter un Impact</h2>
 @if(impact){
 <mat-dialog-content>
+  <h2>Ajouter un Impact</h2>
   <form (ngSubmit)="addImpact()">
 
+    <!-- Montant -->
     <mat-form-field class="full-width">
       <mat-label>Montant</mat-label>
       <input matInput type="number" name="montant" [(ngModel)]="impact.montant" placeholder="Entrez le montant" />
+      <button mat-icon-button matSuffix matTooltip="Valeur monétaire de l'impact.">
+        <mat-icon>info</mat-icon>
+      </button>
     </mat-form-field>
 
+    <!-- Type -->
     <mat-form-field>
       <mat-label>Type</mat-label>
       <mat-select name="type" placeholder="Choisissez le type d'impact" required [(ngModel)]="impact.type">
@@ -17,8 +22,12 @@
         </mat-option>
         }
       </mat-select>
+      <button mat-icon-button matSuffix matTooltip="Catégorie de l'impact (ex: financier, opérationnel...).">
+        <mat-icon>info</mat-icon>
+      </button>
     </mat-form-field>
 
+    <!-- Entité impactée -->
     <mat-form-field>
       <mat-label>Entité impactée</mat-label>
       <mat-select name="entite" required (selectionChange)="setEntite($event.value);">
@@ -28,16 +37,23 @@
         </mat-option>
         }
       </mat-select>
+      <button mat-icon-button matSuffix matTooltip="Organisation ou unité affectée par l'impact.">
+        <mat-icon>info</mat-icon>
+      </button>
     </mat-form-field>
 
+    <!-- Date de comptabilisation -->
     <mat-form-field class="full-width">
       <mat-label>Date de comptabilisation (facultatif)</mat-label>
       <input matInput type="date" name="comptabilisationDate" [(ngModel)]="impact.comptabilisationDate"
-        placeholder="Entrez la description du risque" />
+        placeholder="Entrez la date de comptabilisation" />
+      <button mat-icon-button matSuffix matTooltip="Date à laquelle l'impact est enregistré.">
+        <mat-icon>info</mat-icon>
+      </button>
     </mat-form-field>
 
+    <!-- Boutons -->
     <div class="actions">
-      <button mat-raised-button class="btn-red" type="button" (click)="close()">Annuler</button>
       <button [disabled]="!impact.type || !impact.entityId" mat-button type="submit" mat-raised-button
         class="btn-primary">Ajouter</button>
     </div>

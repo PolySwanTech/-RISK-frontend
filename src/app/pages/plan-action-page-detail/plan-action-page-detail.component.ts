@@ -4,20 +4,25 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActionPlanService } from '../../core/services/action-plan/action-plan.service';
-import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
+import { firstValueFrom } from 'rxjs';
+import { TargetType } from '../../core/enum/targettype.enum';
+import { FichiersComponent } from '../../shared/components/fichiers/fichiers.component';
+import { FileService } from '../../core/services/file/file.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -32,7 +37,9 @@ export class PlanActionPageDetailComponent {
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
-  private equipeService = inject(EquipeService);
+  private router = inject(Router);
+  private fileService = inject(FileService);
+  private dialog = inject(MatDialog);
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -42,6 +49,16 @@ export class PlanActionPageDetailComponent {
   totalActions: number = 0;
 
   validator: string = '';
+
+  goBackButtons : GoBackButton[] = [
+      {
+        label: "Exporter",
+        icon: 'file_download',
+        class: 'btn-green',
+        show: true,
+        action: () => this.export()
+      }
+    ];
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
@@ -119,10 +136,20 @@ export class PlanActionPageDetailComponent {
     }
   }
 
-  openFileUpload(): void {
-    // Déclencher le clic sur l'input file caché
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    fileInput?.click();
+  async viewFiles() {
+    var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
+    let files = await firstValueFrom(this.fileService.getFiles(targetType, this.idPlanAction ))
+
+    this.dialog.open(FichiersComponent,
+      {
+        width: '400px',
+        data: {
+          files: files,
+          targetType: targetType,
+          targetId: this.idPlanAction
+        }
+      }
+    )
   }
 
   getPriorityBarHtml(priority: Priority): string {
@@ -156,6 +183,13 @@ export class PlanActionPageDetailComponent {
         <span class="priority-label ${config.class}">${config.label}</span>
       </div>
     `;
+  }
+
+  export(){
+  }
+
+  goToIncident(){
+    this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
   }
 
 }

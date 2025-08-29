@@ -1,8 +1,8 @@
 import { Type } from "./controltype.enum";
 import { Degree } from "./degree.enum";
-import { Priority, priorityLabels } from "./Priority";
+import { Priority } from "./Priority";
 import { Recurence } from "./recurence.enum";
-import { RiskLevel, RiskLevelLabels } from "./riskLevel.enum";
+import { RiskLevel, RiskLevelEnum, RiskLevelLabels } from "./riskLevel.enum";
 
 
 export const EnumLabels = {
@@ -14,10 +14,10 @@ export const EnumLabels = {
     [Type.MANUAL]: 'Manuel',
   },
   risk: {
-    [RiskLevel.LOW]: 'Faible',
-    [RiskLevel.MEDIUM]: 'Moyen',
-    [RiskLevel.HIGH]: 'Élevé',
-    [RiskLevel.VERY_HIGH]: 'Critique',
+    [RiskLevelEnum.LOW]: 'Faible',
+    [RiskLevelEnum.MEDIUM]: 'Moyen',
+    [RiskLevelEnum.HIGH]: 'Élevé',
+    [RiskLevelEnum.VERY_HIGH]: 'Critique',
   },
   control: {
     [RiskLevelLabels.LOW]: 'Faible',
@@ -26,9 +26,9 @@ export const EnumLabels = {
     [RiskLevelLabels.VERY_HIGH]: 'Critique',
   },
   degres: {
-    [Degree.LEVEL_1]: '2.1',
-    [Degree.LEVEL_2]: '2.2',
-    [Degree.LEVEL_3]: '2.3',
+    [Degree.LEVEL_1]: '1',
+    [Degree.LEVEL_2]: '2',
+    [Degree.LEVEL_3]: '3',
   },
   priority: {
     [Priority.MINIMAL]: 'Basse',

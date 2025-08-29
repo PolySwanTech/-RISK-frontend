@@ -5,7 +5,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 
 @Component({
@@ -17,16 +17,16 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 })
 export class ModifEntityDialogComponent {
 
-  entite : EntiteResponsable = new EntiteResponsable("", '', false, [], null);
+  entite : BusinessUnit = new BusinessUnit("", '', false, [], null);
 
-  entitiesList : EntiteResponsable[] = [];
+  entitiesList : BusinessUnit[] = [];
 
  
 
   constructor(public dialogRef: MatDialogRef<ModifEntityDialogComponent>, 
-    @Inject(MAT_DIALOG_DATA) public data: EntiteResponsable, 
+    @Inject(MAT_DIALOG_DATA) public data: BusinessUnit, 
     public entitiesService : EntitiesService, private cdRef: ChangeDetectorRef) {
-      this.entite = data || new EntiteResponsable("", '', false, [], null);
+      this.entite = data || new BusinessUnit("", '', false, [], null);
   }
 
   ngOnInit(): void {

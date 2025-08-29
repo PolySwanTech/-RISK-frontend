@@ -1,0 +1,78 @@
+<div class="container">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>Risques</h3>
+    </div>
+    <div class="sidebar-content">
+      <ul class="risks-list">
+        <li *ngFor="let risk of risks"
+            (click)="getProcessByRisks(risk)"
+            [class.selected]="risk === selectedRisk"
+            class="risk-item">
+          <span class="risk-label">{{ risk.libellePerso }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Liste hiérarchique -->
+    <div class="process-strip" *ngIf="hierarchicalProcesses?.length">
+      <h3>Process</h3>
+      <div class="bu-group" *ngFor="let bu of hierarchicalProcesses">
+        <h4 class="bu-name">{{ bu.name }}</h4>
+
+        <!-- Processus niveau 0 -->
+        <div *ngFor="let p of bu.children">
+          <button
+            class="process-chip"
+            [class.selected]="selectedProcess?.id === p.id"
+            (click)="onSelectProcess(p)">
+            <span class="chip-name">{{ p.name }}</span>
+          </button>
+
+          <!-- Enfants du process -->
+          <div class="process-children" *ngIf="p.children?.length">
+            <button
+              class="process-chip child"
+              *ngFor="let child of p.children"
+              [class.selected]="selectedProcess?.id === child.id"
+              (click)="onSelectProcess(child)">
+              <span class="chip-name">{{ child.name }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloc évaluation -->
+    <div *ngIf="selectedRisk && selectedProcess">
+      <app-eval-risk-process (evaluationSaved)="onSaveEvaluation()"></app-eval-risk-process>
+      <!-- <div class="content-header">
+        <h2 class="risk-title">{{ selectedRisk.libellePerso }}</h2>
+        <div class="impact-summary">
+          <span class="impact-label">Total des pertes ({{ selectedYear }}):</span>
+          <span class="impact-value">{{ totalImpact | currency:'EUR' }}</span>
+        </div>
+      </div>
+
+      <div class="section evaluation-section">
+        <h4 class="section-title">Évaluer le contrôle : {{ selectedControl.libelle }}</h4>
+        <app-risk-evaluation
+          [riskId]="selectedRisk.id.id"
+          (onSumbit)="submitEvaluation($event)">
+        </app-risk-evaluation>
+      </div> -->
+
+
+
+    </div>
+
+    <div class="empty-state" *ngIf="!selectedRisk">
+      <div class="empty-state-content">
+        <h3>Sélectionnez un risque</h3>
+        <p>Choisissez un risque dans la liste pour commencer l'évaluation</p>
+      </div>
+    </div>
+  </div>
+</div>

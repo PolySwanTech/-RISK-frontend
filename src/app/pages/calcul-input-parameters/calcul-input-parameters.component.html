@@ -31,27 +31,43 @@
 
         <!-- Historique des pertes -->
         <div class="form-section">
-            <div class="section-header">
-                <h2 class="section-title">📈 Historique des Pertes</h2>
-                <p class="section-description">1 paramètre - Données sur 10 ans maximum</p>
-            </div>
-            <div class="section-content">
-                <div class="form-group">
-                    <label>Pertes annuelles totales <span class="required">*</span></label>
-                    <p class="help-text">Calculé depuis l'appli ou à importer</p>
-                    <button class="btn btn-success" (click)="importData()">📥 Importer</button>
-                    <div class="losses-grid">
-                        <div class="year-input" *ngFor="let year of years">
-                            <div class="year-label">{{ year }}</div>
-                            <div class="currency-suffix">
-                                <input type="number" [(ngModel)]="formData.pertes_annuelles[year]" name="perte_{{year}}"
-                                    step="0.01" placeholder="0.00">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="section-header">
+    <h2 class="section-title">📈 Historique des Pertes</h2>
+    <p class="section-description">1 paramètre - Données sur 10 ans maximum</p>
+  </div>
+
+  <div class="section-content">
+    <div class="form-group">
+      <label>Pertes annuelles totales <span class="required">*</span></label>
+      <p class="help-text">Calculé depuis l'appli ou à importer</p>
+
+      <button class="btn btn-success" (click)="importData()">📥 Importer</button>
+
+      <div class="losses-grid">
+        <div class="year-input" *ngFor="let year of years">
+          <div class="year-label">{{ year }}</div>
+          <div class="currency-suffix">
+            <input type="number"
+       [(ngModel)]="formData.pertes_annuelles[year]"
+       name="perte_{{year}}"
+       (ngModelChange)="updateChart()"
+       step="0.01"
+       placeholder="0.00">
+          </div>
         </div>
+      </div>
+
+      <!-- Graphique -->
+      <div style="margin-top: 20px;">
+        <canvas baseChart
+                [data]="lineChartData"
+                [options]="lineChartOptions"
+                chartType="line">
+        </canvas>
+      </div>
+    </div>
+  </div>
+</div>
 
         <!-- Paramètres réglementaires -->
         <div class="form-section">

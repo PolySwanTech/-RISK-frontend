@@ -5,7 +5,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { SelectEntitiesComponent } from "../../../shared/components/select-entities/select-entities.component";
 import { MatInputModule } from '@angular/material/input';
@@ -29,14 +29,14 @@ export class AddEntityDialogComponent {
     parent: [null]
   });
 
-  entiteResponsable = new EntiteResponsable("", '', false, [], null);
+  BusinessUnit = new BusinessUnit("", '', false, [], null);
 
   titlePage = "Création d'une entité responsable";
 
   constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService,
-    @Inject(MAT_DIALOG_DATA) public data: EntiteResponsable, private cdRef: ChangeDetectorRef
+    @Inject(MAT_DIALOG_DATA) public data: BusinessUnit, private cdRef: ChangeDetectorRef
   ) {
-    this.entiteResponsable = data || new EntiteResponsable("", '', false, [], null);
+    this.BusinessUnit = data || new BusinessUnit("", '', false, [], null);
   }
 
   ngOnInit(): void {
@@ -56,10 +56,10 @@ export class AddEntityDialogComponent {
   }
 
   onSave(): void {
-    this.entiteResponsable.name = this.formGroup.get('name')?.value;
-    this.entiteResponsable.lm = this.formGroup.get('lm')?.value;
-    this.entiteResponsable.parentId = this.formGroup.get('parent')?.value;
-    this.dialogRef.close(this.entiteResponsable);
+    this.BusinessUnit.name = this.formGroup.get('name')?.value;
+    this.BusinessUnit.lm = this.formGroup.get('lm')?.value;
+    this.BusinessUnit.parentId = this.formGroup.get('parent')?.value;
+    this.dialogRef.close(this.BusinessUnit);
   }
 
   change() {

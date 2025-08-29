@@ -7,7 +7,7 @@ import { PermissionName } from '../../enum/permission.enum';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
-  private baseUrl = environment.apiUrl + '/users/permissions';
+  private baseUrl = environment.apiUrl + '/permissions';
 
   constructor(private http: HttpClient) {}
 

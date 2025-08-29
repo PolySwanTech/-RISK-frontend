@@ -4,8 +4,7 @@
 </div>
 
 <!-- Affichage du risque -->
-<div *ngIf="riskData"
-     class="risk-wrapper">
+<div *ngIf="riskData" class="risk-wrapper">
 
   <!-- ===================== Infos principales ===================== -->
   <div class="risk-info-grid">
@@ -14,21 +13,21 @@
       <span class="label">Référence :</span>
       <span class="value">{{ riskData.reference }}</span>
     </div>
-    
+
     <div class="info-row">
       <span class="label">Libellé :</span>
-      <span class="value">{{ riskData.libelle }}</span>
+      <span class="value">{{ riskData.libellePerso }}</span>
     </div>
 
-    <!-- <div class="info-row">
-      <span class="label">Sous-catégorie :</span>
-      <span class="value">{{ riskData.categoryL2.name }}</span>
-    </div> -->
+    <div class="info-row">
+      <span class="label">Catégorie Bâloise :</span>
+      <span class="value">{{ riskData.category }}</span>
+    </div>
 
     <div class="info-row">
       <span class="label">Processus :</span>
       <span class="value">
-        {{ processName }}
+        {{ riskData.processName }}
       </span>
     </div>
 
@@ -38,19 +37,18 @@
     </div>
 
     <div class="info-row">
-      <span class="label">Probabilité :</span>
-      <span class="value probability">{{ getProbabilityText() }}</span>
+      <span class="label">Fréquence :</span>
+      <span class="value probability">{{ getFrequency() }}</span>
     </div>
 
     <div class="info-row">
       <span class="label">Risque inhérent :</span>
-      <span class="value badge"
-            [ngClass]="riskClass">{{ riskLabel }}</span>
+      <span class="value badge" [ngClass]="riskBrut">{{ riskBrut }}</span>
     </div>
 
     <div class="info-row">
       <span class="label">Risque résiduel :</span>
-      <span class="value impact">{{ getImpactText() }}</span>
+      <span class="value badge" [ngClass]="riskNet">{{ riskNet }}</span>
     </div>
   </div>
 
@@ -62,14 +60,13 @@
 
   <!-- ===================== Contrôles ===================== -->
   <h4>Contrôles :</h4>
-  <!-- <ul class="controls-list">
-    <li *ngFor="let ctrl of riskData.controls">{{ ctrl }}</li>
-  </ul> -->
+  <div class="info-row">
+    <span class="value">{{ control }}</span>
+  </div>
 
   <!-- ===================== Actions ===================== -->
   <div class="action-buttons">
-    <button mat-raised-button color="primary"
-            (click)="onModifyClick()">
+    <button mat-raised-button color="primary" (click)="onModifyClick()">
       <mat-icon>edit</mat-icon>
       Modifier
     </button>

@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTreeModule } from '@angular/material/tree';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { CategorySelectionComponent } from '../../../shared/components/category-selection/category-selection.component';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { AddEntityDialogComponent } from '../../reglages/add-entity-dialog/add-entity-dialog.component';
@@ -34,8 +34,8 @@ export class OrganigrammeComponent {
   @Output() rolesEvent = new EventEmitter<any>();
 
   teamRoles: TeamMember[] = [];
-  entities: EntiteResponsable[] = [];
-  filteredEntities: EntiteResponsable[] = [];
+  entities: BusinessUnit[] = [];
+  filteredEntities: BusinessUnit[] = [];
   roles: Role[] = [];
 
   buRoles: { buId: string; roleName: string }[] = [];
@@ -64,9 +64,9 @@ export class OrganigrammeComponent {
     });
   }
 
-  childrenAccessor = (node: EntiteResponsable) => node.children ?? [];
+  childrenAccessor = (node: BusinessUnit) => node.children ?? [];
 
-  hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
+  hasChild = (_: number, node: BusinessUnit) => !!node.children && node.children.length > 0;
 
   applyTeamRoles(teamRoles: any[]) {
     const markEntity = (nodes: any[]) => {
@@ -95,7 +95,7 @@ export class OrganigrammeComponent {
     this.getLeafNodes(this.filteredEntities);
   }
 
-  openEntityDialog(entite?: EntiteResponsable, event?: Event) {
+  openEntityDialog(entite?: BusinessUnit, event?: Event) {
     if (event) {
       event.stopPropagation(); // Empêche la propagation du clic
     }
@@ -105,15 +105,15 @@ export class OrganigrammeComponent {
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     });
 
-    dialogRef.afterClosed().subscribe(entiteResponsable => {
-      if (entiteResponsable) {
-        if (entiteResponsable.id == null) { // creation
-          this.entityService.save(entiteResponsable).subscribe(() => {
+    dialogRef.afterClosed().subscribe(BusinessUnit => {
+      if (BusinessUnit) {
+        if (BusinessUnit.id == null) { // creation
+          this.entityService.save(BusinessUnit).subscribe(() => {
             this.ngOnInit(); // Rafraîchir après ajout/modification
           });
         }
         else { // update
-          this.entityService.update(entiteResponsable).subscribe(() => {
+          this.entityService.update(BusinessUnit).subscribe(() => {
             this.ngOnInit(); // Rafraîchir après ajout/modification
           });
         }
@@ -126,7 +126,7 @@ export class OrganigrammeComponent {
     this.filteredEntities = this.filterNodes(this.entities, filterValue);
   }
 
-  private filterNodes(nodes: EntiteResponsable[], filter: string): EntiteResponsable[] {
+  private filterNodes(nodes: BusinessUnit[], filter: string): BusinessUnit[] {
     return nodes
       .map(node => {
         const filteredChildren = node.children ? this.filterNodes(node.children, filter) : [];
@@ -141,7 +141,7 @@ export class OrganigrammeComponent {
         }
         return null;
       })
-      .filter((node): node is EntiteResponsable => node !== null);
+      .filter((node): node is BusinessUnit => node !== null);
   }
 
   confirmSelection() {

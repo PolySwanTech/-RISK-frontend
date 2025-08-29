@@ -61,39 +61,26 @@
   <div class="row-add">
     <mat-form-field appearance="outline">
       <mat-label>Entité Responsable</mat-label>
-      <mat-select formControlName="buId" (selectionChange)="onEntiteResponsableChange()">
-        @for (bu of entitesResponsables; track bu.id) {
-        <mat-option [value]="bu.id">{{ bu.name }}</mat-option>
-        }
+      <mat-select formControlName="buId" (selectionChange)="onTeamChange($event)">
+        <mat-option *ngFor="let bu of listEntities" [value]="bu.id">{{ bu.name }}</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
 
+  @if (listProcess.length != 0) {
   <div class="row-add">
-    @if (form.get('buId')?.value) {
-    <mat-form-field appearance="outline">
-      <mat-label>Process</mat-label>
-      <mat-select formControlName="processId" (selectionChange)="onProcessChange()">
-        @for (p of processes; track p.id) {
-        <mat-option [value]="p.id">{{ p.name }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    }
+    <app-select-arborescence appearance="outline" placeholder="Sélectionnez un processus" [id]="form.get('processId')!.value" (changeValue)="onSelectionProcess($event)"
+      [list]="listProcess" />
   </div>
+  }
 
+  @if (listRisks.length != 0) {
   <div class="row-add">
-    @if (form.get('processId')?.value) {
-    <mat-form-field appearance="outline">
-      <mat-label>Risk</mat-label>
-      <mat-select formControlName="taxonomie">
-        @for (r of risks; track r.id) {
-        <mat-option [value]="r">{{ r.libelle }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    }
+    <app-select-arborescence appearance="outline" placeholder="Sélectionnez un risque" [id]="form.get('riskId')!.value" (changeValue)="onSelectionRisk($event)"
+      [list]="listRisks" />
   </div>
+  }
+
 
   <button mat-raised-button class="btn-primary" type="submit">Créer</button>
 </form>

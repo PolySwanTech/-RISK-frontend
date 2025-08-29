@@ -8,9 +8,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RiskService {
+  
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/risks/taxonomie';
+  baseUrl = environment.apiUrl + '/taxonomie';
 
   getById(id: string) {
     return this.http.get<RiskTemplate>(this.baseUrl + '/' + id)
@@ -30,10 +31,10 @@ export class RiskService {
     return this.http.get<any[]>(this.baseUrl + '/tree', option)
   }
 
-  getAllByProcess(processId: string = "") {
-    console.log('Fetching risks for process ID:', processId);
+  getAllByProcess(processId: string = "", year: number = new Date().getFullYear()) {
     let params = new HttpParams();
     params = params.append('processId', processId);
+    params = params.append('year', year);
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params })
   }
 
@@ -42,4 +43,10 @@ export class RiskService {
     params = params.append('parentId', parentId.toString());
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params: params });
   }
+
+  getRiskOfIncident(incidentId: string) {
+    const params = new HttpParams().set('incidentId', incidentId);
+    return this.http.get<RiskTemplate>(`${this.baseUrl}/incident`, {params : params});
+  }
+  
 }

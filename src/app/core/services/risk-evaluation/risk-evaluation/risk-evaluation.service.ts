@@ -11,7 +11,7 @@ import { RiskLevel } from '../../../enum/riskLevel.enum';
 export class RiskEvaluationService {
 
   private readonly http     = inject(HttpClient);
-  private readonly baseUrl  = environment.apiUrl + '/risks/evaluations';
+  private readonly baseUrl  = environment.apiUrl + '/evaluations';
 
   /* ------------------------------------------------------------------ */
   /*  GET – détail d’une évaluation par son UUID                        */
@@ -23,8 +23,8 @@ export class RiskEvaluationService {
   /* ------------------------------------------------------------------ */
   /*  GET – liste complète (ton contrôleur la renvoie sur GET /)        */
   /* ------------------------------------------------------------------ */
-  getAll(): Observable<RiskEvaluation[]> {
-    return this.http.get<RiskEvaluation[]>(this.baseUrl);
+  getAll(year : number = new Date().getFullYear()): Observable<RiskEvaluation[]> {
+    return this.http.get<RiskEvaluation[]>(`${this.baseUrl}?year=${year}`);
   }
 
   /* ------------------------------------------------------------------ */
@@ -43,6 +43,10 @@ export class RiskEvaluationService {
       `${this.baseUrl}/${evaluationId}`,
       newLevel                                    // corps = simple enum
     );
+  }
+
+  getYearsOfEvaluation() {
+    return this.http.get<number[]>(this.baseUrl + '/years');
   }
 }
 
