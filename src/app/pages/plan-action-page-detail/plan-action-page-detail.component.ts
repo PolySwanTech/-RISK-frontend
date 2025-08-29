@@ -50,15 +50,15 @@ export class PlanActionPageDetailComponent {
 
   validator: string = '';
 
-  goBackButtons : GoBackButton[] = [
-      {
-        label: "Exporter",
-        icon: 'file_download',
-        class: 'btn-green',
-        show: true,
-        action: () => this.export()
-      }
-    ];
+  goBackButtons: GoBackButton[] = [
+    {
+      label: "Exporter",
+      icon: 'file_download',
+      class: 'btn-green',
+      show: true,
+      action: () => this.export()
+    }
+  ];
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
@@ -78,8 +78,8 @@ export class PlanActionPageDetailComponent {
     )
   }
 
-  validateAction(actionId : string) {
-    
+  validateAction(actionId: string) {
+
     this.actionPlanService.finishAction(actionId).subscribe(
       _ => this.ngOnInit()
     )
@@ -125,9 +125,9 @@ export class PlanActionPageDetailComponent {
     }
   }
 
-  async viewFiles(actionId : string) {
+  async viewFiles(actionId: string, closed: boolean = false) {
     var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
-    let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId ))
+    let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId))
 
     this.dialog.open(FichiersComponent,
       {
@@ -135,17 +135,20 @@ export class PlanActionPageDetailComponent {
         data: {
           files: files,
           targetType: targetType,
-          targetId: actionId
+          targetId: actionId,
+          closed: closed
         }
       }
     ).afterClosed().subscribe(result => {
-      this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
-        result => {
-          if (result) {
-            this.validateAction(actionId);
+      if (!closed) {
+        this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
+          result => {
+            if (result) {
+              this.validateAction(actionId);
+            }
           }
-        }
-      )
+        )
+      }
     });
   }
 
@@ -182,10 +185,10 @@ export class PlanActionPageDetailComponent {
     `;
   }
 
-  export(){
+  export() {
   }
 
-  goToIncident(){
+  goToIncident() {
     this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
   }
 

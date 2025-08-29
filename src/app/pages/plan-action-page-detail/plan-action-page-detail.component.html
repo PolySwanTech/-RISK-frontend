@@ -120,14 +120,18 @@
                             </button>
                             <!-- <input style="display: none;" type="file" (change)="validateAction(action, $event)" /> -->
                         </ng-container>
-                        }
-                        @else {
+                    }
+                    @else {
                         <ng-container>
                             <p class="validated">
                                 ✔ Terminé par <strong>{{ action.performedBy }}</strong>
                                 le {{ action.performedAt | date: 'dd/MM/yyyy' }}
                             </p>
                         </ng-container>
+                        <button mat-raised-button class="btn-primary" (click)="viewFiles(action.id, true)">
+                            <mat-icon>upload</mat-icon>
+                            Voir les fichiers joints
+                        </button>
                         }
                     </div>
                 </div>
