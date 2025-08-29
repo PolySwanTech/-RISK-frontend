@@ -6,7 +6,7 @@
             <div class="header-controls">
                 <button mat-raised-button class="btn-primary add-button" (click)="add()"
                     *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter un incident</button>
-                <button mat-raised-button class="btn-green">
+                <button mat-raised-button (click)="exportExcel()" class="btn-green">
                     <mat-icon>file_download</mat-icon>
                     Exporter
                 </button>

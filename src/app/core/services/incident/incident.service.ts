@@ -77,4 +77,9 @@ export class IncidentService {
     return this.http.get<string | null>(`${this.baseUrl}/${incidentId}/action-plan`);
   }
 
+  findAllByIds(ids: Set<string>): Observable<Incident[]> {
+    const params = new HttpParams().set('ids', Array.from(ids).join(','));
+    return this.http.get<Incident[]>(this.baseUrl + '/ids', { params });
+  }
+
 }

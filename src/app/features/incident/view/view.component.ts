@@ -88,13 +88,6 @@ export class ViewComponent implements OnInit {
         action: () => this.addActionPlan()
       },
       {
-        label: 'Export Excel',
-        icon: 'file_download',
-        class: 'btn-green',
-        show: true,
-        action: () => this.downloadExport()
-      },
-      {
         label: 'Fiche Incident (PDF)',
         icon: 'description',
         class: 'btn-green',
