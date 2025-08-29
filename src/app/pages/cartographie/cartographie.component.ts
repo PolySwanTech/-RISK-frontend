@@ -62,6 +62,8 @@ export class CartographieComponent implements OnInit {
     });
   }
 
+  goCreate() { this.router.navigate(['cartographie', 'create'], {queryParams : { buId: this.selectedBuId, year: this.selectedYear }}); }
+
   openDuplicate(row: Cartography) {
     // const ref = this.dialog.open(CartoDuplicateDialogComponent, {
     //   width: '460px',

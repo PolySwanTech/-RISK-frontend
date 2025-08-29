@@ -18,8 +18,6 @@ export class CreateCartoComponent {
 
 
   steps = [
-    'Type de cartographie',
-    'Choix de cartographie',
     'Sélection',
     'Évaluation',
     'Résultats'

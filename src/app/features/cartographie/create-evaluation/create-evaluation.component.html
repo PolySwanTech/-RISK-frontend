@@ -48,24 +48,6 @@
     <!-- Bloc évaluation -->
     <div *ngIf="selectedRisk && selectedProcess">
       <app-eval-risk-process (evaluationSaved)="onSaveEvaluation()"></app-eval-risk-process>
-      <!-- <div class="content-header">
-        <h2 class="risk-title">{{ selectedRisk.libellePerso }}</h2>
-        <div class="impact-summary">
-          <span class="impact-label">Total des pertes ({{ selectedYear }}):</span>
-          <span class="impact-value">{{ totalImpact | currency:'EUR' }}</span>
-        </div>
-      </div>
-
-      <div class="section evaluation-section">
-        <h4 class="section-title">Évaluer le contrôle : {{ selectedControl.libelle }}</h4>
-        <app-risk-evaluation
-          [riskId]="selectedRisk.id.id"
-          (onSumbit)="submitEvaluation($event)">
-        </app-risk-evaluation>
-      </div> -->
-
-
-
     </div>
 
     <div class="empty-state" *ngIf="!selectedRisk">
