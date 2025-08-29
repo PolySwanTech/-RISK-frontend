@@ -338,7 +338,6 @@ export class PlanActionPageComponent {
 
   searchQuery: string = '';
   onSearchFiles(event: any): void {
-    console.log('Search query:', event);
     this.searchQuery = event.trim();
     this.applyAllFilters();
   }
@@ -356,7 +355,6 @@ export class PlanActionPageComponent {
 
       filtered = filtered.filter(actionPlan => {
         const itemValue = actionPlan[key as keyof ActionPlan];
-        console.log(itemValue, value);
 
         // 🎯 Cas plage de dates
         if (typeof value === 'object' && value.start && value.end) {

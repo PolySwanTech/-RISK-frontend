@@ -231,7 +231,6 @@ export class ListComponent implements OnInit {
       });
     }
 
-    console.log('Résultat filtré :', filtered);
     this.dataSource.data = filtered;
   }
 

@@ -77,6 +77,5 @@ selectedDepartment: string | null = null;
   }
 
   handleFiltersChanged(filters: any) {
-    console.log('Filtres appliqués :', filters);
   }
 }

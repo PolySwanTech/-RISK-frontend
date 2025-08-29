@@ -224,7 +224,6 @@ export class MatrixComponent {
 
   /* ===================== SAVE ===================== */
   saveMatrix() {
-    console.log(this.updatedCells);
     this.matrixService.updateCells(this.updatedCells).subscribe(_ => {
       this.snackBarService.success("La matrice a bien été mise à jour");
     });

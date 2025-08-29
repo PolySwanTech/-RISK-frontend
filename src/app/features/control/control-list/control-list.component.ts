@@ -288,7 +288,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     if (dateStart && dateEnd) {
       filtered = filtered.filter(item => {
         const itemDate = new Date(item.nextExecution);
-        console.log(`Filtrage par date : ${itemDate} entre ${dateStart} et ${dateEnd}`);
         return itemDate >= dateStart && itemDate <= dateEnd;
       });
     }
@@ -328,7 +327,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   handleFiltersChanged(filters: Record<string, any>) {
     let filtered = [...this.controls];
-    console.log('Filtres appliqués :', this.controls);
 
     for (const [key, value] of Object.entries(filters)) {
       if (value === null || value === '') continue;
@@ -358,7 +356,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
         // ✅ Champs enum mappés via fonctions
         if (key === 'type') {
-          console.log(this.getTypeLabel(control.controlType).toLowerCase() === this.getTypeLabel(value).toLowerCase());
           return this.getTypeLabel(control.controlType).toLowerCase() === this.getTypeLabel(value).toLowerCase();
         }
 

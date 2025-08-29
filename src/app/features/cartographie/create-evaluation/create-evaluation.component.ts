@@ -147,10 +147,8 @@ export class CreateEvaluationComponent implements OnInit {
     this.evaluationSrv.save(payload).subscribe(
       {
         next: resp => {
-          console.log(resp)
         },
         error: err => {
-          console.error(err)
         }
       })
   }

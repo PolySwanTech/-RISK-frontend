@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
@@ -6,6 +6,7 @@ import { Evaluation } from '../../../../core/enum/evaluation.enum';
 import { ControlService } from '../../../../core/services/control/control.service';
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { ControlExecution } from '../../../../core/models/ControlExecution';
+import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
@@ -51,7 +52,8 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   evaluationOptions = Object.values(EvaluationControl);
   labels = EvaluationControlLabels;
 
-  constructor(private controlService: ControlService) { }
+  private controlService = inject(ControlService);
+  private confirmService = inject(ConfirmService);
 
   ngOnInit(): void {
     if (this.showAsCard) return;
@@ -96,7 +98,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     this.controlService.getEvaluationByExecution(executionId).subscribe({
       next: (res: any) => { this.evalDetails = res as ControlEvaluationView; },
       error: () => {
-        alert('Cette exécution n’a pas encore d’évaluation soumise.');
+        this.confirmService.openConfirmDialog("Cette execution n'a pas encore d'évalutation soumise.", "", false).subscribe();
         this.evaluationData.executionId = executionId;
         this.loadBlockersThenDecide(executionId);
       }

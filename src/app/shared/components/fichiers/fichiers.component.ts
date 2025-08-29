@@ -223,7 +223,6 @@ export class FichiersComponent {
         if (openInBrowser) {
           // Ouvrir dans un nouvel onglet
           window.open(url, '_blank');
-          console.log("ici")
         } else {
           // Télécharger
           const a = document.createElement('a');

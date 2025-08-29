@@ -98,7 +98,6 @@ export class ControlDetailsPageComponent implements OnInit {
     this.controlService.getControl(id).subscribe(control => 
       {
         this.control = control;
-        console.log(control);
       });
   }
 

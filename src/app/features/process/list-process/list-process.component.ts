@@ -92,9 +92,7 @@ export class ListProcessComponent implements OnInit {
         bu.children?.forEach(process => {
           process.risks?.forEach(risk => {
             var rId = risk.id.id;
-            console.log('Evaluations:', evaluations.filter(e => e.riskId === rId));
             risk.riskEvaluations = evaluations.filter(e => e.riskId === rId);
-            console.log(risk)
           });
         });
       });

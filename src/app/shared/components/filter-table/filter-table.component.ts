@@ -62,7 +62,6 @@ export class FilterTableComponent implements OnChanges {
       // Nettoyer ancienne souscription
       this.valueChangesSub?.unsubscribe();
       this.valueChangesSub = this.filtersForm.valueChanges.subscribe(values => {
-        console.log('Form values changed:', values);
         const activeFilters: Record<string, any> = {};
         for (const key of this.activeFilterKeys) {
           const value = values[key];

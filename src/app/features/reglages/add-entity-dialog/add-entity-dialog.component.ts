@@ -63,7 +63,6 @@ export class AddEntityDialogComponent {
   }
 
   change() {
-    alert('change');
   }
 
   goBack(){

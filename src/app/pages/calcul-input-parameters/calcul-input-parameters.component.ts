@@ -5,6 +5,7 @@ import { CalculService } from '../../core/services/calcul/calcul.service';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { MatInputModule } from '@angular/material/input';
+import { ConfirmService } from '../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-calcul-input-parameters',
@@ -15,7 +16,8 @@ import { MatInputModule } from '@angular/material/input';
 })
 export class CalculInputParametersComponent {
 
-  calculService = inject(CalculService);
+  private calculService = inject(CalculService);
+  private confirmService = inject(ConfirmService);
 
   financialFields = [
     { name: 'revenus_interets', label: "Revenus d'intérêts" },
@@ -111,11 +113,11 @@ export class CalculInputParametersComponent {
 
     this.calculService.submitFormData(dataToSubmit).subscribe({
       next: (res) => {
-        alert('Formulaire soumis avec succès !');
+        this.confirmService.openConfirmDialog("Formulaire soumis avec succès", "", false).subscribe();
       },
       error: (err) => {
         console.error('Erreur lors de l’envoi :', err);
-        alert('Erreur lors de l’envoi des données.');
+        this.confirmService.openConfirmDialog("Erreur lors de l’envoi des données", "", false).subscribe();
       }
     });
   }
