@@ -95,7 +95,11 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   loadControl(id: string): void {
-    this.controlService.getControl(id).subscribe(control => this.control = control);
+    this.controlService.getControl(id).subscribe(control => 
+      {
+        this.control = control;
+        console.log(control);
+      });
   }
 
   loadControlExecutions(id: string): void {

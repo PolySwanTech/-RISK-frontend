@@ -73,26 +73,6 @@ export class CreateControlComponent {
   priorities = Object.values(Priority);
   types = Object.values(Type);
   levels = Object.values(Degree);
-  // entitesResponsables$ = this.buService.loadEntities();
-  // processes$: Observable<Process[]> = this.form.get('buId')!.valueChanges.pipe(
-  //   startWith(this.form.get('buId')!.value),
-  //   tap(() => this.form.get('processId')!.reset()),
-  //   switchMap(id => {
-  //     const buId = typeof id === 'string' ? id : id?.id;
-  //     return buId ? this.processService.getAllByEntite(buId) : of([]);
-  //   }),
-  // ); 
-
-  //   risks$: Observable<RiskTemplate[]> = this.form.get('processId')!.valueChanges.pipe(
-  //   startWith(this.form.get('processId')!.value),
-  //   switchMap(id => id
-  //     ? this.riskService.getRisksTree(id).pipe(
-  //         map(list => list ?? []),
-  //         tap(list => console.log('Risks fetched:', list))  // <-- ici le console.log
-  //       )
-  //     : of([])
-  //   )
-  // );
 
   get buIdValue() {
     console.log(this.form.get('buId')?.value)
@@ -190,6 +170,7 @@ export class CreateControlComponent {
     this.controlService.createControl(payload).subscribe({
       next: () => {
         this.snackBarService.success("Le contrôle a bien été ajouté");
+        this.dialogRef.close(true);
         console.log('Création réussie', payload);
       },
       error: err => {

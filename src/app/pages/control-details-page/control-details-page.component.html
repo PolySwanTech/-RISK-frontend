@@ -6,7 +6,7 @@
 }
 @else {
 <div class="control-details-page">
-  <app-go-back [title]="'Détails du contrôle'" [buttons]="goBackButtons"></app-go-back>
+  <app-go-back [title]="'Détails du contrôle'" [subtitle]="control.reference" [buttons]="goBackButtons"></app-go-back>
 
   <div class="main-content">
     <div class="content-grid">
@@ -19,12 +19,8 @@
               <div class="hero-head">
                 <h2 class="hero-title">
                   <span class="hero-emoji">📊</span>
-                  Évaluation d'un contrôle
+                  Informations générales
                 </h2>
-                <div class="hero-sub">
-                  Module de gestion du risque opérationnel —
-                  <span>Contrôle ID: {{ control.reference }}</span>
-                </div>
               </div>
 
               <div class="hero-grid">
