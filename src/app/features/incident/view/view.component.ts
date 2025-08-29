@@ -38,7 +38,7 @@ import { error } from 'jquery';
   styleUrl: './view.component.scss'
 })
 export class ViewComponent implements OnInit {
-[x: string]: any;
+
   private incidentService = inject(IncidentService);
   private actionPlanService = inject(ActionPlanService);
   private dialog = inject(MatDialog);
@@ -84,8 +84,22 @@ export class ViewComponent implements OnInit {
         label: "Plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
-        show: !this.isClosed(),
+        show: this.canClose() && !this.isClosed(),
         action: () => this.addActionPlan()
+      },
+      {
+        label: "Modifier",
+        icon: 'edit',
+        class: 'btn-green',
+        show: this.isDraft(),
+        action: () => this.goToModification()
+      },
+      {
+        label: "Supprimer",
+        icon: 'delete',
+        class: 'btn-red',
+        show: this.isDraft(),
+        action: () => this.delete()
       },
       {
         label: 'Fiche Incident (PDF)',
@@ -105,6 +119,26 @@ export class ViewComponent implements OnInit {
     ];
   }
 
+  isDraft(): boolean {
+    return this.incident?.state === State.DRAFT;
+  }
+
+  goToModification(): void {
+    if (this.incident) {
+      this.router.navigate(['incident', 'create'], { queryParams: { id: this.incident.id } });
+    }
+  }
+
+  delete(){
+    this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer cet incident ? Cette action est irréversible.", true).subscribe(result => {
+      if (result) {
+        this.incidentService.deleteIncident(this.incident!.id).subscribe(() => {
+          this.router.navigate(['incident']);
+        });
+      }
+    });
+  }
+
   extractTokenInfo(): void {
     const token = sessionStorage.getItem('token');
     if (!token) {
@@ -121,7 +155,7 @@ export class ViewComponent implements OnInit {
   }
 
   canClose() {
-    return this.userRole === 'VALIDATEUR' && this.incident?.closedAt == null;
+    return this.incident?.state != State.DRAFT && this.userRole === 'VALIDATEUR' && this.incident?.closedAt == null;
   }
 
   normalize(str?: string): string {

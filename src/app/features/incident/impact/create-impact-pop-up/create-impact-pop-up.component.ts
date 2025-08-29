@@ -76,7 +76,6 @@ export class CreateImpactPopUpComponent implements OnInit {
     const onlyBl = true
     this.entiteService.loadEntities(onlyBl).subscribe(
       list => {
-        console.log("entités",list)
         this.entites = list
       }
     )
@@ -105,8 +104,6 @@ export class CreateImpactPopUpComponent implements OnInit {
           type: this.impact.type,
         };
 
-        console.log(dto)
-
         this.impactService.addImpact(dto, message).subscribe(() => {
           this.confirmService.openConfirmDialog(
             'Impact ajouté',
@@ -125,9 +122,6 @@ export class CreateImpactPopUpComponent implements OnInit {
   async viewFiles(impact: Impact) {
     let files = await firstValueFrom(this.fileService.getFiles(TargetType.IMPACT, impact.id))
 
-   
-    console.log(files);
-    
     this.dialog.open(FichiersComponent,
       {
         width: '400px',
@@ -136,7 +130,5 @@ export class CreateImpactPopUpComponent implements OnInit {
         }
       }
     )
-
-    console.log("Voici les fichiers")
   }
 }

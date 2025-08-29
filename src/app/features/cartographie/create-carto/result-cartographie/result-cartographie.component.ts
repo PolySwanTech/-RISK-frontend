@@ -48,7 +48,6 @@ results: ResultRow[] = [
   ];
 
   export() {
-    console.log('Exporter...');
     // TODO: logique export CSV/XLS
   }
 

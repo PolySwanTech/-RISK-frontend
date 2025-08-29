@@ -63,10 +63,6 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (risk) => {
           this.risk = risk;
-          console.log(this.risk)
-          // if (risk.riskEvaluations?.length) {
-          //   this.lastEvaluation = risk.riskEvaluations[risk.riskEvaluations.length - 1];
-          // }
           this.loading = false;
         },
         error: () => {

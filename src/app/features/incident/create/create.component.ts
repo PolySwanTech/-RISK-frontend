@@ -132,7 +132,6 @@ export class CreateComponent implements OnInit {
     if (this.incidentId) {
       this.title = "Modification d'un incident";
       this.loadIncident(this.incidentId);
-      console.log()
     } else {
       this.loadTrees().subscribe();
     }
@@ -159,8 +158,6 @@ export class CreateComponent implements OnInit {
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
-      console.log(incident)
-      console.log(this.listTeams)
       this.incidentForm1.patchValue({
         reference: incident.reference,
         titre: incident.title,
@@ -237,7 +234,6 @@ export class CreateComponent implements OnInit {
   }
 
   changeUser(event: any) {
-    console.log("Intervenant sélectionné :", event);
     this.incidentForm3.get('intervenant')!.setValue(event.id);
   }
 
@@ -265,7 +261,6 @@ export class CreateComponent implements OnInit {
 
     const incident = this.convertFormToIncident();
     incident.state = State.SUBMIT
-    console.log("Incident à ajouter :", incident);
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
@@ -293,7 +288,6 @@ export class CreateComponent implements OnInit {
   addDraft() {
     const incident = this.convertFormToIncident();
     incident.state = State.DRAFT;
-    console.log("Incident à sauvegarder en brouillon :", incident);
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {

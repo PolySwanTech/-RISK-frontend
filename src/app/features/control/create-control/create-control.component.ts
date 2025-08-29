@@ -75,7 +75,6 @@ export class CreateControlComponent {
   levels = Object.values(Degree);
 
   get buIdValue() {
-    console.log(this.form.get('buId')?.value)
     return this.form.get('buId')?.value;
   }
 
@@ -121,7 +120,6 @@ export class CreateControlComponent {
 
     this.listRisks = [];
     this.riskService.getRisksTree(value.id).subscribe(data => {
-      console.log(data)
       this.listRisks = data;
       if (this.listRisks.length === 0) {
         this.snackBarService.error("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
@@ -153,7 +151,6 @@ export class CreateControlComponent {
   }
 
   onSubmit() {
-    console.log(this.form.value);
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
     const payload: ControlTemplateCreateDto = {
@@ -171,11 +168,9 @@ export class CreateControlComponent {
       next: () => {
         this.snackBarService.success("Le contrôle a bien été ajouté");
         this.dialogRef.close(true);
-        console.log('Création réussie', payload);
       },
       error: err => {
         this.snackBarService.error(err.message);
-        console.error('Erreur création', err)
       }
     });
   }

@@ -55,7 +55,6 @@ export class SuiviComponent implements OnInit {
     this.suiviIncidentService.getIncidentHistory(id).subscribe({
       next: (data) => {
         this.history = data;
-        console.log(this.history)
         this.isLoading = false;
       },
       error: (err) => {

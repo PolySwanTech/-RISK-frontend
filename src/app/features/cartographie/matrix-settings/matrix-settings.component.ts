@@ -50,10 +50,8 @@ export class MatrixSettingsComponent {
       {
 
         next: response => {
-          console.log('Paramètres sauvegardés avec succès', response);
         },
         error: error => {
-          console.error('Erreur lors de la sauvegarde des paramètres', error);
         }
       }
     );
