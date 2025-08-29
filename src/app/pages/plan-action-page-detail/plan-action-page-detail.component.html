@@ -114,11 +114,11 @@
 
                         @if(!action.performedAt){
                         <ng-container>
-                            <button mat-raised-button class="btn-primary" (click)="viewFiles()">
+                            <button mat-raised-button class="btn-primary" (click)="viewFiles(action.id)">
                                 <mat-icon>upload</mat-icon>
                                 Déposer un justificatif
                             </button>
-                            <input style="display: none;" type="file" (change)="validateAction(action, $event)" />
+                            <!-- <input style="display: none;" type="file" (change)="validateAction(action, $event)" /> -->
                         </ng-container>
                         }
                         @else {

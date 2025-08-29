@@ -78,22 +78,11 @@ export class PlanActionPageDetailComponent {
     )
   }
 
-  validateAction(action: Action, event: Event) {
-    // TODO : envoyer le file au back + valide action
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      const file = input.files[0];
-      action.fileName = file.name;
-      action.performedBy = this.authService.decryptToken()?.sub || "";
-      action.performedAt = new Date().toISOString();
-
-      // 🔁 Recalculer les valeurs après validation
-      if (this.actionPlan?.actions) {
-        this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-        this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-        this.updateStatus();
-      }
-    }
+  validateAction(actionId : string) {
+    
+    this.actionPlanService.finishAction(actionId).subscribe(
+      _ => this.ngOnInit()
+    )
   }
 
   getCompletedCount(actions: Action[]): number {
@@ -136,9 +125,9 @@ export class PlanActionPageDetailComponent {
     }
   }
 
-  async viewFiles() {
+  async viewFiles(actionId : string) {
     var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
-    let files = await firstValueFrom(this.fileService.getFiles(targetType, this.idPlanAction ))
+    let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId ))
 
     this.dialog.open(FichiersComponent,
       {
@@ -149,7 +138,9 @@ export class PlanActionPageDetailComponent {
           targetId: this.idPlanAction
         }
       }
-    )
+    ).afterClosed().subscribe(result => {
+      this.validateAction(actionId);
+    });
   }
 
   getPriorityBarHtml(priority: Priority): string {
