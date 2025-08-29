@@ -114,10 +114,6 @@
         <mat-step [stepControl]="incidentForm3" label="Autres info">
           <form [formGroup]="incidentForm3">
 
-            <app-button-add-file label="Télécharger des images" [accept]="'image/*'" [preview]="true"
-              property="newImages" (filesSelected)="onFilesChange($event)">
-            </app-button-add-file>
-
             <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length"
               [id]="incidentForm3.get('processId')!.value" (changeValue)="onSelectionProcess($event)"
               placeholder="Sélectionnez un processus" [list]="listProcess">
