@@ -57,6 +57,20 @@ export class PlanActionPageDetailComponent {
       class: 'btn-green',
       show: true,
       action: () => this.export()
+    },
+    {
+      label: "Démarrer",
+      icon: 'play_arrow',
+      class: 'btn-green',
+      show: true,
+      action: () => console.log('Démarrer le plan d\'action')
+    },
+    {
+      label: "Terminer",
+      icon: 'close',
+      class: 'btn-red',
+      show: true,
+      action: () => console.log('Terminer le plan d\'action')
     }
   ];
 
@@ -64,10 +78,15 @@ export class PlanActionPageDetailComponent {
     this.getActionPlan(this.idPlanAction);
   }
 
+  isNotStarted(){
+    return this.actionPlan && this.actionPlan.status == Status.NOT_STARTED || false;
+  }
+
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(
       resp => {
         this.actionPlan = resp;
+        console.log(this.actionPlan.status);
         if (this.actionPlan?.actions?.length) {
           this.totalActions = this.actionPlan.actions.length;
           this.completedActions = this.getCompletedCount(this.actionPlan.actions);
@@ -97,15 +116,15 @@ export class PlanActionPageDetailComponent {
     const completed = this.completedActions;
     const total = this.totalActions;
 
-    if (total === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === total) {
-      this.actionPlan!.status = Status.ACHIEVED;
-    } else {
-      this.actionPlan!.status = Status.IN_PROGRESS;
-    }
+    // if (total === 0) {
+    //   this.actionPlan!.status = Status.NOT_ACHIEVED;
+    // } else if (completed === 0) {
+    //   this.actionPlan!.status = Status.NOT_ACHIEVED;
+    // } else if (completed === total) {
+    //   this.actionPlan!.status = Status.ACHIEVED;
+    // } else {
+    //   this.actionPlan!.status = Status.IN_PROGRESS;
+    // }
   }
 
   getReadableStatut(status: Status): string {
