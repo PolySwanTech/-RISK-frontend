@@ -21,8 +21,8 @@ import { HasPermissionDirective } from '../../../core/directives/has-permission.
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { State } from '../../../core/enum/state.enum';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatMenuModule }    from '@angular/material/menu';
-
+import { MatMenuModule } from '@angular/material/menu';
+import * as XLSX from 'xlsx';
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
 import { Filter } from '../../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
@@ -52,48 +52,48 @@ export class ListComponent implements OnInit {
 
   filterMode: 'general' | 'detailed' = 'general';
 
-columns = [
-  {
-    columnDef: 'reference',
-    header: 'Référence',
-    cell: (element: Incident) => `${element.reference}`,
-    filterType: 'text',
-    icon: 'tag' // 🏷️
-  },
-  {
-    columnDef: 'title',
-    header: 'Libellé',
-    cell: (element: Incident) => `${element.title}`,
-    filterType: 'text',
-    icon: 'title' // 📝
-  },
-  {
-    columnDef: 'declaredAt',
-    header: 'Date de déclaration',
-    cell: (element: Incident) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
-    filterType: 'date',
-    icon: 'event' // 📅
-  },
-  {
-    columnDef: 'survenueAt',
-    header: 'Date de survenance',
-    cell: (element: Incident) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
-    filterType: 'date',
-    icon: 'event_note' // 🗓️
-  },
-  {
-    columnDef: 'state',
-    header: 'Statut',
-    cell: (incident: Incident) => `
+  columns = [
+    {
+      columnDef: 'reference',
+      header: 'Référence',
+      cell: (element: Incident) => `${element.reference}`,
+      filterType: 'text',
+      icon: 'tag' // 🏷️
+    },
+    {
+      columnDef: 'title',
+      header: 'Libellé',
+      cell: (element: Incident) => `${element.title}`,
+      filterType: 'text',
+      icon: 'title' // 📝
+    },
+    {
+      columnDef: 'declaredAt',
+      header: 'Date de déclaration',
+      cell: (element: Incident) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
+      filterType: 'date',
+      icon: 'event' // 📅
+    },
+    {
+      columnDef: 'survenueAt',
+      header: 'Date de survenance',
+      cell: (element: Incident) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
+      filterType: 'date',
+      icon: 'event_note' // 🗓️
+    },
+    {
+      columnDef: 'state',
+      header: 'Statut',
+      cell: (incident: Incident) => `
       <span class="badge ${incident.state.toLowerCase()}">
         ${State[incident.state.toString() as keyof typeof State] || 'Inconnu'}
       </span>
     `,
-    filterType: 'select',
-    options: ['En cours', 'Clôturé'],
-    icon: 'flag' // 🚩
-  }
-];
+      filterType: 'select',
+      options: ['En cours', 'Clôturé'],
+      icon: 'flag' // 🚩
+    }
+  ];
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
@@ -105,7 +105,7 @@ columns = [
   searchQuery: string = '';
 
   selectedIncidents = new Set<string>();
-  
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -181,7 +181,8 @@ columns = [
   edit(row: Incident) {
     this.router.navigate(['incident', 'create'], {
       queryParams: { id: row.id }
-  })}
+    })
+  }
 
   isAllSelected(): boolean {
     return this.selectedIncidents.size === this.dataSource.data.length && this.dataSource.data.length > 0;
@@ -192,9 +193,9 @@ columns = [
   }
 
   isUpdatable(incident: Incident): boolean {
-    return incident!.state === State.DRAFT ;
+    return incident!.state === State.DRAFT;
   }
-  
+
   handleFiltersChanged(filters: Record<string, any>) {
     let filtered = [...this.incidents];
 
@@ -255,5 +256,27 @@ columns = [
   clearSearch(): void {
     this.searchQuery = '';
     this.dataSource.data = this.incidents;
+  }
+
+  exportExcel(filename: string = 'incidents.xlsx') {
+
+    this.incidentService.findAllByIds(this.selectedIncidents).subscribe(
+      list => {
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(list);
+
+        // Example of adding column widths
+        const columnWidths = list.length > 0
+          ? Object.keys(list[0]).map(key => ({ wch: key.length + 5 }))
+          : [];
+
+        worksheet['!cols'] = columnWidths; // Apply column widths
+
+        const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Incidents');
+
+        // Write to file
+        XLSX.writeFile(workbook, filename);
+      }
+    )
   }
 }

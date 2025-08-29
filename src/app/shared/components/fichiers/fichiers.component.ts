@@ -55,13 +55,15 @@ export class FichiersComponent {
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data?: {
     files?: UploadedFile[];
     targetType?: TargetType;
-    targetId?: string; 
+    targetId?: string;
+    closed?: boolean;
   }) { }
 
   ngOnInit(): void {
     // Data du dialog > Inputs si fournis
     if (this.data?.targetType) this.targetType = this.data.targetType;
     if (this.data?.targetId) this.targetId = this.data.targetId;
+    if (this.data?.closed) this.closed = this.data.closed;
 
     // Si des fichiers sont déjà fournis (dialog)
     if (this.data?.files?.length) {

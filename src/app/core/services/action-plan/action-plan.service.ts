@@ -35,4 +35,8 @@ export class ActionPlanService {
     const params = new HttpParams().set("incidentId", incidentId);
     return this.http.get<ActionPlan>(`${this.base + '/incident'}`, { params : params});
   }
+
+  finishAction(actionId : string){
+    return this.http.put(this.base + '/actions/finish/' + actionId, null);
+  }
 }

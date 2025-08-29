@@ -15,7 +15,6 @@ import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/g
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
 import { firstValueFrom } from 'rxjs';
@@ -23,6 +22,7 @@ import { TargetType } from '../../core/enum/targettype.enum';
 import { FichiersComponent } from '../../shared/components/fichiers/fichiers.component';
 import { FileService } from '../../core/services/file/file.service';
 import { MatDialog } from '@angular/material/dialog';
+import { ConfirmService } from '../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -36,7 +36,7 @@ export class PlanActionPageDetailComponent {
 
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
-  private authService = inject(AuthService);
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private fileService = inject(FileService);
   private dialog = inject(MatDialog);
@@ -50,15 +50,15 @@ export class PlanActionPageDetailComponent {
 
   validator: string = '';
 
-  goBackButtons : GoBackButton[] = [
-      {
-        label: "Exporter",
-        icon: 'file_download',
-        class: 'btn-green',
-        show: true,
-        action: () => this.export()
-      }
-    ];
+  goBackButtons: GoBackButton[] = [
+    {
+      label: "Exporter",
+      icon: 'file_download',
+      class: 'btn-green',
+      show: true,
+      action: () => this.export()
+    }
+  ];
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
@@ -78,22 +78,11 @@ export class PlanActionPageDetailComponent {
     )
   }
 
-  validateAction(action: Action, event: Event) {
-    // TODO : envoyer le file au back + valide action
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      const file = input.files[0];
-      action.fileName = file.name;
-      action.performedBy = this.authService.decryptToken()?.sub || "";
-      action.performedAt = new Date().toISOString();
+  validateAction(actionId: string) {
 
-      // 🔁 Recalculer les valeurs après validation
-      if (this.actionPlan?.actions) {
-        this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-        this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-        this.updateStatus();
-      }
-    }
+    this.actionPlanService.finishAction(actionId).subscribe(
+      _ => this.ngOnInit()
+    )
   }
 
   getCompletedCount(actions: Action[]): number {
@@ -136,9 +125,9 @@ export class PlanActionPageDetailComponent {
     }
   }
 
-  async viewFiles() {
+  async viewFiles(actionId: string, closed: boolean = false) {
     var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
-    let files = await firstValueFrom(this.fileService.getFiles(targetType, this.idPlanAction ))
+    let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId))
 
     this.dialog.open(FichiersComponent,
       {
@@ -146,10 +135,21 @@ export class PlanActionPageDetailComponent {
         data: {
           files: files,
           targetType: targetType,
-          targetId: this.idPlanAction
+          targetId: actionId,
+          closed: closed
         }
       }
-    )
+    ).afterClosed().subscribe(result => {
+      if (!closed) {
+        this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
+          result => {
+            if (result) {
+              this.validateAction(actionId);
+            }
+          }
+        )
+      }
+    });
   }
 
   getPriorityBarHtml(priority: Priority): string {
@@ -185,10 +185,10 @@ export class PlanActionPageDetailComponent {
     `;
   }
 
-  export(){
+  export() {
   }
 
-  goToIncident(){
+  goToIncident() {
     this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
   }
 
