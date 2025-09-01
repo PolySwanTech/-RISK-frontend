@@ -51,7 +51,7 @@
               </mat-select>
             </mat-form-field>
 
-            <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length && listProcess.length > 0"
+            <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length > 0"
               [id]="infoForm.get('processId')!.value" (changeValue)="onProcessSelected($event)"
               placeholder="Sélectionnez un processus" [list]="listProcess">
             </app-select-arborescence>
