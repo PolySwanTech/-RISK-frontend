@@ -50,32 +50,58 @@ export class PlanActionPageDetailComponent {
 
   validator: string = '';
 
-  goBackButtons: GoBackButton[] = [
-    {
-      label: "Exporter",
-      icon: 'file_download',
-      class: 'btn-green',
-      show: true,
-      action: () => this.export()
-    }
-  ];
+  goBackButtons: GoBackButton[] = []
+
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
   }
 
   getActionPlan(id: string) {
-    this.actionPlanService.getActionPlan(id).subscribe(
-      resp => {
-        this.actionPlan = resp;
-        if (this.actionPlan?.actions?.length) {
-          this.totalActions = this.actionPlan.actions.length;
-          this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-          this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-          this.updateStatus();
-        }
+    this.actionPlanService.getActionPlan(id).subscribe(resp => {
+      this.actionPlan = resp;
+
+      // Todo: métriques doivent être calculées côté backend
+      if (this.actionPlan?.actions?.length) {
+        this.totalActions = this.actionPlan.actions.length;
+        this.completedActions = this.getCompletedCount(this.actionPlan.actions);
+        this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
       }
-    )
+
+      // règles d’affichage
+      const st = this.actionPlan?.status;
+
+      const canStart = st === Status.NOT_STARTED;
+
+      const canEnd =
+        st !== Status.ACHIEVED &&
+        st !== Status.NOT_STARTED &&
+        st !== (Status as any).CANCELLED 
+
+      this.goBackButtons = [
+        {
+          label: 'Exporter',
+          icon: 'file_download',
+          class: 'btn-green',
+          show: true,
+          action: () => this.export()
+        },
+        {
+          label: 'Démarrer',
+          icon: 'play_arrow',
+          class: 'btn-blue',
+          show: !!canStart,
+          action: () => this.startActionPlan()
+        },
+        {
+          label: 'Terminer',
+          icon: 'check',
+          class: 'btn-primary',
+          show: !!canEnd,
+          action: () => this.endActionPlan()
+        }
+      ];
+    });
   }
 
   validateAction(actionId: string) {
@@ -91,21 +117,6 @@ export class PlanActionPageDetailComponent {
 
   getCompletionRate(actions: Action[]): number {
     return actions.length ? Math.round((this.getCompletedCount(actions) / actions.length) * 100) : 0;
-  }
-
-  updateStatus() {
-    const completed = this.completedActions;
-    const total = this.totalActions;
-
-    if (total === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === total) {
-      this.actionPlan!.status = Status.ACHIEVED;
-    } else {
-      this.actionPlan!.status = Status.IN_PROGRESS;
-    }
   }
 
   getReadableStatut(status: Status): string {
@@ -186,6 +197,22 @@ export class PlanActionPageDetailComponent {
   }
 
   export() {
+  }
+
+  startActionPlan() {
+    if (this.actionPlan && this.actionPlan.status === Status.NOT_STARTED) {
+      this.actionPlanService.startActionPlan(this.actionPlan.id!).subscribe(
+        _ => this.ngOnInit()
+      )
+    }
+  }
+
+  endActionPlan() {
+    if (this.actionPlan && this.actionPlan.status !== Status.ACHIEVED && this.actionPlan.status !== Status.NOT_STARTED) {
+      this.actionPlanService.endActionPlan(this.actionPlan.id!).subscribe(
+        _ => this.ngOnInit()
+      )
+    }
   }
 
   goToIncident() {
