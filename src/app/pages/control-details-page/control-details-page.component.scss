@@ -281,13 +281,6 @@ $gray-600: #475569;
     margin-top: 5%;
   }
 
-  .btn-primary {
-    background: $brand;
-    color: #fff;
-    border-color: $brand;
-    width: 50%;
-  }
-
   .btn-outline {
     background: #fff;
     color: $gray-700;
@@ -925,3 +918,11 @@ $gray-600: #475569;
   gap: 2rem;
 }
 
+.meta-right .btn-evaluer {
+  font-size: 1rem;      /* taille du texte */
+  padding: .6rem 1rem;  /* hauteur/largeur */
+  line-height: 1.25;    /* évite le texte coupé */
+  min-height: 40px;     /* assure une hauteur mini */
+  white-space: nowrap;  /* évite le retour à la ligne */
+  background: $brand;
+}
