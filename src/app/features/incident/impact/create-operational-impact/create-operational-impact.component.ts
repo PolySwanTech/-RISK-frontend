@@ -2,30 +2,31 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-type PriorityValue = 'FAIBLE' | 'MOYENNE' | 'ELEVEE' | 'CRITIQUE';
-
+// --- Financier ---
 interface FinancialImpactDetails {
   amountType: '' | 'REEL' | 'ESTIME' | 'PREVISIONNEL' | 'BUDGET';
   accountingDate: string; // YYYY-MM-DD
   amount: string;
 }
-
 interface FinancialImpact {
   id: number;
   title: string;
-  priority: PriorityValue;
+  businessLine: string;        // ✅ Business line (déjà présent côté financier)
   type: string;
   description: string;
-  details: FinancialImpactDetails;
+  accountingReference: string;
+  details: FinancialImpactDetails[]; // ✅ plusieurs lignes
 }
 
+// --- Non financier (mise à jour) ---
 interface NonFinancialImpact {
   id: number;
   title: string;
-  priority: PriorityValue;
+  businessLine: string;        // ✅ ajouté
   type: string;
   description: string;
-  measurabilityIndicator: string;
+  amountType: 'ESTIME';        // ✅ fixé
+  amount: string;              // ✅ ajouté
 }
 
 interface FormData {
@@ -43,14 +44,7 @@ type Errors = Record<string, string>;
   styleUrl: './create-operational-impact.component.scss',
 })
 export class CreateOperationalImpactComponent {
-  // Options
-  priorityOptions = [
-    { value: 'FAIBLE' as const,   label: 'Faible',   badge: 'badge--faible' },
-    { value: 'MOYENNE' as const,  label: 'Moyenne',  badge: 'badge--moyenne' },
-    { value: 'ELEVEE' as const,   label: 'Élevée',   badge: 'badge--elevee' },
-    { value: 'CRITIQUE' as const, label: 'Critique', badge: 'badge--critique' },
-  ];
-
+  // Typologies
   financialImpactTypes = [
     'Impact sur les revenus',
     'Impact sur les coûts',
@@ -78,6 +72,9 @@ export class CreateOperationalImpactComponent {
     { value: 'BUDGET' as const,      label: 'Budget alloué' },
   ];
 
+  // À brancher plus tard sur ton service si besoin
+  businessLines = ['Retail', 'Corporate', 'Institutionnel', 'Assurance', 'Autre'];
+
   // State
   formData: FormData = {
     financialImpacts: [],
@@ -85,24 +82,9 @@ export class CreateOperationalImpactComponent {
   };
 
   errors: Errors = {};
-
-  // Helpers
   trackById = (_: number, item: { id: number }) => item.id;
 
-  getBadge(p: PriorityValue | ''): string {
-    switch (p) {
-      case 'FAIBLE': return 'badge--faible';
-      case 'MOYENNE': return 'badge--moyenne';
-      case 'ELEVEE': return 'badge--elevee';
-      case 'CRITIQUE': return 'badge--critique';
-      default: return '';
-    }
-  }
-  getPriorityLabel(p: PriorityValue | ''): string {
-    return this.priorityOptions.find(o => o.value === p)?.label ?? '';
-  }
-
-  // Actions
+  // ---------- Financier ----------
   addFinancialImpact() {
     this.formData = {
       ...this.formData,
@@ -111,15 +93,25 @@ export class CreateOperationalImpactComponent {
         {
           id: Date.now(),
           title: '',
-          priority: 'MOYENNE',
+          businessLine: '',
           type: '',
           description: '',
-          details: { amountType: '', accountingDate: '', amount: '' },
+          accountingReference: '',
+          details: [{ amountType: '', accountingDate: '', amount: '' }],
         },
       ],
     };
   }
 
+  addFinancialDetail(i: number) {
+    this.formData.financialImpacts[i].details.push({ amountType: '', accountingDate: '', amount: '' });
+  }
+
+  removeFinancialDetail(i: number, j: number) {
+    this.formData.financialImpacts[i].details.splice(j, 1);
+  }
+
+  // ---------- Non financier (nouveau modèle) ----------
   addNonFinancialImpact() {
     this.formData = {
       ...this.formData,
@@ -128,10 +120,11 @@ export class CreateOperationalImpactComponent {
         {
           id: Date.now(),
           title: '',
-          priority: 'MOYENNE',
+          businessLine: '',   // ✅
           type: '',
           description: '',
-          measurabilityIndicator: '',
+          amountType: 'ESTIME', // ✅ fixé
+          amount: '',           // ✅
         },
       ],
     };
@@ -142,7 +135,7 @@ export class CreateOperationalImpactComponent {
     this.formData = { ...this.formData, [type]: list.filter(it => it.id !== id) } as FormData;
   }
 
-  // Validation & submit
+  // ---------- Validation ----------
   validateForm(): boolean {
     const newErrors: Errors = {};
 
@@ -150,18 +143,34 @@ export class CreateOperationalImpactComponent {
       newErrors['impacts'] = 'Ajoutez au moins un impact (financier ou non financier).';
     }
 
+    // Non financier
     this.formData.nonFinancialImpacts.forEach((imp, i) => {
-      if (!imp.title || !imp.priority || !imp.type || !imp.description) {
-        newErrors[`nonfinancial_${i}`] = 'Titre, priorité, type et description sont requis.';
+      if (!imp.title || !imp.businessLine || !imp.type || !imp.description) {
+        newErrors[`nonfinancial_${i}`] = 'Titre, Business Line, type et description sont requis.';
+      }
+      if (!imp.amount || isNaN(+imp.amount)) {
+        newErrors[`nonfinancial_${i}`] = (newErrors[`nonfinancial_${i}`] ? newErrors[`nonfinancial_${i}`] + ' ' : '')
+          + 'Montant (estimé) requis et numérique.';
+      }
+      if (imp.amountType !== 'ESTIME') {
+        // au cas où quelqu’un modifie le DOM: on force côté code
+        imp.amountType = 'ESTIME';
       }
     });
 
+    // Financier
     this.formData.financialImpacts.forEach((imp, i) => {
-      if (!imp.title || !imp.priority || !imp.type || !imp.description) {
-        newErrors[`financial_${i}`] = 'Titre, priorité, type et description sont requis.';
+      if (!imp.title || !imp.type || !imp.description || !imp.businessLine) {
+        newErrors[`financial_${i}`] = 'Titre, Business Line, type et description sont requis.';
       }
-      if (!imp.details.amountType || !imp.details.accountingDate || !imp.details.amount) {
-        newErrors[`financial_details_${i}`] = 'Tous les détails comptables sont requis.';
+
+      if (!imp.details.length) {
+        newErrors[`financial_details_${i}`] = 'Ajoutez au moins un type de montant.';
+      } else {
+        const anyMissing = imp.details.some(d => !d.amountType || !d.accountingDate || !d.amount || isNaN(+d.amount));
+        if (anyMissing) {
+          newErrors[`financial_details_${i}`] = 'Tous les détails comptables (type/date/montant numérique) sont requis.';
+        }
       }
     });
 
@@ -170,11 +179,10 @@ export class CreateOperationalImpactComponent {
   }
 
   handleSubmit() {
-    if (this.validateForm()) {
-      console.log("Payload:", this.formData);
-      alert('Impact opérationnel créé avec succès !');
-      // TODO: appel API ici
-    }
+    if (!this.validateForm()) return;
+    console.log('Payload:', this.formData);
+    alert('Impact opérationnel créé avec succès !');
+    // TODO: appel API ici
   }
 
   onCancel() {
@@ -184,10 +192,7 @@ export class CreateOperationalImpactComponent {
   }
 
   resetForm() {
-    this.formData = {
-      financialImpacts: [],
-      nonFinancialImpacts: [],
-    };
+    this.formData = { financialImpacts: [], nonFinancialImpacts: [] };
     this.errors = {};
   }
 }
