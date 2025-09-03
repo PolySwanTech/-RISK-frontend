@@ -124,10 +124,10 @@ export class CreateComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.hasTeam = false;
 
-    
+
     // D'abord charger les équipes
     await this.fetchTeams();
-    
+
     // Ensuite charger l'incident ou l'arbre
     if (this.incidentId) {
       this.title = "Modification d'un incident";
@@ -237,29 +237,34 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('intervenant')!.setValue(event.id);
   }
 
-  private convertFormToIncident() {
+  private convertFormToIncident(isDraft: boolean = false) {
     return {
       reference: this.incidentForm1.value.reference || "",
       state: "",
-      title: this.incidentForm1.value.titre!,
-      location: this.incidentForm1.value.location!,
-      commentaire: this.incidentForm1.value.commentaire!,
-      teamId: this.incidentForm1.value.teamId!,
+      title: this.incidentForm1.value.titre || (isDraft ? null : ""),
+      location: this.incidentForm1.value.location || (isDraft ? null : ""),
+      commentaire: this.incidentForm1.value.commentaire || (isDraft ? null : ""),
+      teamId: this.incidentForm1.value.teamId || (isDraft ? null : ""),
       declaredAt: new Date(this.incidentForm2.value.dateDeDeclaration!),
-      survenueAt: new Date(this.incidentForm2.value.dateDeSurvenance!),
-      detectedAt: new Date(this.incidentForm2.value.dateDeDetection!),
+      survenueAt: this.incidentForm2.value.dateDeSurvenance ? new Date(this.incidentForm2.value.dateDeSurvenance) : null,
+      detectedAt: this.incidentForm2.value.dateDeDetection ? new Date(this.incidentForm2.value.dateDeDetection) : null,
       closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
-      riskId: this.incidentForm3.value.riskId!,
-      processId: this.incidentForm3.value.processId!,
-      consequences: this.incidentForm3.value.consequences!,
-      cause: this.incidentForm3.value.cause!,
+      riskId: this.incidentForm3.value.riskId || null,
+      processId: this.incidentForm3.value.processId || null,
+      consequences: this.incidentForm3.value.consequences || [],
+      cause: this.incidentForm3.value.cause || null,
       intervenant: this.incidentForm3.value.intervenant || null,
     };
   }
 
   addIncident() {
 
-    const incident = this.convertFormToIncident();
+    if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
+      console.error("Formulaire invalide pour la soumission");
+      return;
+    }
+
+    const incident = this.convertFormToIncident(false);
     incident.state = State.SUBMIT
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
@@ -286,31 +291,22 @@ export class CreateComponent implements OnInit {
   }
 
   addDraft() {
-    const incident = this.convertFormToIncident();
+    const incident = this.convertFormToIncident(true);
+
     incident.state = State.DRAFT;
     if (this.incidentId) {
-      this.incidentService.updateIncident(this.incidentId, incident).subscribe(
-        {
-          error: err => {
-            console.error("Erreur lors de la modification de l'incident", err);
-          }
-        },
-      );
+      this.incidentService.updateIncident(this.incidentId, incident).subscribe({
+        error: err => console.error('Erreur update draft', err)
+      });
       this.router.navigate(['incident']);
-    }
-    else {
-      this.incidentService.saveIncident(incident).subscribe(
-        {
-          next: resp => {
-            this.afterCreation("Création réussie", resp);
-          },
-          error: err => {
-            console.error("Erreur lors de la création de l'incident", err);
-          }
-        },
-      );
+    } else {
+      this.incidentService.saveIncident(incident).subscribe({
+        next: resp => this.afterCreation('Création réussie', resp),
+        error: err => console.error('Erreur création draft', err)
+      });
     }
   }
+
 
   afterCreation(title: string, incidentId: string) {
     this.confirmService.openConfirmDialog(title, "Allez vers la consultation ?", true)
@@ -329,9 +325,9 @@ export class CreateComponent implements OnInit {
 
   private toInputDate(d?: string | Date | null): string | null {
     if (!d) return '';
-    return (d instanceof Date ? d : new Date(d))
-      .toISOString()
-      .split('T')[0];
+
+    const date = d instanceof Date ? d : new Date(d);
+    return date.toLocaleDateString('sv-SE');
   }
 
   onFilesChange(event: any) {
@@ -340,5 +336,11 @@ export class CreateComponent implements OnInit {
 
   compareById = (a: { id: string } | null, b: { id: string } | null) =>
     a && b ? a.id === b.id : a === b;
+
+
+  private _iso(v: any) {
+    return v?.toISOString ? v.toISOString() : v;
+  }
+
 
 }
