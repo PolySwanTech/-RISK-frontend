@@ -11,7 +11,7 @@ import { map } from 'rxjs';
 export class ProcessService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/processes'; ;
+  baseUrl = environment.apiUrl + '/processes';;
 
   getAllGroupedByBu() {
     return this.http.get<{ [key: string]: Process[] }>(this.baseUrl);
@@ -26,8 +26,8 @@ export class ProcessService {
     return this.http.get<Process>(`${this.baseUrl}/${id}`);
   }
 
-  createProcess(process : { name: string; bu: { id: string; name: string }; parentId?: string }){ 
-    return this.http.post<Process>(this.baseUrl , process)
+  createProcess(process: { name: string; bu: { id: string; name: string }; parentId?: string }) {
+    return this.http.post<Process>(this.baseUrl, process)
   }
 
   getProcessTree(buId?: string): Observable<Process[]> {
@@ -43,6 +43,6 @@ export class ProcessService {
   getAllByRisks(riskId: string) {
     let params = new HttpParams();
     params = params.append('riskId', riskId);
-    return this.http.get<Process[]>(this.baseUrl + '/by-dmr', { params : params });
+    return this.http.get<Process[]>(this.baseUrl + '/by-dmr', { params: params });
   }
 }

@@ -83,7 +83,7 @@ export class CreateRisksComponent implements OnInit {
   ngOnInit(): void {
     this.riskCategoryService.getAll().subscribe(data => this.bal1 = data);
 
-    this.procSrv.getAll().subscribe(list => this.listProcess = list);
+    this.procSrv.getProcessTree().subscribe(list => this.listProcess = list);
 
     this.riskSrv.getAll().subscribe(risks => this.risks = risks);
 
