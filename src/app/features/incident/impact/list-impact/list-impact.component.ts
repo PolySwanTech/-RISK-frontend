@@ -28,6 +28,7 @@ import { firstValueFrom } from 'rxjs';
 import { MatPaginator } from "@angular/material/paginator";
 import { ImpactTypeEnum } from '../../../../core/enum/impactType.enum';
 import { TargetType } from '../../../../core/enum/targettype.enum';
+import { CreateOperationalImpactComponent } from '../create-operational-impact/create-operational-impact.component';
 
 @Component({
   selector: 'app-list-impact',
@@ -41,6 +42,7 @@ import { TargetType } from '../../../../core/enum/targettype.enum';
 export class ListImpactComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
+  private router = inject(Router);           // ✅ ajoute ceci
   private route = inject(ActivatedRoute);
   private impactService = inject(ImpactService);
   private dialog = inject(MatDialog);
@@ -132,12 +134,7 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
   }
 
   addImpact() {
-    this.dialog.open(CreateImpactPopUpComponent, {
-      width: '700px !important',
-      minWidth: '600px',
-      maxWidth: '600px',
-      data: { incidentId: this.incidentId }
-    }).afterClosed().subscribe(() => this.ngOnInit());
+    this.router.navigate(['/incident', this.incidentId, 'impacts', 'create']);
   }
 
   async viewFiles(impact: Impact) {
