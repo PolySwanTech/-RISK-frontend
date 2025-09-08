@@ -59,15 +59,11 @@ export class ListProcessComponent implements OnInit {
   @Input() isCartographie: boolean = false;
 
   ngOnInit(): void {
+    this.hierarchicalProcesses = [];
+    this.expandedNodes.clear();
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.fetchProcesses(entities);
     });
-
-    // this.getEvaluationYears().then(
-    //   (years: number[]) => {
-    //     this.years = years;
-    //   }
-    // )
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -125,10 +121,8 @@ export class ListProcessComponent implements OnInit {
       minWidth: '600px',
       maxWidth: '600px',
     });
-    dialogRef.afterClosed().subscribe((needRefresh: boolean) => {
-      if (needRefresh) {
-        this.ngOnInit(); // Refresh the list after adding a new process
-      }
+    dialogRef.afterClosed().subscribe(_ => {
+      this.ngOnInit(); // Refresh the list after adding a new process
     });
   }
 
@@ -176,23 +170,6 @@ export class ListProcessComponent implements OnInit {
         });
       }
     }
-  }
-
-  private groupByBU(): Array<{ buName: string | null, processes: any[] }> {
-    const buMap = new Map<string, any[]>();
-
-    this.processes.forEach(process => {
-      const buKey = process.buName || 'no-bu';
-      if (!buMap.has(buKey)) {
-        buMap.set(buKey, []);
-      }
-      buMap.get(buKey)!.push(process);
-    });
-
-    return Array.from(buMap.entries()).map(([buName, processes]) => ({
-      buName: buName === 'no-bu' ? null : buName,
-      processes
-    }));
   }
 
   private buildBUChildren(processes: any[]): ProcessNode[] {
@@ -323,37 +300,24 @@ export class ListProcessComponent implements OnInit {
     if (event) {
       event.stopPropagation(); // Empêche la propagation du clic
     }
-
-    const dialogRef = this.dialog.open(AddEntityDialogComponent, {
+    this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
       data: entite || null // Passe l'entité si c'est une modification, sinon null
-    });
-
-    dialogRef.afterClosed().subscribe(BusinessUnit => {
-      if (BusinessUnit) {
-        if (BusinessUnit.id == null) {
-          this.entityService.save(BusinessUnit).subscribe(() => {
-            this.ngOnInit(); // Rafraîchir après ajout/modification
-          });
-        }
-        else {
-          this.entityService.update(BusinessUnit).subscribe(
-            resp => {
-              this.snackBarService.success("L'entité a bien été crée")
-          }, error => {
-              this.snackBarService.error(error.message)
-             this.ngOnInit(); 
-          });
-        }
+    }).afterClosed().subscribe(bu => {
+      if (bu) {
+        this.entityService.save(bu).subscribe(_ => {
+          this.ngOnInit()
+          this.snackBarService.info("Entité ajoutée avec succès !")
+        })
       }
     });
   }
 
-  navToCreateCarto(){
+  navToCreateCarto() {
     this.router.navigate(['reglages', 'evaluation', 'create'])
   }
 
-  goToMatrixPage(buId : any){
+  goToMatrixPage(buId: any) {
     this.router.navigate(['risk', buId])
   }
 }
