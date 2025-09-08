@@ -13,68 +13,65 @@
 
     <!-- Impacts Financiers -->
     <div class="op-card op-mb">
-    <div class="op-section-header">
+      <div class="op-section-header">
         <div class="op-section-title">
-        <span class="op-icon op-icon--green" aria-hidden="true"></span>
-        <h2 class="op-h2">Impacts Financiers</h2>
+          <span class="op-icon op-icon--green" aria-hidden="true"></span>
+          <h2 class="op-h2">Impacts Financiers</h2>
         </div>
         <button type="button" (click)="addFinancialImpact()" class="btn btn--success">
-        <span class="btn-icon" aria-hidden="true"></span>
-        Ajouter
+          <span class="btn-icon" aria-hidden="true"></span>
+          Ajouter
         </button>
-    </div>
+      </div>
 
-    <div *ngIf="formData.financialImpacts.length === 0; else financialList" class="op-empty">
+      <div *ngIf="formData.financialImpacts.length === 0; else financialList" class="op-empty">
         <span class="op-empty-icon" aria-hidden="true"></span>
         <p>Aucun impact financier défini</p>
         <p class="op-empty-sub">Cliquez sur « Ajouter » pour commencer</p>
-    </div>
+      </div>
 
-    <ng-template #financialList>
+      <ng-template #financialList>
         <div class="op-stack op-stack--lg">
-        <div class="op-subcard" *ngFor="let impact of formData.financialImpacts; let i = index; trackBy: trackById">
+          <div class="op-subcard" *ngFor="let impact of formData.financialImpacts; let i = index; trackBy: trackById">
             <div class="op-subcard-head">
-            <h3 class="op-h3">Impact Financier #{{ i + 1 }}</h3>
-            <button type="button" (click)="removeItem('financialImpacts', impact.id)"
-                    class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
+              <h3 class="op-h3">Impact Financier #{{ i + 1 }}</h3>
+              <button type="button" (click)="removeItem('financialImpacts', impact.id)"
+                      class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
             </div>
 
-            <!-- Titre (priorité supprimée) -->
+            <!-- Titre + Entité -->
             <div class="op-grid op-grid--2">
-            <div class="op-field">
+              <div class="op-field">
                 <label class="op-label">Titre *</label>
                 <input type="text" [(ngModel)]="impact.title" class="op-input"
-                    [ngClass]="{'op-input--error': errors['financial_'+i] || errors['financial_details_'+i]}"/>
-            </div>
-            <div class="op-field">
-                <label class="op-label">Business Line *</label>
-                <select [(ngModel)]="impact.businessLine" class="op-select">
-                <option value="">Sélectionnez</option>
-                <option *ngFor="let bl of businessLines" [value]="bl">{{ bl }}</option>
-                </select>
-            </div>
+                       [ngClass]="{'op-input--error': errors['financial_'+i] || errors['financial_details_'+i]}"/>
+              </div>
+
+              <div class="op-field">
+                <label class="op-label">Entité (Business Unit)</label>
+                <input type="text" class="op-input" [value]="currentBusinessUnitName || '—'" disabled />
+              </div>
             </div>
 
-            <!-- Type + description -->
+            <!-- Type + Référence comptable -->
             <div class="op-grid op-grid--2 op-mt-xs">
-            <div class="op-field">
-                <label class="op-label">Type de Conséquence  *</label>
+              <div class="op-field">
+                <label class="op-label">Type de Conséquence *</label>
                 <select [(ngModel)]="impact.type" class="op-select">
-                <option value="">Sélectionnez un type</option>
-                <option *ngFor="let t of financialImpactTypes" [value]="t">{{ t }}</option>
+                  <option [ngValue]="null">Sélectionnez un type</option>
+                  <option *ngFor="let t of financialOperatingLossTypes" [ngValue]="t.libelle">{{ t.libelle }}</option>
                 </select>
-            </div>
+              </div>
 
-            <div class="op-field">
+              <div class="op-field">
                 <label class="op-label">Référence comptable</label>
-                <input type="text" [(ngModel)]="impact.accountingReference" class="op-input"
-                    placeholder="Ex: REF-2025-001" />
-            </div>
+                <input type="text" [(ngModel)]="impact.accountingReference" class="op-input" placeholder="Ex: REF-2025-001" />
+              </div>
             </div>
 
             <div class="op-field op-mt-xs">
-            <label class="op-label">Description *</label>
-            <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
+              <label class="op-label">Description *</label>
+              <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
                         placeholder="Décrivez cet impact financier..."></textarea>
             </div>
 
@@ -82,138 +79,133 @@
 
             <h4 class="op-h4">Détails Comptables</h4>
 
-            <!-- Liste des lignes montant/date/type -->
+            <!-- Lignes montant/date/type -->
             <div class="op-stack">
-            <div class="op-grid op-grid--3" *ngFor="let d of impact.details; let j = index">
+              <div class="op-grid op-grid--3" *ngFor="let d of impact.details; let j = index">
                 <div class="op-field">
-                <label class="op-label">Type de montant *</label>
-                <select [(ngModel)]="d.amountType" class="op-select">
-                    <option value="">Sélectionnez</option>
-                    <option *ngFor="let t of amountTypes" [value]="t.value">{{ t.label }}</option>
-                </select>
+                  <label class="op-label">Type de montant *</label>
+                  <select [(ngModel)]="d.amountType" class="op-select">
+                    <option [ngValue]="null">Sélectionnez</option>
+                    <option *ngFor="let t of financialAmountTypes" [ngValue]="t.libelle">{{ t.libelle }}</option>
+                  </select>
                 </div>
 
                 <div class="op-field">
-                <label class="op-label">Date de comptabilisation *</label>
-                <input type="date" [(ngModel)]="d.accountingDate" class="op-input" />
+                  <label class="op-label">Date de comptabilisation (optionnelle)</label>
+                  <input type="date" [(ngModel)]="d.accountingDate" class="op-input" />
                 </div>
 
                 <div class="op-field">
-                <label class="op-label">Montant (€) *</label>
-                <div style="display:flex; gap:8px; align-items:center;">
+                  <label class="op-label">Montant (€) *</label>
+                  <div style="display:flex; gap:8px; align-items:center;">
                     <input type="number" [(ngModel)]="d.amount" class="op-input" placeholder="0" />
                     <button type="button" class="btn btn--danger" (click)="removeFinancialDetail(i, j)">x</button>
+                  </div>
                 </div>
-                </div>
-            </div>
+              </div>
 
-            <div>
+              <div>
                 <button type="button" class="btn btn--success" (click)="addFinancialDetail(i)">
-                + Ajouter un type de montant
+                  + Ajouter un type de montant
                 </button>
-            </div>
+              </div>
             </div>
 
             <div class="op-stack-xs" *ngIf="errors['financial_' + i] || errors['financial_details_' + i]">
-            <p class="op-error op-error--row" *ngIf="errors['financial_' + i]">
+              <p class="op-error op-error--row" *ngIf="errors['financial_' + i]">
                 <span class="op-error-icon" aria-hidden="true">!</span>
                 {{ errors['financial_' + i] }}
-            </p>
-            <p class="op-error op-error--row" *ngIf="errors['financial_details_' + i]">
+              </p>
+              <p class="op-error op-error--row" *ngIf="errors['financial_details_' + i]">
                 <span class="op-error-icon" aria-hidden="true">!</span>
                 {{ errors['financial_details_' + i] }}
-            </p>
+              </p>
             </div>
+          </div>
         </div>
-        </div>
-    </ng-template>
+      </ng-template>
     </div>
 
     <!-- Impacts Non Financiers -->
     <div class="op-card op-mb">
-        <div class="op-section-header">
-            <div class="op-section-title">
-            <span class="op-icon op-icon--blue" aria-hidden="true"></span>
-            <h2 class="op-h2">Impacts Non Financiers</h2>
-            </div>
-            <button type="button" (click)="addNonFinancialImpact()" class="btn btn--primary">
-            <span class="btn-icon" aria-hidden="true"></span>
-            Ajouter
-            </button>
+      <div class="op-section-header">
+        <div class="op-section-title">
+          <span class="op-icon op-icon--blue" aria-hidden="true"></span>
+          <h2 class="op-h2">Impacts Non Financiers</h2>
         </div>
+        <button type="button" (click)="addNonFinancialImpact()" class="btn btn--primary">
+          <span class="btn-icon" aria-hidden="true"></span>
+          Ajouter
+        </button>
+      </div>
 
-        <div *ngIf="formData.nonFinancialImpacts.length === 0; else nonFinancialList" class="op-empty">
-            <span class="op-empty-icon" aria-hidden="true"></span>
-            <p>Aucun impact non financier défini</p>
-            <p class="op-empty-sub">Cliquez sur « Ajouter » pour commencer</p>
+      <div *ngIf="formData.nonFinancialImpacts.length === 0; else nonFinancialList" class="op-empty">
+        <span class="op-empty-icon" aria-hidden="true"></span>
+        <p>Aucun impact non financier défini</p>
+        <p class="op-empty-sub">Cliquez sur « Ajouter » pour commencer</p>
+      </div>
+
+      <ng-template #nonFinancialList>
+        <div class="op-stack">
+          <div class="op-subcard" *ngFor="let impact of formData.nonFinancialImpacts; let i = index; trackBy: trackById">
+            <div class="op-subcard-head">
+              <h3 class="op-h3">Impact Non Financier #{{ i + 1 }}</h3>
+              <button type="button" (click)="removeItem('nonFinancialImpacts', impact.id)"
+                      class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
+            </div>
+
+            <!-- Titre + Entité -->
+            <div class="op-grid op-grid--2">
+              <div class="op-field">
+                <label class="op-label">Titre *</label>
+                <input type="text" [(ngModel)]="impact.title" class="op-input"
+                       [ngClass]="{'op-input--error': errors['nonfinancial_'+i]}"/>
+              </div>
+
+              <div class="op-field">
+                <label class="op-label">Entité (Business Unit)</label>
+                <input type="text" class="op-input" [value]="currentBusinessUnitName || '—'" disabled />
+              </div>
+            </div>
+
+            <!-- Type + Type de montant (verrouillé à ESTIME si dispo) -->
+            <div class="op-grid op-grid--2 op-mt-xs">
+              <div class="op-field">
+                <label class="op-label">Type de Conséquence *</label>
+                <select [(ngModel)]="impact.type" class="op-select">
+                  <option [ngValue]="null">Sélectionnez un type</option>
+                  <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t.libelle">{{ t.libelle }}</option>
+                </select>
+              </div>
+
+              <div class="op-field">
+                <label class="op-label">Type de montant</label>
+                <input class="op-input" [value]="estimeAmountType?.libelle || 'Montant estimé'" disabled />
+              </div>
+            </div>
+
+            <!-- Montant + Description -->
+            <div class="op-grid op-grid--2 op-mt-xs">
+              <div class="op-field">
+                <label class="op-label">Montant estimé (€) *</label>
+                <input type="number" [(ngModel)]="impact.amount" class="op-input" placeholder="0" />
+              </div>
+
+              <div class="op-field">
+                <label class="op-label">Description *</label>
+                <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
+                          placeholder="Décrivez cet impact non financier..."></textarea>
+              </div>
+            </div>
+
+            <p class="op-error op-error--row" *ngIf="errors['nonfinancial_' + i]">
+              <span class="op-error-icon" aria-hidden="true">!</span>
+              {{ errors['nonfinancial_' + i] }}
+            </p>
+          </div>
         </div>
-
-        <ng-template #nonFinancialList>
-            <div class="op-stack">
-            <div class="op-subcard" *ngFor="let impact of formData.nonFinancialImpacts; let i = index; trackBy: trackById">
-                <div class="op-subcard-head">
-                <h3 class="op-h3">Impact Non Financier #{{ i + 1 }}</h3>
-                <button type="button" (click)="removeItem('nonFinancialImpacts', impact.id)"
-                        class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
-                </div>
-
-                <!-- Titre + Business Line -->
-                <div class="op-grid op-grid--2">
-                <div class="op-field">
-                    <label class="op-label">Titre *</label>
-                    <input type="text" [(ngModel)]="impact.title" class="op-input"
-                        [ngClass]="{'op-input--error': errors['nonfinancial_'+i]}"/>
-                </div>
-
-                <div class="op-field">
-                    <label class="op-label">Business Line *</label>
-                    <select [(ngModel)]="impact.businessLine" class="op-select">
-                    <option value="">Sélectionnez</option>
-                    <option *ngFor="let bl of businessLines" [value]="bl">{{ bl }}</option>
-                    </select>
-                </div>
-                </div>
-
-                <!-- Type + Montant estimé -->
-                <div class="op-grid op-grid--2 op-mt-xs">
-                <div class="op-field">
-                    <label class="op-label">Type de Conséquence *</label>
-                    <select [(ngModel)]="impact.type" class="op-select">
-                    <option value="">Sélectionnez un type</option>
-                    <option *ngFor="let t of nonFinancialImpactTypes" [value]="t">{{ t }}</option>
-                    </select>
-                </div>
-
-                <div class="op-field">
-                    <label class="op-label">Type de montant</label>
-                    <!-- champ verrouillé sur "Montant estimé" -->
-                    <input class="op-input" value="Montant estimé" disabled />
-                </div>
-                </div>
-
-                <!-- Montant + Description -->
-                <div class="op-grid op-grid--2 op-mt-xs">
-                <div class="op-field">
-                    <label class="op-label">Montant estimé (€) *</label>
-                    <input type="number" [(ngModel)]="impact.amount" class="op-input" placeholder="0" />
-                </div>
-
-                <div class="op-field">
-                    <label class="op-label">Description *</label>
-                    <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
-                            placeholder="Décrivez cet impact non financier..."></textarea>
-                </div>
-                </div>
-
-                <p class="op-error op-error--row" *ngIf="errors['nonfinancial_' + i]">
-                <span class="op-error-icon" aria-hidden="true">!</span>
-                {{ errors['nonfinancial_' + i] }}
-                </p>
-            </div>
-            </div>
-        </ng-template>
+      </ng-template>
     </div>
-
 
     <!-- Erreurs générales -->
     <div class="op-alert" *ngIf="errors['impacts']">
@@ -233,4 +225,3 @@
     </div>
   </div>
 </div>
-

@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ImpactService } from '../../../../core/services/impact/impact.service';
-import { Impact, ImpactCreateDto } from '../../../../core/models/Impact';
 import { DatePipe, CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,9 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { FileService } from '../../../../core/services/file/file.service';
@@ -28,7 +24,8 @@ import { firstValueFrom } from 'rxjs';
 import { MatPaginator } from "@angular/material/paginator";
 import { ImpactTypeEnum } from '../../../../core/enum/impactType.enum';
 import { TargetType } from '../../../../core/enum/targettype.enum';
-import { CreateOperationalImpactComponent } from '../create-operational-impact/create-operational-impact.component';
+import { OperatingLossService } from '../../../../core/services/operating-loss/operating-loss.service';
+import { OperatingLoss } from '../../../../core/models/OperatingLoss';
 
 @Component({
   selector: 'app-list-impact',
@@ -44,16 +41,14 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
 
   private router = inject(Router);           // ✅ ajoute ceci
   private route = inject(ActivatedRoute);
-  private impactService = inject(ImpactService);
+  private impactService = inject(OperatingLossService);
   private dialog = inject(MatDialog);
   private fileService = inject(FileService);
-  private currencyPipe = inject(CurrencyPipe);
   private datePipe = inject(DatePipe);
 
   incidentId: string = this.route.snapshot.paramMap.get('id') || '';
 
-  impacts: Impact[] = [];
-  totalAmount = 0;
+  impacts: OperatingLoss[] = [];
 
   goBackButtons: GoBackButton[] = [];
 
@@ -65,21 +60,21 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'montant',
       header: 'Montant',
-      cell: (impact: Impact) => impact.montant + ' €' || '',
+      cell: (impact: OperatingLoss) => impact.montantFinal + ' €' || '',
       filterType: 'numberRange',
       icon: 'euro_symbol'
     },
     {
       columnDef: 'entityName',
       header: 'Entité',
-      cell: (impact: Impact) => impact.entityName || '',
+      cell: (impact: OperatingLoss) => impact.entityName || '',
       filterType: 'text',
       icon: 'business'
     },
     {
       columnDef: 'type',
       header: 'Type',
-      cell: (impact: Impact) => impact.type || '',
+      cell: (impact: OperatingLoss) => impact.type || '',
       filterType: 'select',
       options: this.types,
       icon: 'category'
@@ -87,22 +82,15 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'createdAt',
       header: 'Créé le',
-      cell: (impact: Impact) => this.datePipe.transform(impact.createdAt, 'dd/MM/yyyy') || '',
+      cell: (impact: OperatingLoss) => this.datePipe.transform(impact.createdAt, 'dd/MM/yyyy') || '',
       filterType: 'date',
       icon: 'event'
-    },
-    {
-      columnDef: 'comptabilisationDate',
-      header: 'Date compta',
-      cell: (impact: Impact) => this.datePipe.transform(impact.comptabilisationDate, 'dd/MM/yyyy') || '',
-      filterType: 'date',
-      icon: 'event_note'
     },
   ];
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
-  dataSource = new MatTableDataSource<Impact>([]);
+  dataSource = new MatTableDataSource<OperatingLoss>([]);
   displayedColumns = [...this.columns.map(c => c.columnDef), 'fichiers'];
 
   @Input() closed: boolean = false;
@@ -113,14 +101,10 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     if (this.incidentId) {
-      this.impactService.getImpactByIncidentId(this.incidentId).subscribe(impacts => {
+      this.impactService.listByIncident(this.incidentId).subscribe(impacts => {
         this.impacts = impacts;
         this.dataSource.data = impacts;
       });
-
-      this.impactService.sum(this.incidentId).subscribe(
-        result => this.totalAmount = result
-      )
     }
     this.goBackButtons = [
       {
@@ -134,10 +118,10 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
   }
 
   addImpact() {
-    this.router.navigate(['/incident', this.incidentId, 'impacts', 'create']);
+    this.router.navigate(['/incident', 'impacts', 'create'], { queryParams: { id: this.incidentId } });
   }
 
-  async viewFiles(impact: Impact) {
+  async viewFiles(impact: OperatingLoss) {
     let files = await firstValueFrom(this.fileService.getFiles(TargetType.IMPACT, impact.id ))
 
     this.dialog.open(FichiersComponent,

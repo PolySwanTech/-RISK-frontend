@@ -23,7 +23,7 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
-import { firstValueFrom, forkJoin, map, Subscription, tap } from 'rxjs';
+import { firstValueFrom, forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
