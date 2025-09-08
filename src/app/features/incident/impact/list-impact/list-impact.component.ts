@@ -118,7 +118,7 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
   }
 
   addImpact() {
-    this.router.navigate(['/incident', 'impacts', 'create'], { queryParams: { id: this.incidentId } });
+    this.router.navigate(['incident', this.incidentId, 'impacts', 'create']);
   }
 
   async viewFiles(impact: OperatingLoss) {
