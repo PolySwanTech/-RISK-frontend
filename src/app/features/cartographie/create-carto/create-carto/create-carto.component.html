@@ -7,22 +7,15 @@
 
   <div class="steps">
     @for(step of steps; track step; let i = $index) {
-    <div [class.active]="i === activeStep" class="step">
+    <div [class.active]="i === activeStep" class="step" (click)="activeStep = i">
       {{ step }}
     </div>
     }
   </div>
-  @if(activeStep === 0) {
-  <app-choose-type-carto (nextStep)="activeStep = 1"></app-choose-type-carto>
+  @if(activeStep === 0 || activeStep === 1) {
+  <app-create-evaluation (changeToEvaluationStep)="activeStep = 1"></app-create-evaluation>
   }
-  @if(activeStep === 1) {
-  <app-select-risk-process (cartoCreated)="activeStep = 2"></app-select-risk-process>
-  <!-- <app-select-mapping></app-select-mapping> -->
-  }
-  @if(activeStep === 2 || activeStep === 3) {
-  <app-create-evaluation (changeToEvaluationStep)="activeStep = 3"></app-create-evaluation>
-  }
-  @if(activeStep === 4) {
+  @if(activeStep === 2) {
   <!-- <app-results-mapping></app-results-mapping> -->
   }
   <div class="actions">

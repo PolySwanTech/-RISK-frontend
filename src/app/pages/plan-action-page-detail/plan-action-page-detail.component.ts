@@ -57,6 +57,10 @@ export class PlanActionPageDetailComponent {
     this.getActionPlan(this.idPlanAction);
   }
 
+  isNotStarted(){
+    return this.actionPlan && this.actionPlan.status == Status.NOT_STARTED || false;
+  }
+
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(resp => {
       this.actionPlan = resp;

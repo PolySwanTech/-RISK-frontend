@@ -22,6 +22,7 @@ export interface UploadedFile {
   size: number;
   etag: string;
   uploadedAt: Date;
+  uploadedBy: string;
 }
 
 @Component({

@@ -57,7 +57,7 @@ export class PlanActionPageComponent {
   {
     columnDef: 'ref_incident',
     header: 'Référence Incident',
-    cell: (element: ActionPlan) => `${element.incidentRef ?? 'N/A'}`,
+    cell: (element: ActionPlan) => `${element.incidentRef != '' ? element.incidentRef : 'N/A'}`,
     filterType: 'text',
     icon: 'tag' // 🏷️
   },

@@ -103,22 +103,8 @@ export class OrganigrammeComponent {
     const dialogRef = this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
       data: entite || null // Passe l'entité si c'est une modification, sinon null
-    });
-
-    dialogRef.afterClosed().subscribe(BusinessUnit => {
-      if (BusinessUnit) {
-        if (BusinessUnit.id == null) { // creation
-          this.entityService.save(BusinessUnit).subscribe(() => {
-            this.ngOnInit(); // Rafraîchir après ajout/modification
-          });
-        }
-        else { // update
-          this.entityService.update(BusinessUnit).subscribe(() => {
-            this.ngOnInit(); // Rafraîchir après ajout/modification
-          });
-        }
-      }
-    });
+    })
+      .afterClosed().subscribe(_ => this.ngOnInit());
   }
 
   applyFilter(event: any) {
@@ -176,12 +162,12 @@ export class OrganigrammeComponent {
   }
 
   onRoleChange(node: any): void {
-    if (node.checked){
+    if (node.checked) {
       // remove existing role if it exists
       this.buRoles = this.buRoles.filter(val => val.buId !== node.id);
       this.buRoles.push({ buId: node.id, roleName: node.role.name });
     }
-    else{
+    else {
       this.buRoles = this.buRoles.filter(val => val.buId !== node.id);
     }
   }
@@ -214,7 +200,7 @@ export class OrganigrammeComponent {
     traverse(tree);
   }
 
-  getRoles(){
+  getRoles() {
     return this.rolesEvent.emit(this.buRoles);
   }
 }
