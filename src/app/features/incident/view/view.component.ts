@@ -83,14 +83,14 @@ export class ViewComponent implements OnInit {
         label: "Plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
-        show: this.canClose() && !this.isClosed(),
+        show: this.canShowActions(),
         action: () => this.addActionPlan()
       },
       {
         label: "Modifier",
         icon: 'edit',
         class: 'btn-green',
-        show: this.isDraft(),
+        show: this.canShowActions(),
         action: () => this.goToModification()
       },
       {
@@ -118,6 +118,11 @@ export class ViewComponent implements OnInit {
     ];
   }
 
+  canShowActions(): boolean {
+    return this.incident?.state !== State.VALIDATE && this.incident?.state !== State.CLOSED;
+  }
+
+
   isDraft(): boolean {
     return this.incident?.state === State.DRAFT;
   }
@@ -128,7 +133,7 @@ export class ViewComponent implements OnInit {
     }
   }
 
-  delete(){
+  delete() {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer cet incident ? Cette action est irréversible.", true).subscribe(result => {
       if (result) {
         this.incidentService.deleteIncident(this.incident!.id).subscribe(() => {
