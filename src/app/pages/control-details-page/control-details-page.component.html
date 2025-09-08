@@ -169,7 +169,6 @@
 </app-planifier-execution-popup>
 
 <app-popup-evaluation-controle *ngIf="showEvaluationPopup && selectedExecutionId" [executionId]="selectedExecutionId!"
-  [initialMode]="forceDetails ? 'DETAILS' : undefined" [canValidate]="true" (submitted)="handleEvaluationSubmitted()"
-  (reviewed)="handleEvaluationSubmitted()" (close)="showEvaluationPopup = false">
+  [initialMode]="forceDetails ? 'DETAILS' : undefined" [canValidate]="true" (close)="handleEvaluationSubmitted()" (close)="showEvaluationPopup = false">
 </app-popup-evaluation-controle>
 }

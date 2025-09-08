@@ -29,11 +29,9 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   @Input() canValidate: boolean = false;
 
   @Output() close = new EventEmitter<void>();
-  @Output() submitted = new EventEmitter<void>();
-  @Output() reviewed = new EventEmitter<void>();
 
   @Output() evaluateRequested = new EventEmitter<void>();
-  @Output() openDetailsRequested = new EventEmitter<void>();
+  @Output() openDetailsRequested = new EventEmitter<string>();
 
   @Input() showNoEvalText = false;
   @Input() showEvaluateButton = true;
@@ -118,7 +116,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   submit(): void {
     this.controlService.createEvaluation(this.evaluationData).subscribe(() => {
-      this.submitted.emit();
       this.close.emit();
     });
   }
@@ -128,7 +125,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
     this.controlService.reviewEvaluationApprove(this.evalDetails.id, this.reviewComment).subscribe(() => {
       this.reviewComment = '';
-      this.reviewed.emit();
       this.close.emit();
     });
   }
@@ -138,7 +134,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
     this.controlService.reviewEvaluationReexam(this.evalDetails.id, this.reviewComment).subscribe(() => {
       this.reviewComment = '';
-      this.reviewed.emit();
       this.close.emit();
     });
   }

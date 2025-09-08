@@ -66,76 +66,6 @@
 
                 <div *ngSwitchCase="'DETAILS'">
                     <ng-container *ngIf="evalDetails; else noEvalYet">
-
-                        <!-- <div class="rv-meta-grid">
-                            <div class="rv-field">
-                                <label>Réalisateur</label>
-                                <div class="rv-val">{{ evalDetails.performedBy || '—' }}</div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Planifié le</label>
-                                <div class="rv-val">
-                                    {{ evalDetails.plannedAt ? (evalDetails.plannedAt | date:'dd/MM/yyyy') : '—' }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Évalué le</label>
-                                <div class="rv-val">
-                                    {{ evalDetails.evaluatedAt ? (evalDetails.evaluatedAt | date:'dd/MM/yyyy') : '—' }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Évaluation</label>
-                                <div class="pill" [ngClass]="{
-                  'pill-success': (evalDetails.evaluation || '').toUpperCase().includes('CONF') && !(evalDetails.evaluation || '').toUpperCase().includes('PARTIEL'),
-                  'pill-warning': (evalDetails.evaluation || '').toUpperCase().includes('PARTIEL'),
-                  'pill-danger': (evalDetails.evaluation || '').toUpperCase().includes('NON'),
-                  'pill-default': !(evalDetails.evaluation)
-                }">
-                                    {{ (evalDetails.evaluation || '—') | uppercase }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Statut de revue</label>
-                                <div class="chip" [ngClass]="{
-  'pill-success': evalDetails.reviewStatus === 'APPROVED',
-  'pill-warning': evalDetails.reviewStatus === 'REEXAM_REQUESTED',
-  'pill-default': evalDetails.reviewStatus === 'PENDING' || !evalDetails.reviewStatus
-}">
-                                    {{ evalDetails.reviewStatus === 'APPROVED' ? 'Validée' :
-                                    evalDetails.reviewStatus === 'REEXAM_REQUESTED' ? 'Réexamen demandé' :
-                                    'En attente de validation' }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field" *ngIf="evalDetails.reviewedAt || evalDetails.reviewedBy">
-                                <label>Mise à jour</label>
-                                <div class="rv-val meta">
-                                    <ng-container *ngIf="evalDetails.reviewedAt">le {{ evalDetails.reviewedAt |
-                                        date:'dd/MM/yyyy' }}</ng-container>
-                                    <ng-container *ngIf="evalDetails.reviewedBy"><span
-                                            *ngIf="evalDetails.reviewedAt">&nbsp;•&nbsp;</span>par {{
-                                        evalDetails.reviewedBy }}</ng-container>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="rv-sep" />
-
-                        <div class="rv-section">
-                            <div class="rv-section__label">Résumé</div>
-                            <div class="rv-box rv-text">{{ evalDetails.resume || '—' }}</div>
-                        </div>
-
-                        <div class="rv-section" *ngIf="evalDetails.comments">
-                            <div class="rv-section__label">Commentaires</div>
-                            <div class="rv-box rv-text">{{ evalDetails.comments }}</div>
-                        </div> -->
-
                         <div class="rv-section" *ngIf="canValidate && evalDetails.reviewStatus === 'PENDING'">
                             <div class="rv-section__label">Votre retour (obligatoire)</div>
                             <textarea [(ngModel)]="reviewComment" rows="3" class="rv-textarea"
@@ -166,7 +96,7 @@
                     <ng-container *ngIf="canValidate && evalDetails?.reviewStatus === 'PENDING'; else onlyClose">
                         <button class="btn btn-primary winter-style"
                             [disabled]="evalDetails?.reviewStatus === 'PENDING' && !reviewComment.trim()"
-                            (click)="approve()">Valider</button>
+                            (click)="approve()">OK</button>
                         <button class="btn btn-outline warning"
                             [disabled]="evalDetails?.reviewStatus === 'PENDING' && !reviewComment.trim()"
                             (click)="requestReexam()">Demander un réexamen</button>
@@ -218,8 +148,8 @@
 
             <!-- Actions de validation : visibles quand une évaluation existe et qu'elle est en attente -->
             <div class="rv-actions rv-actions-inline" *ngIf="evaluationView?.reviewStatus === 'PENDING' && canValidate">
-                <button class="btn btn-primary" (click)="openDetailsRequested.emit()">Valider</button>
-                <button class="btn btn-outline warning" (click)="openDetailsRequested.emit()">Demander un
+                <button class="btn btn-primary" (click)="openDetailsRequested.emit('valid')">Valider</button>
+                <button class="btn btn-outline warning" (click)="openDetailsRequested.emit('reexam')">Demander un
                     réexamen</button>
             </div>
 
@@ -248,8 +178,8 @@
                     <span class="pill pill-default">En attente de validation</span>
                 </div>
                 <div class="rv-actions">
-                    <button class="btn btn-primary" (click)="openDetailsRequested.emit()">Valider</button>
-                    <button class="btn btn-outline warning" (click)="openDetailsRequested.emit()">Demander un
+                    <button class="btn btn-primary" (click)="openDetailsRequested.emit('valid')">Valider</button>
+                    <button class="btn btn-outline warning" (click)="openDetailsRequested.emit('reexam')">Demander un
                         réexamen</button>
                 </div>
             </ng-container>
