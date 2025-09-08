@@ -6,7 +6,6 @@ import { ViewComponent } from './view/view.component';
 import { PermissionGuard } from '../../core/guards/permission.guard';
 import { SuiviComponent } from './suivi/suivi.component';
 import { PermissionName } from '../../core/enum/permission.enum';
-import { CreateImpactPopUpComponent } from './impact/create-impact-pop-up/create-impact-pop-up.component';
 import { ListImpactComponent } from './impact/list-impact/list-impact.component';
 import { CreateOperationalImpactComponent } from './impact/create-operational-impact/create-operational-impact.component';
 

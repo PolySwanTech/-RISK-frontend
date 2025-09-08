@@ -1,8 +1,7 @@
 import { State } from "../enum/state.enum";
 import { Cause } from "./Cause";
-import { Impact } from "./Impact";
-import { Process } from "./Process";
-import { RiskTemplate } from "./RiskTemplate";
+import { OperatingLoss } from "./OperatingLoss";
+
 
 export class Incident {
     id: string;
@@ -24,7 +23,7 @@ export class Incident {
     teamId?: string;
     teamName?: string;
 
-    impacts: Impact[];
+    impacts: OperatingLoss[];
 
     state: State;
     consequences: string[];
@@ -43,7 +42,7 @@ export class Incident {
         cause: Cause,
         process: string,
         teamId?: string,
-        impacts: Impact[] = [],
+        impacts: OperatingLoss[] = [],
         state: State = State.DRAFT,
         consequences: string[] = [],
         intervenant?: string | null,
