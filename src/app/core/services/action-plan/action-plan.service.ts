@@ -23,6 +23,14 @@ export class ActionPlanService {
     return this.http.get<ActionPlan>(`${this.base}/${id}`);
   }
 
+  startActionPlan(id: string) {
+    return this.http.put(`${this.base + '/start/' + id}`, null);
+  }
+
+  endActionPlan(id: string) {
+    return this.http.put(`${this.base + '/end/' + id}`, null);
+  }
+
   getActionsPlan() {
     return this.http.get<ActionPlan[]>(this.base);
   }

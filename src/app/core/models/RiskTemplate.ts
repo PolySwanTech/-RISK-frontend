@@ -1,11 +1,6 @@
-import { BaloiseCategoryEnum } from "../enum/baloisecategory.enum";
-import { RiskImpactType } from "../enum/riskImpactType.enum";
-import { RiskLevelEnum } from "../enum/riskLevel.enum";
 import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
-import { RPC } from "./RPC";
-
 
 
 // -------------  TYPES COMPLÉMENTAIRES -------------
@@ -42,7 +37,7 @@ export class RiskTemplate {
   /** UUID du créateur */
   creator!: string;
 
-  category?: BaloiseCategoryEnum;
+  category!: BaloiseCategoryDto;
 
   /** nom de la BU et du process (injectés par le back) */
   buName: string = '';
@@ -79,8 +74,14 @@ export class RiskTemplate {
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
   libellePerso:        string;
-  category:        BaloiseCategoryEnum;
+  category: BaloiseCategoryDto;
   description: string;
   processId:   string;                 // UUID
   parent? : string | null; // optionnel, pour les risques enfants
+}
+
+export interface BaloiseCategoryDto {
+  libelle: string;
+  definition: string | null;
+  parent: string | null;
 }

@@ -10,6 +10,24 @@
     </div>
 
     <form #parametersForm="ngForm" (ngSubmit)="onSubmit()">
+
+        <!-- Année analysée -->
+        <div class="form-section">
+            <div class="section-header">
+                <h2 class="section-title">📅 Période</h2>
+                <p class="section-description">Exercice analysé (annuel)</p>
+            </div>
+            <div class="section-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Année analysée <span class="required">*</span></label>
+                        <input type="number" [(ngModel)]="formData.period_year" name="period_year" required min="1900"
+                            max="2100" (ngModelChange)="onPeriodYearChange()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Données Financières -->
         <div class="form-section">
             <div class="section-header">
@@ -31,43 +49,36 @@
 
         <!-- Historique des pertes -->
         <div class="form-section">
-  <div class="section-header">
-    <h2 class="section-title">📈 Historique des Pertes</h2>
-    <p class="section-description">1 paramètre - Données sur 10 ans maximum</p>
-  </div>
+            <div class="section-header">
+                <h2 class="section-title">📈 Historique des Pertes</h2>
+                <p class="section-description">1 paramètre - Données sur 10 ans maximum</p>
+            </div>
 
-  <div class="section-content">
-    <div class="form-group">
-      <label>Pertes annuelles totales <span class="required">*</span></label>
-      <p class="help-text">Calculé depuis l'appli ou à importer</p>
+            <div class="section-content">
+                <div class="form-group">
+                    <label>Pertes annuelles totales <span class="required">*</span></label>
+                    <p class="help-text">Calculé depuis l'appli ou à importer</p>
 
-      <button class="btn btn-success" (click)="importData()">📥 Importer</button>
+                    <button class="btn btn-success" (click)="importData()">📥 Importer</button>
 
-      <div class="losses-grid">
-        <div class="year-input" *ngFor="let year of years">
-          <div class="year-label">{{ year }}</div>
-          <div class="currency-suffix">
-            <input type="number"
-       [(ngModel)]="formData.pertes_annuelles[year]"
-       name="perte_{{year}}"
-       (ngModelChange)="updateChart()"
-       step="0.01"
-       placeholder="0.00">
-          </div>
+                    <div class="losses-grid">
+                        <div class="year-input" *ngFor="let year of years">
+                            <div class="year-label">{{ year }}</div>
+                            <div class="currency-suffix">
+                                <input type="number" [(ngModel)]="formData.pertes_annuelles[year]" name="perte_{{year}}"
+                                    (ngModelChange)="updateChart()" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Graphique -->
+                    <div style="margin-top: 20px;">
+                        <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <!-- Graphique -->
-      <div style="margin-top: 20px;">
-        <canvas baseChart
-                [data]="lineChartData"
-                [options]="lineChartOptions"
-                chartType="line">
-        </canvas>
-      </div>
-    </div>
-  </div>
-</div>
 
         <!-- Paramètres réglementaires -->
         <div class="form-section">

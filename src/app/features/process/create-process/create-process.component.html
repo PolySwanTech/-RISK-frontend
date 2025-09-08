@@ -14,26 +14,24 @@
   <!-- Business Unit -->
   <mat-form-field class="full-width">
     <mat-label>Business Unit</mat-label>
-    <mat-select formControlName="bu_id">
-      <mat-option *ngFor="let bu of businessUnits" [value]="bu">
+    <mat-select formControlName="buId"
+                (selectionChange)="onBuChange($event.value)">
+      <mat-option *ngFor="let bu of businessUnits" [value]="bu.id">
         {{ bu.name }}
       </mat-option>
     </mat-select>
-    <mat-error *ngIf="processForm.get('bu_id')?.invalid && processForm.get('bu_id')?.touched">
+    <mat-error *ngIf="processForm.get('buId')?.invalid && processForm.get('buId')?.touched">
       La BU est requise.
     </mat-error>
   </mat-form-field>
 
   <!-- Processus Parent (optionnel) -->
-  <mat-form-field class="full-width">
-    <mat-label>Processus parent (optionnel)</mat-label>
-    <mat-select formControlName="parent">
-      <mat-option [value]="null">Aucun</mat-option>
-      <mat-option *ngFor="let proc of processes" [value]="proc.id">
-        {{ proc.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+  @if (processes.length != 0) {
+    <div class="row-add">
+      <app-select-arborescence appearance="outline" placeholder="Sélectionnez un processus parent"  *ngIf="processes.length > 0" [id]="processForm.get('parentId')!.value" (changeValue)="onSelectionProcess($event)"
+        [list]="processes" />
+    </div>
+  }
 
   <!-- Bouton de soumission -->
   <div class="actions">

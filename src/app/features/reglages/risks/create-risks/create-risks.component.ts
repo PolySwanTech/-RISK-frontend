@@ -17,13 +17,12 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 import { RiskService } from '../../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
 
-import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
-import { RiskLevel, RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
+import { BaloiseCategoryDto, RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
+import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
 import { Process } from '../../../../core/models/Process';
 import { RiskCategoryService } from '../../../../core/services/risk/risk-category.service';
-import { BaloiseCategoryEnum } from '../../../../core/enum/baloisecategory.enum';
 import { SelectArborescenceComponent } from '../../../../shared/components/select-arborescence/select-arborescence.component';
 
 @Component({
@@ -53,8 +52,8 @@ export class CreateRisksComponent implements OnInit {
   risks: RiskTemplate[] = [];
   listProcess: Process[] = [];
 
-  bal1: BaloiseCategoryEnum[] = [];
-  bal2: BaloiseCategoryEnum[] = [];
+  bal1: BaloiseCategoryDto[] = [];
+  bal2: BaloiseCategoryDto[] = [];
 
   pageTitle = 'Création d\'un risque';
   dialogLabel = { title: 'Création', message: 'création' };
@@ -72,8 +71,8 @@ export class CreateRisksComponent implements OnInit {
   infoForm = this.fb.group({
     parentRisk: this.fb.control<string | null>(null),
     libellePerso: this.fb.nonNullable.control<string>(''),
-    balois1: this.fb.nonNullable.control<BaloiseCategoryEnum | null>(null, Validators.required),
-    balois2: this.fb.control<BaloiseCategoryEnum | null>(null),
+    balois1: this.fb.nonNullable.control<BaloiseCategoryDto | null>(null, Validators.required),
+    balois2: this.fb.control<BaloiseCategoryDto | null>(null),
     processId: this.fb.control<string | null>(null, Validators.required),
     description: this.fb.nonNullable.control<string>(''),
     level: this.fb.nonNullable.control<RiskLevelEnum>(RiskLevelEnum.LOW),
@@ -83,7 +82,7 @@ export class CreateRisksComponent implements OnInit {
   ngOnInit(): void {
     this.riskCategoryService.getAll().subscribe(data => this.bal1 = data);
 
-    this.procSrv.getAll().subscribe(list => this.listProcess = list);
+    this.procSrv.getProcessTree().subscribe(list => this.listProcess = list);
 
     this.riskSrv.getAll().subscribe(risks => this.risks = risks);
 
@@ -108,14 +107,14 @@ export class CreateRisksComponent implements OnInit {
     });
   }
 
-  onCategoryChange(baloise: BaloiseCategoryEnum, level: number): void {
-    if (level === 1) {
-      this.riskCategoryService.getByParent(baloise).subscribe(data => {
-        this.bal2 = data;
-        this.infoForm.patchValue({ balois2: null });
-      });
-    }
+onCategoryChange(baloise: BaloiseCategoryDto, level: number): void {
+  if (level === 1 && baloise?.libelle) {
+    this.riskCategoryService.getByParent(baloise.libelle).subscribe(children => {
+      this.bal2 = children;                         // options du niveau 2
+      this.infoForm.patchValue({ balois2: null });  // reset du select niveau 2
+    });
   }
+}
 
   onProcessSelected(process: Process) {
     this.infoForm.get('processId')?.setValue(process.id);

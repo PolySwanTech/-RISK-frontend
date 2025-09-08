@@ -6,6 +6,9 @@ import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { MatInputModule } from '@angular/material/input';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
+import { Router } from '@angular/router';
+import { SmaInputCreateDto, SmaLossUpsert } from '../../core/models/Sma';
+
 
 @Component({
   selector: 'app-calcul-input-parameters',
@@ -18,6 +21,7 @@ export class CalculInputParametersComponent {
 
   private calculService = inject(CalculService);
   private confirmService = inject(ConfirmService);
+  private router = inject(Router);
 
   financialFields = [
     { name: 'revenus_interets', label: "Revenus d'intérêts" },
@@ -32,17 +36,40 @@ export class CalculInputParametersComponent {
     { name: 'resultat_net_portefeuille_bancaire', label: "Résultat net portefeuille bancaire" },
   ];
 
-  years = Array.from({ length: 10 }, (_, i) => 2015 + i);
-
   formData: any = {
+    period_year: new Date().getFullYear(),
     pertes_annuelles: {},
     ratio_cet1: 8.0,
-    exemption_ilm: false
+    exemption_ilm: false,
+    revenus_interets: 0, charges_interets: 0, actifs_productifs_interets: 0, revenus_dividendes: 0,
+    commissions_recues: 0, commissions_versees: 0, autres_revenus_exploitation: 0, autres_charges_exploitation: 0,
+    resultat_net_portefeuille_negociation: 0, resultat_net_portefeuille_bancaire: 0
   };
 
-  // Configuration du graphique
+  years: number[] = [];
+
+  constructor() {
+    this.rebuildYears();
+  }
+
+  onPeriodYearChange() {
+    this.rebuildYears();
+    this.updateChart();
+  }
+
+
+  rebuildYears() {
+    const end = this.formData.period_year;
+    const start = end - 9;
+    this.years = Array.from({ length: 10 }, (_, i) => start + i);
+    this.years.forEach(y => {
+      if (this.formData.pertes_annuelles[y] === undefined) this.formData.pertes_annuelles[y] = 0;
+    });
+    this.lineChartData.labels = this.years.map(String);
+  }
+
   lineChartData: ChartConfiguration<'line'>['data'] = {
-    labels: this.years.map(String),
+    labels: [],
     datasets: [
       {
         label: 'Pertes annuelles (€)',
@@ -63,17 +90,16 @@ export class CalculInputParametersComponent {
   };
 
   updateChart() {
-  // On crée une nouvelle référence pour déclencher le redraw
-  this.lineChartData = {
-    ...this.lineChartData,
-    datasets: [
-      {
-        ...this.lineChartData.datasets[0],
-        data: this.years.map(year => this.formData.pertes_annuelles[year] || 0)
-      }
-    ]
-  };
-}
+    this.lineChartData = {
+      ...this.lineChartData,
+      datasets: [
+        {
+          ...this.lineChartData.datasets[0],
+          data: this.years.map(year => Number(this.formData.pertes_annuelles[year] || 0))
+        }
+      ]
+    };
+  }
 
   importData() {
     alert("Import de données pas encore implémenté");
@@ -83,42 +109,63 @@ export class CalculInputParametersComponent {
     alert("Données rafraîchies");
   }
 
-  getListLosses() {
-    this.calculService.getLosses().subscribe({
-      next: (data: any) => {
-        this.formData.pertes_annuelles = data;
-        this.updateChart();
-      },
-      error: (err: any) => {
-        console.error('Erreur lors du chargement des pertes', err);
-      }
-    });
-  }
-
   resetForm() {
     this.formData = {
+      period_year: new Date().getFullYear(),
       pertes_annuelles: {},
       ratio_cet1: 8.0,
-      exemption_ilm: false
+      exemption_ilm: false,
+      revenus_interets: 0, charges_interets: 0, actifs_productifs_interets: 0, revenus_dividendes: 0,
+      commissions_recues: 0, commissions_versees: 0, autres_revenus_exploitation: 0, autres_charges_exploitation: 0,
+      resultat_net_portefeuille_negociation: 0, resultat_net_portefeuille_bancaire: 0
     };
+    this.rebuildYears();
     this.updateChart();
   }
 
   onSubmit() {
-    const dataToSubmit = {
-      ...this.formData,
-      ratio_cet1: this.formData.ratio_cet1 / 100,
-      pertes_annuelles: Object.values(this.formData.pertes_annuelles || {}).map(val => parseFloat(val as string) || 0)
+    const dto: SmaInputCreateDto = {
+      periodYear: Number(this.formData.period_year),
+      revenusInterets: Number(this.formData.revenus_interets || 0),
+      chargesInterets: Number(this.formData.charges_interets || 0),
+      actifsProductifsInterets: Number(this.formData.actifs_productifs_interets || 0),
+      revenusDividendes: Number(this.formData.revenus_dividendes || 0),
+      commissionsRecues: Number(this.formData.commissions_recues || 0),
+      commissionsVersees: Number(this.formData.commissions_versees || 0),
+      autresRevenusExpl: Number(this.formData.autres_revenus_exploitation || 0),
+      autresChargesExpl: Number(this.formData.autres_charges_exploitation || 0),
+      resultatNego: Number(this.formData.resultat_net_portefeuille_negociation || 0),
+      resultatBanque: Number(this.formData.resultat_net_portefeuille_bancaire || 0),
+      exemptionIlm: !!this.formData.exemption_ilm,
+      ratioCet1Pct: Number(this.formData.ratio_cet1 ?? 8.0)
     };
 
-    this.calculService.submitFormData(dataToSubmit).subscribe({
-      next: (res) => {
-        this.confirmService.openConfirmDialog("Formulaire soumis avec succès", "", false).subscribe();
+    const losses: SmaLossUpsert[] = this.years
+      .filter(y => this.formData.pertes_annuelles[y] !== undefined)
+      .map(y => ({
+        lossYear: y,
+        amountMeur: Number(this.formData.pertes_annuelles[y] || 0)
+      }));
+
+    this.calculService.createInput(dto).subscribe({
+      next: (created) => {
+        const inputId = created.id;
+        this.calculService.upsertLosses(inputId, losses).subscribe({
+          next: () => {
+            this.confirmService.openConfirmDialog("Saisie enregistrée avec succès", "", false).subscribe();
+            this.router.navigate(['/calcul/view']);
+          },
+          error: (e) => {
+            console.error(e);
+            this.confirmService.openConfirmDialog("Erreur lors de l'enregistrement des pertes", "", false).subscribe();
+          }
+        });
       },
       error: (err) => {
-        console.error('Erreur lors de l’envoi :', err);
-        this.confirmService.openConfirmDialog("Erreur lors de l’envoi des données", "", false).subscribe();
+        console.error(err);
+        this.confirmService.openConfirmDialog("Erreur lors de la création de la saisie", "", false).subscribe();
       }
     });
+
   }
 }

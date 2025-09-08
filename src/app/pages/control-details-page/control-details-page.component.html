@@ -123,10 +123,12 @@
                         </div>
                         <div class="meta-sub">Attribuée à {{ s.exec.performedBy || '—' }}</div>
                       </div>
-
                       <div class="meta-right">
-                        <button class="btn btn-primary" *ngIf="!s.view"
-                          (click)="evaluateExec(s.exec.id)">Évaluer</button>
+                        <button class="btn btn-evaluer"
+                                *ngIf="!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED'"
+                                (click)="evaluateExec(s.exec.id)">
+                          {{ s.view?.reviewStatus === 'REEXAM_REQUESTED' ? 'Réévaluer' : 'Évaluer' }}
+                        </button>
                       </div>
                     </div>
                   </div>

@@ -3,7 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';  // Import the French locale
-import { Impact } from '../../../../core/models/Impact';
+import { Impact } from '../../../../core/models/OperatingLoss';
 
 
 // Register the French locale

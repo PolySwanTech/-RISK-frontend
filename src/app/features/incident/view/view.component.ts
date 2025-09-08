@@ -23,11 +23,10 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
 import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
-import { ImpactService } from '../../../core/services/impact/impact.service';
+import { OperatingLossService } from '../../../core/services/operating-loss/operating-loss.service';
 import { saveAs } from 'file-saver';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { error } from 'jquery';
-
+import { OperatingLoss } from '../../../core/models/OperatingLoss';
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
@@ -46,7 +45,7 @@ export class ViewComponent implements OnInit {
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private entitiesService = inject(EntitiesService);
-  private impactService = inject(ImpactService);
+  private impactService = inject(OperatingLossService);
 
 
   incident: Incident | undefined
@@ -60,7 +59,7 @@ export class ViewComponent implements OnInit {
 
   goBackButtons: GoBackButton[] = [];
 
-  totalAmount = 0;
+  operatingLosses: OperatingLoss[] = [];
 
   ngOnInit(): void {
     this.entitiesService.loadEntities().subscribe(entities => {
@@ -70,8 +69,8 @@ export class ViewComponent implements OnInit {
     this.loadIncident(this.idIncident)
 
     if (this.idIncident) {
-      this.impactService.sum(this.idIncident).subscribe(
-        result => this.totalAmount = result
+      this.impactService.listByIncident(this.idIncident).subscribe(
+        result => this.operatingLosses = result
       )
     }
   }
@@ -84,14 +83,14 @@ export class ViewComponent implements OnInit {
         label: "Plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
-        show: this.canClose() && !this.isClosed(),
+        show: this.canShowActions(),
         action: () => this.addActionPlan()
       },
       {
         label: "Modifier",
         icon: 'edit',
         class: 'btn-green',
-        show: this.isDraft(),
+        show: this.canShowActions(),
         action: () => this.goToModification()
       },
       {
@@ -119,6 +118,11 @@ export class ViewComponent implements OnInit {
     ];
   }
 
+  canShowActions(): boolean {
+    return this.incident?.state !== State.VALIDATE && this.incident?.state !== State.CLOSED;
+  }
+
+
   isDraft(): boolean {
     return this.incident?.state === State.DRAFT;
   }
@@ -129,7 +133,7 @@ export class ViewComponent implements OnInit {
     }
   }
 
-  delete(){
+  delete() {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer cet incident ? Cette action est irréversible.", true).subscribe(result => {
       if (result) {
         this.incidentService.deleteIncident(this.incident!.id).subscribe(() => {
@@ -282,6 +286,10 @@ export class ViewComponent implements OnInit {
       },
       error: (err) => console.error('Erreur export PDF :', err)
     });
+  }
+
+  totalAmount(): number {
+    return this.operatingLosses.reduce((sum, loss) => sum + loss.montantFinal, 0);
   }
 
 }

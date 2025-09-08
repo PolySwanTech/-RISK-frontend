@@ -12,7 +12,7 @@
         <ng-container>
             <mat-optgroup [label]="parent.name">
                 <mat-option [value]="parent">{{ parent.name }}</mat-option>
-                @for(child of parent.enfants; track child){
+                @for(child of (parent.enfants ?? []); track child){
                 <mat-option [value]="child">
                     &nbsp;&nbsp;↳ {{ child.name }}
                 </mat-option>

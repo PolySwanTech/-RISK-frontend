@@ -28,6 +28,7 @@ export const routes: Routes = [
   { path: 'cartographie/consulter', component: SelectCartoComponent, canActivate: [AuthGuard] },
   { path: 'cartographie/evaluation', component: CreateEvaluationComponent, canActivate: [AuthGuard] },
   { path: 'calcul', component : CalculInputParametersComponent, canActivate : [AuthGuard] },
+  { path: 'calcul/view/:id', component : CalculViewComponent, canActivate : [AuthGuard] },
   { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard] },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },
