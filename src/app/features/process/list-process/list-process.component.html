@@ -78,7 +78,8 @@
 
                                     <div class="text-info">
                                         <h3 class="node-name" [ngClass]="'name-' + node.type">
-                                            {{ node.name }}
+                                            {{ node.name }} 
+                                            <i>{{ node.lm ? 'LM' : ''}}</i>
                                         </h3>
                                         <p class="node-description" *ngIf="hasChildren(node)">
                                             {{ getChildrenCount(node) }} processus
