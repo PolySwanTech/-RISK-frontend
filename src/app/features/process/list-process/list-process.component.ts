@@ -309,10 +309,19 @@ export class ListProcessComponent implements OnInit {
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     }).afterClosed().subscribe(bu => {
       if (bu) {
-        this.entityService.save(bu).subscribe(_ => {
-          this.ngOnInit()
-          this.snackBarService.info("Entité ajoutée avec succès !")
-        })
+        if(bu.id){
+          // modification
+          this.entityService.update(bu).subscribe(_ => {
+            this.ngOnInit()
+            this.snackBarService.info("Entité modifiée avec succès !")
+          })
+        }
+        else{
+          this.entityService.save(bu).subscribe(_ => {
+            this.ngOnInit()
+            this.snackBarService.info("Entité ajoutée avec succès !")
+          })
+        }
       }
     });
   }
