@@ -78,7 +78,7 @@
 
                                     <div class="text-info">
                                         <h3 class="node-name" [ngClass]="'name-' + node.type">
-                                            {{ node.name }} 
+                                            {{ node.name }}
                                             <i>{{ node.lm ? 'LM' : ''}}</i>
                                         </h3>
                                         <p class="node-description" *ngIf="hasChildren(node)">
@@ -93,7 +93,7 @@
 
                                 </div>
                                 <div class="icon-container" [ngClass]="'icon-' + node.type">
-                                    <button  (click)="goToMatrixPage(node.id)"
+                                    <button (click)="goToMatrixPage(node.id)"
                                         mat-icon-button><mat-icon>grid_on</mat-icon></button>
                                 </div>
                             </div>
@@ -154,6 +154,11 @@
                                 <p class="node-description" *ngIf="hasChildren(node)">
                                     {{ getChildrenCount(node) }} processus
                                 </p>
+                            </div>
+
+                            <div class="icon-container" [ngClass]="'icon-' + node.type">
+                                <button *ngIf="!isCartographie" (click)="openProcessDialog(node, $event)"
+                                    mat-icon-button><mat-icon>edit</mat-icon></button>
                             </div>
                         </div>
                     </div>
