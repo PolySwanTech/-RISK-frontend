@@ -57,7 +57,6 @@ export class OperatingLoss {
 
 }
 
-
 export interface CreateOperatingLossDto {
   type: OperatingLossTypeDto;
   incidentId: string;

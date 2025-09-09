@@ -25,25 +25,95 @@
         </mat-card-content>
     </mat-card>
 <div class="table-container">
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort multiTemplateDataRows>
 
-            <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ column.header }}</th>
-                <td mat-cell *matCellDef="let row" [innerHTML]="column.cell(row)"></td>
-            </ng-container>
+    <!-- Colonne expand (chevron) -->
+    <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let impact">
+        <button mat-icon-button
+                (click)="toggleExpand(impact); $event.stopPropagation()"
+                [attr.aria-label]="'expand ' + impact.libelle">
+            <mat-icon>{{ expandedId === impact.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+        </td>
+    </ng-container>
 
-            <ng-container matColumnDef="fichiers">
-                <th mat-header-cell *matHeaderCellDef> Fichiers </th>
-                <td mat-cell *matCellDef="let impact">
-                    <button mat-button color="primary" (click)="viewFiles(impact)">
-                        Voir les fichiers
-                    </button>
+    <!-- Colonnes existantes (boucle) -->
+    <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ column.header }}</th>
+        <td mat-cell *matCellDef="let row" [textContent]="column.cell(row)"></td>
+    </ng-container>
+
+    <!-- Colonne Fichiers (inchangé) -->
+    <ng-container matColumnDef="fichiers">
+        <th mat-header-cell *matHeaderCellDef> Fichiers </th>
+        <td mat-cell *matCellDef="let impact">
+        <button mat-button color="primary" (click)="viewFiles(impact)">
+            Voir les fichiers
+        </button>
+        </td>
+    </ng-container>
+
+    <!-- Ligne en-tête -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+    <!-- Ligne principale (cliquable pour toggle) -->
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"
+        (click)="toggleExpand(row)"
+        class="row-clickable">
+    </tr>
+
+    <!-- Ligne de détail (expansion) -->
+    <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let impact" [attr.colspan]="displayedColumns.length">
+        <div class="amounts-detail" *ngIf="expandedId === impact.id">
+            <!-- Etat chargement -->
+            <div *ngIf="loadingAmounts.has(impact.id)">Chargement…</div>
+
+            <!-- Erreur -->
+            <div *ngIf="amountsError.get(impact.id)" class="error">
+            {{ amountsError.get(impact.id) }}
+            </div>
+
+            <!-- Liste des montants -->
+            <div *ngIf="!loadingAmounts.has(impact.id) && !amountsError.get(impact.id)">
+            <div *ngIf="(amountsMap.get(impact.id) || []).length === 0" class="muted">
+                Aucun montant.
+            </div>
+
+            <table mat-table [dataSource]="amountsMap.get(impact.id) || []" class="inner-table">
+
+                <ng-container matColumnDef="atype">
+                <th mat-header-cell *matHeaderCellDef> Type de montant </th>
+                <td mat-cell *matCellDef="let a">{{ a.amountType?.libelle || '—' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="adate">
+                <th mat-header-cell *matHeaderCellDef> Date compta </th>
+                <td mat-cell *matCellDef="let a">
+                    {{ a.comptabilisationDate ? (a.comptabilisationDate | date:'dd/MM/yyyy') : '—' }}
                 </td>
-            </ng-container>
+                </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+                <ng-container matColumnDef="avalue">
+                <th mat-header-cell *matHeaderCellDef> Montant </th>
+                <td mat-cell *matCellDef="let a">
+                    {{ a.montant | currency:'EUR':'symbol':'1.0-2' }}
+                </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['atype','adate','avalue']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['atype','adate','avalue']"></tr>
+            </table>
+            </div>
+        </div>
+        </td>
+    </ng-container>
+
+    <!-- RowDef de la ligne de détail (une seule colonne qui s’étend) -->
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+    </table>
 
         <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
         </div>

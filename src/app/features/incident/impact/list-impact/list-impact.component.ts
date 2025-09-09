@@ -26,6 +26,9 @@ import { ImpactTypeEnum } from '../../../../core/enum/impactType.enum';
 import { TargetType } from '../../../../core/enum/targettype.enum';
 import { OperatingLossService } from '../../../../core/services/operating-loss/operating-loss.service';
 import { OperatingLoss } from '../../../../core/models/OperatingLoss';
+import { AmountDto } from '../../../../core/models/Amount';
+import { AmountService } from '../../../../core/services/amount/amount.service';
+import { OperatingLossFamily } from '../../../../core/enum/operatingLossFamily.enum';
 
 @Component({
   selector: 'app-list-impact',
@@ -39,12 +42,18 @@ import { OperatingLoss } from '../../../../core/models/OperatingLoss';
 export class ListImpactComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  private router = inject(Router);           // ✅ ajoute ceci
+  private router = inject(Router);
   private route = inject(ActivatedRoute);
   private impactService = inject(OperatingLossService);
   private dialog = inject(MatDialog);
   private fileService = inject(FileService);
   private datePipe = inject(DatePipe);
+    // + NEW: pour l’expansion
+  private amountService = inject(AmountService);
+  expandedId: string | null = null;
+  amountsMap = new Map<string, AmountDto[]>();    // cache par impactId
+  loadingAmounts = new Set<string>();              // ids en chargement
+  amountsError = new Map<string, string>();        // erreurs éventuelles
 
   incidentId: string = this.route.snapshot.paramMap.get('id') || '';
 
@@ -56,13 +65,14 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
 
   types: ImpactTypeEnum[] = [ImpactTypeEnum.PROVISION, ImpactTypeEnum.RECUPERATION];
 
+
   columns = [
     {
-      columnDef: 'montant',
-      header: 'Montant',
-      cell: (impact: OperatingLoss) => impact.montantFinal + ' €' || '',
-      filterType: 'numberRange',
-      icon: 'euro_symbol'
+      columnDef: 'libelle',
+      header: 'Libellé',
+      cell: (impact: OperatingLoss) => impact.libelle || '',
+      filterType: 'text',
+      icon: 'business'
     },
     {
       columnDef: 'entityName',
@@ -72,12 +82,42 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
       icon: 'business'
     },
     {
-      columnDef: 'type',
-      header: 'Type',
-      cell: (impact: OperatingLoss) => impact.type || '',
+      columnDef: 'impactType',
+      header: "Type d'Impact",
+      cell: (impact: OperatingLoss) =>{
+        const impactType = impact.type;
+        return impactType.family
+      },
       filterType: 'select',
-      options: this.types,
       icon: 'category'
+    },
+    {
+      columnDef: 'type',
+      header: 'Type Conséquence',
+      cell: (impact: OperatingLoss) => impact.type.libelle || '',
+      filterType: 'select',
+      icon: 'category'
+    },
+    {
+      columnDef: 'montantBrut',
+      header: 'Montant Brut',
+      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantBrut + ' €' || '') : 'N/A',
+      filterType: 'numberRange',
+      icon: 'euro_symbol'
+    },
+    {
+      columnDef: 'montantNet',
+      header: 'Montant Net',
+      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantBrut + ' €' || '') : 'N/A',
+      filterType: 'numberRange',
+      icon: 'euro_symbol'
+    },
+    {
+      columnDef: 'montantFinal',
+      header: 'Montant Final',
+      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantBrut + ' €' || '') : 'N/A',
+      filterType: 'numberRange',
+      icon: 'euro_symbol'
     },
     {
       columnDef: 'createdAt',
@@ -87,11 +127,13 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
       icon: 'event'
     },
   ];
+  
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
   dataSource = new MatTableDataSource<OperatingLoss>([]);
-  displayedColumns = [...this.columns.map(c => c.columnDef), 'fichiers'];
+
+  displayedColumns = ['expand', ...this.columns.map(c => c.columnDef), 'fichiers'];
 
   @Input() closed: boolean = false;
 
@@ -146,7 +188,7 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
       filtered = filtered.filter((impact: any) => {
         const fieldValue = impact[key];
 
-        // ✅ Cas spécial : filtre par plage de dates { start, end }
+        // Cas spécial : filtre par plage de dates { start, end }
         if (filterValue.start instanceof Date && filterValue.end instanceof Date) {
           if (!fieldValue) return false;
 
@@ -161,7 +203,6 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
           return impactDate >= start && impactDate <= end;
         }
 
-        // ✅ Cas standard : texte ou nombre
         if (typeof filterValue === 'string' || typeof filterValue === 'number') {
           return fieldValue?.toString().toLowerCase().includes(filterValue.toString().toLowerCase());
         }
@@ -198,6 +239,29 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
         return value?.toString().toLowerCase().includes(lowerQuery);
       })
     );
+  }
+
+  toggleExpand(impact: OperatingLoss) {
+    // replie si on reclique
+    if (this.expandedId === impact.id) {
+      this.expandedId = null;
+      return;
+    }
+
+    this.expandedId = impact.id;
+
+    // si déjà en cache, pas de nouvel appel
+    if (this.amountsMap.has(impact.id)) return;
+
+    // sinon on charge
+    this.loadingAmounts.add(impact.id);
+    this.amountsError.delete(impact.id);
+
+    this.amountService.listByOperatingLoss(impact.id).subscribe({
+      next: (amounts) => this.amountsMap.set(impact.id, amounts),
+      error: () => this.amountsError.set(impact.id, 'Erreur lors du chargement des montants'),
+      complete: () => this.loadingAmounts.delete(impact.id)
+    });
   }
 
   clearSearch() {

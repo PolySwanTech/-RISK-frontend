@@ -14,7 +14,7 @@ export class OperatingLossService {
 
 
   create(operatingLoss: CreateOperatingLossDto, message : string) {
-    return this.http.post(this.baseUrl, { operatingLoss, message })
+    return this.http.post<string>(this.baseUrl, { operatingLoss, message })
   }
 
   listByIncident(incidentId: string) {

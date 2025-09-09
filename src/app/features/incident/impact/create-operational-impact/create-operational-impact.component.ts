@@ -15,17 +15,20 @@ import { AmountService } from '../../../../core/services/amount/amount.service';
 import { OperatingLossTypeService } from '../../../../core/services/operating-loss/operating-loss-type.service';
 import { OperatingLossService } from '../../../../core/services/operating-loss/operating-loss.service';
 import { IncidentService } from '../../../../core/services/incident/incident.service';
+import { EquipeService, Equipe } from '../../../../core/services/equipe/equipe.service';
+import { BusinessUnit } from '../../../../core/models/BusinessUnit';
+import { EntitiesService } from '../../../../core/services/entities/entities.service';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
-  amountType: AmountTypeDto | null;
-  accountingDate: string; // YYYY-MM-DD (optionnelle -> vide = null)
+  amountType: string | null;
+  accountingDate: string;
   amount: string;
 }
 interface FinancialImpact {
   id: number;
   title: string;
-  businessUnitId: string;              // rempli automatiquement depuis l’incident
+  businessUnitId: string;
   type: OperatingLossTypeDto | null;
   description: string;
   accountingReference: string;
@@ -34,7 +37,7 @@ interface FinancialImpact {
 interface NonFinancialImpact {
   id: number;
   title: string;
-  businessUnitId: string;              // rempli automatiquement depuis l’incident
+  businessUnitId: string;
   type: OperatingLossTypeDto | null;
   description: string;
   amount: string;
@@ -65,6 +68,9 @@ export class CreateOperationalImpactComponent implements OnInit {
   private operatingLossTypeService = inject(OperatingLossTypeService);
   private amountTypeService = inject(AmountTypeService);
   private amountService = inject(AmountService);
+  private equipeService = inject(EntitiesService);
+
+  businessUnits: BusinessUnit[] = [];     // <— liste pour le select
 
   // ---------- Contexte Incident/BU ----------
   private currentBusinessUnitId?: string;
@@ -84,23 +90,14 @@ export class CreateOperationalImpactComponent implements OnInit {
 
   // ---------- Lifecycle ----------
   ngOnInit(): void {
-    // 1) Récupère l’ID incident depuis : /:id OU /:incidentId OU ?id=... OU ?incidentId=...
-    const fromSnapshot =
-      this.route.snapshot.paramMap.get('id') ??
-      this.route.snapshot.paramMap.get('incidentId') ??
-      this.route.snapshot.queryParamMap.get('id') ??
-      this.route.snapshot.queryParamMap.get('incidentId') ??
-      undefined;
-    this.incidentId = fromSnapshot;
-
     this.route.paramMap.subscribe(pm => {
-      const id = pm.get('id') ?? pm.get('incidentId');
+      const id = pm.get('id');
       if (id) { this.incidentId = id; this.loadIncidentContext(); }
     });
-    this.route.queryParamMap.subscribe(qm => {
-      const id = qm.get('id') ?? qm.get('incidentId');
-      if (id) { this.incidentId = id; this.loadIncidentContext(); }
-    });
+
+    this.equipeService.loadEntities()
+    .pipe(catchError(() => of([] as BusinessUnit[])))
+    .subscribe(bus => {this.businessUnits = bus.filter(b => b.lm === true); });
 
     // Si on a déjà l’ID au snapshot, on charge tout de suite
     this.loadIncidentContext();
@@ -127,7 +124,7 @@ export class CreateOperationalImpactComponent implements OnInit {
       .pipe(catchError(() => of([])))
       .subscribe((amountTypes) => {
         this.nonFinancialAmountTypes = amountTypes;
-        const found = amountTypes.find((t) => t.libelle?.toUpperCase() === 'ESTIME');
+        const found = amountTypes.find((t) => t.libelle?.includes('ESTIME'));
         this.estimeAmountType = found || amountTypes[0] || null;
       });
   }
@@ -143,20 +140,6 @@ export class CreateOperationalImpactComponent implements OnInit {
 
       this.currentBusinessUnitId = incident.teamId ?? undefined;
       this.currentBusinessUnitName = incident.teamName ?? undefined;
-
-      // Applique la BU (si absente) à toutes les lignes existantes
-      if (this.currentBusinessUnitId) {
-        this.formData = {
-          financialImpacts: this.formData.financialImpacts.map(imp => ({
-            ...imp,
-            businessUnitId: imp.businessUnitId || this.currentBusinessUnitId!
-          })),
-          nonFinancialImpacts: this.formData.nonFinancialImpacts.map(imp => ({
-            ...imp,
-            businessUnitId: imp.businessUnitId || this.currentBusinessUnitId!
-          })),
-        };
-      }
     });
   }
 
@@ -169,7 +152,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         {
           id: Date.now(),
           title: '',
-          businessUnitId: this.currentBusinessUnitId ?? '',  // prérempli
+          businessUnitId: '',
           type: null,
           description: '',
           accountingReference: '',
@@ -194,7 +177,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         {
           id: Date.now(),
           title: '',
-          businessUnitId: this.currentBusinessUnitId ?? '', // prérempli
+          businessUnitId: '',
           type: null,
           description: '',
           amount: '',
@@ -213,10 +196,6 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     if (!this.incidentId) {
       newErrors['impacts'] = 'Incident non défini. Impossible d’associer les impacts.';
-    }
-    if (!this.currentBusinessUnitId) {
-      newErrors['impacts'] = (newErrors['impacts'] ? newErrors['impacts'] + ' ' : '') +
-        'Aucune entité (BU) associée à cet incident.';
     }
 
     if (this.formData.financialImpacts.length === 0 && this.formData.nonFinancialImpacts.length === 0) {
@@ -284,22 +263,21 @@ export class CreateOperationalImpactComponent implements OnInit {
         const dto: CreateOperatingLossDto = {
           type: imp.type!,
           incidentId,
-          businessUnitId: buId, // on force la BU de l’incident
+          businessUnitId: imp.businessUnitId,
           libelle: imp.title,
           description: imp.description || null,
           comptabilityRef: imp.accountingReference || null,
         };
 
         return this.operatingLossService.create(dto, 'Création impact financier').pipe(
-          switchMap((created: any) => {
-            const operatingLossId: string | undefined = created?.id;
+          switchMap((operatingLossId: string) => {
             if (!operatingLossId) return of(null);
 
             const amountCalls = imp.details.map((d) => {
               const amountDto: CreateAmountDto = {
                 amountType: d.amountType!,
                 montant: +d.amount,
-                comptabilisationDate: d.accountingDate || null, // optionnelle
+                comptabilisationDate: d.accountingDate || null,
               };
               return this.amountService.create(operatingLossId, amountDto);
             });
@@ -314,19 +292,18 @@ export class CreateOperationalImpactComponent implements OnInit {
         const dto: CreateOperatingLossDto = {
           type: imp.type!,
           incidentId,
-          businessUnitId: buId, // on force la BU de l’incident
+          businessUnitId: imp.businessUnitId, // on force la BU de l’incident
           libelle: imp.title,
           description: imp.description || null,
           comptabilityRef: null,
         };
 
         return this.operatingLossService.create(dto, 'Création impact non financier').pipe(
-          switchMap((created: any) => {
-            const operatingLossId: string | undefined = created?.id;
-            if (!operatingLossId || !this.estimeAmountType) return of(null);
+          switchMap((operatingLossId: string) => {
+            if (!operatingLossId) return of(null);
 
             const amountDto: CreateAmountDto = {
-              amountType: this.estimeAmountType,
+              amountType: this.estimeAmountType!.libelle,
               montant: +imp.amount,
               comptabilisationDate: null,
             };
