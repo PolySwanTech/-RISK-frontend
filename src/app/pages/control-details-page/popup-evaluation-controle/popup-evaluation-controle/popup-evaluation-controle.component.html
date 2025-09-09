@@ -8,7 +8,7 @@
         <div class="rv-modal__header">
             <div class="rv-modal__title">
                 <span class="rv-emoji">🧾</span>
-                {{ mode === 'DETAILS' ? "Détail de l’évaluation"
+                {{ mode === 'DETAILS' ? actionTaken == 'valid' ? "Détail de l’évaluation" : "Détail du réexamen"
                 : mode === 'FORM' ? "Évaluer le contrôle"
                 : "Évaluations en attente" }}
             </div>
