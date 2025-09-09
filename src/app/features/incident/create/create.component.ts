@@ -89,14 +89,12 @@ export class CreateComponent implements OnInit {
     intervenant: FormControl<string | null>;
     files: FormControl<string | null>;
     cause: FormControl<Cause | null>;
-    consequences: FormControl<string[]>;
     processId: FormControl<string | null>;
   }>({
     riskId: new FormControl(''),
     intervenant: new FormControl(null),
     files: new FormControl(null),
     cause: new FormControl(null, Validators.required),
-    consequences: new FormControl<string[]>([], { validators: [Validators.required], nonNullable: true }),
     processId: new FormControl(null, Validators.required),
   });
 
@@ -142,13 +140,11 @@ export class CreateComponent implements OnInit {
     return forkJoin({
       processes: this.processService.getProcessTree(processRootId),
       risks: this.riskService.getRisksTree(processRootId),
-      consequences: this.consequenceService.getAll(),
       causes: this.causeService.getAll()
     }).pipe(
-      tap(({ processes, risks, consequences, causes }) => {
+      tap(({ processes, risks, causes }) => {
         this.listProcess = processes;
         this.listRisks = risks;
-        this.listConsequence = consequences;
         this.listCauses = causes;
       }),
       /* on ne renvoie plus de valeur (juste la fin du chargement) */
@@ -178,7 +174,6 @@ export class CreateComponent implements OnInit {
         this.incidentForm3.patchValue({
           riskId: incident.risk,
           cause: incident.cause,
-          consequences: incident.consequences.map((c: any) => c.id),
           processId: incident.process,
           intervenant: incident.intervenant,
         });
@@ -251,7 +246,6 @@ export class CreateComponent implements OnInit {
       closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
       riskId: this.incidentForm3.value.riskId || null,
       processId: this.incidentForm3.value.processId || null,
-      consequences: this.incidentForm3.value.consequences || [],
       cause: this.incidentForm3.value.cause || null,
       intervenant: this.incidentForm3.value.intervenant || null,
     };
