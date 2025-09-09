@@ -35,7 +35,7 @@ export class Amount {
 }
 
 export interface CreateAmountDto {
-  amountType: AmountTypeDto;
+  amountType: string;
   montant: number;
   comptabilisationDate?: string | null; // "YYYY-MM-DD" ou null
 }

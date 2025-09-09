@@ -40,17 +40,12 @@
             </div>
 
             <!-- Titre + Entité -->
-            <div class="op-grid op-grid--2">
-              <div class="op-field">
-                <label class="op-label">Titre *</label>
-                <input type="text" [(ngModel)]="impact.title" class="op-input"
-                       [ngClass]="{'op-input--error': errors['financial_'+i] || errors['financial_details_'+i]}"/>
-              </div>
-
-              <div class="op-field">
-                <label class="op-label">Entité (Business Unit)</label>
-                <input type="text" class="op-input" [value]="currentBusinessUnitName || '—'" disabled />
-              </div>
+            <div class="op-field">
+              <label class="op-label">Entité (Business Unit) *</label>
+              <select [(ngModel)]="impact.businessUnitId" class="op-select">
+                <option value="">Sélectionnez</option>
+                <option *ngFor="let bu of businessUnits" [value]="bu.id">{{ bu.name }}</option>
+              </select>
             </div>
 
             <!-- Type + Référence comptable -->
@@ -155,17 +150,12 @@
             </div>
 
             <!-- Titre + Entité -->
-            <div class="op-grid op-grid--2">
-              <div class="op-field">
-                <label class="op-label">Titre *</label>
-                <input type="text" [(ngModel)]="impact.title" class="op-input"
-                       [ngClass]="{'op-input--error': errors['nonfinancial_'+i]}"/>
-              </div>
-
-              <div class="op-field">
-                <label class="op-label">Entité (Business Unit)</label>
-                <input type="text" class="op-input" [value]="currentBusinessUnitName || '—'" disabled />
-              </div>
+            <div class="op-field">
+              <label class="op-label">Entité (Business Unit) *</label>
+              <select [(ngModel)]="impact.businessUnitId" class="op-select">
+                <option value="">Sélectionnez</option>
+                <option *ngFor="let bu of businessUnits" [value]="bu.id">{{ bu.name }}</option>
+              </select>
             </div>
 
             <!-- Type + Type de montant (verrouillé à ESTIME si dispo) -->
