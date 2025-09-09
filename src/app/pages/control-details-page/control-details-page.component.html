@@ -126,7 +126,7 @@
                       <div class="meta-right">
                         <button class="btn btn-evaluer"
                                 *ngIf="!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED'"
-                                (click)="evaluateExec(s.exec.id)">
+                                (click)="evaluateExec(s.exec.id, 'eval');">
                           {{ s.view?.reviewStatus === 'REEXAM_REQUESTED' ? 'Réévaluer' : 'Évaluer' }}
                         </button>
                       </div>
@@ -135,9 +135,9 @@
 
                   <!-- Cartes visibles seulement quand il y a des données -->
                   <ng-container *ngIf="s.view">
-                    <app-popup-evaluation-controle [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true"
-                      (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id)">
-                    </app-popup-evaluation-controle>
+                    <app-evaluation-card [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true"
+                      (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id, $event)">
+                    </app-evaluation-card>
                   </ng-container>
                 </div>
               </div>
@@ -167,8 +167,4 @@
   [frequence]="control!.frequency" [isEditing]="false" (close)="showPopup = false"
   (planifier)="handlePlanification($event)" [lastPlannedAt]="controlExecutions?.[0]?.plannedAt">
 </app-planifier-execution-popup>
-
-<app-popup-evaluation-controle *ngIf="showEvaluationPopup && selectedExecutionId" [executionId]="selectedExecutionId!"
-  [initialMode]="forceDetails ? 'DETAILS' : undefined" [canValidate]="true" (close)="handleEvaluationSubmitted()" (close)="showEvaluationPopup = false">
-</app-popup-evaluation-controle>
 }

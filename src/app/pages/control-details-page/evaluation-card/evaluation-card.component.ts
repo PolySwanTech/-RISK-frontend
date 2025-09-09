@@ -1,36 +1,39 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
-import { Evaluation } from '../../../../core/enum/evaluation.enum';
-import { ControlService } from '../../../../core/services/control/control.service';
-import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
-import { ControlExecution } from '../../../../core/models/ControlExecution';
-import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
+import { Evaluation } from '../../../core/enum/evaluation.enum';
+import { ControlEvaluationView, ControlEvaluation } from '../../../core/models/ControlEvaluation';
+import { ControlExecution } from '../../../core/models/ControlExecution';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { ControlService } from '../../../core/services/control/control.service';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
-  selector: 'app-popup-evaluation-controle',
-  standalone: true,
+  selector: 'app-evaluation-card',
   imports: [CommonModule, FormsModule],
-  templateUrl: './popup-evaluation-controle.component.html',
-  styleUrls: ['./popup-evaluation-controle.component.scss']
+  templateUrl: './evaluation-card.component.html',
+  styleUrl: './evaluation-card.component.scss'
 })
-export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
+export class EvaluationCardComponent {
 
-  showAsCard: boolean = false;
-  evaluationView: ControlEvaluationView | null = null;
-  executionId!: string;
-  canValidate: boolean = false;
+  @Input() showAsCard: boolean = false;
+  @Input() evaluationView: ControlEvaluationView | null = null;
+
+  @Input() initialMode?: PopupMode;
+
+  @Input() executionId!: string;
+
+  @Input() canValidate: boolean = false;
 
   @Output() close = new EventEmitter<void>();
-  @Output() evaluateRequested = new EventEmitter<void>();
-  @Output() openDetailsRequested = new EventEmitter<void>();
 
-  showNoEvalText = false;
-  showEvaluateButton = true;
+  @Output() evaluateRequested = new EventEmitter<void>();
+  @Output() openDetailsRequested = new EventEmitter<string>();
+
+  @Input() showNoEvalText = false;
+  @Input() showEvaluateButton = true;
 
   mode: PopupMode = 'FORM';
   blockers: ControlExecution[] = [];
@@ -51,19 +54,18 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   actionTaken: 'valid' | 'reexam' | null = null;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private dialogRef: MatDialogRef<PopupEvaluationControleComponent>) {
-  }
-
   ngOnInit(): void {
-    if (this.data) {
-      this.executionId = this.data.executionId;
-      this.mode = this.data.mode;
-      if (this.data.mode === 'FORM') this.startEvaluationFor(this.executionId);
-      if (this.data.mode === 'DETAILS') this.openDetails(this.executionId);
-      this.evaluationView = this.data.evaluationView;
-      this.canValidate = this.data.canValidate;
-      this.actionTaken = this.data.action;
+    if (this.showAsCard) return;
+
+    window.addEventListener('keydown', this.onKeyDown);
+
+    if (this.initialMode === 'DETAILS') {
+      this.openDetails(this.executionId);
+      return;
     }
+
+    this.evaluationData.executionId = this.executionId;
+    this.loadBlockersThenDecide(this.executionId);
   }
 
   ngOnDestroy(): void {
@@ -112,39 +114,11 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     this.mode = 'FORM';
   }
 
-  handleAction() {
-    if (this.actionTaken === 'valid') {
-      this.approve();  // Appel de la logique de validation
-    } else if (this.actionTaken === 'reexam') {
-      this.requestReexam();  // Appel de la logique de réexamen
-    } else if (this.actionTaken == 'eval') {
-      this.submit();
-    }
+  handleAction(action : string) {
+    this.openDetailsRequested.emit(action);
   }
-
-  submit(): void {
-    this.controlService.createEvaluation(this.evaluationData).subscribe(() => {
-      this.dialogRef.close();
-    });
-  }
-
-  approve(): void {
-    if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
-    this.controlService.reviewEvaluationApprove(this.evalDetails.id, this.reviewComment).subscribe(() => {
-      this.dialogRef.close();
-    });
-  }
-
-  requestReexam(): void {
-    if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
-    this.controlService.reviewEvaluationReexam(this.evalDetails.id, this.reviewComment).subscribe(() => {
-      this.dialogRef.close();
-    });
-  }
-
-  cancel(): void { this.dialogRef.close(); }
+  
+  cancel(): void { this.close.emit(); }
 
   get evalLabel(): string {
     const v = (this.evaluationView?.evaluation || '').toUpperCase();
