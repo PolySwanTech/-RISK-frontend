@@ -108,7 +108,7 @@ export class CreateControlComponent {
     this.listRisks = [];
     this.form.get('processId')?.reset();
     this.form.get('riskId')?.reset();
-    this.processService.getProcessTree(event.value.id).subscribe(data => {
+    this.processService.getProcessTree(buId).subscribe(data => {
       this.listProcess = data;
     });
   }

@@ -7,19 +7,24 @@ import { Router, RouterModule } from '@angular/router';
 import { CartoService } from '../../core/services/carto/carto.service';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { BusinessUnit } from '../../core/models/BusinessUnit';
 import { EntitiesService } from '../../core/services/entities/entities.service';
+import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-cartographie',
   imports: [MatCardModule, CommonModule, FormsModule, GoBackComponent,
     MatPaginatorModule, RouterModule,
-    MatIconModule, MatTableModule, MatButtonModule, MatMenuModule],
+    MatIconModule, MatTableModule, MatButtonModule, MatMenuModule, 
+    MatFormFieldModule, MatOptionModule, MatSelectModule, ReactiveFormsModule, MatTooltipModule, MatSuffix],
   templateUrl: './cartographie.component.html',
   styleUrls: ['./cartographie.component.scss']
 })

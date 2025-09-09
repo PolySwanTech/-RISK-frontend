@@ -1,34 +1,42 @@
 <app-go-back title="Module cartographie" [buttons]="goBackButtons"></app-go-back>
-<br />
-<br />
-<br />
-<br />
-<br />
 <div class="container">
+  <mat-card class="filters-card">
+    <mat-card-content class="dashboard-header">
+      <div class="grid">
+        <!-- BU -->
+        <div class="input-container">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Business Unit</mat-label>
+          <mat-select [(ngModel)]="selectedBuId" required>
+            <mat-option value="" disabled>— Sélectionnez une BU —</mat-option>
+            <mat-option *ngFor="let bu of businessUnits" [value]="bu.id">
+              {{ bu.name }}
+            </mat-option>
+          </mat-select>
+          <button mat-icon-button matSuffix matTooltip="Sélectionnez la Business Unit associée à cet incident.">
+            <mat-icon>info</mat-icon>
+          </button>
+        </mat-form-field>
 
-  <div class="grid">
-    <!-- BU -->
-    <div class="field">
-      <label for="bu">Business Unit <span class="req">*</span></label>
-      <select id="bu" [(ngModel)]="selectedBuId" required>
-        <option value="" disabled selected>— Sélectionnez une BU —</option>
-        <option *ngFor="let bu of businessUnits" [value]="bu.id">
-          {{ bu.name }}
-        </option>
-      </select>
-    </div>
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Date d'Exercice</mat-label>
+          <mat-select [(ngModel)]="selectedYear" required>
+            <mat-option value="" disabled>— Sélectionnez une année d'exercice —</mat-option>
+            <mat-option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </mat-option>
+          </mat-select>
+          <button mat-icon-button matSuffix matTooltip="Sélectionnez l'année d'exercice pour cet incident.">
+            <mat-icon>info</mat-icon>
+          </button>
+        </mat-form-field>
+        </div>
 
-    <!-- Année -->
-    <div class="field">
-      <label for="year">Date d'Exercice <span class="req">*</span></label>
-      <select id="year" [(ngModel)]="selectedYear" required>
-        <option value="" disabled>— Sélectionnez une année d'exercice —</option>
-        <option *ngFor="let year of years" [value]="year">{{ year }}</option>
-      </select>
-    </div>
-
-    <button class="btn btn-primary" [disabled]="!selectedYear || !selectedBuId" (click)="goCreate()">
-      Voir la cartographie
-    </button>
-  </div>
+        <button mat-raised-button class="btn btn-primary" [disabled]="!selectedYear || !selectedBuId"
+          (click)="goCreate()">
+          Voir la cartographie
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>

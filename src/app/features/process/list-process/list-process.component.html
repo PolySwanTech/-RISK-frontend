@@ -45,7 +45,7 @@
 
     <!-- Arbre hiérarchique -->
     <div class="hierarchy-container">
-        <button *ngIf="!isCartographie" class="btn-primary" style="margin-bottom: 20px;" mat-raised-button
+        <button class="btn-primary" style="margin-bottom: 20px;" mat-raised-button
             (click)="openEntityDialog()">
             <mat-icon>add</mat-icon><span>Ajouter une entité</span>
         </button>
@@ -88,7 +88,7 @@
 
                                 </div>
                                 <div class="icon-container" [ngClass]="'icon-' + node.type">
-                                    <button *ngIf="!isCartographie" (click)="openEntityDialog(node, $event)"
+                                    <button (click)="openEntityDialog(node, $event)"
                                         mat-icon-button><mat-icon>edit</mat-icon></button>
 
                                 </div>
@@ -163,7 +163,7 @@
                         </div>
                     </div>
 
-                    <div *ngIf="isCartographie" class="node-actions">
+                    <div class="node-actions">
                         <button mat-raised-button class="btn-primary" (click)="addRisk(node.id)">
                             <mat-icon>add</mat-icon>
                             Nouveau risk
@@ -177,7 +177,7 @@
                     </div>
                 </div>
 
-                <div *ngIf="node.risks && node.risks.length > 0 && isCartographie" class="risk-table">
+                <div *ngIf="node.risks && node.risks.length > 0" class="risk-table">
                     <div class="table-header">
                         <div class="col-risque">RISQUE</div>
                         <div class="col-risque-brut">RISQUE BRUT</div>
