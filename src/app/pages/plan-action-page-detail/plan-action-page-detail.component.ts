@@ -219,7 +219,10 @@ export class PlanActionPageDetailComponent {
   endActionPlan() {
     if (this.actionPlan && this.actionPlan.status !== Status.ACHIEVED && this.actionPlan.status !== Status.NOT_STARTED) {
       this.actionPlanService.endActionPlan(this.actionPlan.id!).subscribe(
-        _ => this.ngOnInit()
+        _ => {
+          this.snackBarService.success("Le plan d'action a bien été cloturé.");
+          this.ngOnInit()
+        }
       )
     }
   }
