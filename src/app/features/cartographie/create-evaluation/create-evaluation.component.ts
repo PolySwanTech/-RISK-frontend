@@ -80,6 +80,7 @@ export class CreateEvaluationComponent implements OnInit {
         const processes = buMap.get(entity.name) || [];
         return {
           id: `bu-${entity.name}`,
+          lm : entity.lm,
           name: entity.name,
           niveau: 0,
           type: 'bu' as const,
@@ -95,6 +96,7 @@ export class CreateEvaluationComponent implements OnInit {
 
     return parents.map(parent => ({
       id: parent.id,
+      lm : parent.lm,
       name: parent.name,
       niveau: parent.niveau,
       type: this.determineNodeType(parent),
@@ -109,6 +111,7 @@ export class CreateEvaluationComponent implements OnInit {
 
     return directChildren.map(child => ({
       id: child.id,
+      lm : child.lm,
       name: child.name,
       niveau: child.niveau,
       type: this.determineNodeType(child),

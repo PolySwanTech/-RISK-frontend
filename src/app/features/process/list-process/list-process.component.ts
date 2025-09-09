@@ -152,6 +152,7 @@ export class ListProcessComponent implements OnInit {
         return {
           id: entity.id,
           name: entity.name,
+          lm: entity.lm,
           niveau: (entity as any).niveau ?? 1,
           type: 'bu' as const,
           children: this.buildBUChildren(processes)
@@ -163,6 +164,7 @@ export class ListProcessComponent implements OnInit {
       if (orphanProcesses) {
         this.hierarchicalProcesses.push({
           id: `bu-no-bu`,
+          lm: false,
           name: 'Sans BU',
           niveau: 1,
           type: 'bu' as const,
@@ -179,6 +181,7 @@ export class ListProcessComponent implements OnInit {
 
     return parents.map(parent => ({
       id: parent.id,
+      lm: parent.lm,
       name: parent.name,
       niveau: parent.niveau,
       type: this.determineNodeType(parent),
@@ -193,6 +196,7 @@ export class ListProcessComponent implements OnInit {
 
     return directChildren.map(child => ({
       id: child.id,
+      lm: child.lm,
       name: child.name,
       niveau: child.niveau,
       type: this.determineNodeType(child),
@@ -305,11 +309,32 @@ export class ListProcessComponent implements OnInit {
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     }).afterClosed().subscribe(bu => {
       if (bu) {
-        this.entityService.save(bu).subscribe(_ => {
-          this.ngOnInit()
-          this.snackBarService.info("Entité ajoutée avec succès !")
-        })
+        if (bu.id) {
+          // modification
+          this.entityService.update(bu).subscribe(_ => {
+            this.ngOnInit()
+            this.snackBarService.info("Entité modifiée avec succès !")
+          })
+        }
+        else {
+          this.entityService.save(bu).subscribe(_ => {
+            this.ngOnInit()
+            this.snackBarService.info("Entité ajoutée avec succès !")
+          })
+        }
       }
+    });
+  }
+
+  openProcessDialog(process?: any, event?: Event) {
+    if (event) {
+      event.stopPropagation(); // Empêche la propagation du clic
+    }
+    this.dialog.open(CreateProcessComponent, {
+      width: '600px !important',
+      data: process || null
+    }).afterClosed().subscribe(_ => {
+      this.ngOnInit();
     });
   }
 

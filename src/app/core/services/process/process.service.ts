@@ -30,6 +30,10 @@ export class ProcessService {
     return this.http.post<Process>(this.baseUrl, process)
   }
 
+  updateProcess(id: string, process: { name: string; parentId?: string }) {
+    return this.http.put<Process>(`${this.baseUrl}/${id}`, process);
+  }
+
   getProcessTree(buId?: string): Observable<Process[]> {
     const options = buId ? { params: new HttpParams().set('buId', buId) } : {};
     return this.http.get<Process[]>(`${this.baseUrl}/tree`, options);

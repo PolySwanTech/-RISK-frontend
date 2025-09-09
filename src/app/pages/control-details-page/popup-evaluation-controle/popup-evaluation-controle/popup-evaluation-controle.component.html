@@ -8,11 +8,10 @@
         <div class="rv-modal__header">
             <div class="rv-modal__title">
                 <span class="rv-emoji">🧾</span>
-                {{ mode === 'DETAILS' ? "Détail de l’évaluation"
+                {{ mode === 'DETAILS' ? actionTaken == 'valid' ? "Détail de l’évaluation" : "Détail du réexamen"
                 : mode === 'FORM' ? "Évaluer le contrôle"
                 : "Évaluations en attente" }}
             </div>
-            <button class="rv-iconbtn" (click)="cancel()" aria-label="Fermer">×</button>
         </div>
 
         <div class="rv-modal__body">
@@ -66,76 +65,6 @@
 
                 <div *ngSwitchCase="'DETAILS'">
                     <ng-container *ngIf="evalDetails; else noEvalYet">
-
-                        <!-- <div class="rv-meta-grid">
-                            <div class="rv-field">
-                                <label>Réalisateur</label>
-                                <div class="rv-val">{{ evalDetails.performedBy || '—' }}</div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Planifié le</label>
-                                <div class="rv-val">
-                                    {{ evalDetails.plannedAt ? (evalDetails.plannedAt | date:'dd/MM/yyyy') : '—' }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Évalué le</label>
-                                <div class="rv-val">
-                                    {{ evalDetails.evaluatedAt ? (evalDetails.evaluatedAt | date:'dd/MM/yyyy') : '—' }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Évaluation</label>
-                                <div class="pill" [ngClass]="{
-                  'pill-success': (evalDetails.evaluation || '').toUpperCase().includes('CONF') && !(evalDetails.evaluation || '').toUpperCase().includes('PARTIEL'),
-                  'pill-warning': (evalDetails.evaluation || '').toUpperCase().includes('PARTIEL'),
-                  'pill-danger': (evalDetails.evaluation || '').toUpperCase().includes('NON'),
-                  'pill-default': !(evalDetails.evaluation)
-                }">
-                                    {{ (evalDetails.evaluation || '—') | uppercase }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field">
-                                <label>Statut de revue</label>
-                                <div class="chip" [ngClass]="{
-  'pill-success': evalDetails.reviewStatus === 'APPROVED',
-  'pill-warning': evalDetails.reviewStatus === 'REEXAM_REQUESTED',
-  'pill-default': evalDetails.reviewStatus === 'PENDING' || !evalDetails.reviewStatus
-}">
-                                    {{ evalDetails.reviewStatus === 'APPROVED' ? 'Validée' :
-                                    evalDetails.reviewStatus === 'REEXAM_REQUESTED' ? 'Réexamen demandé' :
-                                    'En attente de validation' }}
-                                </div>
-                            </div>
-
-                            <div class="rv-field" *ngIf="evalDetails.reviewedAt || evalDetails.reviewedBy">
-                                <label>Mise à jour</label>
-                                <div class="rv-val meta">
-                                    <ng-container *ngIf="evalDetails.reviewedAt">le {{ evalDetails.reviewedAt |
-                                        date:'dd/MM/yyyy' }}</ng-container>
-                                    <ng-container *ngIf="evalDetails.reviewedBy"><span
-                                            *ngIf="evalDetails.reviewedAt">&nbsp;•&nbsp;</span>par {{
-                                        evalDetails.reviewedBy }}</ng-container>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="rv-sep" />
-
-                        <div class="rv-section">
-                            <div class="rv-section__label">Résumé</div>
-                            <div class="rv-box rv-text">{{ evalDetails.resume || '—' }}</div>
-                        </div>
-
-                        <div class="rv-section" *ngIf="evalDetails.comments">
-                            <div class="rv-section__label">Commentaires</div>
-                            <div class="rv-box rv-text">{{ evalDetails.comments }}</div>
-                        </div> -->
-
                         <div class="rv-section" *ngIf="canValidate && evalDetails.reviewStatus === 'PENDING'">
                             <div class="rv-section__label">Votre retour (obligatoire)</div>
                             <textarea [(ngModel)]="reviewComment" rows="3" class="rv-textarea"
@@ -152,137 +81,10 @@
         </div>
 
         <div class="rv-modal__footer">
-            <ng-container [ngSwitch]="mode">
-                <div class="rv-actions" *ngSwitchCase="'BLOCKERS'">
-                    <button class="btn btn-secondary" (click)="cancel()">Fermer</button>
-                </div>
-
-                <div class="rv-actions" *ngSwitchCase="'FORM'">
-                    <button type="submit" class="btn btn-primary" (click)="submit()">Valider</button>
-                    <button type="button" class="btn btn-secondary" (click)="cancel()">Fermer</button>
-                </div>
-
-                <div class="rv-actions" *ngSwitchCase="'DETAILS'">
-                    <ng-container *ngIf="canValidate && evalDetails?.reviewStatus === 'PENDING'; else onlyClose">
-                        <button class="btn btn-primary winter-style"
-                            [disabled]="evalDetails?.reviewStatus === 'PENDING' && !reviewComment.trim()"
-                            (click)="approve()">Valider</button>
-                        <button class="btn btn-outline warning"
-                            [disabled]="evalDetails?.reviewStatus === 'PENDING' && !reviewComment.trim()"
-                            (click)="requestReexam()">Demander un réexamen</button>
-                        <button class="btn btn-secondary" (click)="cancel()">Fermer</button>
-                    </ng-container>
-                    <ng-template #onlyClose>
-                        <button class="btn btn-secondary" (click)="cancel()">Fermer</button>
-                    </ng-template>
-                </div>
+            <ng-container>
+                <button class="btn btn-primary winter-style" (click)="handleAction()">OK</button>
+                <button class="btn btn-secondary" (click)="cancel()">Fermer</button>
             </ng-container>
         </div>
-
-    </div>
-</div>
-
-<div class="card eval-card" *ngIf="showAsCard && evaluationView">
-    <div class="card-content">
-        <h3 class="title">
-            <span class="dot"></span>
-            🟩 Résultats & observations
-        </h3>
-
-        <ng-container *ngIf="evaluationView; else noData">
-            <div class="eval-header" *ngIf="evaluationView">
-                <div class="eval-left">
-                    <span class="section-label">Évaluation du contrôle</span>
-                    <span class="pill" [ngClass]="evalClass">{{ evalLabel }}</span>
-                </div>
-
-                <div class="eval-right">
-                    <span class="chip" [ngClass]="reviewBadgeClass">{{ reviewBadgeLabel }}</span>
-                    <span class="meta" *ngIf="evaluationView?.evaluatedAt">
-                        Évaluée le {{ evaluationView.evaluatedAt | date:'dd/MM/yyyy' }}
-                    </span>
-                </div>
-            </div>
-
-            <hr class="section-sep" />
-
-            <div class="section">
-                <div class="section-label">Résumé des constats</div>
-                <div class="box text">{{ evaluationView.resume || '—' }}</div>
-            </div>
-
-            <div class="section">
-                <div class="section-label">Commentaires de l'exécutant</div>
-                <div class="box text">{{ evaluationView.comments || '—' }}</div>
-            </div>
-
-            <!-- Actions de validation : visibles quand une évaluation existe et qu'elle est en attente -->
-            <div class="rv-actions rv-actions-inline" *ngIf="evaluationView?.reviewStatus === 'PENDING' && canValidate">
-                <button class="btn btn-primary" (click)="openDetailsRequested.emit()">Valider</button>
-                <button class="btn btn-outline warning" (click)="openDetailsRequested.emit()">Demander un
-                    réexamen</button>
-            </div>
-
-        </ng-container>
-
-        <ng-template #noData>
-            <div class="empty" *ngIf="showNoEvalText">Aucune évaluation disponible.</div>
-            <div class="rv-actions" *ngIf="showEvaluateButton">
-                <button class="btn btn-primary" (click)="evaluateRequested.emit()">Évaluer</button>
-            </div>
-        </ng-template>
-    </div>
-</div>
-
-<div class="card validate-card" *ngIf="showAsCard && evaluationView?.reviewStatus === 'APPROVED'">
-    <div class="card-content">
-        <h3 class="title">
-            <span class="dot dot--purple"></span>
-            🟪 Validation / Approbation
-        </h3>
-
-        <ng-container *ngIf="evaluationView as ev">
-            <!-- Si en attente ET l'utilisateur peut valider → afficher les boutons -->
-            <ng-container *ngIf="canValidate && ev.reviewStatus === 'PENDING'; else showValidationState">
-                <div class="val-status" style="margin-bottom:8px;">
-                    <span class="pill pill-default">En attente de validation</span>
-                </div>
-                <div class="rv-actions">
-                    <button class="btn btn-primary" (click)="openDetailsRequested.emit()">Valider</button>
-                    <button class="btn btn-outline warning" (click)="openDetailsRequested.emit()">Demander un
-                        réexamen</button>
-                </div>
-            </ng-container>
-
-            <!-- Sinon, afficher l'état comme avant -->
-            <ng-template #showValidationState>
-                <div class="val-grid">
-                    <div class="val-field">
-                        <label>Nom du valideur / manager</label>
-                        <div class="val-input">{{ ev.reviewedBy || '—' }}</div>
-                    </div>
-
-                    <div class="val-field">
-                        <label>Date de validation</label>
-                        <div class="val-input">
-                            {{ ev.reviewedAt ? (ev.reviewedAt | date:'dd/MM/yyyy') : '—' }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="val-status">
-                    <span class="pill" [ngClass]="reviewBadgeClass">{{ reviewBadgeLabel }}</span>
-                </div>
-
-                <div class="val-field full">
-                    <label>Commentaires ou avis du valideur</label>
-                    <div class="val-textarea">{{ ev.reviewComment || '—' }}</div>
-                </div>
-            </ng-template>
-        </ng-container>
-
-        <ng-template #noValidation>
-            <div class="empty">Aucune validation enregistrée.</div>
-        </ng-template>
     </div>
 </div>

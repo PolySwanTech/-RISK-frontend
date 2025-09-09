@@ -44,7 +44,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatStepperModule,
     MatRadioModule,
     SelectUsersComponent,
-    ButtonAddFileComponent,
     GoBackComponent,
     NgIf,
     NgFor,
@@ -68,6 +67,8 @@ export class CreateComponent implements OnInit {
   selectedUser: string | null = null;
   title = "Ajout d'un incident";
 
+  today = new Date();
+
 
   incidentForm1 = this._formBuilder.group({
     reference: [''],
@@ -79,8 +80,14 @@ export class CreateComponent implements OnInit {
 
   incidentForm2 = this._formBuilder.group({
     dateDeDeclaration: [new Date().toISOString().split('T')[0], Validators.required],
-    dateDeSurvenance: ['', Validators.required],
-    dateDeDetection: ['', Validators.required],
+    dateDeSurvenance: [
+      '',
+      [Validators.required, this.maxDateValidator(new Date())]
+    ],
+    dateDeDetection: [
+      '',
+      [Validators.required, this.maxDateValidator(new Date())]
+    ],
     dateDeCloture: ['']
   });
 
@@ -135,6 +142,15 @@ export class CreateComponent implements OnInit {
     } else {
       this.loadTrees().subscribe();
     }
+  }
+
+  // Validator personnalisé pour les dates
+  maxDateValidator(maxDate: Date) {
+    return (control: any) => {
+      if (!control.value) return null; // Ne pas valider si vide
+      const inputDate = new Date(control.value);
+      return inputDate <= maxDate ? null : { maxDate: true };
+    };
   }
 
   private loadTrees(processRootId?: string /** optionnel */) {

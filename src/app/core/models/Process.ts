@@ -27,6 +27,7 @@ export class Process {
 export interface ProcessNode {
   id: string;
   name: string;
+  lm: boolean;
   niveau: number;
   type: 'bu' | 'parent' | 'child';
   buName?: string;
