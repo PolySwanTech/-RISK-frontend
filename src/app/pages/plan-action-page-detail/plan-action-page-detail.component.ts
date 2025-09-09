@@ -23,6 +23,7 @@ import { FichiersComponent } from '../../shared/components/fichiers/fichiers.com
 import { FileService } from '../../core/services/file/file.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
+import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -40,6 +41,7 @@ export class PlanActionPageDetailComponent {
   private router = inject(Router);
   private fileService = inject(FileService);
   private dialog = inject(MatDialog);
+  private snackBarService = inject(SnackBarService)
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -206,7 +208,10 @@ export class PlanActionPageDetailComponent {
   startActionPlan() {
     if (this.actionPlan && this.actionPlan.status === Status.NOT_STARTED) {
       this.actionPlanService.startActionPlan(this.actionPlan.id!).subscribe(
-        _ => this.ngOnInit()
+        _ => {
+          this.snackBarService.success("Le plan d'action a bien été démarré, vous pouvez commencer à réaliser les actions.");
+          this.ngOnInit()
+        }
       )
     }
   }

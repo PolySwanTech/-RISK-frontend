@@ -134,16 +134,6 @@
               </button>
             </mat-form-field>
 
-            <mat-form-field>
-              <mat-label>Conséquences</mat-label>
-              <mat-select formControlName="consequences" multiple>
-                <mat-option *ngFor="let cons of listConsequence" [value]="cons.id">{{ cons.name }}</mat-option>
-              </mat-select>
-              <button mat-icon-button matSuffix matTooltip="Choisissez les conséquences associées à l'incident.">
-                <mat-icon>info</mat-icon>
-              </button>
-            </mat-form-field>
-
             @if(incident || listCauses.length > 0){
               <app-select-users [selectedUserId]="selectedUser" (userSelected)="changeUser($event)"
                 placeholder="Collaborateur pouvant vous aider"></app-select-users>
