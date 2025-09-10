@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
 import { RiskLevel, RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 export interface Range {
   libelle: string;
@@ -28,6 +29,7 @@ export class MatrixSettingsComponent {
   riskLevels = RiskLevelLabels;
 
   private settingSrv = inject(MatrixService);
+  private snackBarService = inject(SnackBarService);
 
   updateMin(idx: number, event: any) {
     const newMin = +event.target.value;
@@ -47,13 +49,7 @@ export class MatrixSettingsComponent {
   saveSettings() {
     // Logique de sauvegarde des paramètres
     this.settingSrv.saveScale(this.list, this.type).subscribe(
-      {
-
-        next: response => {
-        },
-        error: error => {
-        }
-      }
+      resp => this.snackBarService.info(resp.success || resp.error)
     );
   }
 }
