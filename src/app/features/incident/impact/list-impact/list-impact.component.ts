@@ -108,14 +108,14 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'montantNet',
       header: 'Montant Net',
-      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantBrut + ' €' || '') : 'N/A',
+      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantNet + ' €' || '') : 'N/A',
       filterType: 'numberRange',
       icon: 'euro_symbol'
     },
     {
       columnDef: 'montantFinal',
       header: 'Montant Final',
-      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantBrut + ' €' || '') : 'N/A',
+      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantFinal + ' €' || '') : 'N/A',
       filterType: 'numberRange',
       icon: 'euro_symbol'
     },
