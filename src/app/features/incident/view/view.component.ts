@@ -83,7 +83,7 @@ export class ViewComponent implements OnInit {
         label: "Plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
-        show: this.canShowActions(),
+        show: this.canShowActions() && !this.isDraft(),
         action: () => this.addActionPlan()
       },
       {
@@ -104,8 +104,8 @@ export class ViewComponent implements OnInit {
         label: 'Fiche Incident (PDF)',
         icon: 'description',
         class: 'btn-green',
-        show: true,
-        action: () => this.downloadPDF()
+        show: !this.isDraft(),
+        action: () => this.downloadPDF() 
       },
       {
         label: 'Clôturer',

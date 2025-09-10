@@ -68,7 +68,6 @@ export class RiskPageComponent implements OnInit {
     this.goBackButtons = [
       { label: 'Ajouter un Risque', icon: 'add', class: 'btn-primary', action: () => this.goToAddRisk(), show: true },
       { label: 'Exporter', icon: 'file_download', class: 'btn-green', action: () => this.exportData(), show: true },
-      { label: 'Actualiser', icon: 'refresh', class: 'btn-primary', action: () => this.refreshData(), show: true }
     ];
 
     this.buId = this.route.snapshot.paramMap.get('id')!;

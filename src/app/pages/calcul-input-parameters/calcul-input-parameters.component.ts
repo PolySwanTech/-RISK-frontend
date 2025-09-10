@@ -8,12 +8,13 @@ import { MatInputModule } from '@angular/material/input';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
 import { Router } from '@angular/router';
 import { SmaInputCreateDto, SmaLossUpsert } from '../../core/models/Sma';
+import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
 
 
 @Component({
   selector: 'app-calcul-input-parameters',
   standalone: true,
-  imports: [FormsModule, NgFor, NgChartsModule, MatInputModule],
+  imports: [FormsModule, NgFor, NgChartsModule, MatInputModule, GoBackComponent],
   templateUrl: './calcul-input-parameters.component.html',
   styleUrl: './calcul-input-parameters.component.scss'
 })

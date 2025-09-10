@@ -1,14 +1,10 @@
 <div class="main-content">
-    <div class="content-header">
-        <div>
-            <h1 class="page-title">Paramètres d'Entrée</h1>
-            <p class="page-subtitle">Configuration des données pour le calcul des risques bancaires</p>
-        </div>
-        <div class="header-actions">
-            <button class="btn btn-primary" (click)="refreshData()">🔄 Actualiser</button>
-        </div>
-    </div>
 
+    <app-go-back [title]="'Module de calcul des fonds propres'" [subtitle]="'Configuration des données pour le calcul des risques bancaires'"></app-go-back>
+
+    <br>
+    <br>
+    <br>
     <form #parametersForm="ngForm" (ngSubmit)="onSubmit()">
 
         <!-- Année analysée -->
