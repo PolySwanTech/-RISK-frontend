@@ -54,6 +54,8 @@ export class PlanActionPageDetailComponent {
 
   goBackButtons: GoBackButton[] = []
 
+  statusEnum = Status;
+
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
