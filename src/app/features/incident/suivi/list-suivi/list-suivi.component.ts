@@ -38,6 +38,7 @@ export class ListSuiviComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSuivi();
+    this.message = '';
   }
 
   getSuivi() {
