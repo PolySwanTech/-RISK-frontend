@@ -159,7 +159,7 @@ export class ViewComponent implements OnInit {
   }
 
   canClose() {
-    return this.incident?.state != State.DRAFT && this.userRole === 'VALIDATEUR' && this.incident?.closedAt == null;
+    return this.incident?.state != State.DRAFT && this.incident?.closedAt == null;
   }
 
   normalize(str?: string): string {

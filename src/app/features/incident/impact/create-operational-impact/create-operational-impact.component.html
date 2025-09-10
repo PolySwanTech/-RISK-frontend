@@ -36,17 +36,28 @@
             <div class="op-subcard-head">
               <h3 class="op-h3">Impact Financier #{{ i + 1 }}</h3>
               <button type="button" (click)="removeItem('financialImpacts', impact.id)"
-                      class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
+                class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
             </div>
 
             <!-- Titre + Entité -->
-            <div class="op-field">
-              <label class="op-label">Entité (Business Unit) *</label>
-              <select [(ngModel)]="impact.businessUnitId" class="op-select">
-                <option value="">Sélectionnez</option>
-                <option *ngFor="let bu of businessUnits" [value]="bu.id">{{ bu.name }}</option>
-              </select>
+
+            <div class="op-grid op-grid--2">
+              <div class="op-field">
+                <label class="op-label">Titre *</label>
+                <input type="text" [(ngModel)]="impact.title" class="op-input"
+                  [ngClass]="{'op-input--error': errors['financial_'+i] || errors['financial_details_'+i]}" />
+              </div>
+
+              <div class="op-field">
+                <label class="op-label">Entité (Business Unit) *</label>
+                <select [(ngModel)]="impact.businessUnitId" class="op-select">
+                  <option value="">Sélectionnez</option>
+                  <option *ngFor="let bu of businessUnits" [value]="bu.id">{{ bu.name }}</option>
+                </select>
+              </div>
             </div>
+
+
 
             <!-- Type + Référence comptable -->
             <div class="op-grid op-grid--2 op-mt-xs">
@@ -60,14 +71,15 @@
 
               <div class="op-field">
                 <label class="op-label">Référence comptable</label>
-                <input type="text" [(ngModel)]="impact.accountingReference" class="op-input" placeholder="Ex: REF-2025-001" />
+                <input type="text" [(ngModel)]="impact.accountingReference" class="op-input"
+                  placeholder="Ex: REF-2025-001" />
               </div>
             </div>
 
             <div class="op-field op-mt-xs">
               <label class="op-label">Description *</label>
               <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
-                        placeholder="Décrivez cet impact financier..."></textarea>
+                placeholder="Décrivez cet impact financier..."></textarea>
             </div>
 
             <div class="op-divider"></div>
@@ -142,20 +154,29 @@
 
       <ng-template #nonFinancialList>
         <div class="op-stack">
-          <div class="op-subcard" *ngFor="let impact of formData.nonFinancialImpacts; let i = index; trackBy: trackById">
+          <div class="op-subcard"
+            *ngFor="let impact of formData.nonFinancialImpacts; let i = index; trackBy: trackById">
             <div class="op-subcard-head">
               <h3 class="op-h3">Impact Non Financier #{{ i + 1 }}</h3>
               <button type="button" (click)="removeItem('nonFinancialImpacts', impact.id)"
-                      class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
+                class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
             </div>
 
             <!-- Titre + Entité -->
-            <div class="op-field">
-              <label class="op-label">Entité (Business Unit) *</label>
-              <select [(ngModel)]="impact.businessUnitId" class="op-select">
-                <option value="">Sélectionnez</option>
-                <option *ngFor="let bu of businessUnits" [value]="bu.id">{{ bu.name }}</option>
-              </select>
+            <div class="op-grid op-grid--2">
+              <div class="op-field">
+                <label class="op-label">Titre *</label>
+                <input type="text" [(ngModel)]="impact.title" class="op-input"
+                  [ngClass]="{'op-input--error': errors['financial_'+i] || errors['financial_details_'+i]}" />
+              </div>
+
+              <div class="op-field">
+                <label class="op-label">Entité (Business Unit) *</label>
+                <select [(ngModel)]="impact.businessUnitId" class="op-select">
+                  <option value="">Sélectionnez</option>
+                  <option *ngFor="let bu of businessUnits" [value]="bu.id">{{ bu.name }}</option>
+                </select>
+              </div>
             </div>
 
             <!-- Type + Type de montant (verrouillé à ESTIME si dispo) -->
@@ -164,7 +185,8 @@
                 <label class="op-label">Type de Conséquence *</label>
                 <select [(ngModel)]="impact.type" class="op-select">
                   <option [ngValue]="null">Sélectionnez un type</option>
-                  <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t.libelle">{{ t.libelle }}</option>
+                  <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t.libelle">{{ t.libelle }}
+                  </option>
                 </select>
               </div>
 
@@ -184,7 +206,7 @@
               <div class="op-field">
                 <label class="op-label">Description *</label>
                 <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
-                          placeholder="Décrivez cet impact non financier..."></textarea>
+                  placeholder="Décrivez cet impact non financier..."></textarea>
               </div>
             </div>
 
