@@ -178,7 +178,7 @@ export class ControlDetailsPageComponent implements OnInit {
   scheduleExecution(): void { this.showPopup = true; }
 
   viewFullHistory(): void {
-    if (this.control) this.router.navigate(['/controls', this.control.id, 'history']);
+    if (this.control) this.router.navigate(['control', 'details', this.control.id.id, 'executions']);
   }
 
 
