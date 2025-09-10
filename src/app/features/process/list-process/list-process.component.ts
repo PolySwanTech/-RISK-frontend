@@ -154,7 +154,7 @@ export class ListProcessComponent implements OnInit {
   }
 
   addRisk(id: string): void {
-    this.router.navigate(['reglages', 'risks', 'create', id]);
+    this.router.navigate(['reglages', 'risks', 'create'], { queryParams: { processId: id } });
   }
 
   navToRisk(id: number) {
