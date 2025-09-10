@@ -23,6 +23,7 @@ import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
 import { ControlExecution } from '../../core/models/ControlExecution';
 import { Status, statusLabels } from '../../core/enum/status.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../core/enum/evaluation-controle.enum';
+import { PopUpDetailExecutionComponent } from '../../features/control/pop-up-detail-execution/pop-up-detail-execution.component';
 
 @Component({
   selector: 'app-executions-list',
@@ -127,7 +128,7 @@ export class ExecutionsListComponent {
 
   ngOnInit() {
     if (this.executionId) {
-      this.controlService.getAllExecutions(this.executionId).subscribe(executions => {
+      this.controlService.getAllExecutions(this.executionId, true).subscribe(executions => {
         console.log(executions);
         this.executions = executions;
         this.dataSource.data = executions;
@@ -239,6 +240,15 @@ export class ExecutionsListComponent {
         return value?.toString().toLowerCase().includes(lowerQuery);
       })
     );
+  }
+
+  openProcessDialog(row?: any) {
+    this.dialog.open(PopUpDetailExecutionComponent, {
+      width: '600px !important',
+      data: row
+    }).afterClosed().subscribe(_ => {
+      this.ngOnInit();
+    });
   }
 
   clearSearch() {

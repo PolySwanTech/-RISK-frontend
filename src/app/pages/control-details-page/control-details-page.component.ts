@@ -1,3 +1,4 @@
+import { ControlEvaluation } from './../../core/models/ControlEvaluation';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -103,6 +104,7 @@ export class ControlDetailsPageComponent implements OnInit {
       const calls = executions.map(e =>
         this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
       );
+      
 
       forkJoin(calls).subscribe(views => {
         this.evaluationCache = {};
@@ -113,6 +115,7 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   private buildSlides(): void {
+    console.log(this.evaluationCache);
     if (!this.controlExecutions) { this.slides = []; return; }
     this.slides = this.controlExecutions
       .map(e => ({ exec: e, view: this.evaluationCache[e.id] ?? null }))

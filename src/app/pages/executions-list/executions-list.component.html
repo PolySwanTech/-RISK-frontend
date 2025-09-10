@@ -19,7 +19,7 @@
                     (filtersChanged)="handleFiltersChanged($event)">
                 </app-filter-table>
                 <app-global-search-bar *ngIf="filterMode === 'general'" [(model)]="searchQuery"
-                    [placeholder]="'Rechercher des impacts'" (modelChange)="onSearchFiles($event)"
+                    [placeholder]="'Rechercher des exécutions'" (modelChange)="onSearchFiles($event)"
                     (cleared)="clearSearch()" />
             </div>
         </mat-card-content>
@@ -34,7 +34,7 @@
             </ng-container>
             <!-- Ligne en-tête -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns" class="row-clickable"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="openProcessDialog(row)" class="row-clickable"></tr>
 
         </table>
 

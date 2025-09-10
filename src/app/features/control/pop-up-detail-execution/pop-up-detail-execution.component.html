@@ -1,0 +1,43 @@
+<mat-dialog-content>
+  <h2 mat-dialog-title>Détail de l'exécution</h2>
+  <div class="carousel-body">
+
+    <!-- Bandeau méta -->
+    <div class="meta-card card" [ngClass]="computeMetaStripe(s)">
+      <div class="card-content meta">
+        @if(s.exec){
+        <div class="meta-left">
+
+          <div class="meta-line">
+
+            <span class="badge" [ngClass]="getStatusClass(s.exec.status)">{{ formatStatus(s.exec.status)
+              }}</span>
+            <span class="meta-date">Planifiée le {{ s.exec.plannedAt | date:'dd/MM/yyyy' }}</span>
+            <span class="meta-date" *ngIf="s.view?.evaluatedAt">• Évaluée le {{ s.view?.evaluatedAt |
+              date:'dd/MM/yyyy' }}</span>
+            <span class="meta-date" *ngIf="s.view?.reviewedAt">• Validée le {{ s.view?.reviewedAt |
+              date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="meta-sub">Attribuée à {{ s.exec.performedBy || '—' }}</div>
+        </div>
+        <div class="meta-right">
+          <button class="btn btn-evaluer" *ngIf="!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED'"
+            (click)="evaluateExec(s.exec.id, 'eval');">
+            {{ s.view?.reviewStatus === 'REEXAM_REQUESTED' ? 'Réévaluer' : 'Évaluer' }}
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+    <!-- Cartes visibles seulement quand il y a des données -->
+    @if(s.view){
+    <ng-container>
+      <app-evaluation-card [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true"
+        (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id, $event)">
+      </app-evaluation-card>
+    </ng-container>
+    }
+  </div>
+
+
+</mat-dialog-content>
