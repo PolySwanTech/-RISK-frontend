@@ -129,7 +129,7 @@ export class ManagePermissionsComponent implements OnInit {
           this.roleService.create({ name: name, permissions: [] }).subscribe(role => {
             this.roles.push(role);
             this.filteredRoles.push(role);
-            this.selectedRole = role;
+            // this.selectedRole = role;
             this.confirmService.openConfirmDialog('Création réussie', 'Rôle créé avec succès.')
           });
         }
