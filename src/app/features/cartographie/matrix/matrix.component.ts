@@ -41,11 +41,9 @@ export class MatrixComponent {
   openColorOverlay(event: MouseEvent, cell: any) {
     event.stopPropagation(); // éviter fermeture immédiate
     this.activeCell = cell;
-
-    // Positionner l’overlay exactement là où la souris a cliqué
     this.overlayPosition = {
-      top: `${event.clientY - 50}px`,
-      left: `${event.clientX}px`,
+      top: `${event.clientY - 300}px`,
+      left: `${event.clientX - 250}px`,
     };
   }
 
