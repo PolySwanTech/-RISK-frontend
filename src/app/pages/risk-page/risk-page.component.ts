@@ -66,9 +66,8 @@ export class RiskPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.goBackButtons = [
-      { label: 'Ajouter un Risque', icon: 'add', class: 'btn-primary', action: () => this.goToAddRisk(), show: true },
+      { label: 'Ajouter un risque', icon: 'add', class: 'btn-primary', action: () => this.goToAddRisk(), show: true },
       { label: 'Exporter', icon: 'file_download', class: 'btn-green', action: () => this.exportData(), show: true },
-      { label: 'Actualiser', icon: 'refresh', class: 'btn-primary', action: () => this.refreshData(), show: true }
     ];
 
     this.buId = this.route.snapshot.paramMap.get('id')!;
@@ -144,6 +143,7 @@ export class RiskPageComponent implements OnInit {
   }
 
   onSelectRisk(risk: RiskTemplate): void {
+    console.log(risk)
     this.selectedRisk = risk;
   }
 
@@ -152,6 +152,6 @@ export class RiskPageComponent implements OnInit {
   }
 
   goToAddRisk(): void {
-    this.router.navigate(['reglages', 'risks', 'create']);
+    this.router.navigate(['reglages', 'risks', 'create'], { queryParams: { buId: this.buId } });
   }
 }

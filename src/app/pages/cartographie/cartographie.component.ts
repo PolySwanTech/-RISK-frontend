@@ -43,13 +43,6 @@ export class CartographieComponent implements OnInit {
 
   goBackButtons = [
     {
-      label: 'Rafraichir',
-      icon: 'refresh',
-      class: 'btn-primary',
-      show: true,
-      action: () => this.ngOnInit()
-    },
-    {
       label: 'Créer une cartographie',
       icon: 'add',
       class: 'btn-secondary',

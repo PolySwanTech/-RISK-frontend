@@ -68,7 +68,7 @@
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Incident</label>
-                            <div  class="incident">
+                            <div class="incident">
                                 <span class="badge status" [ngClass]="actionPlan.incidentRef.toLowerCase()">
                                     {{ actionPlan.incidentRef }}
                                 </span>
@@ -112,7 +112,7 @@
                         </p>
 
 
-                        @if(!action.performedAt){
+                        @if(!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED) {
                         <ng-container>
                             <button mat-raised-button class="btn-primary" (click)="viewFiles(action.id)">
                                 <mat-icon>upload</mat-icon>
@@ -120,8 +120,8 @@
                             </button>
                             <!-- <input style="display: none;" type="file" (change)="validateAction(action, $event)" /> -->
                         </ng-container>
-                    }
-                    @else {
+                        }
+                        @else if(action.performedAt) {
                         <ng-container>
                             <p class="validated">
                                 ✔ Terminé par <strong>{{ action.performedBy }}</strong>
@@ -132,6 +132,9 @@
                             <mat-icon>upload</mat-icon>
                             Voir les fichiers joints
                         </button>
+                        }
+                        @else {
+                        <p class="not-started">⏳ En attente de démarrage du plan d'action</p>
                         }
                     </div>
                 </div>

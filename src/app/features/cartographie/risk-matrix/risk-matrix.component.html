@@ -21,7 +21,7 @@
 
     <div class="info-row">
       <span class="label">Catégorie Bâloise :</span>
-      <span class="value">{{ riskData.category }}</span>
+      <span class="value">{{ riskData.category.parent ? riskData.category.parent + ' > ' + riskData.category.libelle : riskData.category.libelle }}</span>
     </div>
 
     <div class="info-row">

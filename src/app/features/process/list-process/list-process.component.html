@@ -1,26 +1,11 @@
 <div class="process-container">
 
-    <mat-card class="dashboard-header-card">
-        <mat-card-content class="dashboard-header">
-            <h1>{{ isCartographie ? 'Cartographie' : 'Gestion des Processus' }}</h1>
-            <div class="header-controls">
-                @if(isCartographie){
-                <button mat-raised-button (click)="navToCreateCarto()" class="btn-green">
-                    <mat-icon>add</mat-icon>
-                    Nouvelle Cartographie
-                </button>
-                }
-                <button mat-raised-button (click)="add()" class="btn-green">
-                    <mat-icon>add</mat-icon>
-                    Nouveau Processus
-                </button>
-                <button mat-raised-button class="btn-primary">
-                    <mat-icon>refresh</mat-icon>
-                    Actualiser
-                </button>
-            </div>
-        </mat-card-content>
-    </mat-card>
+    <app-go-back [title]="isCartographie ? 'Cartographie' : 'Gestion des processus'"
+        [buttons]="goBackButtons"></app-go-back>
+
+    <br>
+    <br>
+    <br>
     <!-- Header avec glassmorphism -->
     <div class="header-container">
 
@@ -45,10 +30,6 @@
 
     <!-- Arbre hiérarchique -->
     <div class="hierarchy-container">
-        <button class="btn-primary" style="margin-bottom: 20px;" mat-raised-button
-            (click)="openEntityDialog()">
-            <mat-icon>add</mat-icon><span>Ajouter une entité</span>
-        </button>
         <div class="tree-wrapper">
             <ng-container *ngFor="let node of filteredProcesses">
                 <div class="node-container" [ngClass]="'level-' + node.niveau">
@@ -96,6 +77,13 @@
                                     <button (click)="goToMatrixPage(node.id)"
                                         mat-icon-button><mat-icon>grid_on</mat-icon></button>
                                 </div>
+                            </div>
+
+                            <div class="node-actions">
+                                <button mat-raised-button class="btn-red" (click)="deleteBu(node.id)">
+                                    <mat-icon>delete</mat-icon>
+                                    Supprimer
+                                </button>
                             </div>
 
                             <!-- Badge de niveau -->
@@ -164,9 +152,13 @@
                     </div>
 
                     <div class="node-actions">
+                        <button mat-raised-button class="btn-red" (click)="deleteProcess(node.id)">
+                            <mat-icon>delete</mat-icon>
+                            Supprimer
+                        </button>
                         <button mat-raised-button class="btn-primary" (click)="addRisk(node.id)">
                             <mat-icon>add</mat-icon>
-                            Nouveau risk
+                            Nouveau risque
                         </button>
                         <button mat-raised-button class="btn-green" (click)="getRisks($event, node)">
                             {{ node.risks && node.risks.length > 0 ? 'Fermer les risques' : 'Voir les risques' }}

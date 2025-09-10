@@ -7,10 +7,7 @@
 
       <!-- le stepper n’est affiché que lorsque l’objet risk est prêt -->
       @if (risk) {
-      <mat-stepper [linear]="false" #stepper>
-        <!-- ───────────────────── 1. Informations de base ───────────────────── -->
-        <mat-step [stepControl]="infoForm">
-          <form [formGroup]="infoForm">
+      <form [formGroup]="infoForm">
             <!-- Titre --------------------------------------------------------- -->
             <mat-form-field class="full-width">
               <mat-label>Titre du risque</mat-label>
@@ -73,8 +70,6 @@
               </button>
             </div>
           </form>
-        </mat-step>
-      </mat-stepper>
       }
     </div>
   </section>

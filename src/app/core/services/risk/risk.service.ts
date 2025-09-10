@@ -21,8 +21,12 @@ export class RiskService {
   return this.http.post<RiskTemplate>(this.baseUrl, dto);
 }
 
-  getAll() {
-    return this.http.get<RiskTemplate[]>(this.baseUrl)
+  getAll(buId?: string): Observable<RiskTemplate[]> {
+    let params = new HttpParams();
+    if (buId) {
+      params = params.append('buId', buId);
+    }
+    return this.http.get<RiskTemplate[]>(this.baseUrl, { params });
   }
 
   getRisksTree(processId?: string) {

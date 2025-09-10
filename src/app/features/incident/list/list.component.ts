@@ -28,12 +28,13 @@ import { Filter } from '../../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
 @Component({
   selector: 'app-list',
   standalone: true,
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, MatMenuModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule,
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, GoBackComponent,
     ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule,
     MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule,
     MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent, FormsModule],
@@ -95,6 +96,9 @@ export class ListComponent implements OnInit {
     }
   ];
 
+
+  goBackButtons : GoBackButton[] = []
+
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
   displayedColumns = ['select', ...this.columns.map(c => c.columnDef), 'actions'];
@@ -119,6 +123,23 @@ export class ListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadIncidents();
+
+    this.goBackButtons = [
+      {
+        label: 'Créer un incident',
+        icon: 'add',
+        class: 'btn-secondary',
+        show: true,
+        action: () => this.add()
+      },
+      {
+        label: 'Exporter',
+        icon: 'file_download',
+        class: 'btn-secondary',
+        show: true,
+        action: () => this.exportExcel()
+      }
+    ];
   }
 
   refreshData() {

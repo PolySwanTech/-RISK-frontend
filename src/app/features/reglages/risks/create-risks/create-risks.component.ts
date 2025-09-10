@@ -37,7 +37,7 @@ import { SelectArborescenceComponent } from '../../../../shared/components/selec
   styleUrl: './create-risks.component.scss'
 })
 export class CreateRisksComponent implements OnInit {
-  
+
   /* ---------------- services ---------------- */
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -82,11 +82,20 @@ export class CreateRisksComponent implements OnInit {
   ngOnInit(): void {
     this.riskCategoryService.getAll().subscribe(data => this.bal1 = data);
 
-    this.procSrv.getProcessTree().subscribe(list => this.listProcess = list);
-
     this.riskSrv.getAll().subscribe(risks => this.risks = risks);
 
+    const processId = this.route.snapshot.queryParams["processId"];
+    const buId = this.route.snapshot.queryParams["buId"];
     const id = this.route.snapshot.paramMap.get('id');
+
+    this.procSrv.getProcessTree(buId).subscribe(list => {
+      this.listProcess = list
+    });
+
+    if (processId) {
+      this.infoForm.get('processId')?.setValue(processId);
+    }
+
     if (id && id !== 'create') {
       this.loadRiskById(id);
     }
@@ -107,19 +116,17 @@ export class CreateRisksComponent implements OnInit {
     });
   }
 
-onCategoryChange(baloise: BaloiseCategoryDto, level: number): void {
-  if (level === 1 && baloise?.libelle) {
-    this.riskCategoryService.getByParent(baloise.libelle).subscribe(children => {
-      this.bal2 = children;                         // options du niveau 2
-      this.infoForm.patchValue({ balois2: null });  // reset du select niveau 2
-    });
+  onCategoryChange(baloise: BaloiseCategoryDto, level: number): void {
+    if (level === 1 && baloise?.libelle) {
+      this.riskCategoryService.getByParent(baloise.libelle).subscribe(children => {
+        this.bal2 = children;                         // options du niveau 2
+        this.infoForm.patchValue({ balois2: null });  // reset du select niveau 2
+      });
+    }
   }
-}
 
   onProcessSelected(process: Process) {
     this.infoForm.get('processId')?.setValue(process.id);
-    // this.infoForm.get('processId')?.markAsDirty();
-    // this.infoForm.get('processId')?.updateValueAndValidity();
   }
 
 

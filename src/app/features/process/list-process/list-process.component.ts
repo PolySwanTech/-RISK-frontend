@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { ProcessService } from '../../../core/services/process/process.service';
-import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
 import { Process, ProcessNode } from '../../../core/models/Process';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +21,7 @@ import { MatCardModule } from '@angular/material/card';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 import { firstValueFrom } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-list-process',
@@ -33,13 +34,15 @@ import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.serv
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
-    MatCardModule
+    MatCardModule,
+    GoBackComponent
   ],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'
 })
 export class ListProcessComponent implements OnInit {
   processService = inject(ProcessService);
+  confirmService = inject(ConfirmService);
   router = inject(Router);
   private dialog = inject(MatDialog);
   riskService = inject(RiskService); // Assuming you have a risk service to fetch risks
@@ -58,12 +61,38 @@ export class ListProcessComponent implements OnInit {
 
   @Input() isCartographie: boolean = false;
 
+  goBackButtons: GoBackButton[] = [];
+
   ngOnInit(): void {
     this.hierarchicalProcesses = [];
     this.expandedNodes.clear();
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.fetchProcesses(entities);
     });
+
+    this.goBackButtons = [
+      {
+        label: 'Nouveau Processus',
+        icon: 'add',
+        class: 'btn-secondary',
+        show: true,
+        action: () => this.add()
+      },
+      {
+        label: 'Ajouter une entité',
+        icon: 'add',
+        class: 'btn-secondary',
+        show: true,
+        action: () => this.openEntityDialog()
+      },
+      {
+        label: 'Nouvelle cartographie',
+        icon: 'add',
+        class: 'btn-secondary',
+        show: this.isCartographie,
+        action: () => this.navToCreateCarto()
+      }
+    ];
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -127,7 +156,41 @@ export class ListProcessComponent implements OnInit {
   }
 
   addRisk(id: string): void {
-    this.router.navigate(['reglages', 'risks', 'create', id]);
+    this.router.navigate(['reglages', 'risks', 'create'], { queryParams: { processId: id } });
+  }
+
+  deleteProcess(id: string): void {
+    this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")
+      .subscribe(confirm => {
+        if (confirm) {
+          this.processService.delete(id).subscribe({
+            next: () => {
+              this.snackBarService.info("Processus supprimé avec succès !");
+              this.ngOnInit();
+            },
+            error: (err) => {
+              this.snackBarService.error("Erreur lors de la suppression du processus : " + err.message);
+            }
+          });
+        }
+      });
+  }
+
+  deleteBu(id : string) {
+    this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")
+      .subscribe(confirm => {
+        if (confirm) {
+          this.entityService.delete(id).subscribe({
+            next: () => {
+              this.snackBarService.info("Processus supprimé avec succès !");
+              this.ngOnInit();
+            },
+            error: (err) => {
+              this.snackBarService.error("Erreur lors de la suppression du processus : " + err.message);
+            }
+          });
+        }
+      });
   }
 
   navToRisk(id: number) {
