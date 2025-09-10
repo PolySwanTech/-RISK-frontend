@@ -67,7 +67,7 @@
 
             <mat-form-field>
               <mat-label>Date de survenance</mat-label>
-              <input matInput  [max]="today" [matDatepicker]="picker2" formControlName="dateDeSurvenance">
+              <input matInput [max]="today" [matDatepicker]="picker2" formControlName="dateDeSurvenance">
               <div matSuffix class="suffix-container">
                 <mat-datepicker-toggle [for]="picker2"></mat-datepicker-toggle>
                 <button mat-icon-button matTooltip="La date à laquelle l'incident s'est produit.">
@@ -79,7 +79,8 @@
 
             <mat-form-field>
               <mat-label>Date de détection</mat-label>
-              <input matInput  [max]="incidentForm2.get('dateDeSurvenance')?.value" [matDatepicker]="picker3" formControlName="dateDeDetection">
+              <input matInput [max]="incidentForm2.get('dateDeSurvenance')?.value" [matDatepicker]="picker3"
+                formControlName="dateDeDetection">
               <div matSuffix class="suffix-container">
                 <mat-datepicker-toggle [for]="picker3"></mat-datepicker-toggle>
                 <button mat-icon-button matTooltip="Date à laquelle l'incident a été détecté.">
@@ -91,7 +92,7 @@
 
             <mat-form-field>
               <mat-label>Date de clôture (si clôturé)</mat-label>
-              <input matInput  [max]="today" [matDatepicker]="picker4" formControlName="dateDeCloture">
+              <input matInput [max]="today" [matDatepicker]="picker4" formControlName="dateDeCloture">
               <div matSuffix class="suffix-container">
                 <mat-datepicker-toggle [for]="picker4"></mat-datepicker-toggle>
                 <button mat-icon-button matTooltip="Date de clôture de l'incident, si applicable.">
@@ -135,14 +136,15 @@
             </mat-form-field>
 
             @if(incident || listCauses.length > 0){
-              <app-select-users [selectedUserId]="selectedUser" (userSelected)="changeUser($event)"
-                placeholder="Collaborateur pouvant vous aider"></app-select-users>
+            <app-select-users [selectedUserId]="selectedUser" (userSelected)="changeUser($event)"
+              placeholder="Collaborateur pouvant vous aider"></app-select-users>
             }
 
           </form>
 
           <div class="actions">
             <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
+            <button mat-raised-button class="btn-green" (click)="addDraft()">Brouillon</button>
             <button mat-raised-button class="btn-primary"
               [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid"
               (click)="addIncident()">Soumettre</button>
