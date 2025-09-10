@@ -15,9 +15,10 @@ import { AmountService } from '../../../../core/services/amount/amount.service';
 import { OperatingLossTypeService } from '../../../../core/services/operating-loss/operating-loss-type.service';
 import { OperatingLossService } from '../../../../core/services/operating-loss/operating-loss.service';
 import { IncidentService } from '../../../../core/services/incident/incident.service';
-import { EquipeService, Equipe } from '../../../../core/services/equipe/equipe.service';
 import { BusinessUnit } from '../../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../../core/services/entities/entities.service';
+import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
@@ -51,7 +52,7 @@ type Errors = Record<string, string>;
 @Component({
   selector: 'app-create-operational-impact',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, GoBackComponent],
   templateUrl: './create-operational-impact.component.html',
   styleUrl: './create-operational-impact.component.scss',
 })
@@ -69,8 +70,11 @@ export class CreateOperationalImpactComponent implements OnInit {
   private amountTypeService = inject(AmountTypeService);
   private amountService = inject(AmountService);
   private equipeService = inject(EntitiesService);
+  private snackBarService = inject(SnackBarService);
 
-  businessUnits: BusinessUnit[] = [];     // <— liste pour le select
+  businessUnits: BusinessUnit[] = [];
+  goBackButtons: GoBackButton[] = [];
+  
 
   // ---------- Contexte Incident/BU ----------
   private currentBusinessUnitId?: string;
@@ -127,6 +131,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         const found = amountTypes.find((t) => t.libelle?.includes('ESTIME'));
         this.estimeAmountType = found || amountTypes[0] || null;
       });
+      
   }
 
   /** Charge teamId/teamName depuis l'incident, et applique la BU aux éléments du formulaire. */
@@ -316,11 +321,14 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     forkJoin(creations$)
       .pipe(catchError((e) => { console.error(e); return of([]); }))
-      .subscribe(() => {
-        alert('Impact(s) opérationnel(s) créé(s) avec succès !');
-        this.resetForm();
+      .subscribe({
+        next:() => {
+          this.snackBarService.success('Impact(s) opérationnel(s) créé(s) avec succès !');
+          this.resetForm();
+        },
+        error:() => {  this.snackBarService.error('Erreur lors de la création des impacts.'); }
       });
-  }
+    }
 
   onCancel() {
     if (window.confirm('Êtes-vous sûr de vouloir annuler ? Toutes les données saisies seront perdues.')) {

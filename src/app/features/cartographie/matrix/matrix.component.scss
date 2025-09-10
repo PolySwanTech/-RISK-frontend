@@ -126,6 +126,7 @@ $border-color: #ccc;
     cursor: pointer;
     @include transition(opacity);
     position: relative;
+    z-index: 10;
     
     &:hover {
       opacity: 0.8;
@@ -313,7 +314,7 @@ td {
   text-overflow: ellipsis;
 }
 .color-overlay {
-  position: fixed; /* important ! fixe par rapport à l’écran */
+  position: absolute; /* important ! fixe par rapport à l’écran */
   display: flex;
   flex-direction: column;
   gap: 5px;

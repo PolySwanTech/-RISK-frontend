@@ -1,10 +1,8 @@
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Cartography } from '../../core/models/Cartography';
-import { MatDialog } from '@angular/material/dialog';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { Router, RouterModule } from '@angular/router';
-import { CartoService } from '../../core/services/carto/carto.service';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,6 +16,7 @@ import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-cartographie',
@@ -34,6 +33,7 @@ export class CartographieComponent implements OnInit {
 
   private router = inject(Router);
   private businessUnitService = inject(EntitiesService);
+  private snackBarService = inject(SnackBarService);
 
   selectedYear: number | null = null;
   selectedBuId: string | null = null;
@@ -79,7 +79,7 @@ export class CartographieComponent implements OnInit {
   }
 
   viewCarto() {
-    alert(`Consultation de la carto ${this.selectedBuId} - ${this.selectedYear}`);
+    this.snackBarService.info(`Consultation de la carto ${this.selectedBuId} - ${this.selectedYear}`);
   }
 
   addCarto() {

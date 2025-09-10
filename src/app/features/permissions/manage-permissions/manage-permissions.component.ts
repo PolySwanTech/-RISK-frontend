@@ -13,6 +13,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateRoleDialogComponent } from '../role/create-role-dialog/create-role-dialog.component';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Role } from '../../../core/models/TeamMember';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+
 
 @Component({
   selector: 'app-manage-permissions',
@@ -39,6 +41,8 @@ export class ManagePermissionsComponent implements OnInit {
   dialog = inject(MatDialog);
   confirmService = inject(ConfirmService);
   searchQuery: string | Role | null = null;
+  private snackBarService = inject(SnackBarService);
+  
 
   constructor(
     private roleService: RoleService,
@@ -88,9 +92,15 @@ export class ManagePermissionsComponent implements OnInit {
   savePermissions(): void {
     if (!this.selectedRole) return;
 
-    this.roleService.updateRolePermissions(this.selectedRole.name, this.selectedRole.permissions).subscribe(() => {
-      alert(`Permissions mises à jour pour ${this.selectedRole!.name}`);
-    });
+    this.roleService.updateRolePermissions(this.selectedRole.name, this.selectedRole.permissions).subscribe({
+      next:() => {
+      this.snackBarService.success(`Permissions mises à jour pour ${this.selectedRole!.name}`);
+      },
+      error:() => {
+        this.snackBarService.error(`Erreur lors de la mise à jour des permissions pour ${this.selectedRole!.name}`);
+      } 
+    }
+    );
   }
 
   filterBySearch(): void {
@@ -119,7 +129,7 @@ export class ManagePermissionsComponent implements OnInit {
           this.roleService.create({ name: name, permissions: [] }).subscribe(role => {
             this.roles.push(role);
             this.filteredRoles.push(role);
-            this.selectedRole = role;
+            // this.selectedRole = role;
             this.confirmService.openConfirmDialog('Création réussie', 'Rôle créé avec succès.')
           });
         }

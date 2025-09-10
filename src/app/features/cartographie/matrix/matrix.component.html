@@ -14,18 +14,19 @@
               <label class="row-input">{{rowLabels[matrixLevels.length - 1 - rIdx].libelle}}</label>
             </th>
 
-            <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
-              (click)="openColorOverlay($event, cell)" class="matrix-cell">
-
-              <!-- Overlay de sélection de couleur -->
-              <div *ngIf="activeCell === cell" class="color-overlay" [ngStyle]="overlayPosition">
-                <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
-                  (click)="selectColor(cell, risk)">
-                  {{ risk.name }}
-                </div>
-              </div>
-
-            </td>
+            <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx"
+    [ngStyle]="cellStyle(cell)"
+    (click)="openColorOverlay($event, cell)"
+    class="matrix-cell">
+</td>
+<div *ngIf="activeCell" class="color-overlay" [ngStyle]="overlayPosition">
+  <div *ngFor="let risk of riskLevels" 
+       class="color-box" 
+       [style.background]="risk.color"
+       (click)="selectColor(activeCell, risk)">
+    {{ risk.name }}
+  </div>
+</div>
           </tr>
 
           <!-- ligne d’entête des colonnes PROBABILITÉ -->

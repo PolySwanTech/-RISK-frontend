@@ -240,25 +240,24 @@ export class FichiersComponent {
     });
   }
 
+  //   // TODO: Implémenter la "suppression", mais il faut juste cacher le file ne plus le rendre apparant-> pour la traçabilité
+  // deleteFile(fileId: string): void {
+  //   this.fileService.deleteFile(fileId).subscribe({
+  //     next: () => {
+  //       this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
+  //       this.confirmService.openConfirmDialog("Fichier supprimé", "Le fichier a été supprimé avec succès.", false);
+  //     },
+  //     error: (error) => {
+  //       this.confirmService.openConfirmDialog("Erreur", "Erreur lors de la suppression du fichier.", false);
+  //     }
+  //   });
 
-  deleteFile(fileId: string): void {
-    // TODO: Implémenter la suppression via votre API
-    // this.fileService.deleteFile(fileId).subscribe({
-    //   next: () => {
-    //     this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-    //     this.confirmService.openConfirmDialog("Fichier supprimé", "Le fichier a été supprimé avec succès.", false);
-    //   },
-    //   error: (error) => {
-    //     this.confirmService.openConfirmDialog("Erreur", "Erreur lors de la suppression du fichier.", false);
-    //   }
-    // });
-
-    // Simulation pour la démo
-    const file = this.attachedFiles.find(f => f.id === fileId);
-    this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-    this.filteredFiles = this.attachedFiles;
-    this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.filename} a été supprimé avec succès.`, false);
-  }
+  //   // Simulation pour la démo
+  //   const file = this.attachedFiles.find(f => f.id === fileId);
+  //   this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
+  //   this.filteredFiles = this.attachedFiles;
+  //   this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.filename} a été supprimé avec succès.`, false);
+  // }
 
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 B';
