@@ -49,4 +49,8 @@ export class ProcessService {
     params = params.append('riskId', riskId);
     return this.http.get<Process[]>(this.baseUrl + '/by-dmr', { params: params });
   }
+
+  delete(id : string) {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
 }

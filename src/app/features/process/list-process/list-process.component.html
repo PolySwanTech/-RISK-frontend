@@ -1,6 +1,7 @@
 <div class="process-container">
 
-    <app-go-back [title]="isCartographie ? 'Cartographie' : 'Gestion des processus'" [buttons]="goBackButtons"></app-go-back>
+    <app-go-back [title]="isCartographie ? 'Cartographie' : 'Gestion des processus'"
+        [buttons]="goBackButtons"></app-go-back>
 
     <br>
     <br>
@@ -78,6 +79,13 @@
                                 </div>
                             </div>
 
+                            <div class="node-actions">
+                                <button mat-raised-button class="btn-red" (click)="deleteBu(node.id)">
+                                    <mat-icon>delete</mat-icon>
+                                    Supprimer
+                                </button>
+                            </div>
+
                             <!-- Badge de niveau -->
                             <div class="level-badge" [ngClass]="'badge-' + node.type">
                                 Niveau {{ node.niveau }}
@@ -144,6 +152,10 @@
                     </div>
 
                     <div class="node-actions">
+                        <button mat-raised-button class="btn-red" (click)="deleteProcess(node.id)">
+                            <mat-icon>delete</mat-icon>
+                            Supprimer
+                        </button>
                         <button mat-raised-button class="btn-primary" (click)="addRisk(node.id)">
                             <mat-icon>add</mat-icon>
                             Nouveau risque
