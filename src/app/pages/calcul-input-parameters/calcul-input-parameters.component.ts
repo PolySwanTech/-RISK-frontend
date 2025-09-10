@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
 import { Router } from '@angular/router';
 import { SmaInputCreateDto, SmaLossUpsert } from '../../core/models/Sma';
+import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
 
 
 @Component({
@@ -21,6 +22,7 @@ export class CalculInputParametersComponent {
 
   private calculService = inject(CalculService);
   private confirmService = inject(ConfirmService);
+  private snackBarService = inject(SnackBarService);
   private router = inject(Router);
 
   financialFields = [
@@ -106,7 +108,7 @@ export class CalculInputParametersComponent {
   }
 
   refreshData() {
-    alert("Données rafraîchies");
+    this.snackBarService.success("Données rafraîchies");
   }
 
   resetForm() {

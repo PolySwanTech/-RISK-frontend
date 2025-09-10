@@ -240,9 +240,8 @@ export class FichiersComponent {
     });
   }
 
-
+  //   // TODO: Implémenter la "suppression", mais il faut juste cacher le file ne plus le rendre apparant-> pour la traçabilité
   // deleteFile(fileId: string): void {
-  //   // TODO: Implémenter la suppression via votre API
   //   this.fileService.deleteFile(fileId).subscribe({
   //     next: () => {
   //       this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);

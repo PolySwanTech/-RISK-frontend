@@ -8,6 +8,7 @@ import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enu
 import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
@@ -48,6 +49,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   private controlService = inject(ControlService);
   private confirmService = inject(ConfirmService);
+  private snackBarService = inject(SnackBarService);
 
   actionTaken: 'valid' | 'reexam' | null = null;
 
@@ -130,7 +132,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   approve(): void {
     if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
+    if (!this.reviewComment.trim()) { this.snackBarService.info('Commentaire obligatoire'); return; }
     this.controlService.reviewEvaluationApprove(this.evalDetails.id, this.reviewComment).subscribe(() => {
       this.dialogRef.close();
     });
@@ -138,7 +140,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   requestReexam(): void {
     if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
+    if (!this.reviewComment.trim()) { this.snackBarService.info('Commentaire obligatoire'); return; }
     this.controlService.reviewEvaluationReexam(this.evalDetails.id, this.reviewComment).subscribe(() => {
       this.dialogRef.close();
     });

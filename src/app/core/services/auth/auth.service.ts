@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { SnackBarService } from '../snack-bar/snack-bar.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class AuthService {
   private permissions: { [teamId: string]: string[] } = {};
 
   private utilisateurConnecte!: Utilisateur;
+  private snackBarService = inject(SnackBarService);
   
   constructor() { }
   
@@ -50,7 +52,7 @@ export class AuthService {
         this.router.navigate(['/dashboard']);
       },
       error: err => {
-        alert("Nom ou mot de passe incorrect")
+        this.snackBarService.error("Nom ou mot de passe incorrect")
       }
     });;
   }

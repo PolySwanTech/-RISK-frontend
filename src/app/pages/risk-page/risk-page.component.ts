@@ -20,7 +20,7 @@ import { RiskMatrixComponent } from '../../features/cartographie/risk-matrix/ris
 import { RiskTemplate } from '../../core/models/RiskTemplate';
 import { Process } from '../../core/models/Process';
 import { ProcessService } from '../../core/services/process/process.service';
-import { RiskLevelScores, RiskLevel, RiskLevelEnum } from '../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelEnum } from '../../core/enum/riskLevel.enum';
 import { MatrixService } from '../../core/services/matrix/matrix.service';
 import { GoBackComponent } from "../../shared/components/go-back/go-back.component";
 
