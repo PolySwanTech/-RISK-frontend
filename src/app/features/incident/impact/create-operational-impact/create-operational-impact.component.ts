@@ -18,6 +18,7 @@ import { IncidentService } from '../../../../core/services/incident/incident.ser
 import { EquipeService, Equipe } from '../../../../core/services/equipe/equipe.service';
 import { BusinessUnit } from '../../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../../core/services/entities/entities.service';
+import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
@@ -51,7 +52,7 @@ type Errors = Record<string, string>;
 @Component({
   selector: 'app-create-operational-impact',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, GoBackComponent],
   templateUrl: './create-operational-impact.component.html',
   styleUrl: './create-operational-impact.component.scss',
 })
@@ -70,7 +71,9 @@ export class CreateOperationalImpactComponent implements OnInit {
   private amountService = inject(AmountService);
   private equipeService = inject(EntitiesService);
 
-  businessUnits: BusinessUnit[] = [];     // <— liste pour le select
+  businessUnits: BusinessUnit[] = [];
+  goBackButtons: GoBackButton[] = [];
+  
 
   // ---------- Contexte Incident/BU ----------
   private currentBusinessUnitId?: string;
@@ -127,6 +130,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         const found = amountTypes.find((t) => t.libelle?.includes('ESTIME'));
         this.estimeAmountType = found || amountTypes[0] || null;
       });
+      
   }
 
   /** Charge teamId/teamName depuis l'incident, et applique la BU aux éléments du formulaire. */
