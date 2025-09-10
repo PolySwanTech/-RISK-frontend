@@ -79,7 +79,7 @@
 
             <mat-form-field>
               <mat-label>Date de détection</mat-label>
-              <input matInput [max]="incidentForm2.get('dateDeSurvenance')?.value" [matDatepicker]="picker3"
+              <input matInput [min]="incidentForm2.get('dateDeSurvenance')?.value" [max]="today" [matDatepicker]="picker3"
                 formControlName="dateDeDetection">
               <div matSuffix class="suffix-container">
                 <mat-datepicker-toggle [for]="picker3"></mat-datepicker-toggle>
