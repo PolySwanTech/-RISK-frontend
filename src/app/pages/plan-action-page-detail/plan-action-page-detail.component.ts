@@ -24,6 +24,7 @@ import { FileService } from '../../core/services/file/file.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
 import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
+import { AddActionDialogComponent } from '../../features/action-plan/add-action-dialog/add-action-dialog.component';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -61,7 +62,7 @@ export class PlanActionPageDetailComponent {
     this.getActionPlan(this.idPlanAction);
   }
 
-  isNotStarted(){
+  isNotStarted() {
     return this.actionPlan && this.actionPlan.status == Status.NOT_STARTED || false;
   }
 
@@ -84,7 +85,7 @@ export class PlanActionPageDetailComponent {
       const canEnd =
         st !== Status.ACHIEVED &&
         st !== Status.NOT_STARTED &&
-        st !== (Status as any).CANCELLED 
+        st !== (Status as any).CANCELLED
 
       this.goBackButtons = [
         {
@@ -109,6 +110,21 @@ export class PlanActionPageDetailComponent {
           action: () => this.endActionPlan()
         }
       ];
+    });
+  }
+
+  openAddActionDialog() {
+    this.dialog.open(AddActionDialogComponent,
+      {
+        width: '400px',
+        data: {
+          actionPlanId: this.actionPlan?.id
+        }
+      }
+    ).afterClosed().subscribe(result => {
+      if (result) {
+        this.ngOnInit();
+      }
     });
   }
 

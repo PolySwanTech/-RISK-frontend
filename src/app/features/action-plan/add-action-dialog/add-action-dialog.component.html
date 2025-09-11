@@ -1,0 +1,38 @@
+<!-- Actions -->
+<div class="actions-container">
+    <h3 class="description-cont">
+        <div class="description-title">
+            <mat-icon>description</mat-icon>
+            Actions à effectuer
+        </div>
+        <div class="add-action">
+            <button mat-raised-button type="button" class="btn-green" (click)="addAction()">
+                <mat-icon>add</mat-icon>
+                Ajouter une action
+            </button>
+        </div>
+    </h3>
+</div>
+
+<div class="actions-list">
+    <div class="add-action" *ngFor="let action of actions; let i = index">
+        <mat-form-field appearance="outline" class="action-field">
+            <input matInput [(ngModel)]="action.name" [ngModelOptions]="{standalone: true}"
+                placeholder="Entrez une action">
+            <button mat-icon-button matSuffix matTooltip="Supprimer cette action" type="button"
+                (click)="removeAction(i)">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
+    </div>
+</div>
+
+<!-- Buttons -->
+<div class="dialog-buttons">
+    <button mat-button mat-dialog-close type="button" class="btn-cancel">
+        Annuler
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="actions.length === 0">
+        Enregistrer
+    </button>
+</div>
