@@ -1,20 +1,6 @@
 <section class="dashboard-container">
-  <mat-card class="dashboard-header-card">
-    <mat-card-content class="dashboard-header">
-      <h1>Liste des controles</h1>
-      <div class="header-controls">
-        <button (click)="create()" mat-raised-button class="btn-primary add-button">
-          <mat-icon>add</mat-icon>
-          Ajouter un contrôle
-        </button>
-        <button (click)="export()" mat-raised-button class="btn-green">
-          <mat-icon>file_download</mat-icon>
-          Exporter
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
+  <app-go-back [title]="'Liste des controles'" [buttons]="goBackButtons"></app-go-back>
+  <br>
   <!-- SECTION FILTRES -->
   <mat-card class="filters-card">
     <mat-card-content class="dashboard-header">

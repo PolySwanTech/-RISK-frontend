@@ -233,12 +233,14 @@ export class PlanActionPageComponent implements OnInit{
         label: 'Ajouter un plan d\'action',
         icon: 'add',
         show: true,
+        class: 'btn-primary',
         action: () => this.add()
       },
       {
         label: 'Exporter',
         icon: 'file_download',
         show: true,
+        class: 'btn-green',
         action: () => console.log('Export action plans')
       },
 

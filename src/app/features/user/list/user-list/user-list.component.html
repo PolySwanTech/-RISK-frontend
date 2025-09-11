@@ -1,10 +1,10 @@
 <div class="list-container">
-    <h2>Liste des utilisateurs</h2>
+    <app-go-back [title]="'Liste des utilisateurs'" [buttons]="goBackButtons"></app-go-back>
+    <br>
+    <br>
+    <br>
+    <br>
     <div class="table-container">
-        <button mat-raised-button class="btn-primary" (click)="openCreateUserDialog()">
-            Ajouter un utilisateur
-        </button>
-
         <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
             <ng-container matColumnDef="username">

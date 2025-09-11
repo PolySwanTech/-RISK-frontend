@@ -45,7 +45,7 @@ export class CalculViewComponent {
     {
       label: 'Exporter',
       icon: 'download',
-      class: 'export-btn', // tu peux garder ce nom si tu l’as stylé dans ton CSS
+      class: 'btn-green', // tu peux garder ce nom si tu l’as stylé dans ton CSS
       show: true,
       action: () => { } // si une fonction existe, sinon remplace ou crées-en une
     }

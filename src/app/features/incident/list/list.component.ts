@@ -128,14 +128,14 @@ export class ListComponent implements OnInit {
       {
         label: 'Créer un incident',
         icon: 'add',
-        class: 'btn-secondary',
+        class: 'btn-primary',
         show: true,
         action: () => this.add()
       },
       {
         label: 'Exporter',
         icon: 'file_download',
-        class: 'btn-secondary',
+        class: 'btn-green',
         show: true,
         action: () => this.exportExcel()
       }

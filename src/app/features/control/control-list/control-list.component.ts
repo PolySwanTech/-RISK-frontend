@@ -28,6 +28,7 @@ import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util
 import { filter } from 'rxjs';
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
 import { RiskLevel } from '../../../core/enum/riskLevel.enum';
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
 @Component({
   selector: 'app-control-list',
@@ -36,7 +37,7 @@ import { RiskLevel } from '../../../core/enum/riskLevel.enum';
     MatSelectModule, CommonModule, MatCardModule, MatPaginatorModule,
     MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule,
     MatIconModule, MatTooltipModule, FormsModule, MatButtonToggleModule,
-    GlobalSearchBarComponent,
+    GlobalSearchBarComponent, GoBackComponent,
     FilterTableComponent
   ],
   providers: [DatePipe],
@@ -171,6 +172,8 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   controls: ControlTemplate[] = [];
 
+  goBackButtons : GoBackButton[] = [];
+
   searchQuery: string = '';
 
   enumLabels = EnumLabels;
@@ -219,6 +222,22 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.getUsersAndControls();
+    this.goBackButtons = [
+      {
+        label : 'Ajouter un contrôle',
+        icon : 'add',
+        action : () => this.create(),
+        show : true,
+        class: 'btn-primary'
+      },
+      {
+        label : 'Exporter',
+        icon : 'file_download',
+        action : () => this.export(),
+        show : true,
+        class: 'btn-green'
+      }
+    ]
   }
 
   export() {

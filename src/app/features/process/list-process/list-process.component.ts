@@ -74,21 +74,21 @@ export class ListProcessComponent implements OnInit {
       {
         label: 'Nouveau Processus',
         icon: 'add',
-        class: 'btn-secondary',
+        class: 'btn-primary',
         show: true,
         action: () => this.add()
       },
       {
         label: 'Ajouter une entité',
         icon: 'add',
-        class: 'btn-secondary',
+        class: 'btn-primary',
         show: true,
         action: () => this.openEntityDialog()
       },
       {
         label: 'Nouvelle cartographie',
         icon: 'add',
-        class: 'btn-secondary',
+        class: 'btn-primary',
         show: this.isCartographie,
         action: () => this.navToCreateCarto()
       }
