@@ -18,6 +18,7 @@ import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
 import { CreateEvaluationComponent } from './features/cartographie/create-evaluation/create-evaluation.component';
 import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
 import { CreateCartoComponent } from './features/cartographie/create-carto/create-carto/create-carto.component';
+import { TodoComponent } from './pages/todo/todo.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
@@ -38,4 +39,5 @@ export const routes: Routes = [
   { path: 'organigramme', children: organigrammeRoutes, canActivate: [AuthGuard] },
   { path: 'action-plan', children: actionPlanRoutes, canActivate: [AuthGuard] },
   { path: 'control', children: controlRoutes, canActivate: [AuthGuard] },
+  { path: 'todo', component: TodoComponent, canActivate: [AuthGuard] },
 ];

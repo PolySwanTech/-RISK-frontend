@@ -3,9 +3,16 @@
     <mat-toolbar color="primary">
       <span>Risk View</span>
     </mat-toolbar>
-   
+
     <mat-nav-list>
       @if(authService.isLogin$ | async){
+      <ng-container>
+        <a mat-list-item routerLink="/todo">
+          <mat-icon>checklist</mat-icon>
+          <span [matBadge]="7" matBadgeColor="warn"
+            matBadgePosition="above after" mat-button>A faire</span>
+        </a>
+      </ng-container>
       <ng-container *appHasPermission="'VIEW_DASHBOARDS'">
         <a mat-list-item href="/dashboard" routerLink="/dashboard">
           <mat-icon>dashboard</mat-icon>
@@ -15,14 +22,13 @@
       <ng-container *appHasPermission="'VIEW_INCIDENTS'">
         <a mat-list-item routerLink="/incident">
           <mat-icon>warning</mat-icon>
-          <span [matBadge]="unreadIncidents > 0 ? unreadIncidents : null" matBadgeColor="warn"
-            matBadgePosition="above after" mat-button>
+          <span>
             {{ 'MENU.INCIDENTS' | translate }}
           </span>
         </a>
       </ng-container>
       <!-- <ng-container *appHasPermission="'VIEW_ACTION_PLANS'"> -->
-        <ng-container>
+      <ng-container>
         <a mat-list-item routerLink="/cartographie">
           <mat-icon>analytics</mat-icon>
           <span>Cartographie</span>
@@ -42,7 +48,7 @@
       </ng-container>
       <ng-container>
         <a mat-list-item routerLink="/calcul/view">
-          <mat-icon>calculate</mat-icon> 
+          <mat-icon>calculate</mat-icon>
           <span>Calcul fonds propres</span>
         </a>
       </ng-container>
@@ -80,7 +86,7 @@
       </button>
       }
     </mat-nav-list>
-   
+
   </mat-drawer>
   <mat-drawer-content>
     <ng-content></ng-content>

@@ -1,0 +1,211 @@
+<div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>À faire</h1>
+        <p class="subtitle">Tous vos éléments en attente de traitement</p>
+        
+        <div class="stats">
+          <div class="stat plans">
+            <span class="dot">●</span>
+            <span>{{ getItemCount('plans') }} Plans d'action</span>
+          </div>
+          <div class="stat incidents">
+            <span class="dot">●</span>
+            <span>{{ getItemCount('incidents') }} Incidents</span>
+          </div>
+          <div class="stat controls">
+            <span class="dot">●</span>
+            <span>{{ getItemCount('controls') }} Contrôles</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-row">
+          <!-- View Toggle -->
+          <div class="view-toggle">
+            <button 
+              class="view-btn"
+              [class.active]="currentView === 'grouped'"
+              (click)="setView('grouped')">
+              Vue groupée
+            </button>
+            <button 
+              class="view-btn"
+              [class.active]="currentView === 'unified'"
+              (click)="setView('unified')">
+              Vue unifiée
+            </button>
+          </div>
+          
+          <!-- Type Filter -->
+          <div class="filter-group">
+            <span class="filter-label">Filtrer :</span>
+            <button 
+              *ngFor="let filter of typeFilters"
+              class="filter-btn"
+              [class.active]="currentTypeFilter === filter.value"
+              (click)="setTypeFilter(filter.value)">
+              {{ filter.label }}
+            </button>
+          </div>
+          
+          <!-- Priority Filter -->
+          <div class="filter-group">
+            <span class="filter-label">Priorité :</span>
+            <button 
+              *ngFor="let priority of priorityFilters"
+              class="filter-btn"
+              [class.active]="currentPriorityFilter === priority.value"
+              (click)="setPriorityFilter(priority.value)">
+              {{ priority.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="content" [class.unified-view]="currentView === 'unified'">
+        
+        <!-- Grouped View -->
+        <div *ngIf="currentView === 'grouped'">
+          <!-- Plans d'action -->
+          <div 
+            class="group" 
+            *ngIf="shouldShowGroup('plans')"
+            [style.display]="currentTypeFilter === 'all' || currentTypeFilter === 'plans' ? 'block' : 'none'">
+            <div class="group-header" (click)="toggleGroup('plans')">
+              <span>📋 Plans d'action</span>
+              <div class="group-header-right">
+                <span class="group-count">{{ getFilteredGroupCount('plans') }}</span>
+                <span class="chevron" [class.collapsed]="collapsedGroups.plans">▼</span>
+              </div>
+            </div>
+            <div class="group-content" [class.collapsed]="collapsedGroups.plans">
+              <div 
+                *ngFor="let item of getFilteredItems('plans')"
+                class="item"
+                [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+                <div class="item-type type-plans">Plan</div>
+                <div class="item-content">
+                  <div class="item-title">{{ item.title }}</div>
+                  <div class="item-meta">
+                    <span>Échéance: {{ item.date }}</span>
+                    <span class="priority" [ngClass]="'priority-' + item.priority">
+                      {{ getPriorityLabel(item.priority) }}
+                    </span>
+                    <span>Responsable: {{ item.responsible }}</span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button class="action-btn" (click)="viewItem(item)">Voir</button>
+                  <button class="action-btn" (click)="editItem(item)">Modifier</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Incidents -->
+          <div 
+            class="group" 
+            *ngIf="shouldShowGroup('incidents')"
+            [style.display]="currentTypeFilter === 'all' || currentTypeFilter === 'incidents' ? 'block' : 'none'">
+            <div class="group-header" (click)="toggleGroup('incidents')">
+              <span>🚨 Incidents</span>
+              <div class="group-header-right">
+                <span class="group-count">{{ getFilteredGroupCount('incidents') }}</span>
+                <span class="chevron" [class.collapsed]="collapsedGroups.incidents">▼</span>
+              </div>
+            </div>
+            <div class="group-content" [class.collapsed]="collapsedGroups.incidents">
+              <div 
+                *ngFor="let item of getFilteredItems('incidents')"
+                class="item"
+                [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+                <div class="item-type type-incidents">Incident</div>
+                <div class="item-content">
+                  <div class="item-title">{{ item.title }}</div>
+                  <div class="item-meta">
+                    <span>Créé: {{ item.date }}</span>
+                    <span class="priority" [ngClass]="'priority-' + item.priority">
+                      {{ getPriorityLabel(item.priority) }}
+                    </span>
+                    <span>Assigné: {{ item.responsible }}</span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button class="action-btn" (click)="treatItem(item)">Traiter</button>
+                  <button class="action-btn" (click)="escalateItem(item)">Escalader</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contrôles -->
+          <div 
+            class="group" 
+            *ngIf="shouldShowGroup('controls')"
+            [style.display]="currentTypeFilter === 'all' || currentTypeFilter === 'controls' ? 'block' : 'none'">
+            <div class="group-header" (click)="toggleGroup('controls')">
+              <span>✓ Contrôles</span>
+              <div class="group-header-right">
+                <span class="group-count">{{ getFilteredGroupCount('controls') }}</span>
+                <span class="chevron" [class.collapsed]="collapsedGroups.controls">▼</span>
+              </div>
+            </div>
+            <div class="group-content" [class.collapsed]="collapsedGroups.controls">
+              <div 
+                *ngFor="let item of getFilteredItems('controls')"
+                class="item"
+                [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+                <div class="item-type type-controls">Contrôle</div>
+                <div class="item-content">
+                  <div class="item-title">{{ item.title }}</div>
+                  <div class="item-meta">
+                    <span>Planifié: {{ item.date }}</span>
+                    <span class="priority" [ngClass]="'priority-' + item.priority">
+                      {{ getPriorityLabel(item.priority) }}
+                    </span>
+                    <span>{{ item.responsible }}</span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button class="action-btn" (click)="startItem(item)">Démarrer</button>
+                  <button class="action-btn" (click)="scheduleItem(item)">Planifier</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Unified View -->
+        <div *ngIf="currentView === 'unified'" class="unified-content">
+          <div 
+            *ngFor="let item of getAllFilteredItems()"
+            class="item">
+            <div class="item-type" [ngClass]="'type-' + item.type">
+              {{ getTypeLabel(item.type) }}
+            </div>
+            <div class="item-content">
+              <div class="item-title">{{ item.title }}</div>
+              <div class="item-meta">
+                <span>{{ getDateLabel(item) }}: {{ item.date }}</span>
+                <span class="priority" [ngClass]="'priority-' + item.priority">
+                  {{ getPriorityLabel(item.priority) }}
+                </span>
+                <span>{{ item.responsible }}</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button 
+                *ngFor="let action of getActionsForType(item.type)"
+                class="action-btn" 
+                (click)="executeAction(action, item)">
+                {{ action.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
