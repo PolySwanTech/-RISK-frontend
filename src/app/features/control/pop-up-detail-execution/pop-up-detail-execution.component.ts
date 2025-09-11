@@ -38,7 +38,6 @@ export class PopUpDetailExecutionComponent {
       this.controlService.getEvaluationByExecution(this.data.id).subscribe((data) => {
         this.s.exec = this.data;
         this.s.view = data;
-        console.log(this.s);
       });
     }
 
