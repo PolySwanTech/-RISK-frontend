@@ -46,7 +46,9 @@
           </div>
         </div>
 
-        <app-matrix [risks]="filteredRisks" [matrixData]="matrixData" (selectedRiskEvent)="selectedRisk = $event"></app-matrix>
+        @if(matrixData) {
+          <app-matrix  [risks]="filteredRisks" [matrixData]="matrixData" (selectedRiskEvent)="selectedRisk = $event"></app-matrix>
+        }
       </mat-card-content>
     </mat-card>
 
