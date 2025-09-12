@@ -26,35 +26,35 @@ import { FilterTableComponent } from "../../shared/components/filter-table/filte
 })
 export class HomeComponent implements OnInit {
 
-  incidents: Incident [] = [];
+  incidents: Incident[] = [];
 
   filtersConfig: Filter[] = [
-  {
-    key: 'department',
-    label: 'Département',
-    type: 'select',
-    icon: 'domain', // 🏢
-    options: [
-      { value: 'all', label: 'Tous les départements' },
-      { value: 'it', label: 'IT' },
-      { value: 'rh', label: 'RH' },
-      { value: 'finance', label: 'Finance' },
-    ],
-  },
-  {
-    key: 'date',
-    label: 'Période',
-    type: 'date',
-    icon: 'event' // 📅
-  }
-];
+    {
+      key: 'department',
+      label: 'Département',
+      type: 'select',
+      icon: 'domain', // 🏢
+      options: [
+        { value: 'all', label: 'Tous les départements' },
+        { value: 'it', label: 'IT' },
+        { value: 'rh', label: 'RH' },
+        { value: 'finance', label: 'Finance' },
+      ],
+    },
+    {
+      key: 'date',
+      label: 'Période',
+      type: 'date',
+      icon: 'event' // 📅
+    }
+  ];
 
   selectedPeriod: string | null = null;
-selectedDepartment: string | null = null;
+  selectedDepartment: string | null = null;
 
   private incidentService = inject(IncidentService)
-  
-  constructor(private utilisateurService : UtilisateurService){
+
+  constructor(private utilisateurService: UtilisateurService) {
   }
 
   ngOnInit() {
@@ -62,9 +62,9 @@ selectedDepartment: string | null = null;
   }
 
   clearFilters(): void {
-  this.selectedPeriod = null;
-  this.selectedDepartment = null;
-}
+    this.selectedPeriod = null;
+    this.selectedDepartment = null;
+  }
 
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
@@ -72,7 +72,7 @@ selectedDepartment: string | null = null;
     });
   }
 
-  refreshData(){
+  refreshData() {
     this.ngOnInit();
   }
 

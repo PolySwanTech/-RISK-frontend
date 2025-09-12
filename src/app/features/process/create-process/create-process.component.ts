@@ -94,7 +94,6 @@ export class CreateProcessComponent {
       else {
         const { name, buId, parentId } = this.processForm.value;
         const dto = { name, bu: buId, parentId: parentId || null };
-        console.log(dto)
         this.processService.createProcess(dto).subscribe(resp => {
           this.snackBarService.success("Le processus a bien été créé")
           this.dialogRef.close(true);

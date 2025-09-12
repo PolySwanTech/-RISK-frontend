@@ -92,6 +92,12 @@
             <mat-card-header>
                 <mat-card-title>
                     <span>Actions à réaliser</span>
+                    @if(actionPlan.status == statusEnum.NOT_STARTED){
+                    <button mat-raised-button class="btn-primary" (click)="openAddActionDialog()">
+                        <mat-icon>add</mat-icon>
+                        <span>Ajouter une action</span>
+                    </button>
+                    }
                     <div class="progression-section">
                         <label>Progression globale</label>
                         <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
