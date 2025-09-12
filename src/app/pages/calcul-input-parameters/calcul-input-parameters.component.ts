@@ -155,7 +155,7 @@ export class CalculInputParametersComponent {
         const inputId = created.id;
         this.calculService.upsertLosses(inputId, losses).subscribe({
           next: () => {
-            this.confirmService.openConfirmDialog("Saisie enregistrée avec succès", "", false).subscribe();
+            this.snackBarService.success("Saisie enregistrée avec succès");
             this.router.navigate(['/calcul/view']);
           },
           error: (e) => {

@@ -10,6 +10,7 @@ import { GoBackComponent } from '../../shared/components/go-back/go-back.compone
 import { CalculService } from '../../core/services/calcul/calcul.service';
 import { SmaPayload } from '../../core/models/Sma';
 import { SmaResult } from '../../core/models/SmaResult';
+import { ConfirmService } from '../../core/services/confirm/confirm.service';
 
 interface EtatReport {
   poste: string;
@@ -28,6 +29,7 @@ export class CalculViewComponent {
   router = inject(Router);
   route = inject(ActivatedRoute);
   calculService = inject(CalculService);
+  confirmService = inject(ConfirmService);
 
   businessIndicator = 0;
   businessIndicatorComponent = 0;
@@ -92,12 +94,22 @@ export class CalculViewComponent {
       });
     } else {
       this.calculService.getLatestPayload().subscribe({
-        next: (payload: SmaPayload) => this.hydrateFromPayload(payload),
-        error: (err) => {
-          console.error('getLatestPayload error', err);
-          this.router.navigate(['/calcul']);
-        }
-      });
+      next: (payload: SmaPayload) => this.hydrateFromPayload(payload),
+      error: (err) => {
+        console.error('getLatestPayload error', err);
+
+        this.confirmService
+          .openConfirmDialog(
+            'Aucun calcul disponible',
+            'Aucun calcul n’a été trouvé. Veuillez lancer un nouveau calcul.'
+          )
+          .subscribe((confirmed: boolean) => {
+            if (confirmed) {
+              this.router.navigate(['/calcul']);
+            } else { this.router.navigate(['/dashboard']); }
+          });
+      }
+    });
     }
   }
 
