@@ -1,7 +1,7 @@
 import { Type } from "../enum/controltype.enum";
 import { Degree } from "../enum/degree.enum";
 import { Priority } from "../enum/Priority";
-import { Recurence } from "../enum/recurence.enum";
+import { Recurrence } from "../enum/recurrence.enum";
 import { RiskLevel } from "../enum/riskLevel.enum";
 import { ControlExecution } from "./ControlExecution";
 import { RiskTemplate } from "./RiskTemplate";
@@ -18,7 +18,7 @@ export class ControlTemplate {
     reference: string;
     libelle: string;
     description: string;
-    frequency: Recurence;
+    frequency: Recurrence;
     controlLevel: Degree;
     controlType: Type;
     processName: string;
@@ -39,7 +39,7 @@ export class ControlTemplate {
             reference: string,
             libelle: string,
             description: string,
-            frequency: Recurence,
+            frequency: Recurrence,
             controlLevel: Degree,
             controlType: Type,
             taxonomie: RiskTemplate,
@@ -77,7 +77,7 @@ export class ControlTemplate {
 export interface ControlTemplateCreateDto {
     libelle: string,
     description: string,
-    frequency: Recurence,
+    frequency: Recurrence,
     level: Degree,
     controlType: Type,
     priority: Priority,

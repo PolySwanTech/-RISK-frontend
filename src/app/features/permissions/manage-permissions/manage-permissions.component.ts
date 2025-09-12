@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
-import { permissionLabels, PermissionName } from '../../../core/enum/permission.enum';
+import { PermissionLabels, PermissionName } from '../../../core/enum/permission.enum';
 import { RoleService } from '../../../core/services/role/role.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateRoleDialogComponent } from '../role/create-role-dialog/create-role-dialog.component';
@@ -49,7 +49,7 @@ export class ManagePermissionsComponent implements OnInit {
   ) { }
 
   formatPermission(p: PermissionName) {
-    return permissionLabels[p] || p;
+    return PermissionLabels[p] || p;
   }
 
   ngOnInit(): void {

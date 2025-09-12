@@ -58,7 +58,7 @@
                   <label class="op-label">Type de Conséquence *</label>
                   <select [(ngModel)]="impact.type" class="op-select">
                     <option [ngValue]="null">Sélectionnez un type</option>
-                    <option *ngFor="let t of financialOperatingLossTypes" [ngValue]="t.libelle">{{ t.libelle }}</option>
+                    <option *ngFor="let t of financialOperatingLossTypes" [ngValue]="t.libelle">{{ t.label }}</option>
                   </select>
                 </div>
 
@@ -70,7 +70,7 @@
               </div>
 
               <div class="op-field op-mt-xs">
-                <label class="op-label">Description *</label>
+                <label class="op-label">Description</label>
                 <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
                   placeholder="Décrivez cet impact financier..."></textarea>
               </div>
@@ -86,7 +86,7 @@
                     <label class="op-label">Type de montant *</label>
                     <select [(ngModel)]="d.amountType" class="op-select">
                       <option [ngValue]="null">Sélectionnez</option>
-                      <option *ngFor="let t of financialAmountTypes" [ngValue]="t.libelle">{{ t.libelle }}</option>
+                      <option *ngFor="let t of financialAmountTypes" [ngValue]="t.libelle">{{ t.label }}</option>
                     </select>
                   </div>
 
@@ -178,7 +178,7 @@
                   <label class="op-label">Type de Conséquence *</label>
                   <select [(ngModel)]="impact.type" class="op-select">
                     <option [ngValue]="null">Sélectionnez un type</option>
-                    <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t.libelle">{{ t.libelle }}
+                    <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t.libelle">{{ t.label }}
                     </option>
                   </select>
                 </div>
@@ -197,7 +197,7 @@
                 </div>
 
                 <div class="op-field">
-                  <label class="op-label">Description *</label>
+                  <label class="op-label">Description</label>
                   <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
                     placeholder="Décrivez cet impact non financier..."></textarea>
                 </div>

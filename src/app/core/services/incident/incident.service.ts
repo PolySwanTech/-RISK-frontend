@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
 import { saveAs } from 'file-saver';
-import { State } from '../../enum/state.enum';
 
 @Injectable({
   providedIn: 'root'
