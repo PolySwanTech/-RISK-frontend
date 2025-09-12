@@ -24,8 +24,8 @@ export const RiskLevelScores: Record<RiskLevelEnum, number> = {
 
 // ✅ Labels associés (affichage lisible en UI)
 export const RiskLevelLabels: Record<RiskLevelEnum, string> = {
-  [RiskLevelEnum.LOW]: "Low",
-  [RiskLevelEnum.MEDIUM]: "Medium",
-  [RiskLevelEnum.HIGH]: "High",
-  [RiskLevelEnum.VERY_HIGH]: "Very High",
+  [RiskLevelEnum.LOW]: 'Faible',
+  [RiskLevelEnum.MEDIUM]: 'Moyen',
+  [RiskLevelEnum.HIGH]: 'Élevé',
+  [RiskLevelEnum.VERY_HIGH]: 'Critique',
 };

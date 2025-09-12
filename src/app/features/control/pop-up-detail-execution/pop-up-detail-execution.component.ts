@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ControlService } from '../../../core/services/control/control.service';
-import { Status, statusLabels } from '../../../core/enum/status.enum';
+import { Status, StatusLabels } from '../../../core/enum/status.enum';
 import { PopupEvaluationControleComponent } from '../../../pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 import { EvaluationCardComponent } from "../../../pages/control-details-page/evaluation-card/evaluation-card.component";
 
@@ -71,7 +71,7 @@ export class PopUpDetailExecutionComponent {
       }
     }
     
-    formatStatus(s?: Status) { return s ? statusLabels[s] : '—'; }
+    formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
 
     evaluateExec(executionId: string, action: string): void {
         this.dialog.open(PopupEvaluationControleComponent, {

@@ -21,7 +21,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { Filter } from '../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
 import { ControlExecution } from '../../core/models/ControlExecution';
-import { Status, statusLabels } from '../../core/enum/status.enum';
+import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../core/enum/evaluation-controle.enum';
 import { PopUpDetailExecutionComponent } from '../../features/control/pop-up-detail-execution/pop-up-detail-execution.component';
 
@@ -156,7 +156,7 @@ export class ExecutionsListComponent {
 
   formatPriority(p?: string) { return p === 'MINIMAL' ? 'Faible' : p === 'MEDIUM' ? 'Moyenne' : 'Élevée'; }
 
-  formatStatus(s?: Status) { return s ? statusLabels[s] : '—'; }
+  formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
 
   handleFiltersChanged(filters: any) {
     let filtered = [...this.executions];

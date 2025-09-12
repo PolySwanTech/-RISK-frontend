@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { Status, statusLabels } from '../../core/enum/status.enum';
+import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { ControlService } from '../../core/services/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
@@ -14,9 +14,8 @@ import { GoBackComponent } from '../../shared/components/go-back/go-back.compone
 import { PopupEvaluationControleComponent } from './popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 
 import { catchError, forkJoin, of } from 'rxjs';
-import { RecurenceLabels } from '../../core/enum/recurence.enum';
+import { RecurrenceLabels } from '../../core/enum/recurrence.enum';
 import { MethodologyCardComponent } from './methodology-card/methodology-card.component';
-import { Evaluation } from '../../core/enum/evaluation.enum';
 import { EvaluationCardComponent } from './evaluation-card/evaluation-card.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -44,7 +43,7 @@ export class ControlDetailsPageComponent implements OnInit {
   control: ControlTemplate | null = null;
   controlExecutions: ControlExecution[] | null = null;
 
-  recurenceLabels = { ...RecurenceLabels };
+  recurrenceLabels = { ...RecurrenceLabels };
 
   // Popups
   showPopup = false;
@@ -135,7 +134,7 @@ export class ControlDetailsPageComponent implements OnInit {
     }
   }
   
-  formatStatus(s?: Status) { return s ? statusLabels[s] : '—'; }
+  formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
 
 
   openEvaluationDetailsPopup(executionId: string, action: string): void {

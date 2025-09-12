@@ -25,11 +25,11 @@ export enum PermissionName {
   VIEW_INCIDENTS = 'VIEW_INCIDENTS'
 }
 
-export type PermissionNameType = `${PermissionName}`; // 👈 magique
+export type PermissionNameType = `${PermissionName}`;
 
 type PermissionLabelsType = Record<PermissionName, string>;
 
-export const permissionLabels: PermissionLabelsType = {
+export const PermissionLabels: PermissionLabelsType = {
   [PermissionName.ENTER_INCIDENT]: 'Saisir un incident',
   [PermissionName.TRACK_INCIDENT]: 'Suivre un incident',
   [PermissionName.ATTACH_DOCUMENT]: 'Joindre un document',

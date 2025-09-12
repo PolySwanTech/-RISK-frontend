@@ -3,7 +3,7 @@ import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/Ac
 import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { Priority, priorityLabels } from '../../../core/enum/Priority';
+import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -93,7 +93,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
 
   formatPriority(p: Priority): string {
-    return priorityLabels[p] || p;
+    return PriorityLabels[p] || p;
   }
 
   // Ajouter une action à la liste

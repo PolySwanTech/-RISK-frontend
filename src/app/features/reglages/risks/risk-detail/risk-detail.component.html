@@ -9,7 +9,7 @@
       <div class="risk-id">{{ risk.reference| uppercase }}</div>
       <h1 class="risk-title">{{ risk.libellePerso }}</h1>
       <div class="risk-category">
-        {{ 'Catégorie baloise: ' + (risk.category.parent || '') + (risk.category.libelle || '') }}
+        {{ 'Catégorie baloise: ' + (risk.category.parent || '')  + ' > ' + (risk.category.label || '') }}
       </div>
     </div>
 

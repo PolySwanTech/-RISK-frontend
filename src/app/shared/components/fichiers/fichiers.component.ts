@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileService } from '../../../core/services/file/file.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TargetType } from '../../../core/enum/targettype.enum';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 export interface UploadedFile {
   id: string;
@@ -36,6 +37,7 @@ export interface UploadedFile {
 export class FichiersComponent {
 
   private confirmService = inject(ConfirmService);
+  private snackbarService = inject(SnackBarService);
   private fileService = inject(FileService);
 
   searchQuery: string = '';
@@ -156,7 +158,7 @@ export class FichiersComponent {
             ? `Le fichier ${fileNames} a été ajouté avec succès.`
             : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
 
-        this.confirmService.openConfirmDialog("Fichier(s) ajouté(s)", message, false);
+        this.snackbarService.success("Fichier(s) ajouté(s) " + message);
         this.ngOnInit();
       } catch (error) {
         this.confirmService.openConfirmDialog(

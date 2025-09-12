@@ -69,4 +69,5 @@ export interface CreateOperatingLossDto {
 export interface OperatingLossTypeDto {
   libelle: string;
   family: OperatingLossFamily;
+  label: string;
 }

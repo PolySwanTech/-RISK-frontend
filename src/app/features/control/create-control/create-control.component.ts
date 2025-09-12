@@ -8,7 +8,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
-import { Process } from '../../../core/models/Process';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
@@ -16,13 +15,12 @@ import { UtilisateurService } from '../../../core/services/utilisateur/utilisate
 import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
-import { Degree } from '../../../core/enum/degree.enum';
-import { Priority } from '../../../core/enum/Priority';
-import { Recurence } from '../../../core/enum/recurence.enum';
+import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
+import { Priority, PriorityLabels } from '../../../core/enum/Priority';
+import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { Type } from '../../../core/enum/controltype.enum';
-import { EnumLabels } from '../../../core/enum/enum-labels';
+import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 
 @Component({
@@ -80,9 +78,7 @@ export class CreateControlComponent {
 
   responsables$ = this.userService.getUsers();
 
-  recurences = Object.values(Recurence);
-
-  enumLabels = EnumLabels;
+  recurences = Object.values(Recurrence);
 
   ngOnInit() {
     this.fetchTeams();
@@ -134,20 +130,20 @@ export class CreateControlComponent {
     this.form.get('riskId')?.updateValueAndValidity();
   }
 
-  getTypeLabel(type: keyof typeof EnumLabels.type): string {
-    return this.enumLabels.type[type];
+  getTypeLabel(type: Type): string {
+    return ControlTypeLabels[type];
   }
 
-  getPriorityLabel(priority: keyof typeof EnumLabels.priority): string {
-    return this.enumLabels.priority[priority];
+  getPriorityLabel(priority: Priority): string {
+    return PriorityLabels[priority];
   }
 
-  getDegresLabel(control: keyof typeof EnumLabels.degres): string {
-    return this.enumLabels.degres[control];
+  getDegresLabel(d: Degree): string {
+    return DegreeLabels[d];
   }
 
-  getRecurrenceLabel(recurrence: keyof typeof EnumLabels.reccurency): string {
-    return this.enumLabels.reccurency[recurrence];
+  getRecurrenceLabel(recurrence: Recurrence): string {
+    return RecurrenceLabels[recurrence];
   }
 
   onSubmit() {

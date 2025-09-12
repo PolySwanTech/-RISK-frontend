@@ -45,6 +45,14 @@ export class CreateEvaluationComponent implements OnInit {
 
   evaluations = [];
 
+   currentStep: number = 1;
+  selectedBU: ProcessNode | null = null;
+  financialImpact: number = 0;
+  imageSeverity: number = 3;
+  imageFrequency: number = 2;
+  judicialSeverity: number = 1;
+  judicialFrequency: number = 1;
+
   ngOnInit(): void {
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.fetchProcesses(entities);
@@ -159,5 +167,119 @@ export class CreateEvaluationComponent implements OnInit {
   onSaveEvaluation(){
     this.selectedProcess = null;
     this.selectedRisk = null;
+  }
+
+  onRiskChange(): void {
+    this.selectedBU = null;
+    this.selectedProcess = null;
+  }
+
+  selectBusinessUnit(bu: ProcessNode): void {
+    this.selectedBU = bu;
+    this.selectedProcess = null;
+  }
+
+  selectProcess(process: ProcessNode): void {
+    this.selectedProcess = process;
+    if (this.selectedRisk && this.selectedProcess) {
+      this.currentStep = 2;
+    }
+  }
+
+  onImageSeverityChange(event: any): void {
+    this.imageSeverity = parseInt(event.target.value);
+  }
+
+  onImageFrequencyChange(event: any): void {
+    this.imageFrequency = parseInt(event.target.value);
+  }
+
+  onJudicialSeverityChange(event: any): void {
+    this.judicialSeverity = parseInt(event.target.value);
+  }
+
+  onJudicialFrequencyChange(event: any): void {
+    this.judicialFrequency = parseInt(event.target.value);
+  }
+
+  getSeverityLabel(value: number): string {
+    switch(value) {
+      case 1: return 'Faible';
+      case 2: return 'Modérée';
+      case 3: return 'Moyenne';
+      case 4: return 'Élevée';
+      case 5: return 'Critique';
+      default: return '';
+    }
+  }
+
+  getFrequencyLabel(value: number): string {
+    switch(value) {
+      case 1: return 'Rare';
+      case 2: return 'Occasionnelle';
+      case 3: return 'Intermittente';
+      case 4: return 'Fréquente';
+      case 5: return 'Continue';
+      default: return '';
+    }
+  }
+
+  getFinancialImpactLabel(): string {
+    switch(this.financialImpact) {
+      case 1: return 'Faible';
+      case 2: return 'Modéré';
+      case 3: return 'Significatif';
+      case 4: return 'Élevé';
+      case 5: return 'Critique';
+      default: return 'Non défini';
+    }
+  }
+
+  calculateOverallRisk(): string {
+    // Logique simplifiée pour calculer le risque global
+    const avg = (this.financialImpact + this.imageSeverity + this.imageFrequency + 
+                this.judicialSeverity + this.judicialFrequency) / 5;
+    
+    if (avg < 2) return 'Faible';
+    if (avg < 3) return 'Modéré';
+    if (avg < 4) return 'Significatif';
+    if (avg < 4.5) return 'Élevé';
+    return 'Critique';
+  }
+
+  saveEvaluation(): void {
+    // Préparer les données pour l'enregistrement
+    const evaluationData = {
+      riskId: this.selectedRisk?.id.id,
+      processId: this.selectedProcess?.id,
+      financialImpact: this.financialImpact,
+      imageSeverity: this.imageSeverity,
+      imageFrequency: this.imageFrequency,
+      judicialSeverity: this.judicialSeverity,
+      judicialFrequency: this.judicialFrequency,
+      overallRisk: this.calculateOverallRisk()
+    };
+this.currentStep = 3;
+    // Appel au service pour enregistrer
+    // this.evaluationSrv.save(evaluationData).subscribe({
+    //   next: () => {
+    //     this.currentStep = 3;
+    //   },
+    //   error: (err) => {
+    //     console.error('Erreur lors de l\'enregistrement', err);
+    //   }
+    // });
+  }
+
+  newEvaluation(): void {
+    this.currentStep = 1;
+    this.selectedRisk = null;
+    this.selectedBU = null;
+    this.selectedProcess = null;
+    this.financialImpact = 0;
+    this.imageSeverity = 3;
+    this.imageFrequency = 2;
+    this.judicialSeverity = 1;
+    this.judicialFrequency = 1;
   }
 }

@@ -84,4 +84,5 @@ export interface BaloiseCategoryDto {
   libelle: string;
   definition: string | null;
   parent: string | null;
+  label: string;
 }

@@ -1,59 +1,144 @@
 <div class="container">
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h3>Risques</h3>
-    </div>
-    <div class="sidebar-content">
-      <ul class="risks-list">
-        <li *ngFor="let risk of risks"
-            (click)="getProcessByRisks(risk)"
-            [class.selected]="risk === selectedRisk"
-            class="risk-item">
-          <span class="risk-label">{{ risk.libellePerso }}</span>
-        </li>
-      </ul>
-    </div>
+  <header>
+    <h1>Module de Cartographie des Risques</h1>
+  </header>
+  
+  <div class="progress-steps">
+    <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">Sélection</div>
+    <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">Évaluation</div>
+    <div class="step" [class.active]="currentStep === 3">Résultats</div>
   </div>
-
+  
   <div class="content">
-    <!-- Liste hiérarchique -->
-    <div class="process-strip" *ngIf="hierarchicalProcesses?.length">
-      <h3>Process</h3>
-      <div class="bu-group" *ngFor="let bu of hierarchicalProcesses">
-        <h4 class="bu-name">{{ bu.name }}</h4>
-
-        <!-- Processus niveau 0 -->
-        <div *ngFor="let p of bu.children">
-          <button
-            class="process-chip"
-            [class.selected]="selectedProcess?.id === p.id"
-            (click)="onSelectProcess(p)">
-            <span class="chip-name">{{ p.name }}</span>
-          </button>
-
-          <!-- Enfants du process -->
-          <div class="process-children" *ngIf="p.children?.length">
-            <button
-              class="process-chip child"
-              *ngFor="let child of p.children"
-              [class.selected]="selectedProcess?.id === child.id"
-              (click)="onSelectProcess(child)">
-              <span class="chip-name">{{ child.name }}</span>
-            </button>
+    <!-- Étape 1: Sélection -->
+    <div class="selection-panel" *ngIf="currentStep === 1">
+      <h2>Sélection du Risque</h2>
+      
+      <div class="form-group">
+        <label for="risk-type">Type de risque</label>
+        <select id="risk-type" [(ngModel)]="selectedRisk" (change)="onRiskChange()">
+          <option [ngValue]="null">Sélectionnez un type de risque</option>
+          <option *ngFor="let risk of risks" [ngValue]="risk">{{ risk.libellePerso }}</option>
+        </select>
+      </div>
+      
+      <div *ngIf="selectedRisk">
+        <h2>Sélection de l'Unité Métier</h2>
+        
+        <div class="business-units">
+          <div *ngFor="let bu of hierarchicalProcesses" 
+               class="business-unit" 
+               [class.active]="selectedBU?.name === bu.name"
+               (click)="selectBusinessUnit(bu)">
+            {{ bu.name }}
+          </div>
+        </div>
+        
+        <div *ngIf="selectedBU">
+          <h2>Sélection du Processus</h2>
+          
+          <div class="processes">
+            <!-- Processus parents -->
+            <div *ngFor="let p of selectedBU.children" class="process-container">
+              <div class="process-card" 
+                   [class.selected]="selectedProcess?.id === p.id"
+                   (click)="selectProcess(p)">
+                <span class="chip-name">{{ p.name }}</span>
+              </div>
+              
+              <!-- Sous-processus -->
+              <div *ngIf="p.children?.length" class="subprocess-container">
+                <div *ngFor="let child of p.children" 
+                     class="process-card child"
+                     [class.selected]="selectedProcess?.id === child.id"
+                     (click)="selectProcess(child)">
+                  <span class="chip-name">{{ child.name }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Bloc évaluation -->
-    <div *ngIf="selectedRisk && selectedProcess">
-      <app-eval-risk-process (evaluationSaved)="onSaveEvaluation()"></app-eval-risk-process>
+    
+    <!-- Étape 2: Évaluation -->
+    <div class="evaluation-panel" *ngIf="currentStep === 2">
+      <h2>Évaluation des Impacts</h2>
+      
+      <div class="form-group">
+        <label>Impact Financier</label>
+        <div class="impact-scale">
+          <div class="impact-level impact-faible" 
+               [class.selected]="financialImpact === 1"
+               (click)="financialImpact = 1">Faible</div>
+          <div class="impact-level impact-modere" 
+               [class.selected]="financialImpact === 2"
+               (click)="financialImpact = 2">Modéré</div>
+          <div class="impact-level impact-significatif" 
+               [class.selected]="financialImpact === 3"
+               (click)="financialImpact = 3">Significatif</div>
+          <div class="impact-level impact-eleve" 
+               [class.selected]="financialImpact === 4"
+               (click)="financialImpact = 4">Élevé</div>
+          <div class="impact-level impact-critique" 
+               [class.selected]="financialImpact === 5"
+               (click)="financialImpact = 5">Critique</div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Impact Image/Régulation</label>
+        <div class="severity-frequency">
+          <div>
+            <label>Sévérité</label>
+            <input type="range" min="1" max="5" [value]="imageSeverity" (input)="onImageSeverityChange($event)" class="slider">
+            <div class="slider-value">{{ getSeverityLabel(imageSeverity) }}</div>
+          </div>
+          <div>
+            <label>Fréquence</label>
+            <input type="range" min="1" max="5" [value]="imageFrequency" (input)="onImageFrequencyChange($event)" class="slider">
+            <div class="slider-value">{{ getFrequencyLabel(imageFrequency) }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Impact Judiciaire</label>
+        <div class="severity-frequency">
+          <div>
+            <label>Sévérité</label>
+            <input type="range" min="1" max="5" [value]="judicialSeverity" (input)="onJudicialSeverityChange($event)" class="slider">
+            <div class="slider-value">{{ getSeverityLabel(judicialSeverity) }}</div>
+          </div>
+          <div>
+            <label>Fréquence</label>
+            <input type="range" min="1" max="5" [value]="judicialFrequency" (input)="onJudicialFrequencyChange($event)" class="slider">
+            <div class="slider-value">{{ getFrequencyLabel(judicialFrequency) }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary">
+        <h3>Résumé de l'Évaluation</h3>
+        <p><strong>Risque:</strong> {{ selectedRisk?.libellePerso }}</p>
+        <p><strong>Unité Métier:</strong> {{ selectedBU?.name }}</p>
+        <p><strong>Processus:</strong> {{ selectedProcess?.name }}</p>
+        <p><strong>Impact Financier:</strong> {{ getFinancialImpactLabel() }}</p>
+        <p><strong>Niveau de Risque Global:</strong> {{ calculateOverallRisk() }}</p>
+      </div>
+      
+      <div class="buttons">
+        <button mat-raised-button class="btn-red" (click)="currentStep = 1">Retour</button>
+        <button mat-raised-button class="btn-primary" (click)="saveEvaluation()">Enregistrer l'évaluation</button>
+      </div>
     </div>
-
-    <div class="empty-state" *ngIf="!selectedRisk">
-      <div class="empty-state-content">
-        <h3>Sélectionnez un risque</h3>
-        <p>Choisissez un risque dans la liste pour commencer l'évaluation</p>
+    
+    <!-- Étape 3: Résultats -->
+    <div class="results-panel" *ngIf="currentStep === 3">
+      <h2>Évaluation Enregistrée</h2>
+      <div class="success-message">
+        <p>L'évaluation du risque a été enregistrée avec succès.</p>
+        <button mat-raised-button class="btn-primary" (click)="newEvaluation()">Nouvelle évaluation</button>
       </div>
     </div>
   </div>
