@@ -17,9 +17,6 @@ export class ActionPlanService {
   }
 
   getActionPlan(id: string) {
-    // const allPlans = this.getActionsPlan();
-    // return allPlans.find(plan => plan.id === id);
-
     return this.http.get<ActionPlan>(`${this.base}/${id}`);
   }
 

@@ -124,7 +124,6 @@ export class ExecutionsListComponent {
   ngOnInit() {
     if (this.executionId) {
       this.controlService.getAllExecutions(this.executionId, true).subscribe(executions => {
-        console.log(executions);
         this.executions = executions;
         this.dataSource.data = executions;
       });

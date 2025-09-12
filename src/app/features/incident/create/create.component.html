@@ -90,18 +90,6 @@
               <mat-datepicker #picker3></mat-datepicker>
             </mat-form-field>
 
-            <mat-form-field>
-              <mat-label>Date de clôture (si clôturé)</mat-label>
-              <input matInput [max]="today" [matDatepicker]="picker4" formControlName="dateDeCloture">
-              <div matSuffix class="suffix-container">
-                <mat-datepicker-toggle [for]="picker4"></mat-datepicker-toggle>
-                <button mat-icon-button matTooltip="Date de clôture de l'incident, si applicable.">
-                  <mat-icon>info</mat-icon>
-                </button>
-              </div>
-              <mat-datepicker #picker4></mat-datepicker>
-            </mat-form-field>
-
             <div class="actions">
               <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
               <button mat-raised-button class="btn-green" (click)="addDraft()">Brouillon</button>

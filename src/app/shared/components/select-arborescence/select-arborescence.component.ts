@@ -67,7 +67,7 @@ export class SelectArborescenceComponent {
           child.name.toLowerCase().includes(filterValue)
         );
         const parentMatch = group.name.toLowerCase().includes(filterValue);
-        if (parentMatch || enfants.length > 0) {
+        if (parentMatch || enfants?.length > 0) {
           return {
             ...group, 
             enfants: enfants,

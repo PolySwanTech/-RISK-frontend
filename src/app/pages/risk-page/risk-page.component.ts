@@ -142,7 +142,6 @@ export class RiskPageComponent implements OnInit {
   }
 
   onSelectRisk(risk: RiskTemplate): void {
-    console.log(risk)
     this.selectedRisk = risk;
   }
 

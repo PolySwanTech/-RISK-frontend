@@ -88,7 +88,6 @@ export class CreateComponent implements OnInit {
       '',
       [Validators.required, this.maxDateValidator(new Date())]
     ],
-    dateDeCloture: ['']
   });
 
   incidentForm3 = this._formBuilder.group<{
@@ -181,7 +180,6 @@ export class CreateComponent implements OnInit {
         dateDeDeclaration: this.toInputDate(incident.declaredAt),
         dateDeSurvenance: this.toInputDate(incident.survenueAt),
         dateDeDetection: this.toInputDate(incident.detectedAt),
-        dateDeCloture: this.toInputDate(incident.closedAt),
       });
 
       const wantedBuId = incident.teamId;
@@ -259,7 +257,6 @@ export class CreateComponent implements OnInit {
       declaredAt: new Date(this.incidentForm2.value.dateDeDeclaration!),
       survenueAt: this.incidentForm2.value.dateDeSurvenance ? new Date(this.incidentForm2.value.dateDeSurvenance) : null,
       detectedAt: this.incidentForm2.value.dateDeDetection ? new Date(this.incidentForm2.value.dateDeDetection) : null,
-      closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
       riskId: this.incidentForm3.value.riskId || null,
       processId: this.incidentForm3.value.processId || null,
       cause: this.incidentForm3.value.cause || null,

@@ -114,7 +114,6 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   private buildSlides(): void {
-    console.log(this.evaluationCache);
     if (!this.controlExecutions) { this.slides = []; return; }
     this.slides = this.controlExecutions
       .map(e => ({ exec: e, view: this.evaluationCache[e.id] ?? null }))

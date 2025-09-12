@@ -11,17 +11,22 @@ export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
       },
     })
     : req;
-    
+
   return next(modifiedReq).pipe(
-    tap(
-      {
-        error : (error) => {
-          if (error.status === 401) {
-            sessionStorage.clear();
-            window.location.href = '/auth/login';
-          }
+    tap({
+      next: (event: any) => {
+        // Vérifie si un nouveau token est renvoyé dans le header X-New-Access-Token
+        const newToken = event?.headers?.get?.('X-New-Access-Token');
+        if (newToken) {
+          sessionStorage.setItem('token', newToken);
         }
-      }
-    )
+      },
+      error: (error) => {
+        // if (error.status === 401) {
+        //   sessionStorage.clear();
+        //   window.location.href = '/auth/login';
+        // }
+      },
+    })
   );
 };
