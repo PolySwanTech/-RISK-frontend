@@ -189,10 +189,14 @@ export class FichiersComponent {
   }
 
   private async uploadFile(file: File): Promise<void> {
+
     if (!this.targetId) {
       this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
       return;
     }
+
+    console.log(this.targetType)
+    console.log(this.targetId)
 
     this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
       next: _ => {

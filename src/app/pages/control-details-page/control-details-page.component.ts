@@ -154,6 +154,7 @@ export class ControlDetailsPageComponent implements OnInit {
     this.dialog.open(PopupEvaluationControleComponent, {
       data: {
         action: action,
+        controlId : this.control?.id.id,
         executionId: executionId,
         mode: 'FORM',
         canValidate: true
