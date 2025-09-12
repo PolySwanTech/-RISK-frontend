@@ -19,7 +19,7 @@
               <mat-label>Catégorie&nbsp;Bâloise</mat-label>
               <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
                 <mat-option *ngFor="let cat of bal1" [value]="cat.libelle">
-                  {{ cat.libelle }}
+                  {{ cat.label }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -31,7 +31,7 @@
                 <!-- on envoie ici l’OBJET L2 complet,
                        car risk.categoryL2 est de type BaloiseCategoryL2 -->
                 <mat-option *ngFor="let sub of bal2" [value]="sub.libelle">
-                  {{ sub .libelle }}
+                  {{ sub.label }}
                 </mat-option>
               </mat-select>
             </mat-form-field>

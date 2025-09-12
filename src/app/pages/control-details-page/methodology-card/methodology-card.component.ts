@@ -7,8 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 
 import { ControlService } from '../../../core/services/control/control.service';
 import { ControlMethodology, ControlMethodologyCreateDto } from '../../../core/models/ControlMethodology';
-import { ControlNature } from '../../../core/enum/ControlNature.enum';
-import { ExecutionMode } from '../../../core/enum/exceutionmode.enum';
+import { ControlNature, ControlNatureLabels } from '../../../core/enum/ControlNature.enum';
+import { ExecutionMode, ExecutionModeLabels } from '../../../core/enum/exceutionmode.enum';
 
 
 @Component({
@@ -80,6 +80,14 @@ export class MethodologyCardComponent implements OnInit {
       },
       error: () => { this.submitting = false; }
     });
+  }
+
+  getControlNature(n: ControlNature): string {
+    return ControlNatureLabels[n]
+  }
+
+  getExecutionMode(m: ExecutionMode): string {
+    return ExecutionModeLabels[m]
   }
 
   controlTypeLabel(t?: string): string {

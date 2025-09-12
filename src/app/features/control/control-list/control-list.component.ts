@@ -19,15 +19,16 @@ import { Router } from '@angular/router';
 import { CreateControlComponent } from '../create-control/create-control.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
-import { EnumLabels } from '../../../core/enum/enum-labels';
-import { DateRangePickerComponent } from "../../../shared/components/date-range-picker/date-range-picker.component";
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
 import { Filter } from '../../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
-import { filter } from 'rxjs';
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
-import { RiskLevel } from '../../../core/enum/riskLevel.enum';
+import { RiskLevelEnum, RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
+import { Priority, PriorityLabels } from '../../../core/enum/Priority';
+import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
+import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 
 @Component({
   selector: 'app-control-list',
@@ -82,9 +83,9 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       cell: (e: ControlTemplate) => this.getTypeLabel(e.controlType),
       isBadge: 'type',
       filterType: 'select',
-      options: Object.keys(EnumLabels.type).map(key => ({
+      options: Object.values(Type).map(key => ({
         value: key,
-        label: this.getTypeLabel(key as keyof typeof EnumLabels.type)
+        label: ControlTypeLabels[key]
       })),
       icon: 'category' // 📂
     },
@@ -95,9 +96,9 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       cell: (e: ControlTemplate) => this.getRiskLabel(e.riskLevel.name),
       isBadge: 'risk',
       filterType: 'select',
-      options: Object.keys(EnumLabels.risk).map(key => ({
+      options: Object.values(RiskLevelEnum).map(key => ({
         value: key,
-        label: this.getRiskLabel(key as keyof typeof EnumLabels.risk)
+        label: RiskLevelLabels[key]
       })),
       icon: 'report_problem' // ⚠️
     },
@@ -107,9 +108,9 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       header: 'Fréquence',
       cell: (e: ControlTemplate) => this.getRecurrenceLabel(e.frequency),
       filterType: 'select',
-      options: Object.keys(EnumLabels.reccurency).map(key => ({
+      options: Object.values(Recurrence).map(key => ({
         value: key,
-        label: this.getRecurrenceLabel(key as keyof typeof EnumLabels.reccurency)
+        label:  RecurrenceLabels[key]
       })),
       icon: 'schedule' // ⏰
     },
@@ -120,9 +121,9 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       cell: (e: any) => this.getDegresLabel(e.controlLevel),
       isBadge: 'control',
       filterType: 'select',
-      options: Object.keys(EnumLabels.degres).map(key => ({
+      options: Object.values(Degree).map(key => ({
         value: key,
-        label: this.getDegresLabel(key as keyof typeof EnumLabels.degres)
+        label: DegreeLabels[key]
       })),
       icon: 'tune' // 🎚️
     },
@@ -173,26 +174,24 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   searchQuery: string = '';
 
-  enumLabels = EnumLabels;
-
-  getTypeLabel(type: keyof typeof EnumLabels.type): string {
-    return EnumLabels?.type?.[type] ?? type;
+  getTypeLabel(t: Type): string {
+    return ControlTypeLabels[t] || t;
   }
 
-  getPriorityLabel(priority: keyof typeof EnumLabels.priority): string {
-    return EnumLabels?.priority?.[priority] ?? priority;
+  getPriorityLabel(p: Priority): string {
+    return PriorityLabels[p] || p;
   }
 
-  getDegresLabel(degres: keyof typeof EnumLabels.degres): string {
-    return EnumLabels?.degres?.[degres] ?? degres;
+  getDegresLabel(d: Degree): string {
+    return DegreeLabels[d] || d;
   }
 
-  getRecurrenceLabel(key: keyof typeof EnumLabels.reccurency): string {
-    return EnumLabels?.reccurency?.[key] ?? key;
+  getRecurrenceLabel(key: Recurrence): string {
+    return RecurrenceLabels[key] || key;
   }
 
-  getRiskLabel(risk: keyof typeof EnumLabels.risk): string {
-    return EnumLabels?.risk?.[risk] ?? risk;
+  getRiskLabel(risk: RiskLevelEnum): string {
+    return RiskLevelLabels[risk] || risk;
   }
 
   getBadgeClass(type: string, value: any) {
@@ -300,10 +299,10 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         (c.processName?.toLowerCase().includes(query) || '') ||
         (c.responsable?.toLowerCase().includes(query) || '') ||
         (c.creator?.toLowerCase().includes(query) || '') ||
-        this.getTypeLabel(c.controlType as keyof typeof this.enumLabels.type).toLowerCase().includes(query) ||
-        this.getRiskLabel(c.riskLevel.name as keyof typeof this.enumLabels.risk).toLowerCase().includes(query) ||
-        this.getDegresLabel(c.controlLevel as keyof typeof this.enumLabels.degres).toLowerCase().includes(query) ||
-        this.getRecurrenceLabel(c.frequency as keyof typeof this.enumLabels.reccurency).toLowerCase().includes(query) ||
+        this.getTypeLabel(c.controlType).toLowerCase().includes(query) ||
+        this.getRiskLabel(c.riskLevel.name).toLowerCase().includes(query) ||
+        this.getDegresLabel(c.controlLevel).toLowerCase().includes(query) ||
+        this.getRecurrenceLabel(c.frequency).toLowerCase().includes(query) ||
         (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
       );
     }

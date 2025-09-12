@@ -4,10 +4,8 @@ export enum Priority {
     MAXIMUM = 'MAXIMUM',
 }
 
-type PriorityLabelsType = Record<Priority, string>;
-
-export const priorityLabels: PriorityLabelsType = {
-    [Priority.MINIMAL]: 'Minimale',
+export const PriorityLabels: Record<Priority, string> = {
+    [Priority.MINIMAL]: 'Basse',
     [Priority.MEDIUM]: 'Moyenne',
-    [Priority.MAXIMUM]: 'Maximale',
+    [Priority.MAXIMUM]: 'Élevée',
 }

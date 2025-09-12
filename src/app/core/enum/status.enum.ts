@@ -8,7 +8,7 @@ export enum Status {
 
 type StatusLabelsType = Record<Status, string>;
 
-export const statusLabels: StatusLabelsType = {
+export const StatusLabels: StatusLabelsType = {
     [Status.ACHIEVED]: 'Clôturé',
     [Status.IN_PROGRESS]: 'En cours',
     [Status.NOT_ACHIEVED]: 'Non Clôturé',

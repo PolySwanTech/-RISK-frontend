@@ -18,6 +18,6 @@ export const TargetTypeLabel: Record<TargetType, string> = {
   [TargetType.INCIDENT]: 'Incident',
   [TargetType.IMPACT]: 'Impact',
   [TargetType.CONTROL]: 'Contrôle',
-  [TargetType.ACTION_PLAN]: 'Plan d\'action',
-  [TargetType.ACTION_PLAN_FROM_INCIDENT]: 'Plan d\'action',
+  [TargetType.ACTION_PLAN]: "Plan d'action",
+  [TargetType.ACTION_PLAN_FROM_INCIDENT]: "Plan d'action",
 };

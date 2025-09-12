@@ -58,4 +58,5 @@ export function parseLocalDate(s: string): Date {
 export interface AmountTypeDto {
   libelle: string;
   family: OperatingLossFamily;
+  label: string;
 }

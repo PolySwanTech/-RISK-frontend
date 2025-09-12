@@ -19,8 +19,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
-import { Priority, priorityLabels } from '../../core/enum/Priority';
-import { Status, statusLabels } from '../../core/enum/status.enum';
+import { Priority, PriorityLabels } from '../../core/enum/Priority';
+import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
 import { Filter } from '../../core/enum/filter.enum';
 import { FilterTableComponent } from "../../shared/components/filter-table/filter-table.component";
@@ -188,7 +188,7 @@ export class PlanActionPageComponent implements OnInit{
   }
 
   formatPriority(p: Priority): string {
-    return priorityLabels[p] || p;
+    return PriorityLabels[p] || p;
   }
 
   getPriorityBadge(priority: string) {
@@ -335,7 +335,7 @@ export class PlanActionPageComponent implements OnInit{
   }
 
   getReadableStatut(status: Status): string {
-    return statusLabels[status] || status;
+    return StatusLabels[status] || status;
   }
 
 

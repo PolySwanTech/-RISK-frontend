@@ -210,7 +210,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     // Non financier
     this.formData.nonFinancialImpacts.forEach((imp, i) => {
-      if (!imp.title || !imp.type || !imp.description || !imp.businessUnitId) {
+      if (!imp.title || !imp.type || !imp.businessUnitId) {
         newErrors[`nonfinancial_${i}`] = 'Titre, Entité, type et description sont requis.';
       }
       if (!imp.amount || isNaN(+imp.amount)) {
@@ -225,7 +225,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     // Financier
     this.formData.financialImpacts.forEach((imp, i) => {
-      if (!imp.title || !imp.type || !imp.description || !imp.businessUnitId) {
+      if (!imp.title || !imp.type || !imp.businessUnitId) {
         newErrors[`financial_${i}`] = 'Titre, Entité, type et description sont requis.';
       }
       if (!imp.details.length) {
