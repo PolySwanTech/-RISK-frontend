@@ -28,7 +28,7 @@ import { OperatingLossService } from '../../../../core/services/operating-loss/o
 import { OperatingLoss } from '../../../../core/models/OperatingLoss';
 import { AmountDto } from '../../../../core/models/Amount';
 import { AmountService } from '../../../../core/services/amount/amount.service';
-import { OperatingLossFamily } from '../../../../core/enum/operatingLossFamily.enum';
+import { OperatingLossFamily, OperatingLossFamilyLabels } from '../../../../core/enum/operatingLossFamily.enum';
 
 @Component({
   selector: 'app-list-impact',
@@ -86,7 +86,7 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
       header: "Type d'Impact",
       cell: (impact: OperatingLoss) =>{
         const impactType = impact.type;
-        return impactType.family
+        return OperatingLossFamilyLabels[impactType.family] 
       },
       filterType: 'select',
       icon: 'category'
@@ -94,7 +94,7 @@ export class ListImpactComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'type',
       header: 'Type Conséquence',
-      cell: (impact: OperatingLoss) => impact.type.libelle || '',
+      cell: (impact: OperatingLoss) => impact.type.label || '',
       filterType: 'select',
       icon: 'category'
     },

@@ -33,7 +33,7 @@
         <td mat-cell *matCellDef="let impact">
         <button mat-icon-button
                 (click)="toggleExpand(impact); $event.stopPropagation()"
-                [attr.aria-label]="'expand ' + impact.libelle">
+                [attr.aria-label]="'expand ' + impact.label">
             <mat-icon>{{ expandedId === impact.id ? 'expand_less' : 'expand_more' }}</mat-icon>
         </button>
         </td>
@@ -86,7 +86,7 @@
 
                 <ng-container matColumnDef="atype">
                 <th mat-header-cell *matHeaderCellDef> Type de montant </th>
-                <td mat-cell *matCellDef="let a">{{ a.amountType?.libelle || '—' }}</td>
+                <td mat-cell *matCellDef="let a">{{ a.amountType?.label || '—' }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="adate">

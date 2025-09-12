@@ -1,3 +1,4 @@
+import { EvaluationControl } from "../enum/evaluation-controle.enum";
 import { Evaluation } from "../enum/evaluation.enum";
 import { ExecutionMode } from "../enum/exceutionmode.enum";
 import { Priority } from "../enum/Priority";
@@ -14,7 +15,7 @@ export class ControlExecution {
     plannedAt: Date | null;
     performedBy: string;
     status: Status
-    evaluation: Evaluation;
+    evaluation: EvaluationControl;
     resume : string;
     comments: string;
 
@@ -28,7 +29,7 @@ export class ControlExecution {
         plannedAt: Date | null,
         performedBy: string,
         status: Status,
-        evaluation: Evaluation,
+        evaluation: EvaluationControl,
         resume: string,
         comments: string
     ) {
