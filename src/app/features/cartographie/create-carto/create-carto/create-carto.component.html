@@ -4,8 +4,8 @@
 <br>
 <br>
 <mat-card>
-
-  <div class="steps">
+<app-create-evaluation (changeToEvaluationStep)="activeStep = 1"></app-create-evaluation>
+  <!-- <div class="steps">
     @for(step of steps; track step; let i = $index) {
     <div [class.active]="i === activeStep" class="step" (click)="activeStep = i">
       {{ step }}
@@ -16,9 +16,9 @@
   <app-create-evaluation (changeToEvaluationStep)="activeStep = 1"></app-create-evaluation>
   }
   @if(activeStep === 2) {
-  <!-- <app-results-mapping></app-results-mapping> -->
+   <app-results-mapping></app-results-mapping>
   }
-  <div class="actions">
+   <div class="actions">
     <button mat-raised-button color="primary" [disabled]="activeStep === 0"
       (click)="activeStep = activeStep > 0 ? activeStep - 1 : 0">
       Précédent
@@ -27,5 +27,5 @@
       (click)="activeStep = activeStep < steps.length - 1 ? activeStep + 1 : steps.length - 1">
       Suivant
     </button>
-  </div>
+  </div> -->
 </mat-card>

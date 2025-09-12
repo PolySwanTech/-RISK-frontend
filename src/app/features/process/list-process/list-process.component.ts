@@ -22,6 +22,7 @@ import { RiskEvaluationService } from '../../../core/services/risk-evaluation/ri
 import { firstValueFrom } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @Component({
   selector: 'app-list-process',
@@ -35,7 +36,8 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
     MatFormFieldModule,
     FormsModule,
     MatCardModule,
-    GoBackComponent
+    GoBackComponent,
+    MatBadgeModule
   ],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'

@@ -1,6 +1,9 @@
 <mat-drawer-container class="sidenav-container">
-  <mat-drawer mode="side" [opened]="true">
+  <mat-drawer #drawer mode="side" [opened]="true">
     <mat-toolbar color="primary">
+      <button mat-icon-button (click)="onToggle(drawer)" class="hamburger">
+        <mat-icon>menu</mat-icon>
+      </button>
       <span>Risk View</span>
     </mat-toolbar>
 
@@ -9,8 +12,7 @@
       <ng-container>
         <a mat-list-item routerLink="/todo">
           <mat-icon>checklist</mat-icon>
-          <span [matBadge]="7" matBadgeColor="warn"
-            matBadgePosition="above after" mat-button>A faire</span>
+          <span [matBadge]="7" matBadgeColor="warn" matBadgePosition="above after" mat-button>A faire</span>
         </a>
       </ng-container>
       <ng-container *appHasPermission="'VIEW_DASHBOARDS'">
@@ -88,7 +90,15 @@
     </mat-nav-list>
 
   </mat-drawer>
+
   <mat-drawer-content>
+    @if(!drawer.opened){
+    <mat-toolbar color="primary" class="top-toolbar">
+      <button mat-icon-button (click)="onToggle(drawer)" class="hamburger">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </mat-toolbar>
+    }
     <ng-content></ng-content>
   </mat-drawer-content>
 </mat-drawer-container>
