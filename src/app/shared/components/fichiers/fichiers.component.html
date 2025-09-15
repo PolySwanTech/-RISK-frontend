@@ -1,10 +1,13 @@
 <mat-card class="files-card" style="height: 600px;">
 
     <mat-card-content style="display: flex; flex-direction: column; height: 97%;">
-        <mat-card-header>
+        <mat-card-header style="display: flex; align-items: center; justify-content: space-between;">
             <mat-card-title class="files-header">
                 <span>Pièces jointes</span>
             </mat-card-title>
+            <button [hidden]="!dialogRef" mat-icon-button aria-label="Fermer" (click)="closePopup()" class="close-popup-btn">
+                <mat-icon>close</mat-icon>
+            </button>
         </mat-card-header>
         <!-- Zone de dépôt -->
         @if(!closed){

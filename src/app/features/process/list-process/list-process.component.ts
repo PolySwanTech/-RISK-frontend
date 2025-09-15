@@ -1,4 +1,4 @@
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -51,6 +51,7 @@ export class ListProcessComponent implements OnInit {
   riskEvaluationService = inject(RiskEvaluationService);
   entityService = inject(EntitiesService);
   snackBarService = inject(SnackBarService);
+  private route = inject(ActivatedRoute);
 
   processes: Process[] = [];
   displayedColumns: string[] = ['name', 'niveau', 'buName', 'parentName'];
@@ -66,6 +67,7 @@ export class ListProcessComponent implements OnInit {
   goBackButtons: GoBackButton[] = [];
 
   ngOnInit(): void {
+
     this.hierarchicalProcesses = [];
     this.expandedNodes.clear();
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
@@ -95,6 +97,12 @@ export class ListProcessComponent implements OnInit {
         action: () => this.navToCreateCarto()
       }
     ];
+
+    this.route.queryParams.subscribe(params => {
+      if (params['buId'] !== undefined) {
+        this.add(params['buId']);
+      }
+    });
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -145,12 +153,13 @@ export class ListProcessComponent implements OnInit {
     // return level.toLowerCase().replace('é', 'e');
   }
 
-  add() {
+  add(buId?: string): void {
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '600px !important',
       height: '550px',
       minWidth: '600px',
       maxWidth: '600px',
+      data: { buId: buId || null }
     });
     dialogRef.afterClosed().subscribe(_ => {
       this.ngOnInit(); // Refresh the list after adding a new process
@@ -178,7 +187,7 @@ export class ListProcessComponent implements OnInit {
       });
   }
 
-  deleteBu(id : string) {
+  deleteBu(id: string) {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")
       .subscribe(confirm => {
         if (confirm) {

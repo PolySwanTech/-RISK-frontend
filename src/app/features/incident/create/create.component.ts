@@ -273,15 +273,18 @@ export class CreateComponent implements OnInit {
 
     const incident = this.convertFormToIncident(false);
     incident.state = State.SUBMIT
+
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
+          next: resp => {
+            this.afterCreation("Modification réussie", this.incidentId);
+          },
           error: err => {
             console.error("Erreur lors de la modification de l'incident", err);
           }
         },
       );
-      this.router.navigate(['incident']);
     }
     else {
       this.incidentService.saveIncident(incident).subscribe(
@@ -302,10 +305,13 @@ export class CreateComponent implements OnInit {
 
     incident.state = State.DRAFT;
     if (this.incidentId) {
-      this.incidentService.updateIncident(this.incidentId, incident).subscribe({
-        error: err => console.error('Erreur update draft', err)
-      });
-      this.router.navigate(['incident']);
+      this.incidentService.updateIncident(this.incidentId, incident).subscribe(
+        {
+          next: resp => {
+            this.afterCreation("Modification réussie", this.incidentId);
+          },
+          error: err => console.error('Erreur update draft', err)
+        });
     } else {
       this.incidentService.saveIncident(incident).subscribe({
         next: resp => this.afterCreation('Création réussie', resp),

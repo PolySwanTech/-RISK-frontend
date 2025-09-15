@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
+import { PasswordService } from '../../../core/services/password/password.service';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class LoginComponent {
 
   private authService = inject(AuthService);
+  private passwordService = inject(PasswordService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
 
@@ -65,9 +67,9 @@ export class LoginComponent {
   }
 
   resetPassword(email: string) {
-    // Simulating API call for password reset
-    // You can make an actual HTTP request here using Angular's HttpClient service.
-    this.errorMessage = 'Password reset link has been sent to your email.';
+    this.passwordService.requestLink(email).subscribe(
+      _ => alert("Un lien vous a été envoyé par mail.")
+    )
   }
 
   // Close Forgot Password form

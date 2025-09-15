@@ -37,21 +37,21 @@ export class CreateProcessComponent {
   ope = 'Créer'
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: Process
+    @Inject(MAT_DIALOG_DATA) public data: { process: Process , buId?: string} | null
   ) {
 
-    if (data) {
+    if (data && data.process) {
       this.ope = 'Modifier';
       this.processForm = this.fb.group({
-        name: [data.name, Validators.required],
-        parentId: this.fb.control<string | null>(data.parentId || null,)
+        name: [data.process.name, Validators.required],
+        parentId: [data.process.parentId, Validators.required]
       });
     }
     else {
       this.processForm = this.fb.group({
         name: ['', Validators.required],
-        buId: ['', Validators.required],
-        parentId: this.fb.control<string | null>(null,)
+        buId: [this.data ? this.data.buId : null, Validators.required],
+        parentId: [null]
       });
     }
 
@@ -82,10 +82,10 @@ export class CreateProcessComponent {
 
   onSubmit() {
     if (this.processForm.valid) {
-      if (this.data) {
+      if (this.data && this.data.process) {
         const { name, parentId } = this.processForm.value;
         const dto = { name, parentId: parentId || null };
-        this.processService.updateProcess(this.data.id, dto).subscribe(resp => {
+        this.processService.updateProcess(this.data.process.id, dto).subscribe(resp => {
           this.snackBarService.success("Le processus a bien été modifié")
           this.dialogRef.close(true);
           this.router.navigate(['reglages']);
