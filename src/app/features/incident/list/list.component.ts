@@ -130,6 +130,7 @@ export class ListComponent implements OnInit {
         icon: 'add',
         class: 'btn-primary',
         show: true,
+        permission: 'CREATE_INCIDENT',
         action: () => this.add()
       },
       {
