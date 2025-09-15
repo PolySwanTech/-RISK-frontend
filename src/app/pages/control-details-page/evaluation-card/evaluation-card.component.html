@@ -1,4 +1,3 @@
-
 <div class="card eval-card" *ngIf="showAsCard && evaluationView">
     <div class="card-content">
         <h3 class="title">
@@ -33,6 +32,13 @@
                 <div class="box text">{{ evaluationView.comments || '—' }}</div>
             </div>
 
+            <ng-container>
+                <button mat-raised-button class="btn-primary" (click)="viewFiles()">
+                    <mat-icon>upload</mat-icon>
+                    Voir les fichiers attachés
+                </button>
+            </ng-container>
+
             <!-- Actions de validation : visibles quand une évaluation existe et qu'elle est en attente -->
             <div class="rv-actions rv-actions-inline" *ngIf="evaluationView?.reviewStatus === 'PENDING' && canValidate">
                 <button class="btn btn-primary" (click)="handleAction('valid');">Valider</button>
@@ -65,8 +71,10 @@
                     <span class="pill pill-default">En attente de validation</span>
                 </div>
                 <div class="rv-actions">
-                    <button class="btn btn-primary" (click)="actionTaken = 'valid'; openDetailsRequested.emit()">Valider</button>
-                    <button class="btn btn-outline warning" (click)="actionTaken = 'reexam'; openDetailsRequested.emit()">Demander un
+                    <button class="btn btn-primary"
+                        (click)="actionTaken = 'valid'; openDetailsRequested.emit()">Valider</button>
+                    <button class="btn btn-outline warning"
+                        (click)="actionTaken = 'reexam'; openDetailsRequested.emit()">Demander un
                         réexamen</button>
                 </div>
             </ng-container>

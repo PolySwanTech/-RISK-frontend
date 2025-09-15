@@ -195,9 +195,6 @@ export class FichiersComponent {
       return;
     }
 
-    console.log(this.targetType)
-    console.log(this.targetId)
-
     this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
       next: _ => {
         // Refresh la liste

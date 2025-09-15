@@ -34,7 +34,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   private dialog = inject(MatDialog);
   private fileService = inject(FileService);
-  private route = inject(ActivatedRoute);
 
   @Output() close = new EventEmitter<void>();
   @Output() evaluateRequested = new EventEmitter<void>();
@@ -160,10 +159,8 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   async viewFiles(closed: boolean = false) {
 
-    console.log(this.route.snapshot.params)
-
     let target = TargetType.CONTROL
-    let files = await firstValueFrom(this.fileService.getFiles(target, this.controlId))
+    let files = await firstValueFrom(this.fileService.getFiles(target, this.executionId))
 
     this.dialog.open(FichiersComponent,
       {
@@ -171,7 +168,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
         data: {
           files: files,
           targetType: target,
-          targetId: this.controlId,
+          targetId: this.executionId,
           closed: closed
         }
       }

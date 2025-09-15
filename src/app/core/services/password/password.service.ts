@@ -16,7 +16,6 @@ export class PasswordService {
   }
 
   resetPassword(token: string, password: string) {
-    console.log({ token: token, newPassword: password })
     return this.http.post<any>(this.base + '/reset', { token: token, newPassword: password })
   }
 }
