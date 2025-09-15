@@ -12,7 +12,6 @@
     </mat-form-field>
 
     <!-- Business Unit -->
-    @if(!data){
     <mat-form-field class="full-width">
       <mat-label>Business Unit</mat-label>
       <mat-select formControlName="buId" (selectionChange)="onBuChange($event.value)">
@@ -24,7 +23,6 @@
         La BU est requise.
       </mat-error>
     </mat-form-field>
-    }
 
     <!-- Processus Parent (optionnel) -->
     @if (processes.length != 0) {

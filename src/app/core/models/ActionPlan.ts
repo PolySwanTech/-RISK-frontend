@@ -42,6 +42,8 @@ export class ActionPlan {
     incidentId: string;
     echeance: Date;
 
+    createdAt: Date = new Date();
+
     actions: Action[] = [];
 
     incidentRef : string = "";

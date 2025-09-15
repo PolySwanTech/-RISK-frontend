@@ -23,6 +23,8 @@ import { ProcessService } from '../../core/services/process/process.service';
 import { RiskLevel, RiskLevelEnum } from '../../core/enum/riskLevel.enum';
 import { MatrixService } from '../../core/services/matrix/matrix.service';
 import { GoBackComponent } from "../../shared/components/go-back/go-back.component";
+import { BusinessUnit } from '../../core/models/BusinessUnit';
+import { ConfirmService } from '../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-risk-page',
@@ -47,6 +49,8 @@ export class RiskPageComponent implements OnInit {
   filteredRisks: RiskTemplate[] = [];
   buNameList: string[] = [];
 
+  businessUnit: BusinessUnit | null = null;
+
   selectedRisk: RiskTemplate | null = null;
   processMap: Record<string, Process> = {};
 
@@ -58,6 +62,7 @@ export class RiskPageComponent implements OnInit {
   goBackButtons: GoBackButton[] = [];
 
   private riskService = inject(RiskService);
+  private confirmService = inject(ConfirmService);
   private entitiesSrv = inject(EntitiesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -71,7 +76,10 @@ export class RiskPageComponent implements OnInit {
     ];
 
     this.buId = this.route.snapshot.paramMap.get('id')!;
-    this.entitiesSrv.findById(this.buId).subscribe(resp => this.buName = resp.name);
+    this.entitiesSrv.findById(this.buId).subscribe(resp => {
+      this.businessUnit = resp;
+      this.buName = this.businessUnit.name
+    });
 
     this.matrixService.getDefaultMatrix(this.buId).subscribe({
       next: resp => this.matrixData = resp,
@@ -151,6 +159,15 @@ export class RiskPageComponent implements OnInit {
   }
 
   goToAddRisk(): void {
+    if(this.businessUnit?.process.length === 0) {
+      this.confirmService.openConfirmDialog("Impossible d'ajouter un risque", "Cette business unit ne contient aucun processus. Veuillez d'abord ajouter un processus avant de créer un risque.")
+        .subscribe(res => {
+          if(res) {
+            this.router.navigate(['reglages'], { queryParams: { buId: this.buId } });
+          }
+        })
+      return;
+    }
     this.router.navigate(['reglages', 'risks', 'create'], { queryParams: { buId: this.buId } });
   }
 }
