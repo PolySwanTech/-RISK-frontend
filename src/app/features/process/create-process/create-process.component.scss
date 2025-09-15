@@ -7,3 +7,6 @@
   .full-width {
   width: 100%;
 }
+::ng-deep .mat-mdc-dialog-surface{
+  height: auto !important;
+}

@@ -168,7 +168,7 @@ export class MatrixComponent {
     arr.forEach(risk => {
       let impact = 0;
       // let frequency = risk.dmr.at(-1)?.probability;
-      let frequency = risk.riskBrut![0].probability;
+      let frequency = risk.riskBrut![0]?.probability;
 
       if (!impact || !frequency) {
         // const last = risk.dmr?.at(-1);

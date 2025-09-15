@@ -39,7 +39,6 @@ import { ConfirmService } from '../../core/services/confirm/confirm.service';
   templateUrl: './risk-page.component.html',
   styleUrl: './risk-page.component.scss'
 })
-// ...imports inchangés...
 
 export class RiskPageComponent implements OnInit {
   selectedNiveau: RiskLevel | null = null;

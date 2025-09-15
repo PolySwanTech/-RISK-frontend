@@ -12,10 +12,12 @@ import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { EvalRiskProcessComponent } from '../create-carto/eval-risk-process/eval-risk-process.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-create-evaluation',
-  imports: [FormsModule, CommonModule, EvalRiskProcessComponent],
+  imports: [FormsModule, CommonModule, EvalRiskProcessComponent, MatFormFieldModule, MatSelectModule],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })
@@ -170,8 +172,7 @@ export class CreateEvaluationComponent implements OnInit {
   }
 
   onRiskChange(): void {
-    this.selectedBU = null;
-    this.selectedProcess = null;
+    this.currentStep = 2;
   }
 
   selectBusinessUnit(bu: ProcessNode): void {

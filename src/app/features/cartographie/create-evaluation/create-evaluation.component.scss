@@ -190,8 +190,9 @@ h2 {
     }
     
     &.selected {
-      transform: scale(1.05);
+      // transform: scale(1.05);
       box-shadow: 0 0 8px rgba(0,0,0,0.2);
+      border: rgb(0, 0, 0) solid 2px;
       z-index: 1;
     }
     

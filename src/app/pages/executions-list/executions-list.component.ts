@@ -97,14 +97,9 @@ export class ExecutionsListComponent {
     {
       columnDef: 'evaluation',
       header: 'Évaluation',
-      cell: (execution: ControlExecution) => execution.evaluation || '',
+      cell: (execution: ControlExecution) =>  EvaluationControlLabels[execution.evaluation] || '',
       filterType: 'select',
       icon: 'grading',
-      options: [
-        { value: EvaluationControl.CONFORME, label: EvaluationControlLabels.CONFORME },
-        { value: EvaluationControl.PARTIELLEMENT_CONFORME, label: EvaluationControlLabels.PARTIELLEMENT_CONFORME },
-        { value: EvaluationControl.NON_CONFORME, label: EvaluationControlLabels.NON_CONFORME }
-      ]
     },
     {
       columnDef: 'performedBy',
@@ -153,6 +148,10 @@ export class ExecutionsListComponent {
       default: return 'status-default';
     }
   }
+
+  getEvaluationLabel(v?: EvaluationControl | null): string {
+  return v ? EvaluationControlLabels[v] : '';
+}
 
   formatPriority(p?: string) { return p === 'MINIMAL' ? 'Faible' : p === 'MEDIUM' ? 'Moyenne' : 'Élevée'; }
 

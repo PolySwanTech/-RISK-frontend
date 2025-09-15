@@ -1,5 +1,14 @@
 export enum PermissionName {
-  ENTER_INCIDENT = 'ENTER_INCIDENT',
+  VIEW_TODO = 'VIEW_TODO',
+  VIEW_DASHBOARDS = 'VIEW_DASHBOARDS',
+  VIEW_INCIDENTS = 'VIEW_INCIDENTS',
+  VIEW_CARTOGRAPHIE = 'VIEW_CARTOGRAPHIE',
+  VIEW_ACTION_PLAN = 'VIEW_ACTION_PLAN',
+  VIEW_CONTROLES = 'VIEW_CONTROLES',
+  VIEW_CALCUL_FONDS_PROPRE = 'VIEW_CALCUL_FONDS_PROPRE',
+
+  VIEW_REPORTS = 'VIEW_REPORTS',
+  CREATE_INCIDENT = 'CREATE_INCIDENT',
   TRACK_INCIDENT = 'TRACK_INCIDENT',
   ATTACH_DOCUMENT = 'ATTACH_DOCUMENT',
   ANALYZE_INCIDENT = 'ANALYZE_INCIDENT',
@@ -20,9 +29,6 @@ export enum PermissionName {
   MANAGE_CONTROLS = 'MANAGE_CONTROLS',
   CONFIGURE_WORKFLOWS = 'CONFIGURE_WORKFLOWS',
   PERFORM_MAINTENANCE = 'PERFORM_MAINTENANCE',
-  VIEW_DASHBOARDS = 'VIEW_DASHBOARDS',
-  VIEW_REPORTS = 'VIEW_REPORTS',
-  VIEW_INCIDENTS = 'VIEW_INCIDENTS'
 }
 
 export type PermissionNameType = `${PermissionName}`;
@@ -30,7 +36,16 @@ export type PermissionNameType = `${PermissionName}`;
 type PermissionLabelsType = Record<PermissionName, string>;
 
 export const PermissionLabels: PermissionLabelsType = {
-  [PermissionName.ENTER_INCIDENT]: 'Saisir un incident',
+  [PermissionName.VIEW_TODO]: 'Voir les tâches',
+  [PermissionName.VIEW_DASHBOARDS]: 'Voir les tableaux de bord',
+  [PermissionName.VIEW_INCIDENTS]: 'Voir les incidents',
+  [PermissionName.VIEW_CARTOGRAPHIE]: 'Voir la cartographie',
+  [PermissionName.VIEW_ACTION_PLAN]: 'Voir le plan d’action',
+  [PermissionName.VIEW_CONTROLES]: 'Voir les contrôles',
+  [PermissionName.VIEW_CALCUL_FONDS_PROPRE]: 'Voir le calcul des fonds propres',
+
+  
+  [PermissionName.CREATE_INCIDENT]: 'Saisir un incident',
   [PermissionName.TRACK_INCIDENT]: 'Suivre un incident',
   [PermissionName.ATTACH_DOCUMENT]: 'Joindre un document',
   [PermissionName.ANALYZE_INCIDENT]: 'Analyser un incident',
@@ -51,7 +66,5 @@ export const PermissionLabels: PermissionLabelsType = {
   [PermissionName.MANAGE_CONTROLS]: 'Gérer les contrôles',
   [PermissionName.CONFIGURE_WORKFLOWS]: 'Configurer les workflows',
   [PermissionName.PERFORM_MAINTENANCE]: 'Effectuer la maintenance',
-  [PermissionName.VIEW_DASHBOARDS]: 'Voir les tableaux de bord',
-  [PermissionName.VIEW_REPORTS]: 'Voir les rapports',
-  [PermissionName.VIEW_INCIDENTS]: 'Voir les incidents'
+  [PermissionName.VIEW_REPORTS]: 'Voir les rapports'
 };
