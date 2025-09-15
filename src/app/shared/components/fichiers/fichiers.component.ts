@@ -55,7 +55,7 @@ export class FichiersComponent {
 
   isDragOver = false;
 
-  constructor(private dialogRef: MatDialogRef<FichiersComponent>, @Optional() @Inject(MAT_DIALOG_DATA) public data?: {
+  constructor(@Optional() public dialogRef: MatDialogRef<FichiersComponent>, @Optional() @Inject(MAT_DIALOG_DATA) public data?: {
     files?: UploadedFile[];
     targetType?: TargetType;
     targetId?: string;

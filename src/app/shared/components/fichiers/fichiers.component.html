@@ -5,7 +5,7 @@
             <mat-card-title class="files-header">
                 <span>Pièces jointes</span>
             </mat-card-title>
-            <button mat-icon-button aria-label="Fermer" (click)="closePopup()" class="close-popup-btn">
+            <button [hidden]="!dialogRef" mat-icon-button aria-label="Fermer" (click)="closePopup()" class="close-popup-btn">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-card-header>
