@@ -27,15 +27,27 @@ import { OperatingLossService } from '../../../core/services/operating-loss/oper
 import { saveAs } from 'file-saver';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { OperatingLoss } from '../../../core/models/OperatingLoss';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+
+
+type ImpactRow = {
+  bl: string;
+  brut: number;
+  net: number; 
+  final: number;
+  nonFinancialLabels: string[];
+};
+
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
     MatGridListModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
-    FichiersComponent, ListSuiviComponent],
+    FichiersComponent, ListSuiviComponent, MatTableModule],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss'
 })
+
 export class ViewComponent implements OnInit {
 
   private incidentService = inject(IncidentService);
@@ -61,6 +73,51 @@ export class ViewComponent implements OnInit {
 
   operatingLosses: OperatingLoss[] = [];
 
+  impactRows: ImpactRow[] = [];
+  impactDataSource = new MatTableDataSource<ImpactRow>([]);
+
+
+  
+  columns = [
+  {
+    columnDef: 'bl',
+    header: 'Business Line',
+    cell: (row: ImpactRow) => row.bl,
+    filterType: 'text',
+    icon: 'business'
+  },
+  {
+    columnDef: 'brut',
+    header: 'Montant brut',
+    cell: (row: ImpactRow) => row.brut,
+    type: 'currency',
+    icon: 'euro'
+  },
+  {
+    columnDef: 'net',
+    header: 'Montant net',
+    cell: (row: ImpactRow) => row.net,
+    type: 'currency',
+    icon: 'euro'
+  },
+  {
+    columnDef: 'final',
+    header: 'Montant final',
+    cell: (row: ImpactRow) => row.final,
+    type: 'currency',
+    icon: 'euro'
+  },
+  {
+    columnDef: 'nonFinancial',
+    header: 'Impacts non financiers',
+    cell: (row: ImpactRow) => row.nonFinancialLabels.join(', ') || '—',
+    filterType: 'text',
+    icon: 'tips_and_updates'
+  }
+];
+displayedImpactColumns = this.columns.map(c => c.columnDef);
+
+
   ngOnInit(): void {
     this.entitiesService.loadEntities().subscribe(entities => {
       this.businessUnits = entities;
@@ -68,11 +125,14 @@ export class ViewComponent implements OnInit {
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident)
 
-    if (this.idIncident) {
-      this.impactService.listByIncident(this.idIncident).subscribe(
-        result => this.operatingLosses = result
-      )
-    }
+  if (this.idIncident) {
+    this.impactService.listByIncident(this.idIncident).subscribe(result => {
+    this.operatingLosses = result;
+    this.impactRows = this.buildImpactRows(this.operatingLosses);
+    this.impactDataSource.data = this.impactRows;
+  });
+}
+
   }
 
   async loadIncident(id: string) {
@@ -121,7 +181,6 @@ export class ViewComponent implements OnInit {
   canShowActions(): boolean {
     return this.incident?.state !== State.VALIDATE && this.incident?.state !== State.CLOSED;
   }
-
 
   isDraft(): boolean {
     return this.incident?.state === State.DRAFT;
@@ -190,6 +249,48 @@ export class ViewComponent implements OnInit {
       }
     }
   }
+
+
+private toNumber(v: any): number {
+  const n = typeof v === 'number' ? v : (v == null ? 0 : Number(v));
+  return Number.isFinite(n) ? n : 0;
+}
+
+// “Financier” si au moins un montant est présent
+private isFinancial(loss: OperatingLoss): boolean {
+  return !!(this.toNumber((loss as any).montantBrut) ||
+            this.toNumber((loss as any).montantNet)  ||
+            this.toNumber((loss as any).montantFinal));
+}
+
+// Libellé d’un impact non financier
+private impactLabel(loss: OperatingLoss): string {
+  return (loss as any).label || (loss as any).libelle || (loss as any).description || 'Impact';
+}
+
+private buildImpactRows(losses: OperatingLoss[]): ImpactRow[] {
+  const byBL = new Map<string, ImpactRow>();
+
+  for (const loss of losses ?? []) {
+    const bl = (loss as any).entityName || (loss as any).businessLine || 'Non assigné';
+    if (!byBL.has(bl)) {
+      byBL.set(bl, { bl, brut: 0, net: 0, final: 0, nonFinancialLabels: [] });
+    }
+    const row = byBL.get(bl)!;
+
+    if (this.isFinancial(loss)) {
+      row.brut += this.toNumber((loss as any).montantBrut);
+      row.net   += this.toNumber((loss as any).montantNet);
+      row.final += this.toNumber((loss as any).montantFinal);
+    } else {
+      row.nonFinancialLabels.push(this.impactLabel(loss));
+    }
+  }
+
+  return Array.from(byBL.values()).sort((a, b) => a.bl.localeCompare(b.bl));
+}
+
+
 
   isClosed() {
     return this.incident!.closedAt !== null || false;
