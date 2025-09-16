@@ -36,7 +36,7 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, MatMenuModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, GoBackComponent,
     ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule,
-    MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule,
+    MatTooltipModule, MatSelectModule, MatFormFieldModule,
     MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent, FormsModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
