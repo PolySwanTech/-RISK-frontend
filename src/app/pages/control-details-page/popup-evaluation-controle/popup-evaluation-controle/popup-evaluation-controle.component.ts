@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
@@ -14,14 +14,15 @@ import { FichiersComponent } from '../../../../shared/components/fichiers/fichie
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { TargetType } from '../../../../core/enum/targettype.enum';
 import { FileService } from '../../../../core/services/file/file.service';
-import { ActivatedRoute } from '@angular/router';
+import { PopupHeaderComponent } from '../../../../shared/components/popup-header/popup-header.component';
+import { MatCardModule } from '@angular/material/card';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
   selector: 'app-popup-evaluation-controle',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIcon],
+  imports: [CommonModule, FormsModule, MatIcon, PopupHeaderComponent, MatCardModule],
   templateUrl: './popup-evaluation-controle.component.html',
   styleUrls: ['./popup-evaluation-controle.component.scss']
 })
@@ -60,10 +61,11 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   private controlService = inject(ControlService);
   private confirmService = inject(ConfirmService);
   private snackBarService = inject(SnackBarService);
+  dialogRef = inject(MatDialogRef<PopupEvaluationControleComponent>);
 
   actionTaken: 'valid' | 'reexam' | null = null;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private dialogRef: MatDialogRef<PopupEvaluationControleComponent>) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, ) {
   }
 
   ngOnInit(): void {

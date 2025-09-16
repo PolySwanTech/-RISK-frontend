@@ -14,6 +14,7 @@ import { FileService } from '../../../core/services/file/file.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TargetType } from '../../../core/enum/targettype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { PopupHeaderComponent } from '../popup-header/popup-header.component';
 
 export interface UploadedFile {
   id: string;
@@ -29,7 +30,7 @@ export interface UploadedFile {
 @Component({
   selector: 'app-fichiers',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
-    MatGridListModule, MatButtonModule, MatFormFieldModule,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, PopupHeaderComponent,
     MatInputModule, MatTooltipModule, CommonModule],
   templateUrl: './fichiers.component.html',
   styleUrl: './fichiers.component.scss'
