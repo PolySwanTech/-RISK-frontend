@@ -74,7 +74,6 @@ export class TodoComponent implements OnInit {
   }
 
   shouldShowGroup(type : ToDoType): boolean {
-    console.log(this.currentTypeFilter.value == null || this.currentTypeFilter.value === type);
     return this.currentTypeFilter.value == null || this.currentTypeFilter.value === type;
   }
 

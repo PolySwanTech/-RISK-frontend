@@ -27,23 +27,26 @@ import { FilterTableComponent } from "../../shared/components/filter-table/filte
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../shared/components/global-search-bar/global-search-bar.component";
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { MatMenu, MatMenuModule } from '@angular/material/menu';
+import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-plan-action-page',
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, FormsModule, GoBackComponent,
-    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule,
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, MatMenuModule,
     MatSelectModule, MatFormFieldModule, MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent],
   providers: [DatePipe],
   templateUrl: './plan-action-page.component.html',
   styleUrl: './plan-action-page.component.scss'
 })
-export class PlanActionPageComponent implements OnInit{
+export class PlanActionPageComponent implements OnInit {
   private dialog = inject(MatDialog);
   private datePipe = inject(DatePipe)
   private router = inject(Router);
   private confirmService = inject(ConfirmService)
   private actionPlanService = inject(ActionPlanService);
+  private snackBarService = inject(SnackBarService);
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -112,11 +115,11 @@ export class PlanActionPageComponent implements OnInit{
     }
   ];
 
-  goBackButtons : GoBackButton[]  = [];
+  goBackButtons: GoBackButton[] = [];
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
-  displayedColumns = [...this.columns.map(c => c.columnDef)];
+  displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
 
   dataSource = new MatTableDataSource<any>([]);
 
@@ -127,11 +130,14 @@ export class PlanActionPageComponent implements OnInit{
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatMenu) rowMenu! : MatMenu;
 
   dateFilter = new FormControl('');
   priorityFilter = new FormControl('');
   statusFilter = new FormControl('');
 
+
+  selectedActionPlan : ActionPlan | null = null;
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -185,6 +191,13 @@ export class PlanActionPageComponent implements OnInit{
         <span class="priority-label ${config.class}">${config.label}</span>
       </div>
     `;
+  }
+
+  delete(actionPlan : ActionPlan){
+    this.actionPlanService.delete(actionPlan.id).subscribe(_ =>  {
+      this.snackBarService.info("Plan d'action supprimé");
+      this.ngOnInit();
+    })
   }
 
   formatPriority(p: Priority): string {

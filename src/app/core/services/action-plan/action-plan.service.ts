@@ -44,4 +44,8 @@ export class ActionPlanService {
   finishAction(actionId : string){
     return this.http.put(this.base + '/actions/finish/' + actionId, null);
   }
+
+  delete(id : string){
+    return this.http.put(this.base + '/' + id + '/deactivate', {})
+  }
 }
