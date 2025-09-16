@@ -92,19 +92,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     },
 
     {
-      columnDef: 'riskLevel',
-      header: 'Degré de risque',
-      cell: (e: ControlTemplate) => this.getRiskLabel(e.riskLevel.name),
-      isBadge: 'risk',
-      filterType: 'select',
-      options: Object.values(RiskLevelEnum).map(key => ({
-        value: key,
-        label: RiskLevelLabels[key]
-      })),
-      icon: 'report_problem' // ⚠️
-    },
-
-    {
       columnDef: 'Fréquence',
       header: 'Fréquence',
       cell: (e: ControlTemplate) => this.getRecurrenceLabel(e.frequency),
