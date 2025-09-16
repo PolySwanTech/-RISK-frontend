@@ -36,7 +36,7 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, MatMenuModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, GoBackComponent,
     ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule,
-    MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule,
+    MatTooltipModule, MatSelectModule, MatFormFieldModule,
     MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent, FormsModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
@@ -45,7 +45,6 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
 
 export class ListComponent implements OnInit {
 
-  private dialog = inject(MatDialog);
   private incidentService = inject(IncidentService)
   private datePipe = inject(DatePipe)
   private router = inject(Router);
@@ -178,6 +177,7 @@ export class ListComponent implements OnInit {
         }
       })
   }
+  
   toggleIncidentSelection(incidentId: string) {
     if (this.selectedIncidents.has(incidentId)) {
       this.selectedIncidents.delete(incidentId);
