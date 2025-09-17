@@ -30,15 +30,6 @@ export class AuditService {
         targetType: targetType
       }
     })
-      .afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.snackBarService.info("Action abandonnée avec succès.")
-        }
-        else {
-          this.snackBarService.info("Action non-abandonnée.")
-        }
-      })
   }
 
 }

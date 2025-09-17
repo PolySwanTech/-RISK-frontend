@@ -48,4 +48,8 @@ export class ActionPlanService {
   delete(id : string){
     return this.http.put(this.base + '/' + id + '/deactivate', {})
   }
+
+  abandonAction(id : string){
+    return this.http.put(this.base + '/action/' + id + '/deactivate', {})
+  }
 }

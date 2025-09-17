@@ -62,6 +62,7 @@ export class PlanActionPageDetailComponent {
   statusEnum = Status;
 
   abandonedActions : Action[] = []
+  actions : Action[] = []
 
 
   ngOnInit() {
@@ -83,8 +84,10 @@ export class PlanActionPageDetailComponent {
         this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
       }
 
+      this.actions = this.actionPlan.actions.filter(a => a.actif == true);
+
       // TODO : récupérer les actions abandonnées
-      this.abandonedActions = this.actionPlan.actions;
+      this.abandonedActions = this.actionPlan.actions.filter(a => a.actif == false);
 
       // règles d’affichage
       const st = this.actionPlan?.status;
@@ -150,6 +153,20 @@ export class PlanActionPageDetailComponent {
 
   abandon(action : Action){
     this.auditService.openAuditDialog(action.id, TargetType.ACTION_PLAN)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.actionPlanService.abandonAction(action.id).subscribe(
+            _ => {
+              this.snackBarService.info("Action abandonnée avec succès.")
+              this.ngOnInit();
+            }
+          )
+        }
+        else {
+          this.snackBarService.info("Action non-abandonnée.")
+        }
+      })
   }
 
   getCompletedCount(actions: Action[]): number {
