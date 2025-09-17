@@ -27,12 +27,16 @@ import { OperatingLossService } from '../../../core/services/operating-loss/oper
 import { saveAs } from 'file-saver';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { OperatingLoss } from '../../../core/models/OperatingLoss';
+import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
+import { AuditButtonComponent } from '../../../shared/components/audit/audit-button/audit-button.component';
+
+
 @Component({
   selector: 'app-view',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
     MatGridListModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
-    FichiersComponent, ListSuiviComponent],
+    FichiersComponent, AuditButtonComponent],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss'
 })
@@ -105,7 +109,7 @@ export class ViewComponent implements OnInit {
         icon: 'description',
         class: 'btn-green',
         show: !this.isDraft(),
-        action: () => this.downloadPDF() 
+        action: () => this.downloadPDF()
       },
       {
         label: 'Clôturer',

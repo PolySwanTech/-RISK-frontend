@@ -1,0 +1,30 @@
+.custom-drawer {
+  padding : 15px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 25vw;
+  height: 100vh;
+  background: white; // Fond blanc semi-transparent
+  box-shadow: -2px 0 10px gray;
+  z-index: 9999;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  overflow-y: auto;
+  pointer-events: auto;
+  border-radius: 10px;
+}
+
+.custom-drawer.open {
+  transform: translateX(0%);
+}
+
+.audit-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  pointer-events: auto;
+  z-index: 10000;
+  background-color: #1976d2;
+  color: white;
+}

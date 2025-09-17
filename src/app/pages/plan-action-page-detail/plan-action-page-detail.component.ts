@@ -14,7 +14,6 @@ import { ActionPlanService } from '../../core/services/action-plan/action-plan.s
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
-import { AuthService } from '../../core/services/auth/auth.service';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
 import { firstValueFrom } from 'rxjs';
@@ -26,15 +25,15 @@ import { ConfirmService } from '../../core/services/confirm/confirm.service';
 import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
 import { AddActionDialogComponent } from '../../features/action-plan/add-action-dialog/add-action-dialog.component';
 import { MatTabsModule } from '@angular/material/tabs';
-import { AuditComponent } from '../../shared/components/audit/audit.component';
 import { AuditService } from '../../core/services/audit/audit.service';
 import { AuditPanelComponent } from '../../shared/components/audit/audit-panel/audit-panel.component';
 import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
+import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
 
 @Component({
   selector: 'app-plan-action-page-detail',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, MatDrawerContainer, MatDrawer, AuditPanelComponent,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, AuditButtonComponent,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
