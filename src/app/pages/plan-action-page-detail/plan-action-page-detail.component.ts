@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,16 +28,21 @@ import { AddActionDialogComponent } from '../../features/action-plan/add-action-
 import { MatTabsModule } from '@angular/material/tabs';
 import { AuditComponent } from '../../shared/components/audit/audit.component';
 import { AuditService } from '../../core/services/audit/audit.service';
+import { AuditPanelComponent } from '../../shared/components/audit/audit-panel/audit-panel.component';
+import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-plan-action-page-detail',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, MatDrawerContainer, MatDrawer, AuditPanelComponent,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
 export class PlanActionPageDetailComponent {
+
+  @ViewChild('auditDrawer') auditDrawer!: MatDrawer;
+
 
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
@@ -61,8 +66,8 @@ export class PlanActionPageDetailComponent {
 
   statusEnum = Status;
 
-  abandonedActions : Action[] = []
-  actions : Action[] = []
+  abandonedActions: Action[] = []
+  actions: Action[] = []
 
 
   ngOnInit() {
@@ -140,8 +145,8 @@ export class PlanActionPageDetailComponent {
     });
   }
 
-  canAbandonAction(action : Action){
-    return action.performedAt == null && this.actionPlan?.status != Status.ACHIEVED && this.actionPlan?.status != Status.CANCELLED 
+  canAbandonAction(action: Action) {
+    return action.performedAt == null && this.actionPlan?.status != Status.ACHIEVED && this.actionPlan?.status != Status.CANCELLED
   }
 
   validateAction(actionId: string) {
@@ -151,7 +156,7 @@ export class PlanActionPageDetailComponent {
     )
   }
 
-  abandon(action : Action){
+  abandon(action: Action) {
     this.auditService.openAuditDialog(action.id, TargetType.ACTION_PLAN)
       .afterClosed()
       .subscribe(result => {
@@ -281,6 +286,15 @@ export class PlanActionPageDetailComponent {
 
   goToIncident() {
     this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
+  }
+
+  openAuditPanel() {
+    if (this.auditDrawer.opened) {
+      this.auditDrawer.close();
+    }
+    else{
+      this.auditDrawer.open();
+    }
   }
 
 }

@@ -11,17 +11,6 @@ import { SnackBarService } from '../snack-bar/snack-bar.service';
 })
 export class AuditService {
 
-  private http = inject(HttpClient);
-  private dialog = inject(MatDialog);
-  private snackBarService = inject(SnackBarService);
-
-  private baseUrl = environment.apiUrl + '/audit'
-
-  trace(targetId: string, targetType: TargetType, comments: string) {
-    const params = new HttpParams().set("targetId", targetId).set("type", targetType);
-    return this.http.post(this.baseUrl, comments, { params: params });
-  }
-
   openAuditDialog(targetId: string, targetType: TargetType) {
     return this.dialog.open(AuditComponent, {
       width: '120vw',
@@ -30,6 +19,20 @@ export class AuditService {
         targetType: targetType
       }
     })
+  }
+
+  private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
+
+  private baseUrl = environment.apiUrl + '/audit'
+
+  trace(targetId: string, targetType: TargetType, comments: string) {
+    const params = new HttpParams().set("targetId", targetId).set("type", targetType);
+    return this.http.post(this.baseUrl, comments, { params: params });
+  }
+
+  getAudit(){
+    return this.http.get<any[]>(this.baseUrl);
   }
 
 }

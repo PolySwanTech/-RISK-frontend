@@ -27,7 +27,7 @@ export class AuditComponent {
   confirm(){
     this.auditService.trace(this.data.targetId, this.data.targetType, this.comments).subscribe(
       _ => {
-        this.dialogRef.close(true);
+        this.dialogRef.close(this.comments);
       }
     )
   }

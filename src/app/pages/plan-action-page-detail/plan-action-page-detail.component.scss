@@ -234,3 +234,40 @@ mat-card-content {
     justify-content: center;
     align-items: center;
 }
+
+.audit-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  background-color: #1976d2; /* bleu mat */
+  color: white;
+}
+
+
+.audit-drawer-container {
+  height: 100vh;
+  width: 85vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.audit-drawer {
+  width: 25vw;
+  min-width: 320px;
+  max-width: 400px;
+  height: 100vh;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  background-color: #fff;
+  z-index: 1000;
+}
+
+.audit-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1100;
+  background-color: #1976d2;
+  color: white;
+}
