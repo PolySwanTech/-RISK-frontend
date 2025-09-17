@@ -50,7 +50,7 @@ export class ControlService {
     return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${queryString}`);
   }
 
-  getAllTemplatesByProcessAndRisk(selectedProcess: Process, selectedRisk: RiskTemplate) {
+  getAllTemplatesByProcessAndRisk(selectedProcess: any, selectedRisk: RiskTemplate) {
     return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`)
   }
 
