@@ -31,8 +31,9 @@ export class AuditService {
     return this.http.post(this.baseUrl, comments, { params: params });
   }
 
-  getAudit(){
-    return this.http.get<any[]>(this.baseUrl);
+  getAudit(id : string, type : TargetType){
+    const params = new HttpParams().set("targetId", id).set("targetType", type);
+    return this.http.get<any[]>(this.baseUrl, {params : params});
   }
 
 }

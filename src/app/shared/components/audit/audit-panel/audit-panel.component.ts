@@ -14,7 +14,7 @@ import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.s
 export class AuditPanelComponent implements OnInit {
 
   @Input() contextId!: string;
-  @Input() contextType!: string;
+  @Input() contextType!: TargetType;
 
   auditList: any[] = []
 
@@ -23,7 +23,7 @@ export class AuditPanelComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.auditService.getAudit().subscribe(
+    this.auditService.getAudit(this.contextId, this.contextType).subscribe(
       list => this.auditList = list
     )
   }

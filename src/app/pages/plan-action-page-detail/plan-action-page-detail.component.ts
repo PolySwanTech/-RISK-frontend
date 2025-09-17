@@ -64,6 +64,7 @@ export class PlanActionPageDetailComponent {
   goBackButtons: GoBackButton[] = []
 
   statusEnum = Status;
+  targetTypeEnum = TargetType;
 
   abandonedActions: Action[] = []
   actions: Action[] = []
