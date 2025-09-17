@@ -8,10 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-add-action-dialog',
-  imports: [FormsModule, CommonModule, MatFormFieldModule, MatIconModule, MatInputModule],
+  imports: [FormsModule, CommonModule, MatFormFieldModule, PopupHeaderComponent,
+     MatIconModule, MatInputModule, MatCardModule],
   templateUrl: './add-action-dialog.component.html',
   styleUrl: './add-action-dialog.component.scss'
 })
@@ -40,6 +43,10 @@ export class AddActionDialogComponent implements OnInit{
         this.dialogRef.close(false);
       }
     });
+  }
+  
+  closePopup(){
+    this.dialogRef.close();
   }
 
   addAction(){

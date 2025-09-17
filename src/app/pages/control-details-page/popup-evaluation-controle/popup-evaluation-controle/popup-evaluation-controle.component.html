@@ -1,97 +1,95 @@
-<div class="popup-overlay" *ngIf="!showAsCard" (click)="cancel()">
-    <div class="rv-modal" [ngClass]="{
-    'rv-modal--form': mode === 'FORM',
-    'rv-modal--blockers': mode === 'BLOCKERS',
-    'rv-modal--details': mode === 'DETAILS'
-  }" (click)="$event.stopPropagation()">
+<mat-card>
+    <div class="popup-overlay" *ngIf="!showAsCard" (click)="cancel()">
+        <div class="rv-modal" [ngClass]="{
+            'rv-modal--form': mode === 'FORM',
+            'rv-modal--blockers': mode === 'BLOCKERS',
+            'rv-modal--details': mode === 'DETAILS'
+        }" (click)="$event.stopPropagation()">
+            <app-popup-header [title]="
+                    mode === 'DETAILS' 
+                        ? (actionTaken === 'valid' ? 'Détail de l’évaluation' : 'Détail du réexamen') 
+                        : (mode === 'FORM' ? 'Évaluer le contrôle' : 'Évaluations en attente')
+                    " [showClose]="true" (close)="cancel()"></app-popup-header>
 
-        <div class="rv-modal__header">
-            <div class="rv-modal__title">
-                <span class="rv-emoji">🧾</span>
-                {{ mode === 'DETAILS' ? actionTaken == 'valid' ? "Détail de l’évaluation" : "Détail du réexamen"
-                : mode === 'FORM' ? "Évaluer le contrôle"
-                : "Évaluations en attente" }}
+            <div class="rv-modal__body">
+                <ng-container [ngSwitch]="mode">
+
+                    <div *ngSwitchCase="'BLOCKERS'">
+                        <p>Vous devez d’abord évaluer les exécutions précédentes :</p>
+
+                        <div class="list">
+                            <div class="item" *ngFor="let b of blockers">
+                                <div class="left">
+                                    <div class="date">Planifiée le {{ b.plannedAt | date: 'dd/MM/yyyy' }}</div>
+                                    <div class="who">Attribuée à {{ b.performedBy }}</div>
+                                    <span class="badge small" [ngClass]="{
+                      'status-realise': b.status === 'ACHIEVED',
+                      'status-en-cours': b.status === 'IN_PROGRESS',
+                      'status-non-realise': b.status === 'NOT_ACHIEVED'
+                    }">
+                                        {{ b.status }}
+                                    </span>
+                                </div>
+                                <div class="right">
+                                    <button class="btn btn-primary" (click)="startEvaluationFor(b.id)">Évaluer
+                                        maintenant</button>
+                                    <button class="btn btn-outline" (click)="openDetails(b.id)">Détails</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form *ngSwitchCase="'FORM'" (ngSubmit)="submit()" #form="ngForm">
+                        <div class="form-group">
+                            <label for="evaluation">Évaluation</label>
+                            <select [(ngModel)]="evaluationData.evaluation" name="evaluation" required>
+                                <option *ngFor="let option of evaluationOptions" [value]="option">
+                                    {{ labels[option] }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resume">Résumé</label>
+                            <textarea [(ngModel)]="evaluationData.resume" name="resume" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="comments">Commentaires</label>
+                            <textarea [(ngModel)]="evaluationData.comments" name="comments"></textarea>
+                        </div>
+                    </form>
+
+                    <div *ngSwitchCase="'DETAILS'">
+                        <ng-container *ngIf="evalDetails; else noEvalYet">
+                            <div class="rv-section" *ngIf="canValidate && evalDetails.reviewStatus === 'PENDING'">
+                                <div class="rv-section__label">Votre retour (obligatoire)</div>
+                                <textarea [(ngModel)]="reviewComment" rows="3" class="rv-textarea"
+                                    placeholder="Votre avis / décision..."></textarea>
+                            </div>
+                        </ng-container>
+
+                        <ng-template #noEvalYet>
+                            <p>Pas d’évaluation soumise pour cette exécution.</p>
+                        </ng-template>
+                    </div>
+
+                </ng-container>
+            </div>
+
+            <ng-container>
+                <button mat-raised-button class="btn-primary" (click)="viewFiles()">
+                    <mat-icon>upload</mat-icon>
+                    Déposer un justificatif
+                </button>
+            </ng-container>
+
+            <div class="rv-modal__footer">
+                <ng-container>
+                    <button class="btn btn-primary winter-style" (click)="handleAction()">OK</button>
+                    <button class="btn btn-secondary" (click)="cancel()">Fermer</button>
+                </ng-container>
             </div>
         </div>
-
-        <div class="rv-modal__body">
-            <ng-container [ngSwitch]="mode">
-
-                <div *ngSwitchCase="'BLOCKERS'">
-                    <p>Vous devez d’abord évaluer les exécutions précédentes :</p>
-
-                    <div class="list">
-                        <div class="item" *ngFor="let b of blockers">
-                            <div class="left">
-                                <div class="date">Planifiée le {{ b.plannedAt | date: 'dd/MM/yyyy' }}</div>
-                                <div class="who">Attribuée à {{ b.performedBy }}</div>
-                                <span class="badge small" [ngClass]="{
-                  'status-realise': b.status === 'ACHIEVED',
-                  'status-en-cours': b.status === 'IN_PROGRESS',
-                  'status-non-realise': b.status === 'NOT_ACHIEVED'
-                }">
-                                    {{ b.status }}
-                                </span>
-                            </div>
-                            <div class="right">
-                                <button class="btn btn-primary" (click)="startEvaluationFor(b.id)">Évaluer
-                                    maintenant</button>
-                                <button class="btn btn-outline" (click)="openDetails(b.id)">Détails</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <form *ngSwitchCase="'FORM'" (ngSubmit)="submit()" #form="ngForm">
-                    <div class="form-group">
-                        <label for="evaluation">Évaluation</label>
-                        <select [(ngModel)]="evaluationData.evaluation" name="evaluation" required>
-                            <option *ngFor="let option of evaluationOptions" [value]="option">
-                                {{ labels[option] }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="resume">Résumé</label>
-                        <textarea [(ngModel)]="evaluationData.resume" name="resume" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="comments">Commentaires</label>
-                        <textarea [(ngModel)]="evaluationData.comments" name="comments"></textarea>
-                    </div>
-                </form>
-
-                <div *ngSwitchCase="'DETAILS'">
-                    <ng-container *ngIf="evalDetails; else noEvalYet">
-                        <div class="rv-section" *ngIf="canValidate && evalDetails.reviewStatus === 'PENDING'">
-                            <div class="rv-section__label">Votre retour (obligatoire)</div>
-                            <textarea [(ngModel)]="reviewComment" rows="3" class="rv-textarea"
-                                placeholder="Votre avis / décision..."></textarea>
-                        </div>
-                    </ng-container>
-
-                    <ng-template #noEvalYet>
-                        <p>Pas d’évaluation soumise pour cette exécution.</p>
-                    </ng-template>
-                </div>
-
-            </ng-container>
-        </div>
-
-        <ng-container>
-            <button mat-raised-button class="btn-primary" (click)="viewFiles()">
-                <mat-icon>upload</mat-icon>
-                Déposer un justificatif
-            </button>
-        </ng-container>
-
-        <div class="rv-modal__footer">
-            <ng-container>
-                <button class="btn btn-primary winter-style" (click)="handleAction()">OK</button>
-                <button class="btn btn-secondary" (click)="cancel()">Fermer</button>
-            </ng-container>
-        </div>
     </div>
-</div>
+</mat-card>

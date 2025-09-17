@@ -10,6 +10,8 @@ export class Action {
     performedAt: string;
     fileName: string;
 
+    actif : boolean = true
+
     constructor(
         id: string,
         name: string,

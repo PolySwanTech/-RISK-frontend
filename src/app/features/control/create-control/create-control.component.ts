@@ -1,7 +1,7 @@
 import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
+import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,6 +22,8 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
+import { MatIconModule } from '@angular/material/icon';
+import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 
 @Component({
   selector: 'app-create-control',
@@ -34,7 +36,7 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
     MatDatepickerModule,
     MatNativeDateModule,
     FormsModule, MatButtonModule, ReactiveFormsModule,
-    SelectArborescenceComponent
+    SelectArborescenceComponent, MatIconModule, PopupHeaderComponent
   ],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
@@ -163,12 +165,16 @@ export class CreateControlComponent {
     this.controlService.createControl(payload).subscribe({
       next: () => {
         this.snackBarService.success("Le contrôle a bien été ajouté");
-        this.dialogRef.close(true);
+        this.closePopup();
       },
       error: err => {
         this.snackBarService.error(err.message);
       }
     });
+  }
+
+  closePopup() {
+    this.dialogRef.close();
   }
 
   trackById = (index: number, item: { id: string }) => item.id;
