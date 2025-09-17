@@ -27,7 +27,7 @@ import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 
 @Component({
   selector: 'app-create-evaluation',
-  imports: [FormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatrixComponent, MatCardModule, MatChipsModule, FormsModule,
+  imports: [FormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatCardModule, MatChipsModule, FormsModule,
     ReactiveFormsModule,
     MatStepperModule,
     MatButtonModule],

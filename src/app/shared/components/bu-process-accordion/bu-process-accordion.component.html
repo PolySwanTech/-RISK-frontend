@@ -1,0 +1,47 @@
+<div class="bp-wrapper">
+  <div class="breadcrumb" *ngIf="breadcrumb.length">
+    <button mat-button class="crumb" *ngFor="let c of breadcrumb; let i = index" (click)="jumpTo(i)">
+      <mat-icon>chevron_left</mat-icon>
+      <span>{{ c.name }}</span>
+    </button>
+  </div>
+
+  <div class="list-panel">
+    <!-- BU list -->
+    <div *ngIf="view === 'bu'" class="bu-list">
+      <h3 class="panel-title">Unités Métiers</h3>
+      <mat-list>
+        <mat-list-item *ngFor="let bu of data" (click)="enterBu(bu)">
+          <div mat-line><h3>{{ bu.name }}</h3></div>
+          <button mat-icon-button (click)="enterBu(bu); $event.stopPropagation()">
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+      <div *ngIf="!data?.length" class="empty">Aucune unité métier trouvée.</div>
+    </div>
+
+    <!-- Process list -->
+    <div *ngIf="view === 'process'" class="process-list">
+      <h3 class="panel-title">Processus de « {{ currentBU?.name }} »</h3>
+      <button mat-stroked-button (click)="back()">
+        <mat-icon>arrow_back</mat-icon> Retour
+      </button>
+
+      <mat-chip-listbox *ngIf="breadcrumb.length">
+        <mat-chip color="primary">{{ breadcrumbDisplay }}</mat-chip>
+      </mat-chip-listbox>
+
+      <mat-list>
+        <mat-list-item *ngFor="let p of currentBU?.process" (click)="selectProcess(p)">
+          <div mat-line><h3>{{ p.name }}</h3></div>
+          <button mat-icon-button (click)="selectProcess(p); $event.stopPropagation()">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+
+      <div *ngIf="!currentBU?.children?.length" class="empty">Aucun processus pour cette unité.</div>
+    </div>
+  </div>
+</div> 
