@@ -29,6 +29,10 @@ import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
+import { Dialog } from '@angular/cdk/dialog';
+import { MatDialog } from '@angular/material/dialog';
+import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
 
 
 @Component({
@@ -47,11 +51,12 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     GoBackComponent,
     NgIf,
     NgFor,
-    SelectArborescenceComponent,
     MatIconModule,
     MatTooltipModule,
-    MatDatepickerModule
-  ],
+    MatDatepickerModule,
+    MatChipsModule,
+    MatChipListbox
+],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
@@ -61,6 +66,7 @@ export class CreateComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
+  private dialog = inject(MatDialog)
   private incidentId = this.route.snapshot.queryParams['id'];
 
   incident: Incident | null = null;
@@ -68,6 +74,8 @@ export class CreateComponent implements OnInit {
   title = "Ajout d'un incident";
 
   today = new Date();
+
+  selectedBPR : any = null
 
 
   incidentForm1 = this._formBuilder.group({
@@ -271,8 +279,12 @@ export class CreateComponent implements OnInit {
       return;
     }
 
+   
+
     const incident = this.convertFormToIncident(false);
     incident.state = State.SUBMIT
+
+     console.log(incident)
 
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
@@ -354,6 +366,27 @@ export class CreateComponent implements OnInit {
   private _iso(v: any) {
     return v?.toISOString ? v.toISOString() : v;
   }
+
+  selectBPR(event : any){
+    this.selectedBPR = event;
+    this.incidentForm1.get('teamId')?.setValue(event.bu.id)
+    this.incidentForm3.get('processId')?.setValue(event.process.id)
+    this.incidentForm3.get('riskId')?.setValue(event.risk.id)
+    console.log()
+
+  }
+
+  create() {
+  const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
+    minWidth: '750px',
+    height: '400px',
+    maxHeight: '600px',
+  });
+
+  dialogRef.afterClosed().subscribe(event => {
+    this.selectBPR(event);
+  });
+}
 
 
 }

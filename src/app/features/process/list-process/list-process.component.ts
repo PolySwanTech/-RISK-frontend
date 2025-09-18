@@ -76,7 +76,6 @@ export class ListProcessComponent implements OnInit {
     this.expandedNodes.clear();
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.entities = entities;
-      console.log('➡️ Entités chargées :', entities);
       this.fetchProcesses(entities);
     });
 
@@ -429,7 +428,6 @@ export class ListProcessComponent implements OnInit {
   loadProcesses(bu: any) {
     this.processService.getProcessLeaf(bu.id).subscribe(processes => {
     bu.children = processes;
-    console.log('➡️ Processus chargés pour la BU', bu.name, ':', processes);
   });
 }
 
@@ -445,5 +443,9 @@ export class ListProcessComponent implements OnInit {
 
 onRiskSelected(risk: any) {
   console.log('➡️ Risque sélectionné :', risk);
+}
+
+test(event : any){
+  console.log(event)
 }
 }
