@@ -24,13 +24,14 @@ import { ControlTemplate } from '../../../core/models/ControlTemplate';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
 
 @Component({
   selector: 'app-create-evaluation',
   imports: [FormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatCardModule, MatChipsModule, FormsModule,
     ReactiveFormsModule,
     MatStepperModule,
-    MatButtonModule],
+    MatButtonModule, BuProcessAccordionComponent],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })
@@ -81,6 +82,8 @@ export class CreateEvaluationComponent implements OnInit {
 
   controls: ControlTemplate[] = [];
 
+  selectedBPR : any = null;
+
   ngOnInit(): void {
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.fetchProcesses(entities);
@@ -107,7 +110,7 @@ export class CreateEvaluationComponent implements OnInit {
     return ControlTypeLabels[controlType];
   }
 
-  gotoSteppe3(event : any) {
+  gotoSteppe3(event: any) {
     this.highestRiskLevelNet = this.highestRiskLevel;
     event.next();
   }
@@ -318,8 +321,19 @@ export class CreateEvaluationComponent implements OnInit {
     this.selectedRisk = null;
   }
 
-  onRiskChange(): void {
+  onRiskChange(event: any): void {
     this.currentStep = 2;
+    this.selectedBPR = event;
+    this.selectedBU = event.bu
+    if (this.selectedBU) {
+      this.getMatrix(this.selectedBU.id);
+      this.getFrequenciesByBu(this.selectedBU.id);
+      this.getSeveritiesByBu(this.selectedBU.id);
+    }
+
+    this.selectedProcess = event.process
+    this.selectedRisk = event.risk
+
     this.controlService.getAllTemplatesByProcessAndRisk(this.selectedProcess, this.selectedRisk!).subscribe(controls => {
       console.log(controls);
       this.controls = controls;
@@ -327,15 +341,15 @@ export class CreateEvaluationComponent implements OnInit {
   }
 
   getContrastColor(hexColor: string): string {
-  if (!hexColor) return '#000';
-  const c = hexColor.substring(1); // supprime #
-  const rgb = parseInt(c, 16); // convertit en nombre
-  const r = (rgb >> 16) & 0xff;
-  const g = (rgb >> 8) & 0xff;
-  const b = (rgb >> 0) & 0xff;
-  const yiq = (r*299 + g*587 + b*114)/1000;
-  return yiq >= 128 ? '#000' : '#fff';
-}
+    if (!hexColor) return '#000';
+    const c = hexColor.substring(1); // supprime #
+    const rgb = parseInt(c, 16); // convertit en nombre
+    const r = (rgb >> 16) & 0xff;
+    const g = (rgb >> 8) & 0xff;
+    const b = (rgb >> 0) & 0xff;
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? '#000' : '#fff';
+  }
 
   selectBusinessUnit(bu: ProcessNode): void {
     this.selectedBU = bu;
@@ -358,7 +372,7 @@ export class CreateEvaluationComponent implements OnInit {
     }
   }
 
-  saveEvaluation(stepper : any): void {
+  saveEvaluation(stepper: any): void {
     // Préparer les données pour l'enregistrement
     const evaluationData = {
       riskId: this.selectedRisk?.id.id,
@@ -371,7 +385,7 @@ export class CreateEvaluationComponent implements OnInit {
     };
 
     console.log(evaluationData);
-    
+
     stepper.next();
     // this.evaluationSrv.save(evaluationData).subscribe({
     //   next: () => {

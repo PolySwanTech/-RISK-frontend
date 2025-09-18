@@ -445,7 +445,4 @@ onRiskSelected(risk: any) {
   console.log('➡️ Risque sélectionné :', risk);
 }
 
-test(event : any){
-  console.log(event)
-}
 }

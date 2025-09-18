@@ -2,8 +2,13 @@
   <!-- Étape 1 : Sélection -->
   <mat-step>
     <ng-template matStepLabel>Sélection</ng-template>
-
-    <h2>Sélection de l'Unité Métier</h2>
+    <app-bu-process-accordion (riskSelected)="onRiskChange($event)"></app-bu-process-accordion>
+    <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
+              <mat-chip> Unité métier : {{ selectedBPR.bu.name }}</mat-chip>
+              <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
+              <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
+            </mat-chip-listbox>
+    <!-- <h2>Sélection de l'Unité Métier</h2>
     <div class="business-units">
       <div *ngFor="let bu of hierarchicalProcesses" class="business-unit" [class.active]="selectedBU?.name === bu.name"
         (click)="selectBusinessUnit(bu)">
@@ -14,7 +19,6 @@
     <div *ngIf="selectedBU">
       <h2>Sélection du Processus</h2>
 
-      <!-- Cas où la liste est vide -->
       <div *ngIf="!selectedBU.children?.length" class="empty-message">
         <mat-card class="empty-card">
           <mat-card-content>
@@ -23,7 +27,6 @@
         </mat-card>
       </div>
 
-      <!-- Cas où la liste contient des processus -->
       <div *ngIf="selectedBU.children?.length" class="processes">
         <div *ngFor="let p of selectedBU.children" class="process-container">
           <div class="process-card" [class.selected]="selectedProcess?.id === p.id" (click)="selectProcess(p)">
@@ -42,7 +45,6 @@
     <div *ngIf="selectedProcess" class="selection-panel">
       <h2>Sélection du Risque</h2>
 
-      <!-- Cas où la liste est vide -->
       <div *ngIf="!risks?.length" class="empty-message">
         <mat-card class="empty-card">
           <mat-card-content>
@@ -51,7 +53,6 @@
         </mat-card>
       </div>
 
-      <!-- Cas où la liste contient des risques -->
       <div *ngIf="risks?.length">
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Type de risque</mat-label>
@@ -63,7 +64,7 @@
           </mat-select>
         </mat-form-field>
       </div>
-    </div>
+    </div> -->
 
     <div style="margin-top: 20px;">
       <button mat-raised-button class="btn-primary" (click)="stepper.next()"

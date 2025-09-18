@@ -63,6 +63,13 @@ export class BuProcessAccordionComponent {
   hierarchicalProcesses: any[] = [];
   filteredProcesses: ProcessNode[] = [];
 
+  // Recherche globale
+  searchQuery: string = '';
+  searchResults: any[] = [];
+  isSearching: boolean = false;
+  showSearchResults: boolean = false;
+  allRisks: any[] = []; // Cache de tous les risques pour la recherche
+
   ngOnInit() {
     this.entityService.loadEntitiesTree().subscribe((entitiesTree: any) => {
       this.entities = entitiesTree;
@@ -77,7 +84,102 @@ export class BuProcessAccordionComponent {
       this.buildHierarchy(allEntities);
       this.filteredProcesses = [...this.hierarchicalProcesses];
       this.currentNodes = this.hierarchicalProcesses;
+      // Charger tous les risques pour la recherche
+      this.loadAllRisks();
     });
+  }
+
+  // Charger tous les risques pour la recherche globale
+  private loadAllRisks(): void {
+    const processIds = this.processes.map(p => p.id);
+    const riskPromises = processIds.map(processId => 
+      this.riskService.getRisksTreeByProcessId(processId).toPromise()
+    );
+
+    Promise.allSettled(riskPromises).then(results => {
+      this.allRisks = [];
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value?.length) {
+          const processId = processIds[index];
+          const process = this.processes.find(p => p.id === processId);
+          const bu = this.findBuByProcessId(processId);
+          
+          result.value.forEach((risk: any) => {
+            this.addRiskToCache(risk, process, bu);
+          });
+        }
+      });
+      console.log('➡️ Cache des risques construit :', this.allRisks.length, 'risques');
+    });
+  }
+
+  private addRiskToCache(risk: any, process: any, bu: any): void {
+    this.allRisks.push({
+      ...risk,
+      processId: process?.id,
+      processName: process?.name,
+      buId: bu?.id,
+      buName: bu?.name,
+      type: 'risk'
+    });
+    
+    // Ajouter récursivement les sous-risques
+    if (risk.enfants?.length) {
+      risk.enfants.forEach((subRisk: any) => {
+        this.addRiskToCache(subRisk, process, bu);
+      });
+    }
+  }
+
+  private findBuByProcessId(processId: string): any {
+    for (let bu of this.hierarchicalProcesses) {
+      const process = this.findProcessInBu(bu, processId);
+      if (process) return bu;
+      
+      // Chercher dans les sous-BU
+      if (bu.buChildren) {
+        const result = this.findBuInChildren(bu.buChildren, processId);
+        if (result) return result;
+      }
+    }
+    return null;
+  }
+
+  private findProcessInBu(bu: any, processId: string): any {
+    if (bu.children) {
+      for (let process of bu.children) {
+        if (process.id === processId) return process;
+        if (process.children) {
+          const found = this.findProcessInChildren(process.children, processId);
+          if (found) return found;
+        }
+      }
+    }
+    return null;
+  }
+
+  private findBuInChildren(buChildren: any[], processId: string): any {
+    for (let child of buChildren) {
+      const process = this.findProcessInBu(child, processId);
+      if (process) return child;
+      
+      if (child.buChildren) {
+        const result = this.findBuInChildren(child.buChildren, processId);
+        if (result) return result;
+      }
+    }
+    return null;
+  }
+
+  private findProcessInChildren(children: any[], processId: string): any {
+    for (let child of children) {
+      if (child.id === processId) return child;
+      if (child.children) {
+        const found = this.findProcessInChildren(child.children, processId);
+        if (found) return found;
+      }
+    }
+    return null;
   }
 
   buildHierarchy(allEntities: BusinessUnit[]): void {
@@ -128,6 +230,8 @@ export class BuProcessAccordionComponent {
   }
 
   private buildBUChildren(processes: any[]): ProcessNode[] {
+    if (!processes?.length) return [];
+    
     const parents = processes.filter(p => !p.parentName);
     const children = processes.filter(p => p.parentName);
 
@@ -232,12 +336,12 @@ export class BuProcessAccordionComponent {
     if (processes?.length) {
       this.view = 'process'; // CHANGEMENT DE VUE : de BU vers process
       this.currentNodes = processes;
-      this.breadcrumb.push({
+      this.breadcrumb = [{
         id: bu.id,
         name: bu.name,
         nodes: processes,
         type: 'process' // On passe en vue process
-      });
+      }];
       this.buSelected.emit(bu);
       console.log('Switched to process view, breadcrumb:', this.breadcrumb);
     } else {
@@ -356,7 +460,8 @@ export class BuProcessAccordionComponent {
 
   getNextLevelButtonText(node: any): string {
     if (this.view === 'bu') {
-      return this.consultationMode == 'admin' ? 'Voir les processus ' : 'Sélectionner la BU ' + '(' + node.children.length + ')';
+      const processCount = node.children?.length || 0;
+      return this.consultationMode == 'admin' ? 'Voir les processus ' : 'Sélectionner la BU (' + processCount + ')';
     }
     if (this.view === 'process') {
       return this.consultationMode == 'admin' ? 'Voir les risques' : 'Sélectionner le process';
@@ -392,6 +497,126 @@ export class BuProcessAccordionComponent {
     else {
       this.riskSelected.emit(obj);
     }
+  }
 
+  // ---- Fonctions de recherche ----
+  onSearchInput(event: any): void {
+    this.searchQuery = event.target.value.trim();
+    
+    if (this.searchQuery.length >= 2) {
+      this.performSearch();
+    } else {
+      this.clearSearch();
+    }
+  }
+
+  private performSearch(): void {
+    this.isSearching = true;
+    this.showSearchResults = true;
+    
+    // Rechercher dans les risques
+    const riskResults = this.allRisks.filter(risk => 
+      risk.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    ).map(risk => ({
+      ...risk,
+      displayType: 'Risque',
+      fullPath: `${risk.buName} > ${risk.processName} > ${risk.name}`
+    }));
+
+    // Rechercher dans les processus
+    const processResults = this.processes.filter(process => 
+      process.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    ).map(process => {
+      const bu = this.findBuByProcessId(process.id);
+      return {
+        ...process,
+        type: 'process',
+        displayType: 'Processus',
+        buName: bu?.name || 'BU inconnue',
+        fullPath: `${bu?.name || 'BU inconnue'} > ${process.name}`
+      };
+    });
+
+    // Rechercher dans les BU
+    const buResults: any[] = [];
+    this.searchInBuHierarchy(this.hierarchicalProcesses, buResults);
+
+    this.searchResults = [
+      ...riskResults.slice(0, 5), 
+      // ...processResults.slice(0, 5),
+      // ...buResults.slice(0, 5)
+    ];
+
+    this.isSearching = false;
+    console.log('➡️ Résultats de recherche:', this.searchResults);
+  }
+
+  private searchInBuHierarchy(buList: any[], results: any[]): void {
+    buList.forEach(bu => {
+      if (bu.name.toLowerCase().includes(this.searchQuery.toLowerCase())) {
+        results.push({
+          ...bu,
+          displayType: 'Unité Métier',
+          fullPath: bu.name
+        });
+      }
+      
+      if (bu.buChildren?.length) {
+        this.searchInBuHierarchy(bu.buChildren, results);
+      }
+    });
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.showSearchResults = false;
+  }
+
+  selectSearchResult(result: any): void {
+    console.log('➡️ Sélection depuis la recherche:', result);
+    
+    if (result.type === 'risk') {
+      // Sélectionner directement le risque avec son contexte
+      const obj = {
+        bu: { id: result.buId, name: result.buName },
+        process: { id: result.processId, name: result.processName },
+        risk: result
+      };
+      
+      if (this.dialogRef) {
+        this.dialogRef.close(obj);
+      } else {
+        this.riskSelected.emit(obj);
+      }
+    } else if (result.type === 'process') {
+      // Naviguer vers les risques de ce processus
+      this.navigateToProcessRisks(result);
+    } else if (result.type === 'bu') {
+      // Naviguer vers les processus de cette BU
+      this.navigateToBuProcesses(result);
+    }
+    
+    this.clearSearch();
+  }
+
+  private navigateToProcessRisks(process: any): void {
+    const bu = this.findBuByProcessId(process.id);
+    if (bu) {
+      // Construire le breadcrumb pour arriver aux risques
+      this.view = 'risks';
+      this.breadcrumb = [
+        { id: bu.id, name: bu.name, nodes: [], type: 'process' },
+      ];
+      
+      this.viewRisks(process);
+    }
+  }
+
+  private navigateToBuProcesses(bu: any): void {
+    // Naviguer vers les processus de cette BU
+    this.view = 'process';
+    this.breadcrumb = [];
+    this.viewProcesses(bu);
   }
 }

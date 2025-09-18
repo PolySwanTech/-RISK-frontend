@@ -1,6 +1,46 @@
 <div class="bp-wrapper" *ngIf="currentNodes?.length">
 
-  <div class="breadcrumb" *ngIf="breadcrumb.length">
+  <div class="search-section">
+    <div class="search-input-wrapper">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input type="text" placeholder="Rechercher un risque" [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
+        class="search-input">
+      <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </div>
+
+    <!-- Résultats de recherche -->
+    <div *ngIf="showSearchResults" class="search-results">
+
+      <div *ngIf="isSearching" class="search-loading">
+        <mat-spinner diameter="24"></mat-spinner>
+        <div class="search-loading-text">Recherche en cours...</div>
+      </div>
+
+      <div *ngIf="!isSearching && searchResults.length === 0" class="search-empty">
+        Aucun résultat trouvé pour "<strong>{{ searchQuery }}</strong>"
+      </div>
+
+      <div *ngFor="let result of searchResults; let last = last" class="search-result-item"
+        (click)="selectSearchResult(result)" [class.search-result-item-last]="last">
+        <div class="search-result-header">
+          <strong class="search-result-name">{{ result.name }}</strong>
+          <span class="search-result-type" [ngClass]="{
+                  'type-risque': result.displayType === 'Risque',
+                  'type-processus': result.displayType === 'Processus',
+                  'type-bu': result.displayType !== 'Risque' && result.displayType !== 'Processus'
+                }">
+            {{ result.displayType }}
+          </span>
+        </div>
+        <div class="search-result-path">{{ result.fullPath }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation normale -->
+  <div *ngIf="!showSearchResults && currentNodes?.length" class="breadcrumb">
     <button mat-button (click)="jumpTo(-1)">
       <mat-icon>home</mat-icon>
       <span>Accueil</span>
@@ -21,35 +61,27 @@
         </div>
 
         <div class="panel-title-actions">
-
           <button *ngIf="breadcrumb.length > 0" mat-stroked-button (click)="back()">
             <mat-icon>arrow_back</mat-icon> Retour
           </button>
         </div>
       </div>
 
-      <mat-list style="display: flex
-;
-    flex-direction: column;
-    gap: 20px;">
-        <mat-list-item *ngFor="let node of currentNodes">
+      <mat-list class="custom-list">
+        @for(node of currentNodes; track node.id){
+        <mat-list-item (click)="view === 'risks' ? selectRisk(node) : viewNextLevel(node)">
           <div class="node-content">
-            <div style="display: flex
-;
-    gap: 20px;
-    align-items: baseline;">
+            <div class="node-content-wrapper">
               <h3 class="node-title">{{ node.name }}</h3>
-              <p *ngIf="node.lm" class="node-subtitle">{{ node.lm ? 'LM' : '' }}</p>
+              <mat-chip *ngIf="node.lm" selected class="lm-chip">LM</mat-chip>
             </div>
           </div>
 
           <div class="node-actions">
-
-            <button *ngIf="hasChildren(node)" mat-stroked-button (click)="enterNode(node)">
+            <button *ngIf="hasChildren(node)" mat-stroked-button class="btn-hierarchy" (click)="enterNode(node)">
               <mat-icon>account_tree</mat-icon>
               Voir la hiérarchie
             </button>
-
 
             <button *ngIf="canViewNextLevel(node)" mat-stroked-button color="primary"
               (click)="viewNextLevel(node); $event.stopPropagation()">
@@ -57,33 +89,29 @@
               {{ getNextLevelButtonText(node) }}
             </button>
 
-
             <button *ngIf="view === 'risks'" mat-stroked-button color="accent"
               (click)="selectRisk(node); $event.stopPropagation()">
               <mat-icon>check</mat-icon> {{ consultationMode == 'admin' ? 'Choisir' : 'Sélectionner le risque' }}
             </button>
 
-
             <ng-container *ngIf="(!view || view !== 'risks') && consultationMode == 'admin'">
-
               <button mat-icon-button color="primary">
                 <mat-icon>edit</mat-icon>
               </button>
-
-
               <button mat-icon-button color="warn">
                 <mat-icon>delete</mat-icon>
               </button>
             </ng-container>
           </div>
         </mat-list-item>
+        }
+
       </mat-list>
-
-
     </div>
   </div>
 </div>
+
 <div *ngIf="!currentNodes?.length" class="empty">
   <mat-spinner></mat-spinner>
-  Chargment des données...
+  Chargement des données...
 </div>

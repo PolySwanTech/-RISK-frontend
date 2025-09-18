@@ -372,14 +372,12 @@ export class CreateComponent implements OnInit {
     this.incidentForm1.get('teamId')?.setValue(event.bu.id)
     this.incidentForm3.get('processId')?.setValue(event.process.id)
     this.incidentForm3.get('riskId')?.setValue(event.risk.id)
-    console.log()
-
   }
 
   create() {
   const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
     minWidth: '750px',
-    height: '400px',
+    height: '600px',
     maxHeight: '600px',
   });
 
