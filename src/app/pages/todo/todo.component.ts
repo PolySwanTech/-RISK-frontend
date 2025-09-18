@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ToDoService } from '../../core/services/to-do/to-do.service';
 import { ToDoLabels, ToDoType } from '../../core/enum/to-do.enum';
@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-todo',
-  imports: [CommonModule],
+  imports: [CommonModule, DatePipe],
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss'
 })
