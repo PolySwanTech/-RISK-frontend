@@ -33,5 +33,5 @@ export interface ProcessNode {
   buName?: string;
   parentName?: string;
   risks?: any[]; 
-  children?: ProcessNode[];
+  children?: any[];
 }

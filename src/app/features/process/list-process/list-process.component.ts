@@ -6,13 +6,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { ProcessService } from '../../../core/services/process/process.service';
-
-import { Process } from '../../../core/models/Process';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ActivatedRoute } from '@angular/router';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 
 @Component({
   selector: 'app-list-process',

@@ -25,6 +25,7 @@ import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
 
 
 interface Indicator{
@@ -37,7 +38,7 @@ interface Indicator{
   imports: [FormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatCardModule, MatChipsModule, FormsModule,
     ReactiveFormsModule,
     MatStepperModule,
-    MatButtonModule],
+    MatButtonModule, BuProcessAccordionComponent],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })
@@ -91,6 +92,8 @@ export class CreateEvaluationComponent implements OnInit {
 
   controls: ControlTemplate[] = [];
 
+  selectedBPR : any = null;
+
   ngOnInit(): void {
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
       this.fetchProcesses(entities);
@@ -120,7 +123,7 @@ export class CreateEvaluationComponent implements OnInit {
   gotoSteppe3(event: any) {
     this.highestRiskLevelNet = this.highestRiskLevel;
     if (this.highestRiskLevel && this.selectedBU) {
-      this.riskService.saveEvaluation(this.selectedRisk.id.id, this.highestRiskLevel, this.indicators, true).subscribe(
+      this.riskService.saveEvaluation(this.selectedRisk.id, this.highestRiskLevel, this.indicators, true).subscribe(
         _ => {
           this.snackBarService.info("Evaluation sauvegarder");
           event.next();
@@ -315,8 +318,19 @@ export class CreateEvaluationComponent implements OnInit {
     this.selectedRisk = null;
   }
 
-  onRiskChange(): void {
+  onRiskChange(event: any): void {
     this.currentStep = 2;
+    this.selectedBPR = event;
+    this.selectedBU = event.bu
+    if (this.selectedBU) {
+      this.getMatrix(this.selectedBU.id);
+      this.getFrequenciesByBu(this.selectedBU.id);
+      this.getSeveritiesByBu(this.selectedBU.id);
+    }
+
+    this.selectedProcess = event.process
+    this.selectedRisk = event.risk
+
     this.controlService.getAllTemplatesByProcessAndRisk(this.selectedProcess, this.selectedRisk!).subscribe(controls => {
       this.controls = controls;
     });
@@ -365,7 +379,7 @@ export class CreateEvaluationComponent implements OnInit {
     };
 
     if (this.highestRiskLevelNet) {
-      this.riskService.saveEvaluation(this.selectedRisk.id.id, this.highestRiskLevelNet, [], false).subscribe(
+      this.riskService.saveEvaluation(this.selectedRisk.id, this.highestRiskLevelNet, [], false).subscribe(
         _ => {
           this.snackBarService.info("Evaluation sauvegarder");
           stepper.next();
