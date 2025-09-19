@@ -10,11 +10,12 @@ import { MatInputModule } from '@angular/material/input';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-add-action-dialog',
   imports: [FormsModule, CommonModule, MatFormFieldModule, PopupHeaderComponent,
-     MatIconModule, MatInputModule, MatCardModule],
+     MatIconModule, MatInputModule, MatCardModule, MatButtonModule],
   templateUrl: './add-action-dialog.component.html',
   styleUrl: './add-action-dialog.component.scss'
 })
