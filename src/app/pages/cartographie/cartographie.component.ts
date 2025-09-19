@@ -47,7 +47,7 @@ export class CartographieComponent implements OnInit {
     {
       label: 'Créer une cartographie',
       icon: 'add',
-      class: 'btn-secondary',
+      class: 'btn-primary',
       show: true,
       action: () => this.addCarto()
     }

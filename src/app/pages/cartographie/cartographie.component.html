@@ -25,7 +25,7 @@
             </button>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="w-100">
+          <!-- <mat-form-field appearance="outline" class="w-100">
             <mat-label>Date d'Exercice</mat-label>
             <mat-select [(ngModel)]="selectedYear" required>
               <mat-option value="" disabled>— Sélectionnez une année d'exercice —</mat-option>
@@ -36,17 +36,19 @@
             <button mat-icon-button matSuffix matTooltip="Sélectionnez l'année d'exercice pour cet incident.">
               <mat-icon>info</mat-icon>
             </button>
-          </mat-form-field>
+          </mat-form-field> -->
         </div>
 
-        <button mat-raised-button class="btn btn-primary" [disabled]="!selectedYear || !selectedBu"
+        <!-- <button mat-raised-button class="btn btn-primary" [disabled]="!selectedYear || !selectedBu"
           (click)="viewCarto()">
           Voir la cartographie
-        </button>
+        </button> -->
       </div>
     </mat-card-content>
   </mat-card>
 
-  <app-list-process></app-list-process>
+  @if(selectedBu){
+ <app-list-process></app-list-process>  
+  }
 
 </div>
