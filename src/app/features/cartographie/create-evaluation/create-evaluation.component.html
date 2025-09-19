@@ -132,6 +132,10 @@
       </mat-form-field>
     </div>
 
+     @if(matrixData) {
+          <app-matrix [matrixData]="matrixData" [modifPlan]="false"></app-matrix>
+        }
+
     <div style="display: flex; gap: 20px;">
       <button mat-raised-button class="btn-red" (click)="stepper.previous()">Retour</button>
       <button mat-raised-button class="btn-primary" (click)="gotoSteppe3(stepper)"
