@@ -4,6 +4,8 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
 import { MatDialog } from '@angular/material/dialog';
 import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
 import { CreateProcessComponent } from '../../process/create-process/create-process.component';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { ProcessService } from '../../../core/services/process/process.service';
 
 @Component({
   selector: 'app-reglages',
@@ -14,6 +16,8 @@ import { CreateProcessComponent } from '../../process/create-process/create-proc
 export class ReglagesComponent {
 
   private dialog = inject(MatDialog);
+  private entitiesService = inject(EntitiesService)
+  private processService = inject(ProcessService)
 
   goBackButtons: GoBackButton[] = [
     {
@@ -37,7 +41,12 @@ export class ReglagesComponent {
       {
         width: '800px'
       }
-    )
+    ).afterClosed().subscribe(bu => {
+      console.log(bu)
+      this.entitiesService.save(bu).subscribe(resp => {
+        console.log(resp)
+      })
+    })
   }
 
   addProcess() {
@@ -45,7 +54,12 @@ export class ReglagesComponent {
       {
         width: '800px'
       }
-    )
+    ).afterClosed().subscribe(p => {
+      console.log(p)
+      this.processService.createProcess(p).subscribe(resp => {
+        console.log(resp)
+      })
+    })
   }
 
 }

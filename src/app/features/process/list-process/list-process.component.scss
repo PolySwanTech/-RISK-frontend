@@ -7,7 +7,6 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 
 .process-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #e0e7ff 100%);
     padding: 24px;
 }
 
@@ -442,6 +441,7 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 
 .risk-table {
     width: 100%;
+    border: 1px solid black;
 }
 
 .table-header {
@@ -468,7 +468,7 @@ $main-blue-gradient: linear-gradient(135deg, #4a74b8 0%, #345c94 50%, #2b4d7e 10
 }
 
 .table-row:hover {
-    background: #f9fafb;
+    background: #d7e2ed;
 }
 
 .col-risque {
