@@ -12,9 +12,6 @@ export class Action {
     fileName: string;
     reviewStatus: ReviewStatus;
     actif: boolean;
-
-    actif : boolean = true
-
     constructor(
         id: string,
         name: string,
