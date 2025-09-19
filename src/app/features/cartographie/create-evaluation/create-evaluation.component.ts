@@ -25,12 +25,11 @@ import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
-import { Range } from '../matrix-settings/matrix-settings.component';
 
 
 interface Indicator{
-  frequence : Range;
-  severite : Range;
+  frequenceId : number;
+  severiteId : number;
 }
 
 @Component({
@@ -251,7 +250,7 @@ export class CreateEvaluationComponent implements OnInit {
 
     let frequency = severity.selectedFrequency;
 
-    this.indicators.push({severite : severity, frequence : frequency});
+    this.indicators.push({severiteId: severity.id, frequenceId : frequency.id});
     
     interface MatrixCell {
       severite: { id: number };
