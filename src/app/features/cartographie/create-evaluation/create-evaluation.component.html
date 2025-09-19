@@ -4,10 +4,10 @@
     <ng-template matStepLabel>Sélection</ng-template>
     <app-bu-process-accordion (riskSelected)="onRiskChange($event)"></app-bu-process-accordion>
     <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
-              <mat-chip> Unité métier : {{ selectedBPR.bu.name }}</mat-chip>
-              <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
-              <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
-            </mat-chip-listbox>
+      <mat-chip> Unité métier : {{ selectedBPR.bu.name }}</mat-chip>
+      <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
+      <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
+    </mat-chip-listbox>
     <!-- <h2>Sélection de l'Unité Métier</h2>
     <div class="business-units">
       <div *ngFor="let bu of hierarchicalProcesses" class="business-unit" [class.active]="selectedBU?.name === bu.name"
@@ -77,6 +77,7 @@
     <ng-template matStepLabel>Évaluation Brut</ng-template>
 
     <h2>⚖️ Évaluation Brut Des Impacts</h2>
+    <h3>Financier Direct</h3>
     <div class="impacts-grid">
       <mat-card *ngFor="let sev of severityList; let i = index" class="impact-card" (click)="financialImpact = sev.id">
         <mat-card-header [ngClass]="getClassByIndex(i)">
@@ -85,8 +86,7 @@
         <mat-card-content>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Fréquence</mat-label>
-            <mat-select [(ngModel)]="sev.selectedFrequency"
-              (selectionChange)="updateRisk(sev)">
+            <mat-select [(ngModel)]="sev.selectedFrequency" (selectionChange)="updateRisk(sev)">
               <mat-option *ngFor="let freq of frequencyList" [value]="freq">{{ freq.libelle }}</mat-option>
             </mat-select>
           </mat-form-field>
@@ -150,7 +150,8 @@
           [ngStyle]="{'border-left': '5px solid ' + ctrl.riskLevel.color}">
           <mat-card-header style="justify-content: start;">
             <mat-card-title>{{ ctrl.libelle }}</mat-card-title>
-            <mat-card-subtitle>{{ getControlTypeLabels(ctrl.controlType) }} - {{ getDegreeLabels(ctrl.controlLevel) }}</mat-card-subtitle>
+            <mat-card-subtitle>{{ getControlTypeLabels(ctrl.controlType) }} - {{ getDegreeLabels(ctrl.controlLevel)
+              }}</mat-card-subtitle>
           </mat-card-header>
 
           <mat-card-content>
