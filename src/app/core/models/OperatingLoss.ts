@@ -5,7 +5,6 @@ import { OperatingLossState } from "../enum/operatingLossState.enum";
 export class OperatingLoss {
   id: string;
   libelle: string;
-  comptabilityRef: string | null;
   description: string | null;
   state: OperatingLossState;
 
@@ -23,10 +22,12 @@ export class OperatingLoss {
   entityId: string | null;
   entityName: string | null;
 
+  creatorName: string;
+  actif: boolean;
+
   constructor(args: {
     id: string;
     libelle: string;
-    comptabilityRef: string | null;
     description: string | null;
     state: OperatingLossState;
     incidentId: string;
@@ -38,10 +39,11 @@ export class OperatingLoss {
     type: OperatingLossTypeDto;
     entityId: string | null;
     entityName: string | null;
+    creatorName: string;
+    actif: boolean;
   }) {
     this.id = args.id;
     this.libelle = args.libelle;
-    this.comptabilityRef = args.comptabilityRef;
     this.description = args.description;
     this.state = args.state;
     this.incidentId = args.incidentId;
@@ -53,6 +55,8 @@ export class OperatingLoss {
     this.type = args.type;
     this.entityId = args.entityId;
     this.entityName = args.entityName;
+    this.creatorName = args.creatorName;
+    this.actif = args.actif;
   }
 
 }
@@ -63,7 +67,6 @@ export interface CreateOperatingLossDto {
   businessUnitId: string;
   libelle: string;
   description?: string | null;
-  comptabilityRef?: string | null;
 }
 
 export interface OperatingLossTypeDto {

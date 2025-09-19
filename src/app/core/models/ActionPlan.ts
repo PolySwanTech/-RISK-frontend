@@ -1,4 +1,5 @@
 import { Priority } from "../enum/Priority";
+import { ReviewStatus } from "../enum/reviewStatus.enum";
 import { Status } from "../enum/status.enum";
 import { RiskTemplate } from "./RiskTemplate";
 
@@ -9,16 +10,17 @@ export class Action {
     performedBy: string;
     performedAt: string;
     fileName: string;
-
-    actif : boolean = true
-
+    reviewStatus: ReviewStatus;
+    actif: boolean;
     constructor(
         id: string,
         name: string,
         createdAt: Date,
         performedBy: string,
         performedAt: string,
-        fileName: string
+        fileName: string,
+        reviewStatus: ReviewStatus = ReviewStatus.PENDING,
+        actif: boolean = true   
     ) {
         this.id = id;
         this.name = name;
@@ -26,6 +28,8 @@ export class Action {
         this.performedBy = performedBy;
         this.performedAt = performedAt;
         this.fileName = fileName;
+        this.reviewStatus = reviewStatus;
+        this.actif = actif;
     }
 }
 
@@ -49,6 +53,7 @@ export class ActionPlan {
     actions: Action[] = [];
 
     incidentRef : string = "";
+    actif: boolean;
 
     constructor(
         id: string,
@@ -61,7 +66,8 @@ export class ActionPlan {
         userInCharge: string,
         taxonomie: RiskTemplate | null,
         incidentId: string,
-        echeance: Date
+        echeance: Date,
+        actif: true
     ) {
         this.id = id;
         this.reference = reference;
@@ -74,6 +80,7 @@ export class ActionPlan {
         this.taxonomie = taxonomie;
         this.incidentId = incidentId;
         this.echeance = echeance;
+        this.actif = actif;
     }
 
 }
