@@ -66,7 +66,7 @@
             <div class="item-content">
               <div class="item-title">{{ item.libelle }}</div>
               <div class="item-meta">
-                <span>Échéance: {{ item.date }}</span>
+                <span>Échéance: {{ item.date | date : "dd/MM/yyyy" }}</span>
               </div>
             </div>
             <div class="item-actions">
@@ -93,7 +93,7 @@
             <div class="item-content">
               <div class="item-title">{{ item.libelle }}</div>
               <div class="item-meta">
-                <span>Créé: {{ item.date }}</span>
+                <span>Créé: {{ item.date | date : "dd/MM/yyyy" }}</span>
               </div>
             </div>
             <div class="item-actions">
@@ -120,7 +120,7 @@
             <div class="item-content">
               <div class="item-title">{{ item.libelle }}</div>
               <div class="item-meta">
-                <span>Planifié: {{ item.date }}</span>
+                <span>Planifié: {{ item.date | date : "dd/MM/yyyy" }}</span>
               </div>
             </div>
             <div class="item-actions">
@@ -140,7 +140,7 @@
         <div class="item-content">
           <div class="item-title">{{ item.libelle }}</div>
           <div class="item-meta">
-            <span>{{ getDateLabel(item) }}: {{ item.date }}</span>
+            <span>{{ getDateLabel(item) }}: {{ item.date | date : "dd/MM/yyyy" }}</span>
           </div>
         </div>
         <div class="item-actions">

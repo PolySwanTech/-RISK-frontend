@@ -1,50 +1,52 @@
-
 <div class="dashboard-container">
   <app-go-back title="Module cartographie" [buttons]="goBackButtons"></app-go-back>
   <mat-card class="filters-card">
-    
+
     <mat-card-content>
       <div class="filters-header">
-                    <div>
-                        <mat-icon>analytics</mat-icon>
-                        <span class="filters-title">Recherche</span>
-                    </div>
-                </div>
+        <div>
+          <mat-icon>analytics</mat-icon>
+          <span class="filters-title">Recherche</span>
+        </div>
+      </div>
       <div class="grid">
         <!-- BU -->
         <div class="input-container">
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Business Unit</mat-label>
-          <mat-select [(ngModel)]="selectedBuId" required>
-            <mat-option value="" disabled>— Sélectionnez une BU —</mat-option>
-            <mat-option *ngFor="let bu of businessUnits" [value]="bu.id">
-              {{ bu.name }}
-            </mat-option>
-          </mat-select>
-          <button mat-icon-button matSuffix matTooltip="Sélectionnez la Business Unit associée à cet incident.">
-            <mat-icon>info</mat-icon>
-          </button>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Business Unit</mat-label>
+            <mat-select [(ngModel)]="selectedBu" (selectionChange)="onBuChange($event.value)" required>
+              <mat-option value="" disabled>— Sélectionnez une BU —</mat-option>
+              <mat-option *ngFor="let bu of businessUnits" [value]="bu">
+                {{ bu.name }}
+              </mat-option>
+            </mat-select>
+            <button mat-icon-button matSuffix matTooltip="Sélectionnez la Business Unit associée à cet incident.">
+              <mat-icon>info</mat-icon>
+            </button>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Date d'Exercice</mat-label>
-          <mat-select [(ngModel)]="selectedYear" required>
-            <mat-option value="" disabled>— Sélectionnez une année d'exercice —</mat-option>
-            <mat-option *ngFor="let year of years" [value]="year">
-              {{ year }}
-            </mat-option>
-          </mat-select>
-          <button mat-icon-button matSuffix matTooltip="Sélectionnez l'année d'exercice pour cet incident.">
-            <mat-icon>info</mat-icon>
-          </button>
-        </mat-form-field>
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Date d'Exercice</mat-label>
+            <mat-select [(ngModel)]="selectedYear" required>
+              <mat-option value="" disabled>— Sélectionnez une année d'exercice —</mat-option>
+              <mat-option *ngFor="let year of years" [value]="year">
+                {{ year }}
+              </mat-option>
+            </mat-select>
+            <button mat-icon-button matSuffix matTooltip="Sélectionnez l'année d'exercice pour cet incident.">
+              <mat-icon>info</mat-icon>
+            </button>
+          </mat-form-field>
         </div>
 
-        <button mat-raised-button class="btn btn-primary" [disabled]="!selectedYear || !selectedBuId"
-          (click)="goCreate()">
+        <button mat-raised-button class="btn btn-primary" [disabled]="!selectedYear || !selectedBu"
+          (click)="viewCarto()">
           Voir la cartographie
         </button>
       </div>
     </mat-card-content>
   </mat-card>
+
+  <app-list-process></app-list-process>
+
 </div>

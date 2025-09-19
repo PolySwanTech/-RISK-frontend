@@ -85,9 +85,9 @@
         <mat-card-content>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Fréquence</mat-label>
-            <mat-select [(ngModel)]="sev.selectedFrequencyId"
-              (selectionChange)="updateRisk(sev.id, sev.selectedFrequencyId)">
-              <mat-option *ngFor="let freq of frequencyList" [value]="freq.id">{{ freq.libelle }}</mat-option>
+            <mat-select [(ngModel)]="sev.selectedFrequency"
+              (selectionChange)="updateRisk(sev)">
+              <mat-option *ngFor="let freq of frequencyList" [value]="freq">{{ freq.libelle }}</mat-option>
             </mat-select>
           </mat-form-field>
           <div class="risk-result" *ngIf="sev.riskLevel">
