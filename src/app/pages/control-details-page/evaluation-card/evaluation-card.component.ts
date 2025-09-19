@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 import { Evaluation } from '../../../core/enum/evaluation.enum';
@@ -7,13 +7,19 @@ import { ControlEvaluationView, ControlEvaluation } from '../../../core/models/C
 import { ControlExecution } from '../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ControlService } from '../../../core/services/control/control.service';
+import { MatIconModule } from '@angular/material/icon';
+import { firstValueFrom } from 'rxjs';
+import { TargetType } from '../../../core/enum/targettype.enum';
+import { FichiersComponent } from '../../../shared/components/fichiers/fichiers.component';
+import { MatDialog } from '@angular/material/dialog';
+import { FileService } from '../../../core/services/file/file.service';
 import { ReviewStatus, ReviewStatusLabels } from '../../../core/enum/reviewStatus.enum';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
   selector: 'app-evaluation-card',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './evaluation-card.component.html',
   styleUrl: './evaluation-card.component.scss'
 })
@@ -50,12 +56,17 @@ export class EvaluationCardComponent {
   evaluationOptions = Object.values(EvaluationControl);
   labels = EvaluationControlLabels;
 
+  constructor() { }
+
   private controlService = inject(ControlService);
+  private fileService = inject(FileService);
   private confirmService = inject(ConfirmService);
+  private dialog = inject(MatDialog);
 
   actionTaken: 'valid' | 'reexam' | null = null;
 
   ngOnInit(): void {
+
     if (this.showAsCard) return;
 
     window.addEventListener('keydown', this.onKeyDown);
@@ -115,11 +126,40 @@ export class EvaluationCardComponent {
     this.mode = 'FORM';
   }
 
-  handleAction(action : string) {
+  handleAction(action: string) {
     this.openDetailsRequested.emit(action);
   }
-  
+
   cancel(): void { this.close.emit(); }
+
+  async viewFiles(closed: boolean = false) {
+
+    let target = TargetType.CONTROL
+    let files = await firstValueFrom(this.fileService.getFiles(target, this.executionId))
+
+    this.dialog.open(FichiersComponent,
+      {
+        width: '400px',
+        data: {
+          files: files,
+          targetType: target,
+          targetId: this.executionId,
+          closed: true
+        }
+      }
+    )
+      .afterClosed().subscribe(_ => {
+        if (!closed) {
+          // this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
+          //   result => {
+          //     if (result) {
+          //       this.validateAction(actionId);
+          //     }
+          //   }
+          // )
+        }
+      });
+  }
 
   get evalLabel(): string {
     const v = (this.evaluationView?.evaluation || '').toUpperCase();

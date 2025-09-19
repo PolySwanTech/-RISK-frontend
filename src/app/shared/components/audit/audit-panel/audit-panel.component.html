@@ -1,0 +1,11 @@
+<div class="container">
+  <h2>Historique des modifications</h2>
+
+  <ul>
+    @for(audit of auditList; track audit){
+    <li>{{ audit.comments }} - {{ audit.writeAt | date : 'dd/MM/yyyy' }} - {{ audit.writeBy.username }}</li>
+    }
+  </ul>
+
+  <button mat-raised-button (click)="addAudit()">Ajouter un commentaire</button>
+</div>

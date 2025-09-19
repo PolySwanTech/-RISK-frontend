@@ -11,7 +11,7 @@ import { CreateOperationalImpactComponent } from './impact/create-operational-im
 
 export const incidentRoute: Routes = [
   { path: '', component:  ListComponent},
-  { path: 'create', component: CreateComponent, canActivate: [PermissionGuard], data: { permission: PermissionName.ENTER_INCIDENT } },
+  { path: 'create', component: CreateComponent, canActivate: [PermissionGuard], data: { permission: PermissionName.CREATE_INCIDENT } },
   { path: ':id', component:  ViewComponent},
   // { path: ':id/history', component: HistoryComponent },
   { path: ':id/suivi', component:  SuiviComponent},

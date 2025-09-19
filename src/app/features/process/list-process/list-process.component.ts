@@ -1,4 +1,4 @@
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,6 +23,8 @@ import { firstValueFrom } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MatBadgeModule } from '@angular/material/badge';
+import { RiskEvaluation } from '../../../core/models/RiskEvaluation';
+import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
 
 @Component({
   selector: 'app-list-process',
@@ -37,8 +39,9 @@ import { MatBadgeModule } from '@angular/material/badge';
     FormsModule,
     MatCardModule,
     GoBackComponent,
-    MatBadgeModule
-  ],
+    MatBadgeModule,
+    BuProcessAccordionComponent
+],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'
 })
@@ -51,6 +54,7 @@ export class ListProcessComponent implements OnInit {
   riskEvaluationService = inject(RiskEvaluationService);
   entityService = inject(EntitiesService);
   snackBarService = inject(SnackBarService);
+  private route = inject(ActivatedRoute);
 
   processes: Process[] = [];
   displayedColumns: string[] = ['name', 'niveau', 'buName', 'parentName'];
@@ -60,15 +64,18 @@ export class ListProcessComponent implements OnInit {
   searchTerm: string = '';
   years: number[] = [];
   selectedYear: number = new Date().getFullYear();
+  entities: BusinessUnit[] = [];
 
   @Input() isCartographie: boolean = false;
 
   goBackButtons: GoBackButton[] = [];
 
   ngOnInit(): void {
+
     this.hierarchicalProcesses = [];
     this.expandedNodes.clear();
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
+      this.entities = entities;
       this.fetchProcesses(entities);
     });
 
@@ -95,6 +102,12 @@ export class ListProcessComponent implements OnInit {
         action: () => this.navToCreateCarto()
       }
     ];
+
+    this.route.queryParams.subscribe(params => {
+      if (params['buId'] !== undefined) {
+        this.add(params['buId']);
+      }
+    });
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -117,7 +130,7 @@ export class ListProcessComponent implements OnInit {
       this.filteredProcesses.forEach(bu => {
         // 3. Pour chaque risque de ce process
         bu.children?.forEach(process => {
-          process.risks?.forEach(risk => {
+          process.risks?.forEach((risk: { id: { id: any; }; riskEvaluations: RiskEvaluation[]; }) => {
             var rId = risk.id.id;
             risk.riskEvaluations = evaluations.filter(e => e.riskId === rId);
           });
@@ -145,12 +158,13 @@ export class ListProcessComponent implements OnInit {
     // return level.toLowerCase().replace('é', 'e');
   }
 
-  add() {
+  add(buId?: string): void {
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '600px !important',
       height: '550px',
       minWidth: '600px',
       maxWidth: '600px',
+      data: { buId: buId || null }
     });
     dialogRef.afterClosed().subscribe(_ => {
       this.ngOnInit(); // Refresh the list after adding a new process
@@ -178,7 +192,7 @@ export class ListProcessComponent implements OnInit {
       });
   }
 
-  deleteBu(id : string) {
+  deleteBu(id: string) {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")
       .subscribe(confirm => {
         if (confirm) {
@@ -410,4 +424,25 @@ export class ListProcessComponent implements OnInit {
   goToMatrixPage(buId: any) {
     this.router.navigate(['risk', buId])
   }
+
+  loadProcesses(bu: any) {
+    this.processService.getProcessLeaf(bu.id).subscribe(processes => {
+    bu.children = processes;
+  });
+}
+
+// loadRisksAndChildren(process: ProcessNode) {
+//   this.processService.getChildren(process.id).subscribe(children => {
+//     process.children = children;
+//   });
+
+//   this.processService.getRisksByProcess(process.id).subscribe(risks => {
+//     process.risks = risks;
+//   });
+// }
+
+onRiskSelected(risk: any) {
+  console.log('➡️ Risque sélectionné :', risk);
+}
+
 }

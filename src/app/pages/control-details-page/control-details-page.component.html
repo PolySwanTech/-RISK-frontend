@@ -13,7 +13,7 @@
       <div class="main-column">
         <div class="hero-section">
           <!-- === Carte héro (inchangée) === -->
-          <div class="card card-overview hero control-hero">
+          <div class="card is-purple card-overview hero control-hero">
             <div class="card-content">
 
               <div class="hero-head">
@@ -135,7 +135,7 @@
 
                   <!-- Cartes visibles seulement quand il y a des données -->
                   <ng-container *ngIf="s.view">
-                    <app-evaluation-card [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true"
+                    <app-evaluation-card [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true" [executionId]="s.exec.id"
                       (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id, $event)">
                     </app-evaluation-card>
                   </ng-container>

@@ -393,7 +393,7 @@ mat-paginator {
         font-weight: bold !important;
     }
 
-    button:not(.mdc-switch, .mdc-icon-button) {
+    button:not(.mdc-switch):not(.mdc-icon-button):not(div.node-actions > button):not(.breadcrumb > button):not(.mat-mdc-button-base) {
         width: 100%;
         margin-top: 20px;
         padding: 12px;
@@ -512,9 +512,17 @@ button[mat-raised-button] {
     gap: 30px;
     flex-direction: column;
     align-items: normal;
-    padding: 20px 100px;
+    // padding: 20px 100px;
+
     width: auto;
     height: auto;
+
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f8fafc;
+    min-height: 100vh;
+    justify-content: flex-start;
 }
 
 /* Nouveaux styles pour les mat-cards */
@@ -786,15 +794,36 @@ mat-calendar {
 }
 
 .container-body {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8fafc;
-      color: #334155;
-      min-height: 100vh;
-    }
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    color: #334155;
+    min-height: 100vh;
+}
 
-    .mat-mdc-card{
-        background: var(--mat-sys-surface-bright) !important;
-    }
+.mat-mdc-card {
+    background: var(--mat-sort-arrow-color) !important;
+}
+
+::ng-deep .audit-dialog-panel {
+  height: 100vh;
+  max-height: 100vh;
+  margin: 0;
+  top: 0;
+  right: 0;
+  position: fixed;
+  animation: slideIn 0.3s ease-out;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}

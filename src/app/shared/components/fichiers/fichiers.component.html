@@ -1,11 +1,7 @@
 <mat-card class="files-card" style="height: 600px;">
 
     <mat-card-content style="display: flex; flex-direction: column; height: 97%;">
-        <mat-card-header>
-            <mat-card-title class="files-header">
-                <span>Pièces jointes</span>
-            </mat-card-title>
-        </mat-card-header>
+        <app-popup-header [title]="'Pièces jointes'" [showClose]="data != null" (close)="closePopup()"></app-popup-header>
         <!-- Zone de dépôt -->
         @if(!closed){
         <div class="upload-zone" (click)="fileInput.click()" (dragover)="onDragOver($event)"

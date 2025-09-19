@@ -13,6 +13,8 @@ export class Action {
     reviewStatus: ReviewStatus;
     actif: boolean;
 
+    actif : boolean = true
+
     constructor(
         id: string,
         name: string,
@@ -48,6 +50,8 @@ export class ActionPlan {
     taxonomie: RiskTemplate | null;
     incidentId: string;
     echeance: Date;
+
+    createdAt: Date = new Date();
 
     actions: Action[] = [];
 

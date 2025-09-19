@@ -11,9 +11,10 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FileService } from '../../../core/services/file/file.service';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TargetType } from '../../../core/enum/targettype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { PopupHeaderComponent } from '../popup-header/popup-header.component';
 
 export interface UploadedFile {
   id: string;
@@ -29,7 +30,7 @@ export interface UploadedFile {
 @Component({
   selector: 'app-fichiers',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
-    MatGridListModule, MatButtonModule, MatFormFieldModule,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, PopupHeaderComponent,
     MatInputModule, MatTooltipModule, CommonModule],
   templateUrl: './fichiers.component.html',
   styleUrl: './fichiers.component.scss'
@@ -55,7 +56,7 @@ export class FichiersComponent {
 
   isDragOver = false;
 
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data?: {
+  constructor(@Optional() public dialogRef: MatDialogRef<FichiersComponent>, @Optional() @Inject(MAT_DIALOG_DATA) public data?: {
     files?: UploadedFile[];
     targetType?: TargetType;
     targetId?: string;
@@ -83,6 +84,10 @@ export class FichiersComponent {
         this.filteredFilesCount = files.length;
       });
     }
+  }
+
+  closePopup(){
+    this.dialogRef.close();
   }
 
   formatDate(dateString: any) {
@@ -189,6 +194,7 @@ export class FichiersComponent {
   }
 
   private async uploadFile(file: File): Promise<void> {
+
     if (!this.targetId) {
       this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
       return;

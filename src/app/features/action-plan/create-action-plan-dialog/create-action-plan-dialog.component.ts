@@ -19,6 +19,8 @@ import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardHeader, MatCardModule } from '@angular/material/card';
+import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -30,6 +32,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatCardModule,
+    PopupHeaderComponent,
     FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule
   ],
   templateUrl: './create-action-plan-dialog.component.html',
@@ -38,7 +42,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class CreateActionPlanDialogComponent implements OnInit {
 
   private actionPlanService = inject(ActionPlanService);
-  private dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
+  dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
   private confirmService = inject(ConfirmService);
   private equipeService = inject(EquipeService);
   private riskService = inject(RiskService);
@@ -61,6 +65,10 @@ export class CreateActionPlanDialogComponent implements OnInit {
   ngOnInit(): void {
     this.fetchTeams();
     this.getRisk();
+  }
+
+  closePopup() {
+    this.dialogRef.close();
   }
 
   getRisk() {

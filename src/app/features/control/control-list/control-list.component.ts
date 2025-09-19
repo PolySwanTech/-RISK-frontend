@@ -30,6 +30,8 @@ import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { MatMenu, MatMenuModule } from '@angular/material/menu';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-control-list',
@@ -38,7 +40,7 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
     MatSelectModule, CommonModule, MatCardModule, MatPaginatorModule,
     MatFormFieldModule, MatInputModule, ReactiveFormsModule, MatNativeDateModule,
     MatIconModule, MatTooltipModule, FormsModule, MatButtonToggleModule,
-    GlobalSearchBarComponent, GoBackComponent,
+    GlobalSearchBarComponent, GoBackComponent, MatMenuModule,
     FilterTableComponent
   ],
   providers: [DatePipe],
@@ -49,9 +51,13 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('rowMenu') rowMenu!: MatMenu;  // ViewChild to access mat-menu
+
 
   datePipe = inject(DatePipe);
   fb = inject(FormBuilder);
+
+  private snackBarService = inject(SnackBarService);
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -92,26 +98,13 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     },
 
     {
-      columnDef: 'riskLevel',
-      header: 'Degré de risque',
-      cell: (e: ControlTemplate) => this.getRiskLabel(e.riskLevel.name),
-      isBadge: 'risk',
-      filterType: 'select',
-      options: Object.values(RiskLevelEnum).map(key => ({
-        value: key,
-        label: RiskLevelLabels[key]
-      })),
-      icon: 'report_problem' // ⚠️
-    },
-
-    {
       columnDef: 'Fréquence',
       header: 'Fréquence',
       cell: (e: ControlTemplate) => this.getRecurrenceLabel(e.frequency),
       filterType: 'select',
       options: Object.values(Recurrence).map(key => ({
         value: key,
-        label:  RecurrenceLabels[key]
+        label: RecurrenceLabels[key]
       })),
       icon: 'schedule' // ⏰
     },
@@ -163,7 +156,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   selectedRange: { start: Date | null; end: Date | null } = { start: null, end: null };
 
-  displayedColumns = this.columns.map(c => c.columnDef);
+  displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
   dataSource = new MatTableDataSource<ControlTemplate>([]);
 
   controlService = inject(ControlService);
@@ -173,9 +166,11 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   controls: ControlTemplate[] = [];
 
-  goBackButtons : GoBackButton[] = [];
+  goBackButtons: GoBackButton[] = [];
 
   searchQuery: string = '';
+
+  selectedControl: ControlTemplate | null = null;
 
   getTypeLabel(t: Type): string {
     return ControlTypeLabels[t] || t;
@@ -207,8 +202,8 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         if (value.toLowerCase().includes('élevé') || value.toLowerCase().includes('very_high')) return 'badge-risque-élevé';
         return '';
       case 'control':
-        if (value === '1') return 'badge-controle-faible';
-        if (value === '2') return 'badge-controle-moyen';
+        if (value === 'Niveau 1') return 'badge-controle-faible';
+        if (value === 'Niveau 2') return 'badge-controle-moyen';
         return '';
       case 'statut':
         if (value.toLowerCase().includes('actif')) return 'badge-statut-ouvert';
@@ -223,17 +218,17 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     this.getUsersAndControls();
     this.goBackButtons = [
       {
-        label : 'Ajouter un contrôle',
-        icon : 'add',
-        action : () => this.create(),
-        show : true,
+        label: 'Ajouter un contrôle',
+        icon: 'add',
+        action: () => this.create(),
+        show: true,
         class: 'btn-primary'
       },
       {
-        label : 'Exporter',
-        icon : 'file_download',
-        action : () => this.export(),
-        show : true,
+        label: 'Exporter',
+        icon: 'file_download',
+        action: () => this.export(),
+        show: true,
         class: 'btn-green'
       }
     ]
@@ -327,6 +322,19 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     }
 
     this.dataSource.data = filtered;
+  }
+
+  activeOrSuspendControl(control: ControlTemplate) {
+    if (control.actif) {
+      // suspend
+      this.controlService.suspendControl(control.id.id).subscribe(_ => this.snackBarService.info('Le contrôle a été suspendu avec succès.'));
+      this.getUsersAndControls();
+    }
+    else {
+      // activate
+      this.controlService.activateControl(control.id.id).subscribe(_ => this.snackBarService.info('Le contrôle a été activé avec succès.'));
+      this.getUsersAndControls();
+    }
   }
 
   resetFilters() {

@@ -1,4 +1,4 @@
-import { Component, inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -21,12 +21,15 @@ import { State } from '../../../core/enum/state.enum';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
-import { ListSuiviComponent } from '../suivi/list-suivi/list-suivi.component';
 import { firstValueFrom } from 'rxjs';
 import { OperatingLossService } from '../../../core/services/operating-loss/operating-loss.service';
 import { saveAs } from 'file-saver';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { OperatingLoss } from '../../../core/models/OperatingLoss';
+import { AuditButtonComponent } from '../../../shared/components/audit/audit-button/audit-button.component';
+import { TargetType } from '../../../core/enum/targettype.enum';
+
+
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
@@ -45,7 +48,7 @@ type ImpactRow = {
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
     MatGridListModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
-    FichiersComponent, ListSuiviComponent, MatTableModule],
+    FichiersComponent, AuditButtonComponent, MatTableModule],
   templateUrl: './view.component.html',
   styleUrl: './view.component.scss'
 })
@@ -68,6 +71,9 @@ export class ViewComponent implements OnInit {
   userTeam: string | undefined;
   message: string = "";
   idIncident: string = "";
+
+  targetTypeEnum = TargetType
+
   suivi: SuiviIncident[] = []
 
   businessUnits: BusinessUnit[] = [];
@@ -170,7 +176,7 @@ displayedImpactColumns = this.columns.map(c => c.columnDef);
         icon: 'description',
         class: 'btn-green',
         show: !this.isDraft(),
-        action: () => this.downloadPDF() 
+        action: () => this.downloadPDF()
       },
       {
         label: 'Clôturer',

@@ -10,11 +10,14 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { SelectEntitiesComponent } from "../../../shared/components/select-entities/select-entities.component";
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-add-entity-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
+  imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule, MatIconModule, PopupHeaderComponent, MatCardModule,
     MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: './add-entity-dialog.component.html',
   styleUrls: ['./add-entity-dialog.component.scss']

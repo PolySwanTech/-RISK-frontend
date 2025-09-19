@@ -22,6 +22,7 @@ export class Incident {
     categoryBaloise : BaloiseCategoryDto;
     cause : Cause;
     process: string ;
+    processName?: string ;
     teamId?: string;
     teamName?: string;
 

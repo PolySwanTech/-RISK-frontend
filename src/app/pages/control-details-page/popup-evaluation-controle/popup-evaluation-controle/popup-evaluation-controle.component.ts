@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
@@ -10,13 +10,20 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
+import { MatIcon } from '@angular/material/icon';
+import { FichiersComponent } from '../../../../shared/components/fichiers/fichiers.component';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { TargetType } from '../../../../core/enum/targettype.enum';
+import { FileService } from '../../../../core/services/file/file.service';
+import { PopupHeaderComponent } from '../../../../shared/components/popup-header/popup-header.component';
+import { MatCardModule } from '@angular/material/card';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
   selector: 'app-popup-evaluation-controle',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIcon, PopupHeaderComponent, MatCardModule],
   templateUrl: './popup-evaluation-controle.component.html',
   styleUrls: ['./popup-evaluation-controle.component.scss']
 })
@@ -27,6 +34,9 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   executionId!: string;
   canValidate: boolean = false;
 
+  private dialog = inject(MatDialog);
+  private fileService = inject(FileService);
+
   @Output() close = new EventEmitter<void>();
   @Output() evaluateRequested = new EventEmitter<void>();
   @Output() openDetailsRequested = new EventEmitter<void>();
@@ -35,6 +45,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   showEvaluateButton = true;
 
   mode: PopupMode = 'FORM';
+  controlId : string = '';
   blockers: ControlExecution[] = [];
   evalDetails?: ControlEvaluationView;
   reviewComment = '';
@@ -51,16 +62,18 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   private controlService = inject(ControlService);
   private confirmService = inject(ConfirmService);
   private snackBarService = inject(SnackBarService);
+  dialogRef = inject(MatDialogRef<PopupEvaluationControleComponent>);
 
   actionTaken: 'valid' | 'reexam' | null = null;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private dialogRef: MatDialogRef<PopupEvaluationControleComponent>) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, ) {
   }
 
   ngOnInit(): void {
     if (this.data) {
       this.executionId = this.data.executionId;
       this.mode = this.data.mode;
+      this.controlId = this.data.controlId;
       if (this.data.mode === 'FORM') this.startEvaluationFor(this.executionId);
       if (this.data.mode === 'DETAILS') this.openDetails(this.executionId);
       this.evaluationView = this.data.evaluationView;
@@ -145,6 +158,35 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     this.controlService.reviewEvaluationReexam(this.evalDetails.id, this.reviewComment).subscribe(() => {
       this.dialogRef.close();
     });
+  }
+
+  async viewFiles(closed: boolean = false) {
+
+    let target = TargetType.CONTROL
+    let files = await firstValueFrom(this.fileService.getFiles(target, this.executionId))
+
+    this.dialog.open(FichiersComponent,
+      {
+        width: '400px',
+        data: {
+          files: files,
+          targetType: target,
+          targetId: this.executionId,
+          closed: closed
+        }
+      }
+    )
+      .afterClosed().subscribe(_ => {
+        if (!closed) {
+          // this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
+          //   result => {
+          //     if (result) {
+          //       this.validateAction(actionId);
+          //     }
+          //   }
+          // )
+        }
+      });
   }
 
   cancel(): void { this.dialogRef.close(); }
