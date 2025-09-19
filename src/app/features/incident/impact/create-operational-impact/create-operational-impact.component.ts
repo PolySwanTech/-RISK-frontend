@@ -8,8 +8,8 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 
 import { OperatingLossFamily } from '../../../../core/enum/operatingLossFamily.enum';
-import { AmountTypeDto, CreateAmountDto } from '../../../../core/models/Amount';
-import { OperatingLossTypeDto, CreateOperatingLossDto } from '../../../../core/models/OperatingLoss';
+import { Amount, AmountDto, AmountTypeDto, CreateAmountDto } from '../../../../core/models/Amount';
+import { OperatingLossTypeDto, CreateOperatingLossDto, OperatingLoss } from '../../../../core/models/OperatingLoss';
 import { AmountTypeService } from '../../../../core/services/amount/amount-type.service';
 import { AmountService } from '../../../../core/services/amount/amount.service';
 import { OperatingLossTypeService } from '../../../../core/services/operating-loss/operating-loss-type.service';
@@ -19,10 +19,13 @@ import { BusinessUnit } from '../../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../../core/services/entities/entities.service';
 import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
+import { OperatingLossState, OperatingLossStateLabels } from '../../../../core/enum/operatingLossState.enum';
+import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
   amountType: string | null;
+  accountingReference: string;
   accountingDate: string;
   amount: string;
 }
@@ -32,7 +35,6 @@ interface FinancialImpact {
   businessUnitId: string;
   type: OperatingLossTypeDto | null;
   description: string;
-  accountingReference: string;
   details: FinancialImpactDetail[];
 }
 interface NonFinancialImpact {
@@ -73,6 +75,8 @@ export class CreateOperationalImpactComponent implements OnInit {
   private snackBarService = inject(SnackBarService);
 
   businessUnits: BusinessUnit[] = [];
+  allBusinessUnits: BusinessUnit[] = [];
+
   goBackButtons: GoBackButton[] = [];
   
 
@@ -86,6 +90,26 @@ export class CreateOperationalImpactComponent implements OnInit {
   financialAmountTypes: AmountTypeDto[] = [];
   nonFinancialAmountTypes: AmountTypeDto[] = [];
   estimeAmountType: AmountTypeDto | null = null;
+  
+  newAmounts: Record<string, { amountType: string | null; accountingReference: string; accountingDate: string; amount: string }> = {};
+  showAddAmountForm: Record<string, boolean> = {};
+
+  // ---------- Expansion ----------
+  expandedDetails: Record<string, boolean> = {};
+  expandedImpacts: Record<string, boolean> = {};
+
+
+
+
+  // ---------- State (OperatingLoss existants) ----------
+  existingOperatingLosses: OperatingLoss[] = [];
+  existingFinancialLosses: OperatingLoss[] = [];
+  existingNonFinancialLosses: OperatingLoss[] = [];
+  existingAmounts: Record<string, Amount[]> = {};
+  isLoadingExisting = false;
+  selectedImpacts: Record<string, boolean> = {};
+  selectedAmounts: Record<string, Record<string, boolean>> = {}; 
+  trackByIdString = (_: number, item: { id: string }) => item.id;
 
   // ---------- State ----------
   formData: FormData = { financialImpacts: [], nonFinancialImpacts: [] };
@@ -96,56 +120,68 @@ export class CreateOperationalImpactComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(pm => {
       const id = pm.get('id');
-      if (id) { this.incidentId = id; this.loadIncidentContext(); }
+      if (id) {
+        this.incidentId = id;
+        this.loadIncidentContext();
+      }
     });
 
     this.equipeService.loadEntities()
-    .pipe(catchError(() => of([] as BusinessUnit[])))
-    .subscribe(bus => {this.businessUnits = bus.filter(b => b.lm === true); });
+      .pipe(catchError(() => of([] as BusinessUnit[])))
+      .subscribe(bus => {
+        this.businessUnits = bus.filter(b => b.lm === true);
+        this.allBusinessUnits = bus;
+      });
 
-    // Si on a déjà l’ID au snapshot, on charge tout de suite
     this.loadIncidentContext();
 
-    // 2) Types d’impacts
     this.operatingLossTypeService
       .findByOperatingLossFamily(OperatingLossFamily.FINANCIER)
       .pipe(catchError(() => of([])))
-      .subscribe((types) => (this.financialOperatingLossTypes = types));
+      .subscribe(types => (this.financialOperatingLossTypes = types));
 
     this.operatingLossTypeService
       .findByOperatingLossFamily(OperatingLossFamily.NON_FINANCIER)
       .pipe(catchError(() => of([])))
-      .subscribe((types) => (this.nonFinancialOperatingLossTypes = types));
+      .subscribe(types => (this.nonFinancialOperatingLossTypes = types));
 
-    // 3) Types de montants
     this.amountTypeService
       .findByOperatingLossFamily(OperatingLossFamily.FINANCIER)
       .pipe(catchError(() => of([])))
-      .subscribe((amountTypes) => (this.financialAmountTypes = amountTypes));
+      .subscribe(amountTypes => (this.financialAmountTypes = amountTypes));
 
     this.amountTypeService
       .findByOperatingLossFamily(OperatingLossFamily.NON_FINANCIER)
       .pipe(catchError(() => of([])))
-      .subscribe((amountTypes) => {
+      .subscribe(amountTypes => {
         this.nonFinancialAmountTypes = amountTypes;
-        const found = amountTypes.find((t) => t.libelle?.includes('ESTIME'));
+        const found = amountTypes.find(t => t.libelle?.includes('ESTIME'));
         this.estimeAmountType = found || amountTypes[0] || null;
       });
-      
-  }
 
-  /** Charge teamId/teamName depuis l'incident, et applique la BU aux éléments du formulaire. */
-  private loadIncidentContext() {
-    if (!this.incidentId) return;
-
-    this.incidentService.getIncidentById(this.incidentId).pipe(
-      catchError((e) => { console.error('Erreur chargement incident', e); return of(null); })
-    ).subscribe(incident => {
-      if (!incident) return;
-
-      this.currentBusinessUnitId = incident.teamId ?? undefined;
-      this.currentBusinessUnitName = incident.teamName ?? undefined;
-    });
+      this.goBackButtons = [
+        {
+          label: 'Valider la sélection',
+          icon: 'check_circle',
+          class: 'btn-secondary',
+          show: true,
+          action: () => this.validateSelected(),
+        },
+        {
+          label: 'Rejeter la sélection',
+          icon: 'cancel',
+          class: 'btn-tertiary',
+          show: true,
+          action: () => this.rejectSelected(),
+        },
+        {
+          label: 'Désactiver',
+          icon: '',
+          class: 'btn-primary',
+          show: true,
+          action: () => this.deactivateSelected(),
+        }
+      ];
   }
 
   // ---------- Financier ----------
@@ -160,18 +196,88 @@ export class CreateOperationalImpactComponent implements OnInit {
           businessUnitId: '',
           type: null,
           description: '',
-          accountingReference: '',
-          details: [{ amountType: null, accountingDate: '', amount: '' }],
+          details: [{ amountType: null, accountingReference: '', accountingDate: '', amount: '' }],
         },
       ],
     };
   }
-  addFinancialDetail(i: number) {
-    this.formData.financialImpacts[i].details.push({ amountType: null, accountingDate: '', amount: '' });
+    addFinancialDetail(i: number) {
+      this.formData.financialImpacts[i].details.push({ amountType: null, accountingReference: '',accountingDate: '', amount: '' });
+    }
+    removeFinancialDetail(i: number, j: number) {
+      this.formData.financialImpacts[i].details.splice(j, 1);
+    }
+
+  toggleImpactSelection(impactId: string, amounts: Amount[]) {
+    const newState = !this.selectedImpacts[impactId];
+    this.selectedImpacts[impactId] = newState;
+
+    // init si pas encore fait
+    this.selectedAmounts[impactId] = this.selectedAmounts[impactId] || {};
+
+    // Appliquer la sélection à tous les montants de l’impact
+    amounts.forEach(a => this.selectedAmounts[impactId][a.id] = newState);
   }
-  removeFinancialDetail(i: number, j: number) {
-    this.formData.financialImpacts[i].details.splice(j, 1);
+
+  toggleAmountSelection(impactId: string, amountId: string) {
+    this.selectedAmounts[impactId] = this.selectedAmounts[impactId] || {};
+    const newState = !this.selectedAmounts[impactId][amountId];
+    this.selectedAmounts[impactId][amountId] = newState;
+
+    // Vérifier si tous les montants de l’impact sont cochés
+    const allSelected = Object.values(this.selectedAmounts[impactId]).every(v => v);
+    this.selectedImpacts[impactId] = allSelected;
   }
+
+
+  toggleAddAmountForm(operatingLossId: string) {
+    this.showAddAmountForm[operatingLossId] = !this.showAddAmountForm[operatingLossId];
+
+    // init form si pas encore fait
+    if (!this.newAmounts[operatingLossId]) {
+      this.newAmounts[operatingLossId] = { amountType: null, accountingReference: '', accountingDate: '', amount: '' };
+    }
+  }
+
+  toggleDetails(id: string) {
+    this.expandedDetails[id] = !this.expandedDetails[id];
+  }
+
+  toggleImpactDetails(event: any, id: string) {
+    event.stopPropagation();
+    this.expandedImpacts[id] = !this.expandedImpacts[id];
+  }
+
+  // ajout
+  addAmountToExistingImpact(operatingLossId: string) {
+    const form = this.newAmounts[operatingLossId];
+    if (!form || !form.amountType || !form.amount) {
+      this.snackBarService.error("Veuillez renseigner le type et le montant.");
+      return;
+    }
+
+    const dto: CreateAmountDto = {
+      amountType: form.amountType,
+      montant: +form.amount,
+      comptabilityRef: form.accountingReference || null,
+      comptabilisationDate: form.accountingDate || null,
+    };
+
+    this.amountService.create(operatingLossId, dto)
+      .pipe(catchError((e) => {
+        console.error("Erreur ajout montant", e);
+        this.snackBarService.error("Erreur lors de l’ajout du montant.");
+        return of(null);
+      }))
+      .subscribe((created) => {
+        if (created) {
+          this.snackBarService.success("Montant ajouté avec succès !");
+          this.loadAmountsForOperatingLoss(operatingLossId);
+          this.toggleAddAmountForm(operatingLossId);
+        }
+      });
+  }
+
 
   // ---------- Non financier ----------
   addNonFinancialImpact() {
@@ -195,7 +301,215 @@ export class CreateOperationalImpactComponent implements OnInit {
     this.formData = { ...this.formData, [type]: list.filter((it) => it.id !== id) } as FormData;
   }
 
+  refreshExistingOperatingLosses() {
+    if (!this.incidentId) return;
+    this.isLoadingExisting = true;
+   
+    this.operatingLossService
+      .listByIncident(this.incidentId)
+      .pipe(catchError(() => of([] as OperatingLoss[])))
+      .subscribe((losses) => {
+        this.existingOperatingLosses = losses;
+        this.existingFinancialLosses = losses.filter(
+          (l) => l?.type?.family === OperatingLossFamily.FINANCIER
+        );
+        this.existingNonFinancialLosses = losses.filter(
+          (l) => l?.type?.family === OperatingLossFamily.NON_FINANCIER
+        );
+  
+        // Charger les montants pour chaque OperatingLoss
+        losses.forEach((l) => this.loadAmountsForOperatingLoss(l.id));
+  
+        this.isLoadingExisting = false;
+      });
+  }
+
+  deactivateSelected() {
+    const impactIds = Object.keys(this.selectedImpacts).filter(id => this.selectedImpacts[id]);
+    const amountIds: { impactId: string; amountId: string }[] = [];
+
+    Object.entries(this.selectedAmounts).forEach(([impactId, amounts]) => {
+      Object.entries(amounts).forEach(([amountId, isSelected]) => {
+        if (isSelected) {
+          amountIds.push({ impactId, amountId });
+        }
+      });
+    });
+
+    if (impactIds.length === 0 && amountIds.length === 0) {
+      this.snackBarService.error("Aucun élément sélectionné à désactiver.");
+      return;
+    }
+
+    if (!window.confirm(`Désactiver ${impactIds.length} impact(s) et ${amountIds.length} montant(s) sélectionné(s) ?`)) {
+      return;
+    }
+
+    const calls = [
+      ...impactIds.map(id =>
+        this.operatingLossService.deactivate(id).pipe(
+          catchError(err => {
+            console.error("Erreur désactivation impact", err);
+            this.snackBarService.error("Erreur désactivation impact");
+            return of(null);
+          })
+        )
+      ),
+      ...amountIds.map(({ impactId, amountId }) =>
+        this.amountService.deactivate(amountId).pipe(
+          catchError(err => {
+            console.error("Erreur désactivation montant", err);
+            this.snackBarService.error("Erreur désactivation montant");
+            return of(null);
+          }),
+          switchMap(() => {
+            // recharger les montants de l’impact
+            return this.amountService.listByOperatingLoss(impactId).pipe(
+              catchError(() => of([] as AmountDto[])),
+              switchMap(amountDtos => {
+                this.existingAmounts[impactId] = amountDtos.map(a => Amount.fromDto(a));
+                return of(null);
+              })
+            );
+          })
+        )
+      )
+    ];
+
+    forkJoin(calls).subscribe(() => {
+      this.snackBarService.success("Désactivation effectuée.");
+      this.refreshExistingOperatingLosses();
+      this.selectedImpacts = {};
+      this.selectedAmounts = {};
+    });
+  }
+
+  
+    deactivateOperatingLoss(id: string) {
+      if (!id) return;
+      if (!window.confirm('Désactiver cet impact ?')) return;
+  
+      this.operatingLossService.deactivate(id)
+        .pipe(
+          catchError((e) => {
+            console.error('Erreur désactivation', e);
+            this.snackBarService.error('Erreur lors de la désactivation de l’impact.');
+            return of(void 0);
+          })
+        )
+        .subscribe(() => {
+          this.snackBarService.success('Impact désactivé.');
+          this.refreshExistingOperatingLosses();
+        });
+    }
+
+    loadAmountsForOperatingLoss(operatingLossId: string) {
+      this.amountService.listByOperatingLoss(operatingLossId)
+        .pipe(catchError(() => of([] as AmountDto[])))
+        .subscribe(amountDtos => {
+          this.existingAmounts[operatingLossId] = amountDtos.map(a => Amount.fromDto(a));
+        });
+        console.log(this.existingAmounts);
+    }
+    
+      deactivateAmount(id: string, operatingLossId: string) {
+        if (!id) return;
+        if (!window.confirm('Désactiver ce montant ?')) return;
+    
+        this.amountService.deactivate(id)
+          .pipe(
+            catchError((e) => {
+              console.error('Erreur désactivation montant', e);
+              this.snackBarService.error('Erreur lors de la désactivation du montant.');
+              return of(void 0);
+            })
+          )
+          .subscribe(() => {
+            this.snackBarService.success('Montant désactivé.');
+            this.loadAmountsForOperatingLoss(operatingLossId);
+          });
+      }
+
+  private loadIncidentContext() {
+    if (!this.incidentId) return;
+
+    this.incidentService.getIncidentById(this.incidentId).pipe(
+      catchError((e) => { console.error('Erreur chargement incident', e); return of(null); })
+    ).subscribe(incident => {
+      if (!incident) return;
+
+      this.currentBusinessUnitId = incident.teamId ?? undefined;
+      this.currentBusinessUnitName = incident.teamName ?? undefined;
+
+      // Charger les impacts déjà associés
+      this.refreshExistingOperatingLosses();
+    });
+  }
+
   // ---------- Validation ----------
+  validateSelected() {
+    this.updateSelected(OperatingLossState.VALIDATED, ReviewStatus.APPROVED, "Validation effectuée !");
+  }
+
+  rejectSelected() {
+    this.updateSelected(OperatingLossState.REJECTED, ReviewStatus.REJECTED, "Rejet effectué !");
+  }
+
+  private updateSelected(lossState: OperatingLossState, amountStatus: ReviewStatus, successMsg: string) {
+    const impactIds = Object.keys(this.selectedImpacts).filter(id => this.selectedImpacts[id]);
+    const amountIds: { impactId: string; amountId: string }[] = [];
+
+    Object.entries(this.selectedAmounts).forEach(([impactId, amounts]) => {
+      Object.entries(amounts).forEach(([amountId, isSelected]) => {
+        if (isSelected) {
+          amountIds.push({ impactId, amountId });
+        }
+      });
+    });
+
+    if (impactIds.length === 0 && amountIds.length === 0) {
+      this.snackBarService.error("Aucun élément sélectionné.");
+      return;
+    }
+
+    const calls = [
+      ...impactIds.map(id =>
+        this.operatingLossService.updateState(id, lossState).pipe(
+          catchError(err => {
+            console.error("Erreur update impact", err);
+            this.snackBarService.error("Erreur mise à jour impact");
+            return of(null);
+          })
+        )
+      ),
+      ...amountIds.map(({ impactId, amountId }) =>
+        this.amountService.updateReviewStatus(amountId, amountStatus).pipe(
+          catchError(err => {
+            console.error("Erreur update montant", err);
+            this.snackBarService.error("Erreur mise à jour montant");
+            return of(null);
+          }),
+          switchMap(() =>
+            this.amountService.listByOperatingLoss(impactId).pipe(
+              catchError(() => of([] as AmountDto[])),
+              switchMap(amountDtos => {
+                this.existingAmounts[impactId] = amountDtos.map(a => Amount.fromDto(a));
+                return of(null);
+              })
+            )
+          )
+        )
+      )
+    ];
+
+    forkJoin(calls).subscribe(() => {
+      this.snackBarService.success(successMsg);
+      this.refreshExistingOperatingLosses();
+      this.selectedImpacts = {};
+      this.selectedAmounts = {};
+    });
+  }
+
   validateForm(): boolean {
     const newErrors: Errors = {};
 
@@ -254,86 +568,111 @@ export class CreateOperationalImpactComponent implements OnInit {
     return Object.keys(newErrors).length === 0;
   }
 
-  // ---------- Submit ----------
-  handleSubmit() {
-    if (!this.validateForm()) return;
+  // ---------- Submit Financier ----------
+  handleSubmitFinancial(impact: FinancialImpact) {
     if (!this.incidentId || !this.currentBusinessUnitId) return;
 
     const incidentId = this.incidentId;
-    const buId = this.currentBusinessUnitId;
 
-    const creations$ = [
-      // 1) Financiers
-      ...this.formData.financialImpacts.map((imp) => {
-        const dto: CreateOperatingLossDto = {
-          type: imp.type!,
-          incidentId,
-          businessUnitId: imp.businessUnitId,
-          libelle: imp.title,
-          description: imp.description || null,
-          comptabilityRef: imp.accountingReference || null,
-        };
+    const dto: CreateOperatingLossDto = {
+      type: impact.type!,
+      incidentId,
+      businessUnitId: impact.businessUnitId,
+      libelle: impact.title,
+      description: impact.description || null,
+    };
 
-        return this.operatingLossService.create(dto, 'Création impact financier').pipe(
-          switchMap((operatingLossId: string) => {
-            if (!operatingLossId) return of(null);
+    this.operatingLossService.create(dto, 'Création impact financier').pipe(
+      switchMap((operatingLossId: string) => {
+        if (!operatingLossId) return of(null);
 
-            const amountCalls = imp.details.map((d) => {
-              const amountDto: CreateAmountDto = {
-                amountType: d.amountType!,
-                montant: +d.amount,
-                comptabilisationDate: d.accountingDate || null,
-              };
-              return this.amountService.create(operatingLossId, amountDto);
-            });
-            return amountCalls.length ? forkJoin(amountCalls) : of(null);
-          }),
-          catchError((e) => { console.error('Erreur création impact financier', e); return of(null); })
-        );
+        const amountCalls = impact.details.map((d) => {
+          const amountDto: CreateAmountDto = {
+            amountType: d.amountType!,
+            montant: +d.amount,
+            comptabilityRef: d.accountingReference || null,
+            comptabilisationDate: d.accountingDate || null,
+          };
+          return this.amountService.create(operatingLossId, amountDto);
+        });
+        return amountCalls.length ? forkJoin(amountCalls) : of(null);
       }),
+      catchError((e) => {
+        console.error('Erreur création impact financier', e);
+        this.snackBarService.error('Erreur lors de la création de l’impact financier.');
+        return of(null);
+      })
+    ).subscribe({
+      next: () => {
+        this.snackBarService.success('Impact financier créé avec succès !');
+        this.refreshExistingOperatingLosses();
+        this.formData.financialImpacts = this.formData.financialImpacts.filter((i) => i.id !== impact.id);
+      }
+    });
+  }
 
-      // 2) Non financiers
-      ...this.formData.nonFinancialImpacts.map((imp) => {
-        const dto: CreateOperatingLossDto = {
-          type: imp.type!,
-          incidentId,
-          businessUnitId: imp.businessUnitId, // on force la BU de l’incident
-          libelle: imp.title,
-          description: imp.description || null,
+  // ---------- Submit Non Financier ----------
+  handleSubmitNonFinancial(impact: NonFinancialImpact) {
+    if (!this.incidentId || !this.currentBusinessUnitId || !this.estimeAmountType) return;
+
+    const incidentId = this.incidentId;
+
+    const dto: CreateOperatingLossDto = {
+      type: impact.type!,
+      incidentId,
+      businessUnitId: impact.businessUnitId,
+      libelle: impact.title,
+      description: impact.description || null,
+    };
+
+    this.operatingLossService.create(dto, 'Création impact non financier').pipe(
+      switchMap((operatingLossId: string) => {
+        if (!operatingLossId) return of(null);
+
+        const amountDto: CreateAmountDto = {
+          amountType: this.estimeAmountType!.libelle,
+          montant: +impact.amount,
           comptabilityRef: null,
+          comptabilisationDate: null,
         };
-
-        return this.operatingLossService.create(dto, 'Création impact non financier').pipe(
-          switchMap((operatingLossId: string) => {
-            if (!operatingLossId) return of(null);
-
-            const amountDto: CreateAmountDto = {
-              amountType: this.estimeAmountType!.libelle,
-              montant: +imp.amount,
-              comptabilisationDate: null,
-            };
-            return this.amountService.create(operatingLossId, amountDto);
-          }),
-          catchError((e) => { console.error('Erreur création impact non financier', e); return of(null); })
-        );
+        return this.amountService.create(operatingLossId, amountDto);
       }),
-    ];
+      catchError((e) => {
+        console.error('Erreur création impact non financier', e);
+        this.snackBarService.error('Erreur lors de la création de l’impact non financier.');
+        return of(null);
+      })
+    ).subscribe({
+      next: () => {
+        this.snackBarService.success('Impact non financier créé avec succès !');
+        this.refreshExistingOperatingLosses();
+        this.formData.nonFinancialImpacts = this.formData.nonFinancialImpacts.filter((i) => i.id !== impact.id);
+      }
+    });
+  }
 
-    forkJoin(creations$)
-      .pipe(catchError((e) => { console.error(e); return of([]); }))
-      .subscribe({
-        next:() => {
-          this.snackBarService.success('Impact(s) opérationnel(s) créé(s) avec succès !');
-          this.resetForm();
-        },
-        error:() => {  this.snackBarService.error('Erreur lors de la création des impacts.'); }
-      });
-    }
+  get filteredGoBackButtons(): GoBackButton[] {
+    const hasImpacts = Object.values(this.selectedImpacts).some(v => v);
+    const hasAmounts = Object.values(this.selectedAmounts).some(
+      amounts => Object.values(amounts).some(v => v)
+    );
+    return (hasImpacts || hasAmounts) ? this.goBackButtons : [];
+  }
+
+
 
   onCancel() {
     if (window.confirm('Êtes-vous sûr de vouloir annuler ? Toutes les données saisies seront perdues.')) {
       this.resetForm();
     }
+  }
+
+  getReviewStatusLabel(status: ReviewStatus): string {
+    return ReviewStatusLabels[status] || 'Inconnu';
+  }
+
+  getStatutLabel(state: OperatingLossState): string {
+    return OperatingLossStateLabels[state] || 'En attente';
   }
 
   resetForm() {

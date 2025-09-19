@@ -28,6 +28,8 @@ import { saveAs } from 'file-saver';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { OperatingLoss } from '../../../core/models/OperatingLoss';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { RiskService } from '../../../core/services/risk/risk.service';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
 
 
 type ImpactRow = {
@@ -58,6 +60,7 @@ export class ViewComponent implements OnInit {
   private router = inject(Router);
   private entitiesService = inject(EntitiesService);
   private impactService = inject(OperatingLossService);
+  private riskService = inject(RiskService);
 
 
   incident: Incident | undefined
@@ -75,6 +78,7 @@ export class ViewComponent implements OnInit {
 
   impactRows: ImpactRow[] = [];
   impactDataSource = new MatTableDataSource<ImpactRow>([]);
+  currentRisk: RiskTemplate | undefined;
 
 
   
@@ -107,13 +111,13 @@ export class ViewComponent implements OnInit {
     type: 'currency',
     icon: 'euro'
   },
-  {
-    columnDef: 'nonFinancial',
-    header: 'Impacts non financiers',
-    cell: (row: ImpactRow) => row.nonFinancialLabels.join(', ') || '—',
-    filterType: 'text',
-    icon: 'tips_and_updates'
-  }
+  // {
+  //   columnDef: 'nonFinancial',
+  //   header: 'Impacts non financiers',
+  //   cell: (row: ImpactRow) => row.nonFinancialLabels.join(', ') || '—',
+  //   filterType: 'text',
+  //   icon: 'tips_and_updates'
+  // }
 ];
 displayedImpactColumns = this.columns.map(c => c.columnDef);
 
@@ -124,6 +128,7 @@ displayedImpactColumns = this.columns.map(c => c.columnDef);
     });
     this.idIncident = this.route.snapshot.params['id'];
     this.loadIncident(this.idIncident)
+
 
   if (this.idIncident) {
     this.impactService.listByIncident(this.idIncident).subscribe(result => {

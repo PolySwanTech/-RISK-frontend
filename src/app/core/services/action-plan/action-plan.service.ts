@@ -44,4 +44,12 @@ export class ActionPlanService {
   finishAction(actionId : string){
     return this.http.put(this.base + '/actions/finish/' + actionId, null);
   }
+
+  deactivate(id: string) {
+    return this.http.put<void>(`${this.base}/${id}/deactivate`, {});
+  }
+
+  deactivateActionFromActionPlan(id: string, actionId: string) {
+    return this.http.put<void>(`${this.base}/${id}/action/${actionId}/deactivate`, {});
+  }
 }

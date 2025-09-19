@@ -54,7 +54,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   actionPlan: ActionPlan = new ActionPlan(
     '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', null, '', new Date());
+    '', '', null, '', new Date(), true);
 
   actions: Action[] = []
 

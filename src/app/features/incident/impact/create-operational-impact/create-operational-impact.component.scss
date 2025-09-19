@@ -53,6 +53,7 @@
   --radius-xl: 20px;
   
   /* Spacing */
+  --space-min:2px;
   --space-xs: 8px;
   --space-sm: 12px;
   --space-md: 16px;
@@ -616,4 +617,16 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Métadonnées auteur + date */
+.op-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: var(--space-md);
+}
+
+.op-meta strong {
+  color: var(--text-secondary);
 }
