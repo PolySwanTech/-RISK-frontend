@@ -24,7 +24,14 @@ import { ControlTemplate } from '../../../core/models/ControlTemplate';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
+
+
+interface Indicator{
+  frequenceId : number;
+  severiteId : number;
+}
 
 @Component({
   selector: 'app-create-evaluation',
@@ -43,6 +50,7 @@ export class CreateEvaluationComponent implements OnInit {
   private entityService = inject(EntitiesService);
   private matrixService = inject(MatrixService);
   private controlService = inject(ControlService);
+  private snackBarService = inject(SnackBarService);
 
 
   @Output() changeToEvaluationStep = new EventEmitter<void>();
@@ -80,6 +88,8 @@ export class CreateEvaluationComponent implements OnInit {
   highestRiskLevelNet: RiskLevelEnum | null = null;
   riskLevels = Object.values(RiskLevelEnum);
 
+  indicators : Indicator[] = [];
+
   controls: ControlTemplate[] = [];
 
   selectedBPR : any = null;
@@ -112,7 +122,14 @@ export class CreateEvaluationComponent implements OnInit {
 
   gotoSteppe3(event: any) {
     this.highestRiskLevelNet = this.highestRiskLevel;
-    event.next();
+    if (this.highestRiskLevel && this.selectedBU) {
+      this.riskService.saveEvaluation(this.selectedRisk.id, this.highestRiskLevel, this.indicators, true).subscribe(
+        _ => {
+          this.snackBarService.info("Evaluation sauvegarder");
+          event.next();
+        }
+      )
+    }
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -194,7 +211,6 @@ export class CreateEvaluationComponent implements OnInit {
   getMatrix(id: string) {
     this.matrixService.getDefaultMatrix(id).subscribe({
       next: resp => {
-        console.log(resp);
         this.matrixData = resp;
 
       },
@@ -205,7 +221,6 @@ export class CreateEvaluationComponent implements OnInit {
   getFrequenciesByBu(buId: string) {
     this.matrixService.getFrequenciesByBu(buId).subscribe({
       next: resp => {
-        console.log(resp);
         this.frequencyList = resp;
 
       },
@@ -216,7 +231,6 @@ export class CreateEvaluationComponent implements OnInit {
   getSeveritiesByBu(buId: string) {
     this.matrixService.getSeveritiesByBu(buId).subscribe({
       next: resp => {
-        console.log(resp);
         this.severityList = resp;
 
       },
@@ -235,7 +249,12 @@ export class CreateEvaluationComponent implements OnInit {
     return classes[index] || '';
   }
 
-  updateRisk(severityId: number, frequencyId: number) {
+  updateRisk(severity: any) {
+
+    let frequency = severity.selectedFrequency;
+
+    this.indicators.push({severiteId: severity.id, frequenceId : frequency.id});
+    
     interface MatrixCell {
       severite: { id: number };
       frequence: { id: number };
@@ -243,16 +262,15 @@ export class CreateEvaluationComponent implements OnInit {
     }
 
     const cell: MatrixCell | undefined = this.matrixData.cells.find(
-      (c: MatrixCell) => c.severite.id == severityId && c.frequence.id == Number(frequencyId)
+      (c: MatrixCell) => c.severite.id == severity.id && c.frequence.id == Number(frequency.id)
     );
 
     if (cell) {
       // retrouver la sévérité concernée et lui attacher le niveau de risque
-      const sev = this.severityList.find(s => s.id == severityId);
+      const sev = this.severityList.find(s => s.id == severity.id);
       if (sev) {
         sev.riskLevel = cell.riskLevel; // ⚡ maintenant une string (ex: "LOW")
       }
-      console.log("➡️ Sévérité mise à jour :", sev);
     }
 
     // toujours recalculer après chaque changement
@@ -277,8 +295,6 @@ export class CreateEvaluationComponent implements OnInit {
       selectedRisks.push(this.financierNonFinancier);
     }
 
-    console.log("➡️ Niveaux de risque sélectionnés :", selectedRisks);
-
     if (!selectedRisks.length) {
       this.highestRiskLevel = null;
       return;
@@ -288,8 +304,6 @@ export class CreateEvaluationComponent implements OnInit {
       (max: RiskLevelEnum, current: RiskLevelEnum) =>
         RiskLevelScores[current] > RiskLevelScores[max] ? current : max
     );
-
-    console.log("➡️ Highest Risk Level =", this.highestRiskLevel);
   }
 
   trackByProcessId = (_: number, p: ProcessNode) => p.id;
@@ -297,23 +311,6 @@ export class CreateEvaluationComponent implements OnInit {
   onSelectProcess(p: ProcessNode) {
     this.selectedProcess = p;
     this.changeToEvaluationStep.emit();
-  }
-
-  submitEvaluation(data: any) {
-    const payload: any = {
-      commentaire: data.commentaire!,
-      probability: data.probability!,
-      riskNet: data.riskNet!,
-      riskId: this.selectedRisk.id.id,
-    };
-
-    this.evaluationSrv.save(payload).subscribe(
-      {
-        next: resp => {
-        },
-        error: err => {
-        }
-      })
   }
 
   onSaveEvaluation() {
@@ -335,7 +332,6 @@ export class CreateEvaluationComponent implements OnInit {
     this.selectedRisk = event.risk
 
     this.controlService.getAllTemplatesByProcessAndRisk(this.selectedProcess, this.selectedRisk!).subscribe(controls => {
-      console.log(controls);
       this.controls = controls;
     });
   }
@@ -361,10 +357,8 @@ export class CreateEvaluationComponent implements OnInit {
 
   selectProcess(process: ProcessNode): void {
     this.selectedProcess = process;
-    console.log(this.selectedProcess)
     this.riskService.getAllByProcess(this.selectedProcess?.id).subscribe(risks => {
       this.risks = risks;
-      console.log(risks)
     });
 
     if (this.selectedRisk && this.selectedProcess) {
@@ -384,17 +378,14 @@ export class CreateEvaluationComponent implements OnInit {
       highestRiskLevelNet: this.highestRiskLevelNet
     };
 
-    console.log(evaluationData);
-
-    stepper.next();
-    // this.evaluationSrv.save(evaluationData).subscribe({
-    //   next: () => {
-    //     stepper.next();
-    //   },
-    //   error: (err) => {
-    //     console.error('Erreur lors de l\'enregistrement', err);
-    //   }
-    // });
+    if (this.highestRiskLevelNet) {
+      this.riskService.saveEvaluation(this.selectedRisk.id, this.highestRiskLevelNet, [], false).subscribe(
+        _ => {
+          this.snackBarService.info("Evaluation sauvegarder");
+          stepper.next();
+        }
+      )
+    }
   }
 
   newEvaluation(): void {

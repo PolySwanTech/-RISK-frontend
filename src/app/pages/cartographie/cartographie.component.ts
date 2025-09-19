@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Cartography } from '../../core/models/Cartography';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -17,12 +17,14 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
+import { RiskService } from '../../core/services/risk/risk.service';
+import { ListProcessComponent } from '../../features/process/list-process/list-process.component';
 
 @Component({
   selector: 'app-cartographie',
   imports: [MatCardModule, CommonModule, FormsModule, GoBackComponent,
-    MatPaginatorModule, RouterModule,
-    MatIconModule, MatTableModule, MatButtonModule, MatMenuModule, 
+    MatPaginatorModule, RouterModule, ListProcessComponent,
+    MatIconModule, MatTableModule, MatButtonModule, MatMenuModule,
     MatFormFieldModule, MatOptionModule, MatSelectModule, ReactiveFormsModule, MatTooltipModule, MatSuffix],
   templateUrl: './cartographie.component.html',
   styleUrls: ['./cartographie.component.scss']
@@ -32,11 +34,11 @@ export class CartographieComponent implements OnInit {
   loading = false;
 
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private businessUnitService = inject(EntitiesService);
-  private snackBarService = inject(SnackBarService);
 
   selectedYear: number | null = null;
-  selectedBuId: string | null = null;
+  selectedBu: BusinessUnit | null = null;
 
   businessUnits: BusinessUnit[] = [];
   years: number[] = [];
@@ -60,26 +62,28 @@ export class CartographieComponent implements OnInit {
     });
   }
 
-  goCreate() { this.router.navigate(['cartographie', 'create'], {queryParams : { buId: this.selectedBuId, year: this.selectedYear }}); }
-
-  openDuplicate(row: Cartography) {
-    // const ref = this.dialog.open(CartoDuplicateDialogComponent, {
-    //   width: '460px',
-    //   data: { source: row }
-    // });
-
-    // ref.afterClosed().subscribe(result => {
-    //   if (!result) return;
-    //   this.service.duplicateFrom(row, result).subscribe(newCarto => {
-    //     // rafraîchir la liste et naviguer vers la nouvelle carto
-    //     this.fetch();
-    //     this.router.navigate(['/carto', newCarto.id]);
-    //   });
-    // });
+  goCreate() {
+    if (this.selectedBu)
+      this.router.navigate(['cartographie', 'create'], { queryParams: { buId: this.selectedBu.id, year: this.selectedYear } });
   }
 
+  onBuChange(bu: BusinessUnit) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { buId: bu.id },
+      queryParamsHandling: 'merge' // garde les autres query params existants
+    });
+  }
+  
   viewCarto() {
-    this.snackBarService.info(`Consultation de la carto ${this.selectedBuId} - ${this.selectedYear}`);
+    // if(this.selectedBuId){
+    //   this.riskService.getEvaluationsByBu(this.selectedBuId).subscribe(
+    //     resp => {
+    //       console.log(resp)
+    //     }
+    //   )
+    // }
+    // this.snackBarService.info(`Consultation de la carto ${this.selectedBuId} - ${this.selectedYear}`);
   }
 
   addCarto() {
