@@ -23,6 +23,8 @@ import { firstValueFrom } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MatBadgeModule } from '@angular/material/badge';
+import { RiskEvaluation } from '../../../core/models/RiskEvaluation';
+import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
 
 @Component({
   selector: 'app-list-process',
@@ -37,8 +39,9 @@ import { MatBadgeModule } from '@angular/material/badge';
     FormsModule,
     MatCardModule,
     GoBackComponent,
-    MatBadgeModule
-  ],
+    MatBadgeModule,
+    BuProcessAccordionComponent
+],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'
 })
@@ -61,6 +64,7 @@ export class ListProcessComponent implements OnInit {
   searchTerm: string = '';
   years: number[] = [];
   selectedYear: number = new Date().getFullYear();
+  entities: BusinessUnit[] = [];
 
   @Input() isCartographie: boolean = false;
 
@@ -71,6 +75,7 @@ export class ListProcessComponent implements OnInit {
     this.hierarchicalProcesses = [];
     this.expandedNodes.clear();
     this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
+      this.entities = entities;
       this.fetchProcesses(entities);
     });
 
@@ -125,7 +130,7 @@ export class ListProcessComponent implements OnInit {
       this.filteredProcesses.forEach(bu => {
         // 3. Pour chaque risque de ce process
         bu.children?.forEach(process => {
-          process.risks?.forEach(risk => {
+          process.risks?.forEach((risk: { id: { id: any; }; riskEvaluations: RiskEvaluation[]; }) => {
             var rId = risk.id.id;
             risk.riskEvaluations = evaluations.filter(e => e.riskId === rId);
           });
@@ -419,4 +424,25 @@ export class ListProcessComponent implements OnInit {
   goToMatrixPage(buId: any) {
     this.router.navigate(['risk', buId])
   }
+
+  loadProcesses(bu: any) {
+    this.processService.getProcessLeaf(bu.id).subscribe(processes => {
+    bu.children = processes;
+  });
+}
+
+// loadRisksAndChildren(process: ProcessNode) {
+//   this.processService.getChildren(process.id).subscribe(children => {
+//     process.children = children;
+//   });
+
+//   this.processService.getRisksByProcess(process.id).subscribe(risks => {
+//     process.risks = risks;
+//   });
+// }
+
+onRiskSelected(risk: any) {
+  console.log('➡️ Risque sélectionné :', risk);
+}
+
 }

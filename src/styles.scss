@@ -393,7 +393,7 @@ mat-paginator {
         font-weight: bold !important;
     }
 
-    button:not(.mdc-switch, .mdc-icon-button) {
+    button:not(.mdc-switch):not(.mdc-icon-button):not(div.node-actions > button):not(.breadcrumb > button):not(.mat-mdc-button-base) {
         width: 100%;
         margin-top: 20px;
         padding: 12px;

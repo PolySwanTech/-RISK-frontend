@@ -20,6 +20,7 @@ export class Incident {
     riskName : string = "";
     cause : Cause;
     process: string ;
+    processName?: string ;
     teamId?: string;
     teamName?: string;
 
