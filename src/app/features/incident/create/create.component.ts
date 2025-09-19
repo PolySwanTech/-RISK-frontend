@@ -56,7 +56,7 @@ import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
     MatDatepickerModule,
     MatChipsModule,
     MatChipListbox
-],
+  ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
@@ -75,7 +75,7 @@ export class CreateComponent implements OnInit {
 
   today = new Date();
 
-  selectedBPR : any = null
+  selectedBPR: any = null
 
 
   incidentForm1 = this._formBuilder.group({
@@ -203,20 +203,20 @@ export class CreateComponent implements OnInit {
         });
       });
 
-      if(incident.riskName){
-this.selectedBPR = {
-        bu : {
-          name : incident.teamName
-        },
-        process: {
-          name : incident.processName
-        },
-        risk: {
-          name : incident.riskName
+      if (incident.riskName) {
+        this.selectedBPR = {
+          bu: {
+            name: incident.teamName
+          },
+          process: {
+            name: incident.processName
+          },
+          risk: {
+            name: incident.riskName
+          }
         }
       }
-      }
-      
+
       this.incident = incident;
       this.selectedUser = incident.intervenant || null;
     });
@@ -296,12 +296,12 @@ this.selectedBPR = {
       return;
     }
 
-   
+
 
     const incident = this.convertFormToIncident(false);
     incident.state = State.SUBMIT
 
-     console.log(incident)
+    console.log(incident)
 
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
@@ -384,7 +384,7 @@ this.selectedBPR = {
     return v?.toISOString ? v.toISOString() : v;
   }
 
-  selectBPR(event : any){
+  selectBPR(event: any) {
     this.selectedBPR = event;
     this.incidentForm3.get('teamId')?.setValue(event.bu.id)
     this.incidentForm3.get('processId')?.setValue(event.process.id)
@@ -392,16 +392,16 @@ this.selectedBPR = {
   }
 
   create() {
-  const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
-    minWidth: '750px',
-    height: '600px',
-    maxHeight: '600px',
-  });
+    const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
+      minWidth: '750px',
+      height: '600px',
+      maxHeight: '600px',
+    });
 
-  dialogRef.afterClosed().subscribe(event => {
-    this.selectBPR(event);
-  });
-}
+    dialogRef.afterClosed().subscribe(event => {
+      this.selectBPR(event);
+    });
+  }
 
 
 }
