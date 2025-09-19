@@ -1,273 +1,473 @@
-import { AfterViewInit, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DatePipe, CommonModule, CurrencyPipe } from '@angular/common';
+import { AfterViewInit, Component, OnInit, inject } from '@angular/core';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import { forkJoin, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { OperatingLossFamily } from '../../../../core/enum/operatingLossFamily.enum';
+import { Amount, AmountDto, AmountTypeDto, CreateAmountDto } from '../../../../core/models/Amount';
+import { OperatingLossTypeDto, CreateOperatingLossDto, OperatingLoss } from '../../../../core/models/OperatingLoss';
+import { AmountTypeService } from '../../../../core/services/amount/amount-type.service';
+import { AmountService } from '../../../../core/services/amount/amount.service';
+import { OperatingLossTypeService } from '../../../../core/services/operating-loss/operating-loss-type.service';
+import { OperatingLossService } from '../../../../core/services/operating-loss/operating-loss.service';
+import { IncidentService } from '../../../../core/services/incident/incident.service';
+import { BusinessUnit } from '../../../../core/models/BusinessUnit';
+import { EntitiesService } from '../../../../core/services/entities/entities.service';
+import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialog } from '@angular/material/dialog';
-import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { FileService } from '../../../../core/services/file/file.service';
-import { FichiersComponent } from '../../../../shared/components/fichiers/fichiers.component';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { FilterTableComponent } from "../../../../shared/components/filter-table/filter-table.component";
-import { GlobalSearchBarComponent } from "../../../../shared/components/global-search-bar/global-search-bar.component";
-import { Filter } from '../../../../core/enum/filter.enum';
-import { buildFilterFromColumn } from '../../../../shared/utils/filter-builder.util';
-import { firstValueFrom } from 'rxjs';
-import { MatPaginator } from "@angular/material/paginator";
-import { ImpactTypeEnum } from '../../../../core/enum/impactType.enum';
-import { TargetType } from '../../../../core/enum/targettype.enum';
-import { OperatingLossService } from '../../../../core/services/operating-loss/operating-loss.service';
-import { OperatingLoss } from '../../../../core/models/OperatingLoss';
-import { AmountDto } from '../../../../core/models/Amount';
-import { AmountService } from '../../../../core/services/amount/amount.service';
-import { OperatingLossFamily, OperatingLossFamilyLabels } from '../../../../core/enum/operatingLossFamily.enum';
+import { FilterTableComponent } from '../../../../shared/components/filter-table/filter-table.component';
+import { GlobalSearchBarComponent } from '../../../../shared/components/global-search-bar/global-search-bar.component';
+import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
+
+// ------------------ Modèles locaux (form) ------------------
+interface FinancialImpactDetail {
+  amountType: string | null;
+  accountingReference: string;
+  accountingDate: string;
+  amount: string;
+}
+interface FinancialImpact {
+  id: number;
+  title: string;
+  businessUnitId: string;
+  type: OperatingLossTypeDto | null;
+  description: string;
+  details: FinancialImpactDetail[];
+}
+interface NonFinancialImpact {
+  id: number;
+  title: string;
+  businessUnitId: string;
+  type: OperatingLossTypeDto | null;
+  description: string;
+  amount: string;
+}
+interface FormData {
+  financialImpacts: FinancialImpact[];
+  nonFinancialImpacts: NonFinancialImpact[];
+}
+type Errors = Record<string, string>;
+
 
 @Component({
   selector: 'app-list-impact',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
+  imports: [
+    CommonModule, FormsModule, GoBackComponent,
+    MatCardModule, MatListModule, MatIconModule, FormsModule,
     MatGridListModule, MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatTooltipModule, CommonModule, GoBackComponent, MatTableModule, MatButtonToggleModule, FilterTableComponent, GlobalSearchBarComponent, MatPaginator],
+    MatInputModule, MatTooltipModule, CommonModule,
+    GoBackComponent, MatTableModule, MatButtonToggleModule,
+    FilterTableComponent, GlobalSearchBarComponent, MatPaginator
+  ],
   providers: [DatePipe, CurrencyPipe],
   templateUrl: './list-impact.component.html',
   styleUrl: './list-impact.component.scss'
 })
 export class ListImpactComponent implements OnInit, AfterViewInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  ngAfterViewInit(): void {
+    // no-op
+  }
 
-  private router = inject(Router);
+  // ---------- Routing ----------
   private route = inject(ActivatedRoute);
-  private impactService = inject(OperatingLossService);
-  private dialog = inject(MatDialog);
-  private fileService = inject(FileService);
-  private datePipe = inject(DatePipe);
-    // + NEW: pour l’expansion
+  private router = inject(Router);
+
+
+  incidentId?: string;
+
+  // ---------- Services ----------
+  private incidentService = inject(IncidentService);
+  private operatingLossService = inject(OperatingLossService);
+  private operatingLossTypeService = inject(OperatingLossTypeService);
+  private amountTypeService = inject(AmountTypeService);
   private amountService = inject(AmountService);
-  expandedId: string | null = null;
-  amountsMap = new Map<string, AmountDto[]>();    // cache par impactId
-  loadingAmounts = new Set<string>();              // ids en chargement
-  amountsError = new Map<string, string>();        // erreurs éventuelles
+  private equipeService = inject(EntitiesService);
+  private snackBarService = inject(SnackBarService);
 
-  incidentId: string = this.route.snapshot.paramMap.get('id') || '';
 
-  impacts: OperatingLoss[] = [];
-
+  businessUnits: BusinessUnit[] = [];
   goBackButtons: GoBackButton[] = [];
 
-  filterMode: 'general' | 'detailed' = 'general';
+  // ---------- Contexte Incident/BU ----------
+  private currentBusinessUnitId?: string;
+  currentBusinessUnitName?: string;
 
-  types: ImpactTypeEnum[] = [ImpactTypeEnum.PROVISION, ImpactTypeEnum.RECUPERATION];
+  // ---------- Données dynamiques ----------
+  financialOperatingLossTypes: OperatingLossTypeDto[] = [];
+  nonFinancialOperatingLossTypes: OperatingLossTypeDto[] = [];
+  financialAmountTypes: AmountTypeDto[] = [];
+  nonFinancialAmountTypes: AmountTypeDto[] = [];
+  estimeAmountType: AmountTypeDto | null = null;
+  expandedDetails: Record<string, boolean> = {};
 
 
-  columns = [
-    {
-      columnDef: 'libelle',
-      header: 'Libellé',
-      cell: (impact: OperatingLoss) => impact.libelle || '',
-      filterType: 'text',
-      icon: 'business'
-    },
-    {
-      columnDef: 'entityName',
-      header: 'Entité',
-      cell: (impact: OperatingLoss) => impact.entityName || '',
-      filterType: 'text',
-      icon: 'business'
-    },
-    {
-      columnDef: 'impactType',
-      header: "Type d'Impact",
-      cell: (impact: OperatingLoss) =>{
-        const impactType = impact.type;
-        return OperatingLossFamilyLabels[impactType.family] 
-      },
-      filterType: 'select',
-      icon: 'category'
-    },
-    {
-      columnDef: 'type',
-      header: 'Type Conséquence',
-      cell: (impact: OperatingLoss) => impact.type.label || '',
-      filterType: 'select',
-      icon: 'category'
-    },
-    {
-      columnDef: 'montantBrut',
-      header: 'Montant Brut',
-      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantBrut + ' €' || '') : 'N/A',
-      filterType: 'numberRange',
-      icon: 'euro_symbol'
-    },
-    {
-      columnDef: 'montantNet',
-      header: 'Montant Net',
-      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantNet + ' €' || '') : 'N/A',
-      filterType: 'numberRange',
-      icon: 'euro_symbol'
-    },
-    {
-      columnDef: 'montantFinal',
-      header: 'Montant Final',
-      cell: (impact: OperatingLoss) => impact.type.family === OperatingLossFamily.FINANCIER ? (impact.montantFinal + ' €' || '') : 'N/A',
-      filterType: 'numberRange',
-      icon: 'euro_symbol'
-    },
-    {
-      columnDef: 'createdAt',
-      header: 'Créé le',
-      cell: (impact: OperatingLoss) => this.datePipe.transform(impact.createdAt, 'dd/MM/yyyy') || '',
-      filterType: 'date',
-      icon: 'event'
-    },
-  ];
-  
 
-  filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
+  // ---------- State (form) ----------
+  formData: FormData = { financialImpacts: [], nonFinancialImpacts: [] };
+  errors: Errors = {};
+  trackById = (_: number, item: { id: number }) => item.id;
 
-  dataSource = new MatTableDataSource<OperatingLoss>([]);
+  // ---------- State (OperatingLoss existants) ----------
+  existingOperatingLosses: OperatingLoss[] = [];
+  existingFinancialLosses: OperatingLoss[] = [];
+  existingNonFinancialLosses: OperatingLoss[] = [];
+  existingAmounts: Record<string, Amount[]> = {};
+  isLoadingExisting = false;
+  trackByIdString = (_: number, item: { id: string }) => item.id;
 
-  displayedColumns = ['expand', ...this.columns.map(c => c.columnDef), 'fichiers'];
+  // ---------- Lifecycle ----------
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(pm => {
+      const id = pm.get('id');
+      if (id) { this.incidentId = id; this.loadIncidentContext(); }
+    });
 
-  @Input() closed: boolean = false;
+    this.equipeService.loadEntities()
+      .pipe(catchError(() => of([] as BusinessUnit[])))
+      .subscribe(bus => { this.businessUnits = bus.filter(b => b.lm === true); });
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
+    // Si on a déjà l’ID au snapshot, on charge tout de suite
+    this.loadIncidentContext();
 
-  ngOnInit() {
-    if (this.incidentId) {
-      this.impactService.listByIncident(this.incidentId).subscribe(impacts => {
-        this.impacts = impacts;
-        this.dataSource.data = impacts;
+    // 2) Types d’impacts
+    this.operatingLossTypeService
+      .findByOperatingLossFamily(OperatingLossFamily.FINANCIER)
+      .pipe(catchError(() => of([])))
+      .subscribe((types) => (this.financialOperatingLossTypes = types));
+
+    this.operatingLossTypeService
+      .findByOperatingLossFamily(OperatingLossFamily.NON_FINANCIER)
+      .pipe(catchError(() => of([])))
+      .subscribe((types) => (this.nonFinancialOperatingLossTypes = types));
+
+    // 3) Types de montants
+    this.amountTypeService
+      .findByOperatingLossFamily(OperatingLossFamily.FINANCIER)
+      .pipe(catchError(() => of([])))
+      .subscribe((amountTypes) => (this.financialAmountTypes = amountTypes));
+
+    this.amountTypeService
+      .findByOperatingLossFamily(OperatingLossFamily.NON_FINANCIER)
+      .pipe(catchError(() => of([])))
+      .subscribe((amountTypes) => {
+        this.nonFinancialAmountTypes = amountTypes;
+        const found = amountTypes.find((t) => t.libelle?.includes('ESTIME'));
+        this.estimeAmountType = found || amountTypes[0] || null;
       });
-    }
     this.goBackButtons = [
-      {
-        label: 'Ajouter un impact',
-        icon: 'add',
-        class: 'btn-primary',
-        show: true,
-        action: () => this.addImpact()
-      }
-    ];
-  }
-
-  addImpact() {
-    this.router.navigate(['incident', this.incidentId, 'impacts', 'create']);
-  }
-
-  async viewFiles(impact: OperatingLoss) {
-    let files = await firstValueFrom(this.fileService.getFiles(TargetType.IMPACT, impact.id ))
-
-    this.dialog.open(FichiersComponent,
-      {
-        width: '400px',
-        data: {
-          files: files,
-          targetType: TargetType.IMPACT,
-          targetId: impact.id
+        {
+          label: 'Ajouter un impact',
+          icon: 'add',
+          class: 'btn-primary',
+          show: true,
+          action: () => this.addImpact()
         }
-      }
-    )
-  }
+      ];
+    }
+    
+    addImpact() {
+      this.router.navigate(['incident', this.incidentId, 'impacts', 'create']);
+    }
 
-  handleFiltersChanged(filters: any) {
-    let filtered = [...this.impacts];
+  loadAmountsForOperatingLoss(operatingLossId: string) {
+  this.amountService.listByOperatingLoss(operatingLossId)
+    .pipe(catchError(() => of([] as AmountDto[])))
+    .subscribe(amountDtos => {
+      this.existingAmounts[operatingLossId] = amountDtos.map(a => Amount.fromDto(a));
+    });
+    console.log(this.existingAmounts);
+}
 
-    for (const key in filters) {
-      const filterValue = filters[key];
-      if (!filterValue) continue;
+  deactivateAmount(id: string, operatingLossId: string) {
+    if (!id) return;
+    if (!window.confirm('Désactiver ce montant ?')) return;
 
-      filtered = filtered.filter((impact: any) => {
-        const fieldValue = impact[key];
-
-        // Cas spécial : filtre par plage de dates { start, end }
-        if (filterValue.start instanceof Date && filterValue.end instanceof Date) {
-          if (!fieldValue) return false;
-
-          const impactDate = new Date(fieldValue); // date du champ
-          if (isNaN(impactDate.getTime())) return false;
-
-          const start = new Date(filterValue.start);
-          const end = new Date(filterValue.end);
-          start.setHours(0, 0, 0, 0);
-          end.setHours(23, 59, 59, 999);
-
-          return impactDate >= start && impactDate <= end;
-        }
-
-        if (typeof filterValue === 'string' || typeof filterValue === 'number') {
-          return fieldValue?.toString().toLowerCase().includes(filterValue.toString().toLowerCase());
-        }
-
-        if (filterValue.min !== undefined || filterValue.max !== undefined) {
-          const fieldNumber = Number(fieldValue);
-          if (isNaN(fieldNumber)) return false;
-
-          const min = filterValue.min ?? -Infinity;
-          const max = filterValue.max ?? Infinity;
-          return fieldNumber >= min && fieldNumber <= max;
-        }
-
-        return true;
+    this.amountService.deactivate(id)
+      .pipe(
+        catchError((e) => {
+          console.error('Erreur désactivation montant', e);
+          this.snackBarService.error('Erreur lors de la désactivation du montant.');
+          return of(void 0);
+        })
+      )
+      .subscribe(() => {
+        this.snackBarService.success('Montant désactivé.');
+        this.loadAmountsForOperatingLoss(operatingLossId);
       });
-    }
-
-    this.dataSource.data = filtered;
   }
 
-  searchQuery: string = '';
+  /** Charge teamId/teamName depuis l'incident, et applique la BU aux éléments du formulaire. */
+  private loadIncidentContext() {
+    if (!this.incidentId) return;
 
-  onSearchFiles(query: string) {
-    const lowerQuery = query.toLowerCase();
-    this.dataSource.data = this.impacts.filter(impact =>
-      Object.entries(impact).some(([key, value]) => {
-        if (key === 'id' || key === 'entityId') return false;
+    this.incidentService.getIncidentById(this.incidentId).pipe(
+      catchError((e) => { console.error('Erreur chargement incident', e); return of(null); })
+    ).subscribe(incident => {
+      if (!incident) return;
 
-        if (key === 'createdAt') {
-          const formattedDate = this.datePipe.transform(value, 'dd/MM/yyyy') || '';
-          return formattedDate.toLowerCase().includes(lowerQuery);
-        }
+      this.currentBusinessUnitId = incident.teamId ?? undefined;
+      this.currentBusinessUnitName = incident.teamName ?? undefined;
 
-        return value?.toString().toLowerCase().includes(lowerQuery);
-      })
-    );
-  }
-
-  toggleExpand(impact: OperatingLoss) {
-    // replie si on reclique
-    if (this.expandedId === impact.id) {
-      this.expandedId = null;
-      return;
-    }
-
-    this.expandedId = impact.id;
-
-    // si déjà en cache, pas de nouvel appel
-    if (this.amountsMap.has(impact.id)) return;
-
-    // sinon on charge
-    this.loadingAmounts.add(impact.id);
-    this.amountsError.delete(impact.id);
-
-    this.amountService.listByOperatingLoss(impact.id).subscribe({
-      next: (amounts) => this.amountsMap.set(impact.id, amounts),
-      error: () => this.amountsError.set(impact.id, 'Erreur lors du chargement des montants'),
-      complete: () => this.loadingAmounts.delete(impact.id)
+      // Charger les impacts déjà associés
+      this.refreshExistingOperatingLosses();
     });
   }
 
-  clearSearch() {
-    this.searchQuery = '';
-    this.dataSource.data = this.impacts;
-  }
+ refreshExistingOperatingLosses() {
+  if (!this.incidentId) return;
+  this.isLoadingExisting = true;
+
+  this.operatingLossService
+    .listByIncident(this.incidentId)
+    .pipe(catchError(() => of([] as OperatingLoss[])))
+    .subscribe((losses) => {
+      this.existingOperatingLosses = losses;
+      this.existingFinancialLosses = losses.filter(
+        (l) => l?.type?.family === OperatingLossFamily.FINANCIER
+      );
+      this.existingNonFinancialLosses = losses.filter(
+        (l) => l?.type?.family === OperatingLossFamily.NON_FINANCIER
+      );
+
+      // Charger les montants pour chaque OperatingLoss
+      losses.forEach((l) => this.loadAmountsForOperatingLoss(l.id));
+
+      this.isLoadingExisting = false;
+    });
 }
 
+  deactivateOperatingLoss(id: string) {
+    if (!id) return;
+    if (!window.confirm('Désactiver cet impact ?')) return;
 
+    this.operatingLossService.deactivate(id)
+      .pipe(
+        catchError((e) => {
+          console.error('Erreur désactivation', e);
+          this.snackBarService.error('Erreur lors de la désactivation de l’impact.');
+          return of(void 0);
+        })
+      )
+      .subscribe(() => {
+        this.snackBarService.success('Impact désactivé.');
+        this.refreshExistingOperatingLosses();
+      });
+  }
+
+  toggleDetails(olId: string) {
+  this.expandedDetails[olId] = !this.expandedDetails[olId];
+}
+
+  // ---------- Financier ----------
+  addFinancialImpact() {
+    this.formData = {
+      ...this.formData,
+      financialImpacts: [
+        ...this.formData.financialImpacts,
+        {
+          id: Date.now(),
+          title: '',
+          businessUnitId: '',
+          type: null,
+          description: '',
+          details: [{ amountType: null, accountingReference: '', accountingDate: '', amount: '' }],
+        },
+      ],
+    };
+  }
+  addFinancialDetail(i: number) {
+    this.formData.financialImpacts[i].details.push({ amountType: null, accountingReference: '', accountingDate: '', amount: '' });
+  }
+  removeFinancialDetail(i: number, j: number) {
+    this.formData.financialImpacts[i].details.splice(j, 1);
+  }
+
+  // ---------- Non financier ----------
+  addNonFinancialImpact() {
+    this.formData = {
+      ...this.formData,
+      nonFinancialImpacts: [
+        ...this.formData.nonFinancialImpacts,
+        {
+          id: Date.now(),
+          title: '',
+          businessUnitId: '',
+          type: null,
+          description: '',
+          amount: '',
+        },
+      ],
+    };
+  }
+  removeItem(type: keyof FormData, id: number) {
+    const list = (this.formData[type] as any[]) ?? [];
+    this.formData = { ...this.formData, [type]: list.filter((it) => it.id !== id) } as FormData;
+  }
+
+  // ---------- Validation ----------
+  validateForm(): boolean {
+    const newErrors: Errors = {};
+
+    if (!this.incidentId) {
+      newErrors['impacts'] = 'Incident non défini. Impossible d’associer les impacts.';
+    }
+
+    if (this.formData.financialImpacts.length === 0 && this.formData.nonFinancialImpacts.length === 0) {
+      newErrors['impacts'] = (newErrors['impacts'] ? newErrors['impacts'] + ' ' : '') +
+        'Ajoutez au moins un impact (financier ou non financier).';
+    }
+
+    // Non financier
+    this.formData.nonFinancialImpacts.forEach((imp, i) => {
+      if (!imp.title || !imp.type || !imp.businessUnitId) {
+        newErrors[`nonfinancial_${i}`] = 'Titre, Entité, type et description sont requis.';
+      }
+      if (!imp.amount || isNaN(+imp.amount)) {
+        newErrors[`nonfinancial_${i}`] = (newErrors[`nonfinancial_${i}`] ? newErrors[`nonfinancial_${i}`] + ' ' : '') +
+          'Montant (estimé) requis et numérique.';
+      }
+      if (!this.estimeAmountType) {
+        newErrors[`nonfinancial_${i}`] = (newErrors[`nonfinancial_${i}`] ? newErrors[`nonfinancial_${i}`] + ' ' : '') +
+          'Impossible de déterminer le type de montant "ESTIME".';
+      }
+    });
+
+    // Financier
+    this.formData.financialImpacts.forEach((imp, i) => {
+      if (!imp.title || !imp.type || !imp.businessUnitId) {
+        newErrors[`financial_${i}`] = 'Titre, Entité, type et description sont requis.';
+      }
+      if (!imp.details.length) {
+        newErrors[`financial_details_${i}`] = 'Ajoutez au moins un type de montant.';
+      } else {
+        const anyMissing = imp.details.some(
+          (d) => !d.amountType || !d.amount || isNaN(+d.amount)
+        );
+        if (anyMissing) {
+          newErrors[`financial_details_${i}`] =
+            'Chaque détail doit avoir un type de montant et un montant numérique.';
+        }
+        const dateInvalid = imp.details.some(
+          (d) => d.accountingDate && !/^\d{4}-\d{2}-\d{2}$/.test(d.accountingDate)
+        );
+        if (dateInvalid) {
+          newErrors[`financial_details_${i}`] =
+            (newErrors[`financial_details_${i}`] ? newErrors[`financial_details_${i}`] + ' ' : '') +
+            'Format de date attendu AAAA-MM-JJ.';
+        }
+      }
+    });
+
+    this.errors = newErrors;
+    return Object.keys(newErrors).length === 0;
+  }
+
+  // ---------- Submit ----------
+  handleSubmit() {
+    if (!this.validateForm()) return;
+    if (!this.incidentId || !this.currentBusinessUnitId) return;
+
+    const incidentId = this.incidentId;
+
+    const creations$ = [
+      // 1) Financiers
+      ...this.formData.financialImpacts.map((imp) => {
+        const dto: CreateOperatingLossDto = {
+          type: imp.type!,
+          incidentId,
+          businessUnitId: imp.businessUnitId,
+          libelle: imp.title,
+          description: imp.description || null,
+        };
+
+        return this.operatingLossService.create(dto, 'Création impact financier').pipe(
+          switchMap((operatingLossId: string) => {
+            if (!operatingLossId) return of(null);
+
+            const amountCalls = imp.details.map((d) => {
+              const amountDto: CreateAmountDto = {
+                amountType: d.amountType!,
+                montant: +d.amount,
+                comptabilityRef: d.accountingReference || null,
+                comptabilisationDate: d.accountingDate || null,
+              };
+              return this.amountService.create(operatingLossId, amountDto);
+            });
+            return amountCalls.length ? forkJoin(amountCalls) : of(null);
+          }),
+          catchError((e) => { console.error('Erreur création impact financier', e); return of(null); })
+        );
+      }),
+
+      // 2) Non financiers
+      ...this.formData.nonFinancialImpacts.map((imp) => {
+        const dto: CreateOperatingLossDto = {
+          type: imp.type!,
+          incidentId,
+          businessUnitId: imp.businessUnitId,
+          libelle: imp.title,
+          description: imp.description || null,
+        };
+
+        return this.operatingLossService.create(dto, 'Création impact non financier').pipe(
+          switchMap((operatingLossId: string) => {
+            if (!operatingLossId) return of(null);
+
+            const amountDto: CreateAmountDto = {
+              amountType: this.estimeAmountType!.libelle,
+              montant: +imp.amount,
+              comptabilityRef: null,
+              comptabilisationDate: null,
+            };
+            return this.amountService.create(operatingLossId, amountDto);
+          }),
+          catchError((e) => { console.error('Erreur création impact non financier', e); return of(null); })
+        );
+      }),
+    ];
+
+    forkJoin(creations$)
+      .pipe(catchError((e) => { console.error(e); return of([]); }))
+      .subscribe({
+        next:() => {
+          this.snackBarService.success('Impact(s) opérationnel(s) créé(s) avec succès !');
+          this.resetForm();
+          this.refreshExistingOperatingLosses();
+        },
+        error:() => {  this.snackBarService.error('Erreur lors de la création des impacts.'); }
+      });
+  }
+
+  onCancel() {
+    if (window.confirm('Êtes-vous sûr de vouloir annuler ? Toutes les données saisies seront perdues.')) {
+      this.resetForm();
+    }
+  }
+
+  resetForm() {
+    this.formData = { financialImpacts: [], nonFinancialImpacts: [] };
+    this.errors = {};
+  }
+
+  getReviewStatusLabel(rs: ReviewStatus): string {
+    return ReviewStatusLabels[rs];
+  }
+
+  trackByAmountId = (_: number, item: Amount) => item.id;
+
+}

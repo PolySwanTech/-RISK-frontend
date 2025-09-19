@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 
 // Adapte ces chemins selon ton projet
 import { AmountDto, CreateAmountDto } from '../../models/Amount';
+import { ReviewStatus } from '../../enum/reviewStatus.enum';
 
 @Injectable({ providedIn: 'root' })
 export class AmountService {
@@ -21,9 +22,9 @@ export class AmountService {
   }
 
   /** GET /amounts/operating-losses/{operatingLossId} */
-  listByOperatingLoss(operatingLossId: string): Observable<AmountDto[]> {
+  listByOperatingLoss(operatingLossId: string, all? : boolean): Observable<AmountDto[]> {
     return this.http.get<AmountDto[]>(
-      `${this.baseUrl}/operating-losses/${operatingLossId}`
+      all ? `${this.baseUrl}/operating-losses/${operatingLossId}?all=${all}` : `${this.baseUrl}/operating-losses/${operatingLossId}`
     );
   }
 
@@ -37,8 +38,18 @@ export class AmountService {
     return this.http.patch<AmountDto>(`${this.baseUrl}/${id}`, dto);
   }
 
+  updateReviewStatus(id: string, status: ReviewStatus) {
+    return this.http.put<void>(`${this.baseUrl}/${id}/review-status`, { status });
+  }
+
+
   /** DELETE /amounts/{id} */
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  deactivate(id: string): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}/deactivate`, {});
+  }
+
 }

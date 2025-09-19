@@ -9,6 +9,7 @@ import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
+import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
 import { MatIcon } from '@angular/material/icon';
 import { FichiersComponent } from '../../../../shared/components/fichiers/fichiers.component';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
@@ -212,16 +213,14 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   }
   get reviewBadgeClass(): string {
     const s = this.evaluationView?.reviewStatus;
-    if (s === 'APPROVED') return 'pill-success';
-    if (s === 'REEXAM_REQUESTED') return 'pill-warning';
-    if (s === 'PENDING') return 'pill-default';
+    if (s === ReviewStatus.APPROVED) return 'pill-success';
+    if (s === ReviewStatus.REEXAM_REQUESTED) return 'pill-warning';
+    if (s === ReviewStatus.PENDING) return 'pill-default';
+    if (s === ReviewStatus.REJECTED) return 'pill-danger';
     return 'pill-default';
   }
-  get reviewBadgeLabel(): string {
-    const s = this.evaluationView?.reviewStatus;
-    if (s === 'APPROVED') return 'Validée';
-    if (s === 'REEXAM_REQUESTED') return 'Réexamen demandé';
-    if (s === 'PENDING') return 'En attente de validation';
-    return '—';
-  }
+ get reviewBadgeLabel(): string {
+     const s = this.evaluationView?.reviewStatus;
+     return s ? ReviewStatusLabels[s] : '—';
+   }
 }

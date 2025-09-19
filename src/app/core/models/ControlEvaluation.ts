@@ -1,4 +1,5 @@
 import { Evaluation } from "../enum/evaluation.enum";
+import { ReviewStatus } from "../enum/reviewStatus.enum";
 
 export class ControlEvaluation {
   executionId!: string;
@@ -15,7 +16,7 @@ export interface ControlEvaluationView {
   evaluatedAt: string;
   plannedAt: string;
   performedBy: string;
-  reviewStatus: 'PENDING' | 'APPROVED' | 'REEXAM_REQUESTED';
+  reviewStatus: ReviewStatus;
   reviewedAt?: string;
   reviewedBy?: string;
   reviewComment?: string;

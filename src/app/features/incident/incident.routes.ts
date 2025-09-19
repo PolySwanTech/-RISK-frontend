@@ -15,6 +15,6 @@ export const incidentRoute: Routes = [
   { path: ':id', component:  ViewComponent},
   // { path: ':id/history', component: HistoryComponent },
   { path: ':id/suivi', component:  SuiviComponent},
-  { path: ':id/impacts', component:  ListImpactComponent},
-  { path: ':id/impacts/create', component:  CreateOperationalImpactComponent},
+  { path: ':id/impacts', component:  CreateOperationalImpactComponent},
+  // { path: ':id/impacts/create', component:  CreateOperationalImpactComponent},
 ];
