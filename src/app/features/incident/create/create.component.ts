@@ -81,7 +81,6 @@ export class CreateComponent implements OnInit {
   incidentForm1 = this._formBuilder.group({
     reference: [''],
     titre: ['', Validators.required],
-    teamId: ['', Validators.required],
     commentaire: ['', Validators.required],
     location: ['', Validators.required],
   });
@@ -99,17 +98,19 @@ export class CreateComponent implements OnInit {
   });
 
   incidentForm3 = this._formBuilder.group<{
+    teamId: FormControl<string | null>,
+    processId: FormControl<string | null>;
     riskId: FormControl<string | null>;
     intervenant: FormControl<string | null>;
     files: FormControl<string | null>;
     cause: FormControl<Cause | null>;
-    processId: FormControl<string | null>;
   }>({
+    teamId: new FormControl('', Validators.required),
+    processId: new FormControl(null, Validators.required),
     riskId: new FormControl(''),
     intervenant: new FormControl(null),
     files: new FormControl(null),
     cause: new FormControl(null, Validators.required),
-    processId: new FormControl(null, Validators.required),
   });
 
   listRisks: any[] = [];
@@ -177,10 +178,10 @@ export class CreateComponent implements OnInit {
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
+      console.log(incident)
       this.incidentForm1.patchValue({
         reference: incident.reference,
         titre: incident.title,
-        teamId: incident.teamId,
         commentaire: incident.commentaire,
         location: incident.location
       });
@@ -194,12 +195,28 @@ export class CreateComponent implements OnInit {
 
       this.loadTrees(wantedBuId).subscribe(() => {
         this.incidentForm3.patchValue({
+          teamId: incident.teamId,
+          processId: incident.process,
           riskId: incident.risk,
           cause: incident.cause,
-          processId: incident.process,
           intervenant: incident.intervenant,
         });
       });
+
+      if(incident.riskName){
+this.selectedBPR = {
+        bu : {
+          name : incident.teamName
+        },
+        process: {
+          name : incident.processName
+        },
+        risk: {
+          name : incident.riskName
+        }
+      }
+      }
+      
       this.incident = incident;
       this.selectedUser = incident.intervenant || null;
     });
@@ -261,10 +278,10 @@ export class CreateComponent implements OnInit {
       title: this.incidentForm1.value.titre || (isDraft ? null : ""),
       location: this.incidentForm1.value.location || (isDraft ? null : ""),
       commentaire: this.incidentForm1.value.commentaire || (isDraft ? null : ""),
-      teamId: this.incidentForm1.value.teamId || (isDraft ? null : ""),
       declaredAt: new Date(this.incidentForm2.value.dateDeDeclaration!),
       survenueAt: this.incidentForm2.value.dateDeSurvenance ? new Date(this.incidentForm2.value.dateDeSurvenance) : null,
       detectedAt: this.incidentForm2.value.dateDeDetection ? new Date(this.incidentForm2.value.dateDeDetection) : null,
+      teamId: this.incidentForm3.value.teamId || (isDraft ? null : ""),
       riskId: this.incidentForm3.value.riskId || null,
       processId: this.incidentForm3.value.processId || null,
       cause: this.incidentForm3.value.cause || null,
@@ -369,7 +386,7 @@ export class CreateComponent implements OnInit {
 
   selectBPR(event : any){
     this.selectedBPR = event;
-    this.incidentForm1.get('teamId')?.setValue(event.bu.id)
+    this.incidentForm3.get('teamId')?.setValue(event.bu.id)
     this.incidentForm3.get('processId')?.setValue(event.process.id)
     this.incidentForm3.get('riskId')?.setValue(event.risk.id)
   }
