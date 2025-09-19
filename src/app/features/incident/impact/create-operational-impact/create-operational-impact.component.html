@@ -50,7 +50,7 @@
               <label class="op-label">Type *</label>
               <select [(ngModel)]="impact.type" class="op-select">
                 <option [ngValue]="null">Sélectionnez</option>
-                <option *ngFor="let t of financialOperatingLossTypes" [ngValue]="t.libelle">{{ t.label }}</option>
+                <option *ngFor="let t of financialOperatingLossTypes" [ngValue]="t">{{ t.label }}</option>
               </select>
             </div>
           </div>
@@ -124,7 +124,8 @@
 
         <div class="op-stack op-stack--lg">
           <!-- ===== EXISTANTS (disabled) ===== -->
-          <div class="op-subcard" *ngFor="let impact of existingFinancialLosses; trackBy: trackByIdString">
+          <div class="op-subcard"  *ngFor="let impact of existingFinancialLosses; trackBy: trackByIdString"
+              [id]="'impact-' + impact.id">
             <div class="op-subcard-head" (click)="toggleImpactDetails($event, impact.id)" style="cursor:pointer;">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <input type="checkbox"
@@ -334,7 +335,7 @@
                 <label class="op-label">Type de Conséquence *</label>
                 <select [(ngModel)]="impact.type" class="op-select">
                   <option [ngValue]="null">Sélectionnez un type</option>
-                  <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t.libelle">{{ t.label }}</option>
+                  <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t">{{ t.label }}</option>
                 </select>
               </div>
               <div class="op-field">
@@ -369,7 +370,8 @@
           </div>
 
           <!-- ===== EXISTANTS (disabled) ===== -->
-          <div class="op-subcard" *ngFor="let impact of existingNonFinancialLosses; trackBy: trackByIdString">
+          <div class="op-subcard" *ngFor="let impact of existingNonFinancialLosses; trackBy: trackByIdString"
+              [id]="'impact-' + impact.id">
             <div class="op-subcard-head" (click)="toggleImpactDetails($event, impact.id)" style="cursor:pointer;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <input type="checkbox"

@@ -572,6 +572,19 @@ export class CreateOperationalImpactComponent implements OnInit {
   handleSubmitFinancial(impact: FinancialImpact) {
     if (!this.incidentId || !this.currentBusinessUnitId) return;
 
+    // Vérifier s'il existe déjà un impact avec la même BU et le même type
+    const duplicate = this.existingFinancialLosses.find(
+      existing => 
+        existing.entityId === impact.businessUnitId &&
+        existing.type?.libelle === impact.type?.libelle
+    );
+
+    if (duplicate) {
+      this.snackBarService.error("Un impact existe déjà pour cette BU et ce type.");
+      this.expandAndScrollToImpact(duplicate.id);
+      return;
+    }
+
     const incidentId = this.incidentId;
 
     const dto: CreateOperatingLossDto = {
@@ -613,7 +626,20 @@ export class CreateOperationalImpactComponent implements OnInit {
 
   // ---------- Submit Non Financier ----------
   handleSubmitNonFinancial(impact: NonFinancialImpact) {
-    if (!this.incidentId || !this.currentBusinessUnitId || !this.estimeAmountType) return;
+    if (!this.incidentId || !this.currentBusinessUnitId) return;
+
+    // Vérifier s'il existe déjà un impact avec la même BU et le même type
+    const duplicate = this.existingNonFinancialLosses.find(
+      existing => 
+        existing.entityId === impact.businessUnitId &&
+        existing.type?.libelle === impact.type?.libelle
+    );
+
+    if (duplicate) {
+      this.snackBarService.error("Un impact existe déjà pour cette BU et ce type.");
+      this.expandAndScrollToImpact(duplicate.id);
+      return;
+    }
 
     const incidentId = this.incidentId;
 
@@ -650,6 +676,22 @@ export class CreateOperationalImpactComponent implements OnInit {
       }
     });
   }
+
+  expandAndScrollToImpact(impactId: string) {
+    // Étendre l’impact
+    this.expandedImpacts[impactId] = true;
+
+    // Petit délai pour s’assurer que l’UI s’est mise à jour
+    setTimeout(() => {
+      const el = document.getElementById(`impact-${impactId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('highlight');
+        setTimeout(() => el.classList.remove('highlight'), 2000); // effet visuel temporaire
+      }
+    }, 100);
+  }
+
 
   get filteredGoBackButtons(): GoBackButton[] {
     const hasImpacts = Object.values(this.selectedImpacts).some(v => v);
