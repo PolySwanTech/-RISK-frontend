@@ -60,8 +60,8 @@
           </div>
         </div>
         <div class="group-content" [class.collapsed]="collapsedGroups[todoEnum.ACTION_PLAN]">
-          <div *ngFor="let item of getFilteredItems(todoEnum.ACTION_PLAN)" class="item"
-            [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+          @for(item of getFilteredItems(todoEnum.ACTION_PLAN); track item.id){
+          <div (click)="viewItem(item)" class="item" matTooltip="Voir le plan d'action" [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
             <div class="item-type type-plans">Plan</div>
             <div class="item-content">
               <div class="item-title">{{ item.libelle }}</div>
@@ -73,6 +73,8 @@
               <button class="action-btn" (click)="viewItem(item)">Voir</button>
             </div>
           </div>
+          }
+
         </div>
       </div>
 
@@ -87,8 +89,8 @@
           </div>
         </div>
         <div class="group-content" [class.collapsed]="collapsedGroups[todoEnum.INCIDENT]">
-          <div *ngFor="let item of getFilteredItems(todoEnum.INCIDENT)" class="item"
-            [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+          @for(item of getFilteredItems(todoEnum.INCIDENT); track item.id){
+          <div (click)="viewItem(item)" class="item" matTooltip="Traiter l'incident" [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
             <div class="item-type type-incidents">Incident</div>
             <div class="item-content">
               <div class="item-title">{{ item.libelle }}</div>
@@ -100,6 +102,8 @@
               <button class="action-btn" (click)="viewItem(item)">Traiter</button>
             </div>
           </div>
+          }
+
         </div>
       </div>
 
@@ -113,9 +117,9 @@
             <span class="chevron" [class.collapsed]="collapsedGroups[todoEnum.CONTROL]">▼</span>
           </div>
         </div>
-        <div class="group-content" [class.collapsed]="collapsedGroups[todoEnum.CONTROL]">
-          <div *ngFor="let item of getFilteredItems(todoEnum.CONTROL)" class="item"
-            [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+        @for(item of getFilteredItems(todoEnum.CONTROL); track item.id){
+        <div (click)="viewItem(item)" class="group-content" [class.collapsed]="collapsedGroups[todoEnum.CONTROL]">
+          <div class="item" matTooltip="Accéder au contrôle" [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
             <div class="item-type type-controls">Contrôle</div>
             <div class="item-content">
               <div class="item-title">{{ item.libelle }}</div>
@@ -128,6 +132,8 @@
             </div>
           </div>
         </div>
+        }
+
       </div>
     </div>
 
@@ -144,8 +150,7 @@
           </div>
         </div>
         <div class="item-actions">
-          <button class="action-btn"
-            (click)="viewItem(item)">
+          <button class="action-btn" (click)="viewItem(item)">
             Voir
           </button>
         </div>

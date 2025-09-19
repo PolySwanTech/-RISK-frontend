@@ -38,7 +38,7 @@ interface Indicator{
   imports: [FormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatCardModule, MatChipsModule, FormsModule,
     ReactiveFormsModule,
     MatStepperModule,
-    MatButtonModule, BuProcessAccordionComponent],
+    MatButtonModule, BuProcessAccordionComponent, MatrixComponent],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })

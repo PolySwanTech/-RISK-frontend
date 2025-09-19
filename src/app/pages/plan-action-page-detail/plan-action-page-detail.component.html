@@ -102,11 +102,10 @@
                 <mat-tab label="Actions à réaliser">
                     <mat-card-header>
                         <mat-card-title>
-                            <span>Actions à réaliser</span>
                             <button mat-raised-button class="btn-primary"
                                 *ngIf="actionPlan.status == statusEnum.NOT_STARTED" (click)="openAddActionDialog()">
                                 <mat-icon>add</mat-icon>
-                                <span>Action</span>
+                                <span>Ajouter</span>
                             </button>
                             <div class="progression-section">
                                 <label>Progression globale</label>
@@ -129,7 +128,7 @@
                                             <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy'
                                                 }})</span>
                                         </p>
-                                        <button *ngIf="canAbandonAction(action)" mat-raised-button class="btn-red"
+                                        <button *ngIf="canAbandonAction(action)" mat-icon-button class="btn-red"
                                             matTooltip="Abandonner" (click)="abandon(action)">
                                             <mat-icon>delete</mat-icon>
                                         </button>

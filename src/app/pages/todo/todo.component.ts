@@ -4,10 +4,11 @@ import { ToDoService } from '../../core/services/to-do/to-do.service';
 import { ToDoLabels, ToDoType } from '../../core/enum/to-do.enum';
 import { ToDo } from '../../core/models/ToDo';
 import { Router } from '@angular/router';
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-todo',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, MatTooltipModule],
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss'
 })
