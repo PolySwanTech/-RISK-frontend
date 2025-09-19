@@ -28,8 +28,8 @@
                                 </div>
 
                                 <div class="line-gradient" [ngStyle]="{
-         'background': 'linear-gradient(to right, ' + getLineColor(incident.survenueAt, incident.detectedAt) + ', ' + getLineColor(incident.survenueAt, incident.detectedAt) + ')'
-       }">
+     'background': 'linear-gradient(to right, ' + getLineColor(incident.survenueAt, incident.detectedAt) + ', ' + getLineColor(incident.survenueAt, incident.detectedAt) + ')'
+   }">
                                 </div>
                             </div>
 
@@ -47,8 +47,8 @@
                                 </div>
 
                                 <div class="line-gradient" [ngStyle]="{
-         'background': 'linear-gradient(to right, ' + getLineColor(incident.detectedAt, incident.declaredAt) + ', ' + getLineColor(incident.detectedAt, incident.declaredAt) + ')'
-       }">
+     'background': 'linear-gradient(to right, ' + getLineColor(incident.detectedAt, incident.declaredAt) + ', ' + getLineColor(incident.detectedAt, incident.declaredAt) + ')'
+   }">
                                 </div>
                             </div>
 
@@ -137,13 +137,17 @@
                 </mat-card-content>
             </mat-card>
             <div style="display: flex; gap: 20px;">
-                
+
                 <app-fichiers style="flex: 3;" [targetId]="idIncident" [closed]="isClosed()"></app-fichiers>
                 <div style="flex: 2;" class="info2-container">
-                    <app-list-suivi [closed]="isClosed()"></app-list-suivi>
+                    <!-- <app-list-suivi [closed]="isClosed()"></app-list-suivi> -->
                 </div>
             </div>
         </div>
     </div>
     }
 </div>
+
+@if(incident){
+<app-audit-button [contextId]="incident.id" [contextTarget]="targetTypeEnum.INCIDENT"></app-audit-button>
+}

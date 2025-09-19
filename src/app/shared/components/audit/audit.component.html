@@ -1,0 +1,13 @@
+<mat-card class="audit-card">
+    <app-popup-header [title]="'Détails'" [showClose]="true" (close)="closePopUp()"></app-popup-header>
+    <div class="rv-section">
+        <div class="rv-section__label">Votre commentaire (obligatoire)</div>
+        <textarea [(ngModel)]="comments" rows="3" class="rv-textarea" placeholder="Votre avis / décision..."></textarea>
+    </div>
+    <div class="rv-modal__footer">
+        <ng-container>
+            <button class="btn btn-primary winter-style" (click)="confirm()">OK</button>
+            <button class="btn btn-secondary" (click)="closePopUp()">Fermer</button>
+        </ng-container>
+    </div>
+</mat-card>

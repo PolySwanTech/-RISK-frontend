@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +14,6 @@ import { ActionPlanService } from '../../core/services/action-plan/action-plan.s
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
-import { AuthService } from '../../core/services/auth/auth.service';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
 import { firstValueFrom } from 'rxjs';
@@ -25,16 +24,24 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
 import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
 import { AddActionDialogComponent } from '../../features/action-plan/add-action-dialog/add-action-dialog.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { AuditService } from '../../core/services/audit/audit.service';
+import { AuditPanelComponent } from '../../shared/components/audit/audit-panel/audit-panel.component';
+import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
+import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
 
 @Component({
   selector: 'app-plan-action-page-detail',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, AuditButtonComponent,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
 export class PlanActionPageDetailComponent {
+
+  @ViewChild('auditDrawer') auditDrawer!: MatDrawer;
+
 
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
@@ -43,6 +50,7 @@ export class PlanActionPageDetailComponent {
   private fileService = inject(FileService);
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService)
+  private auditService = inject(AuditService);
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -56,6 +64,10 @@ export class PlanActionPageDetailComponent {
   goBackButtons: GoBackButton[] = []
 
   statusEnum = Status;
+  targetTypeEnum = TargetType;
+
+  abandonedActions: Action[] = []
+  actions: Action[] = []
 
 
   ngOnInit() {
@@ -76,6 +88,11 @@ export class PlanActionPageDetailComponent {
         this.completedActions = this.getCompletedCount(this.actionPlan.actions);
         this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
       }
+
+      this.actions = this.actionPlan.actions.filter(a => a.actif == true);
+
+      // TODO : récupérer les actions abandonnées
+      this.abandonedActions = this.actionPlan.actions.filter(a => a.actif == false);
 
       // règles d’affichage
       const st = this.actionPlan?.status;
@@ -128,11 +145,33 @@ export class PlanActionPageDetailComponent {
     });
   }
 
+  canAbandonAction(action: Action) {
+    return action.performedAt == null && this.actionPlan?.status != Status.ACHIEVED && this.actionPlan?.status != Status.CANCELLED
+  }
+
   validateAction(actionId: string) {
 
     this.actionPlanService.finishAction(actionId).subscribe(
       _ => this.ngOnInit()
     )
+  }
+
+  abandon(action: Action) {
+    this.auditService.openAuditDialog(action.id, TargetType.ACTION_PLAN)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.actionPlanService.abandonAction(action.id).subscribe(
+            _ => {
+              this.snackBarService.info("Action abandonnée avec succès.")
+              this.ngOnInit();
+            }
+          )
+        }
+        else {
+          this.snackBarService.info("Action non-abandonnée.")
+        }
+      })
   }
 
   getCompletedCount(actions: Action[]): number {
@@ -247,6 +286,15 @@ export class PlanActionPageDetailComponent {
 
   goToIncident() {
     this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
+  }
+
+  openAuditPanel() {
+    if (this.auditDrawer.opened) {
+      this.auditDrawer.close();
+    }
+    else{
+      this.auditDrawer.open();
+    }
   }
 
 }
