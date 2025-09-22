@@ -72,6 +72,14 @@
                         <mat-card-content>
                             <div class="info-pairs-grid">
                                 <div class="info-field">
+                                    <label>Créateur</label>
+                                    <div class="info-box">{{ incident.creatorName }}</div>
+                                </div>
+                                <div class="info-field">
+                                    <label>Intervenant</label>
+                                    <div class="info-box">{{ incident.intervenantName }}</div>
+                                </div>
+                                <div class="info-field">
                                     <label>Localisation</label>
                                     <div class="info-box">{{ incident.location ? incident.location : 'N/R' }}</div>
                                 </div>
