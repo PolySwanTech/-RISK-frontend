@@ -107,6 +107,7 @@
                                 <mat-icon>add</mat-icon>
                                 <span>Ajouter</span>
                             </button>
+                            <div *ngIf="actionPlan.status != statusEnum.NOT_STARTED"></div>
                             <div class="progression-section">
                                 <label>Progression globale</label>
                                 <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
