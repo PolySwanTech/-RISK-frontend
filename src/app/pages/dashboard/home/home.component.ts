@@ -15,11 +15,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { Filter } from '../../../core/enum/filter.enum';
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { PermissionName } from '../../../core/enum/permission.enum';
 
 @Component({
   selector: 'app-home',
   imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent,
-    BarChartComponent, DoughnutChartComponent, MatIconModule,
+    BarChartComponent, DoughnutChartComponent, MatIconModule, GoBackComponent,
     MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -52,10 +54,19 @@ export class HomeComponent implements OnInit {
   selectedPeriod: string | null = null;
   selectedDepartment: string | null = null;
 
+  goBackButtons: GoBackButton[] = [
+    {
+      label: 'Exporter',
+      icon: 'file_download',
+      action: () => this.export(),
+      class: 'btn-green',
+      show: true,
+      permission: [PermissionName.PREPARE_REPORTS]
+    }
+  ]
+
   private incidentService = inject(IncidentService)
 
-  constructor(private utilisateurService: UtilisateurService) {
-  }
 
   ngOnInit() {
     this.loadIncidents();
@@ -77,5 +88,9 @@ export class HomeComponent implements OnInit {
   }
 
   handleFiltersChanged(filters: any) {
+  }
+
+  export(){
+    console.error("Fonctionnalité non-impémentée")
   }
 }
