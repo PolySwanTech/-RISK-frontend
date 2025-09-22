@@ -24,7 +24,7 @@ export class MatrixService {
     return this.http.get<Matrix>(`${this.baseUrl}/${id}`);
   }
 
-  getDefaultMatrix(buId: string): Observable<Matrix> {
+  getDefaultMatrix(buId: string): Observable<any> {
     const params = new HttpParams().set("buId", buId);
     return this.http.get<Matrix>(this.baseUrl, { params: params });
   }
@@ -42,6 +42,18 @@ export class MatrixService {
       item.type = rangeType;
     });
     return this.http.post<any>(`${this.baseUrl}/scale`, { scales: list, type: rangeType });
+  }
+
+  /** 🔹 Récupère les fréquences par BU */
+  getFrequenciesByBu(buId: string): Observable<any[]> {
+    const params = new HttpParams().set("buId", buId);
+    return this.http.get<any[]>(`${this.baseUrl}/frequency`, { params });
+  }
+
+  /** 🔹 Récupère les sévérités par BU */
+  getSeveritiesByBu(buId: string): Observable<any[]> {
+    const params = new HttpParams().set("buId", buId);
+    return this.http.get<any[]>(`${this.baseUrl}/severity`, { params });
   }
 
 }

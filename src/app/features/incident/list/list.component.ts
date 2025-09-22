@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { State } from '../../../core/enum/state.enum';
+import { State, StateLabels } from '../../../core/enum/state.enum';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
 import * as XLSX from 'xlsx';
@@ -28,14 +28,15 @@ import { Filter } from '../../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 
 @Component({
   selector: 'app-list',
   standalone: true,
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, MatMenuModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule,
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, GoBackComponent,
     ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule,
-    MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule,
+    MatTooltipModule, MatSelectModule, MatFormFieldModule,
     MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent, FormsModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
@@ -44,7 +45,6 @@ import { GlobalSearchBarComponent } from "../../../shared/components/global-sear
 
 export class ListComponent implements OnInit {
 
-  private dialog = inject(MatDialog);
   private incidentService = inject(IncidentService)
   private datePipe = inject(DatePipe)
   private router = inject(Router);
@@ -84,16 +84,19 @@ export class ListComponent implements OnInit {
     {
       columnDef: 'state',
       header: 'Statut',
-      cell: (incident: Incident) => `
-      <span class="badge ${incident.state.toLowerCase()}">
-        ${State[incident.state.toString() as keyof typeof State] || 'Inconnu'}
-      </span>
-    `,
+      cell: (incident: Incident) => this.getStateLabel(incident.state), // ← label lisible
+      isBadge: 'state',                                                // ← si ton template gère les badges
       filterType: 'select',
-      options: ['En cours', 'Clôturé'],
-      icon: 'flag' // 🚩
+      options: Object.values(State).map(s => ({                        // ← options = enum + label
+        value: s,
+        label: StateLabels[s]
+      })),
+      icon: 'flag'
     }
   ];
+
+
+  goBackButtons : GoBackButton[] = []
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
@@ -119,6 +122,24 @@ export class ListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadIncidents();
+
+    this.goBackButtons = [
+      {
+        label: 'Créer un incident',
+        icon: 'add',
+        class: 'btn-primary',
+        show: true,
+        permission: 'CREATE_INCIDENT',
+        action: () => this.add()
+      },
+      {
+        label: 'Exporter',
+        icon: 'file_download',
+        class: 'btn-green',
+        show: true,
+        action: () => this.exportExcel()
+      }
+    ];
   }
 
   refreshData() {
@@ -156,6 +177,7 @@ export class ListComponent implements OnInit {
         }
       })
   }
+  
   toggleIncidentSelection(incidentId: string) {
     if (this.selectedIncidents.has(incidentId)) {
       this.selectedIncidents.delete(incidentId);
@@ -222,8 +244,12 @@ export class ListComponent implements OnInit {
 
         // ✅ Cas spécial : filtre par statut (clôturé ou en cours)
         if (key === 'state') {
-          if (value === 'Clôturé') return incident.closedAt !== null;
-          if (value === 'En cours') return incident.closedAt === null;
+          // Si le filtre renvoie encore les vieux libellés, on garde une compatibilité.
+          if (value === 'Clôturé') return incident.state === State.CLOSED;
+          if (value === 'En cours') return incident.state !== State.CLOSED;
+
+          // Sinon on filtre proprement par enum.
+          return incident.state === value; // value : State
         }
 
         // ✅ Cas standard : texte ou valeur simple
@@ -245,7 +271,8 @@ export class ListComponent implements OnInit {
         incident.title?.toLowerCase().includes(lowerQuery) ||
         this.datePipe.transform(incident.declaredAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
         this.datePipe.transform(incident.survenueAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
-        (incident.closedAt ? 'clôturé' : 'en cours').includes(lowerQuery)
+        this.getStateLabel(incident.state).toLowerCase().includes(lowerQuery) ||     // ← NEW
+        (incident.closedAt ? 'clôturé' : 'en cours').includes(lowerQuery)            // compat “en cours/clôturé”
       );
     });
 
@@ -255,6 +282,10 @@ export class ListComponent implements OnInit {
   clearSearch(): void {
     this.searchQuery = '';
     this.dataSource.data = this.incidents;
+  }
+
+  getStateLabel(s: State): string {
+    return StateLabels?.[s] ?? String(s);
   }
 
   exportExcel(filename: string = 'incidents.xlsx') {

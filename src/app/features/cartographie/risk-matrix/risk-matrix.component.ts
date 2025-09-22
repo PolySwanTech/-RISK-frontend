@@ -71,28 +71,4 @@ export class RiskMatrixComponent {
   getFrequency(): string {
     return '—'; // il faut recalculer à partir des incidents qui ont eu ce risque ? 
   }
-
-
-  /* ----------- mapping internes ----------- */
-  private frequencyLabel(v: number) {
-    switch (v) {
-      case 1: return 'Très rare';
-      case 2: return 'Rare';
-      case 3: return 'Occasionnel';
-      case 4: return 'Fréquent';
-      case 5: return 'Très fréquent';
-      default: return 'Inconnu';
-    }
-  }
-
-  private impactLabel(v: number) {
-    switch (v) {
-      case 1: return 'Insignifiant';
-      case 2: return 'Mineur';
-      case 3: return 'Modéré';
-      case 4: return 'Majeur';
-      case 5: return 'Catastrophique';
-      default: return 'Inconnu';
-    }
-  }
 }

@@ -1,11 +1,13 @@
-<h2 mat-dialog-title>{{ data.title }}</h2>
-<mat-dialog-content>
-    <p>{{ data.message }}</p>
-
-    @if(data.buttons){
-    <div class="actions">
-        <button class="red" (click)="onCancel()">Annuler</button>
-        <button (click)="onConfirm()">Confirmer</button>
-    </div>
-    }
-</mat-dialog-content>
+<mat-card>
+    <app-popup-header [title]="data.title" [showClose]="true" (close)="onCancel()"></app-popup-header>
+    <mat-dialog-content>
+        <p>{{ data.message }}</p>
+    
+        @if(data.buttons){
+        <div class="actions">
+            <button class="red" (click)="onCancel()">Annuler</button>
+            <button (click)="onConfirm()">Confirmer</button>
+        </div>
+        }
+    </mat-dialog-content>
+</mat-card>

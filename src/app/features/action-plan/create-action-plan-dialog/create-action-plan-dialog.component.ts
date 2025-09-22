@@ -3,7 +3,7 @@ import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/Ac
 import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { Priority, priorityLabels } from '../../../core/enum/Priority';
+import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -19,6 +19,8 @@ import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardHeader, MatCardModule } from '@angular/material/card';
+import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -30,6 +32,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatCardModule,
+    PopupHeaderComponent,
     FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule
   ],
   templateUrl: './create-action-plan-dialog.component.html',
@@ -38,7 +42,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class CreateActionPlanDialogComponent implements OnInit {
 
   private actionPlanService = inject(ActionPlanService);
-  private dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
+  dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
   private confirmService = inject(ConfirmService);
   private equipeService = inject(EquipeService);
   private riskService = inject(RiskService);
@@ -54,13 +58,17 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   actionPlan: ActionPlan = new ActionPlan(
     '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', null, '', new Date());
+    '', '', null, '', new Date(), true);
 
   actions: Action[] = []
 
   ngOnInit(): void {
     this.fetchTeams();
     this.getRisk();
+  }
+
+  closePopup() {
+    this.dialogRef.close();
   }
 
   getRisk() {
@@ -93,7 +101,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
 
   formatPriority(p: Priority): string {
-    return priorityLabels[p] || p;
+    return PriorityLabels[p] || p;
   }
 
   // Ajouter une action à la liste

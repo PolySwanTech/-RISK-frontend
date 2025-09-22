@@ -6,10 +6,11 @@ export enum Type {
     MANUAL = 'MANUAL'
 }
 
-export const TypeLabels: Record<Type, string> = {
-  [Type.PREVENTIVE]: 'Préventif',
-  [Type.DETECTIVE]: 'Détectif',
-  [Type.CORRECTIVE]: 'Correctif',
-  [Type.AUTOMATIC]: 'Automatique',
-  [Type.MANUAL]: 'Manuel'
-};
+
+export const ControlTypeLabels: Record<Type, string> = {
+    [Type.PREVENTIVE]: 'Préventif',
+    [Type.DETECTIVE]: 'Détectif',
+    [Type.CORRECTIVE]: 'Correctif',
+    [Type.AUTOMATIC]: 'Automatique',
+    [Type.MANUAL]: 'Manuel',
+}

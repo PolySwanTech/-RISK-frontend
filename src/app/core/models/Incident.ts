@@ -1,8 +1,8 @@
 import { State } from "../enum/state.enum";
 import { Cause } from "./Cause";
-import { Impact } from "./Impact";
-import { Process } from "./Process";
-import { RiskTemplate } from "./RiskTemplate";
+import { OperatingLoss } from "./OperatingLoss";
+import { BaloiseCategoryDto } from "./RiskTemplate";
+
 
 export class Incident {
     id: string;
@@ -19,12 +19,14 @@ export class Incident {
 
     risk: string;
     riskName : string = "";
+    categoryBaloise : BaloiseCategoryDto;
     cause : Cause;
     process: string ;
+    processName?: string ;
     teamId?: string;
     teamName?: string;
 
-    impacts: Impact[];
+    impacts: OperatingLoss[];
 
     state: State;
     consequences: string[];
@@ -40,10 +42,11 @@ export class Incident {
         detectedAt: Date,
         closedAt: Date | null,
         risk: string,
+        categoryBaloise: BaloiseCategoryDto,
         cause: Cause,
         process: string,
         teamId?: string,
-        impacts: Impact[] = [],
+        impacts: OperatingLoss[] = [],
         state: State = State.DRAFT,
         consequences: string[] = [],
         intervenant?: string | null,
@@ -57,6 +60,7 @@ export class Incident {
         this.detectedAt = detectedAt;
         this.closedAt = closedAt;
         this.risk = risk;
+        this.categoryBaloise = categoryBaloise;
         this.cause = cause;
         this.process = process;
         this.teamId = teamId;

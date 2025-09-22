@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { OrganigrammeComponent } from "../../../organigramme/organigramme/organigramme.component";
 import { MatButtonModule } from '@angular/material/button';
 import { arrayNotEmptyValidator } from '../../../../shared/validators/custom-validators';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-create-user',
@@ -44,6 +45,7 @@ export class CreateUserComponent implements OnInit {
 
   private userService = inject(UtilisateurService);
   private dialogRef = inject(MatDialogRef<CreateUserComponent>);
+  private snackBarService = inject(SnackBarService);
   private authService = inject(AuthService);
 
   constructor
@@ -96,13 +98,13 @@ export class CreateUserComponent implements OnInit {
           next: user => {
             this.userService.updateUserRoles(user.id, this.userForm.value.teamRoleList).subscribe({
               next: () => {
-                alert("✅ Utilisateur créé avec succès");
+                this.snackBarService.success("✅ Utilisateur créé avec succès");
                 this.dialogRef.close(true);
               }
             });
           },
           error: () => {
-            alert("❌ Une erreur est survenue");
+            this.snackBarService.error("❌ Une erreur est survenue");
           }
         });
       }

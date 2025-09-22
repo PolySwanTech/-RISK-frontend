@@ -1,4 +1,4 @@
-<div class="header sticky">
+<div class="header sticky" [class.sticky-close]="isStickyClosed">
   <div class="header-content">
     <div class="header-left">
       <button class="back-button" (click)="goBack()">
@@ -13,11 +13,21 @@
     </div>
     <div class="header-actions">
       @for(btn of buttons; track btn){
-      @if(btn.show){
+      @if(btn.show && !btn.permission){
       <ng-container>
         <button mat-raised-button [ngClass]="btn.class" (click)="btn.action()">
           @if(btn.icon){
-            <mat-icon>{{ btn.icon }}</mat-icon>
+          <mat-icon>{{ btn.icon }}</mat-icon>
+          }
+          {{ btn.label }}
+        </button>
+      </ng-container>
+      }
+      @else if(btn.permission){
+      <ng-container *appHasPermission="btn.permission">
+        <button mat-raised-button [ngClass]="btn.class" (click)="btn.action()">
+          @if(btn.icon){
+          <mat-icon>{{ btn.icon }}</mat-icon>
           }
           {{ btn.label }}
         </button>
@@ -27,3 +37,4 @@
     </div>
   </div>
 </div>
+<div style="margin-top: 40px;"></div>

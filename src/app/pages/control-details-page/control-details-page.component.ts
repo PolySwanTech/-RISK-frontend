@@ -1,8 +1,9 @@
+import { ControlEvaluation } from './../../core/models/ControlEvaluation';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { Status, statusLabels } from '../../core/enum/status.enum';
+import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { ControlService } from '../../core/services/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
@@ -13,8 +14,10 @@ import { GoBackComponent } from '../../shared/components/go-back/go-back.compone
 import { PopupEvaluationControleComponent } from './popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 
 import { catchError, forkJoin, of } from 'rxjs';
-import { RecurenceLabels } from '../../core/enum/recurence.enum';
+import { RecurrenceLabels } from '../../core/enum/recurrence.enum';
 import { MethodologyCardComponent } from './methodology-card/methodology-card.component';
+import { EvaluationCardComponent } from './evaluation-card/evaluation-card.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-control-details-page',
@@ -23,7 +26,7 @@ import { MethodologyCardComponent } from './methodology-card/methodology-card.co
     CommonModule,
     PlanifierExecutionPopupComponent,
     GoBackComponent,
-    PopupEvaluationControleComponent,
+    EvaluationCardComponent,
     RouterModule,
     MethodologyCardComponent
   ],
@@ -35,23 +38,15 @@ export class ControlDetailsPageComponent implements OnInit {
   private controlService = inject(ControlService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   control: ControlTemplate | null = null;
   controlExecutions: ControlExecution[] | null = null;
 
-  ControlStatus = Status;
-  recurenceLabels = { ...RecurenceLabels };
+  recurrenceLabels = { ...RecurrenceLabels };
 
   // Popups
   showPopup = false;
-  showEvaluationPopup = false;
-  selectedExecutionId: string | null = null;
-  selectedExecutionToEdit: ControlExecution | null = null;
-  forceDetails: boolean = false;
-
-  // Sélection utilisateur
-  currentUsername = '';
-  selectedExecId: string | null = null;
 
   // Cache des vues d'évaluation
   evaluationCache: Record<string, ControlEvaluationView | null> = {};
@@ -86,7 +81,6 @@ export class ControlDetailsPageComponent implements OnInit {
   private dragStartedInside = false;
 
   ngOnInit(): void {
-    this.currentUsername = this.getUsernameFromToken() || '';
     const controlId = this.route.snapshot.paramMap.get('id');
     if (controlId) {
       this.loadControl(controlId);
@@ -95,10 +89,9 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   loadControl(id: string): void {
-    this.controlService.getControl(id).subscribe(control => 
-      {
-        this.control = control;
-      });
+    this.controlService.getControl(id).subscribe(control => {
+      this.control = control;
+    });
   }
 
   loadControlExecutions(id: string): void {
@@ -110,6 +103,7 @@ export class ControlDetailsPageComponent implements OnInit {
       const calls = executions.map(e =>
         this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
       );
+      
 
       forkJoin(calls).subscribe(views => {
         this.evaluationCache = {};
@@ -125,9 +119,8 @@ export class ControlDetailsPageComponent implements OnInit {
       .map(e => ({ exec: e, view: this.evaluationCache[e.id] ?? null }))
       .sort((a, b) =>
         new Date(a.exec.plannedAt as any).getTime() - new Date(b.exec.plannedAt as any).getTime()
-      )
-      .slice(0, 4);
-    this.currentSlide =  Math.max(0, this.slides.length - 1);
+      );
+    this.currentSlide = Math.max(0, this.slides.length - 1);
   }
 
   // === Helpers affichage ===
@@ -140,26 +133,35 @@ export class ControlDetailsPageComponent implements OnInit {
       default: return 'status-default';
     }
   }
-  formatStatus(s?: Status) { return s ? statusLabels[s] : '—'; }
+  
+  formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
 
-  getUsernameFromToken(): string | null {
-    const token = sessionStorage.getItem('token');
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.username || null;
-    } catch { return null; }
+
+  openEvaluationDetailsPopup(executionId: string, action: string): void {
+    this.dialog.open(PopupEvaluationControleComponent, {
+      data: {
+        action: action,
+        executionId: executionId,
+        mode: action == 'eval' ? 'FORM' : 'DETAILS',
+        canValidate: true
+      }
+    }).afterClosed().subscribe(() => {
+      this.loadControlExecutions(this.control!.id.id);
+    });
   }
 
-  // === Actions ===
-  scheduleExecution(): void { this.showPopup = true; }
-  viewFullHistory(): void {
-    if (this.control) this.router.navigate(['/controls', this.control.id, 'history']);
-  }
-  openEvaluationDetailsPopup(executionId: string): void {
-    this.forceDetails = true;
-    this.selectedExecutionId = executionId;
-    this.showEvaluationPopup = true;
+  evaluateExec(executionId: string, action: string): void {
+    this.dialog.open(PopupEvaluationControleComponent, {
+      data: {
+        action: action,
+        controlId : this.control?.id.id,
+        executionId: executionId,
+        mode: 'FORM',
+        canValidate: true
+      }
+    }).afterClosed().subscribe(() => {
+      this.loadControlExecutions(this.control!.id.id);
+    });
   }
 
   handlePlanification(payload: any): void {
@@ -168,34 +170,47 @@ export class ControlDetailsPageComponent implements OnInit {
     if (payload.id) this.controlService.updateExecution(payload).subscribe(reload);
     else this.controlService.createExecution(payload).subscribe(reload);
   }
+
   handleEvaluationSubmitted(): void {
     if (this.control) this.loadControlExecutions(this.control.id.id);
   }
 
+  /** === ACTIONS === */
+
+  scheduleExecution(): void { this.showPopup = true; }
+
+  viewFullHistory(): void {
+    if (this.control) this.router.navigate(['control', 'details', this.control.id.id, 'executions']);
+  }
+
+
+  /** === Carrousel === */
+
   hasPrev(): boolean {
     return this.currentSlide > 0;
   }
+
   hasNext(): boolean {
     return this.currentSlide < Math.max(0, this.slides.length - 1);
   }
+
   prevSlide(): void {
     if (this.hasPrev()) this.currentSlide -= 1;
   }
+
   nextSlide(): void {
     if (this.hasNext()) this.currentSlide += 1;
   }
+
   goTo(i: number): void { if (i >= 0 && i < this.slides.length) this.currentSlide = i; }
+
+  /** === FIN carrousel === */
 
   // === Calculations pour l’en-tête ===
   get currentOrLatestExecution(): ControlExecution | null {
     return this.controlExecutions?.[0] ?? null;
   }
 
-  evaluateExec(execId: string): void {
-    this.forceDetails = false;              // ouvre la modale en mode FORM (pas DETAILS)
-    this.selectedExecutionId = execId;
-    this.showEvaluationPopup = true;
-  }
 
   onDragStart(e: PointerEvent | TouchEvent) {
     const x = (e as TouchEvent).touches?.[0]?.clientX ?? (e as PointerEvent).clientX;
@@ -250,9 +265,4 @@ export class ControlDetailsPageComponent implements OnInit {
 
     return 'stripe--neutral';
   }
-
-  getControlVersionIso(): string {
-    return this.control ? new Date(this.control.id.version).toISOString() : '';
-  }
-
 }

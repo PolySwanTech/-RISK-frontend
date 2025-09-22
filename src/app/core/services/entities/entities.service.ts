@@ -38,4 +38,8 @@ export class EntitiesService {
   update(entite: BusinessUnit) {
     return this.http.put(this.baseUrl, entite);
   }
+
+  delete(id : string){
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
 }

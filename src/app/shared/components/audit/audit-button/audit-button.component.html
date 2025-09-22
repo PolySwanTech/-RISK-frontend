@@ -1,0 +1,9 @@
+<!-- Bouton flottant en bas à droite -->
+<button mat-raised-button mat-tooltip="'Consulter la piste d\'audit'" class="audit-button" (click)="toggleDrawer()">
+  <mat-icon>{{ drawerOpened ? 'close' : 'history' }}</mat-icon>
+</button>
+
+<!-- Drawer personnalisé -->
+<div class="custom-drawer" [class.open]="drawerOpened">
+  <app-audit-panel [contextId]="contextId" [contextType]="contextTarget!"></app-audit-panel>
+</div>

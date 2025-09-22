@@ -1,5 +1,5 @@
 import { ActionPlanService } from './../../core/services/action-plan/action-plan.service';
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -19,101 +19,107 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
-import { Priority, priorityLabels } from '../../core/enum/Priority';
-import { Status, statusLabels } from '../../core/enum/status.enum';
+import { Priority, PriorityLabels } from '../../core/enum/Priority';
+import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
 import { Filter } from '../../core/enum/filter.enum';
 import { FilterTableComponent } from "../../shared/components/filter-table/filter-table.component";
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../shared/components/global-search-bar/global-search-bar.component";
+import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { MatMenu, MatMenuModule } from '@angular/material/menu';
+import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-plan-action-page',
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, FormsModule,
-    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule,
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, FormsModule, GoBackComponent,
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, MatMenuModule,
     MatSelectModule, MatFormFieldModule, MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent],
   providers: [DatePipe],
   templateUrl: './plan-action-page.component.html',
   styleUrl: './plan-action-page.component.scss'
 })
-export class PlanActionPageComponent {
+export class PlanActionPageComponent implements OnInit {
   private dialog = inject(MatDialog);
   private datePipe = inject(DatePipe)
   private router = inject(Router);
   private confirmService = inject(ConfirmService)
   private actionPlanService = inject(ActionPlanService);
+  private snackBarService = inject(SnackBarService);
 
   filterMode: 'general' | 'detailed' = 'general';
 
   columns = [
-  {
-    columnDef: 'reference',
-    header: 'Référence',
-    cell: (element: ActionPlan) => `${element.reference}`,
-    filterType: 'text',
-    icon: 'tag' // 🏷️
-  },
-  {
-    columnDef: 'ref_incident',
-    header: 'Référence Incident',
-    cell: (element: ActionPlan) => `${element.incidentRef ?? 'N/A'}`,
-    filterType: 'text',
-    icon: 'tag' // 🏷️
-  },
-  {
-    columnDef: 'libelle',
-    header: 'Titre',
-    cell: (element: ActionPlan) => `${element.libelle}`,
-    filterType: 'text',
-    icon: 'title' // 📝
-  },
-  {
-    columnDef: 'userInCharge',
-    header: 'Responsable',
-    cell: (element: ActionPlan) => `${element.userInCharge}`,
-    filterType: 'text',
-    icon: 'person' // 👤
-  },
-  {
-    columnDef: 'echeance',
-    header: 'Date d\'échéance',
-    cell: (element: ActionPlan) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
-    filterType: 'date',
-    icon: 'event' // 📅
-  },
-  {
-    columnDef: 'priority',
-    header: 'Priorité',
-    cell: (element: ActionPlan) => this.getPriorityBarHtml(element.priority),
-    filterType: 'select',
-    icon: 'signal_cellular_alt', // 📶
-    options: [
-      { value: Priority.MAXIMUM, label: 'Maximale' },
-      { value: Priority.MEDIUM, label: 'Moyenne' },
-      { value: Priority.MINIMAL, label: 'Minimale' }
-    ]
-  },
-  {
-    columnDef: 'status',
-    header: 'Statut',
-    cell: (element: ActionPlan) => `
+    {
+      columnDef: 'reference',
+      header: 'Référence',
+      cell: (element: ActionPlan) => `${element.reference}`,
+      filterType: 'text',
+      icon: 'tag' // 🏷️
+    },
+    {
+      columnDef: 'ref_incident',
+      header: 'Référence Incident',
+      cell: (element: ActionPlan) => `${element.incidentRef != '' ? element.incidentRef : 'N/A'}`,
+      filterType: 'text',
+      icon: 'tag' // 🏷️
+    },
+    {
+      columnDef: 'libelle',
+      header: 'Titre',
+      cell: (element: ActionPlan) => `${element.libelle}`,
+      filterType: 'text',
+      icon: 'title' // 📝
+    },
+    {
+      columnDef: 'userInCharge',
+      header: 'Responsable',
+      cell: (element: ActionPlan) => `${element.userInCharge}`,
+      filterType: 'text',
+      icon: 'person' // 👤
+    },
+    {
+      columnDef: 'echeance',
+      header: 'Date d\'échéance',
+      cell: (element: ActionPlan) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
+      filterType: 'date',
+      icon: 'event' // 📅
+    },
+    {
+      columnDef: 'priority',
+      header: 'Priorité',
+      cell: (element: ActionPlan) => this.getPriorityBarHtml(element.priority),
+      filterType: 'select',
+      icon: 'signal_cellular_alt', // 📶
+      options: [
+        { value: Priority.MAXIMUM, label: 'Maximale' },
+        { value: Priority.MEDIUM, label: 'Moyenne' },
+        { value: Priority.MINIMAL, label: 'Minimale' }
+      ]
+    },
+    {
+      columnDef: 'status',
+      header: 'Statut',
+      cell: (element: ActionPlan) => `
       <span class="badge ${element.status.toLowerCase()}">
         ${this.getReadableStatut(element.status)}
       </span>
     `,
-    filterType: 'select',
-    icon: 'flag', // 🚩
-    options: Object.values(Status).map(status => ({
-      value: status,
-      label: this.getReadableStatut(status)
-    }))
-  }
-];
+      filterType: 'select',
+      icon: 'flag', // 🚩
+      options: Object.values(Status).map(status => ({
+        value: status,
+        label: this.getReadableStatut(status)
+      }))
+    }
+  ];
+
+  goBackButtons: GoBackButton[] = [];
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
-  displayedColumns = [...this.columns.map(c => c.columnDef)];
+  displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
 
   dataSource = new MatTableDataSource<any>([]);
 
@@ -124,11 +130,14 @@ export class PlanActionPageComponent {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatMenu) rowMenu! : MatMenu;
 
   dateFilter = new FormControl('');
   priorityFilter = new FormControl('');
   statusFilter = new FormControl('');
 
+
+  selectedActionPlan : ActionPlan | null = null;
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -184,8 +193,15 @@ export class PlanActionPageComponent {
     `;
   }
 
+  delete(actionPlan : ActionPlan){
+    this.actionPlanService.delete(actionPlan.id).subscribe(_ =>  {
+      this.snackBarService.info("Plan d'action supprimé");
+      this.ngOnInit();
+    })
+  }
+
   formatPriority(p: Priority): string {
-    return priorityLabels[p] || p;
+    return PriorityLabels[p] || p;
   }
 
   getPriorityBadge(priority: string) {
@@ -223,6 +239,25 @@ export class PlanActionPageComponent {
     this.dateFilter.valueChanges.subscribe(() => this.applyAllFilters());
     this.priorityFilter.valueChanges.subscribe(() => this.applyAllFilters());
     this.statusFilter.valueChanges.subscribe(() => this.applyAllFilters());
+
+    this.goBackButtons = [
+
+      {
+        label: 'Ajouter un plan d\'action',
+        icon: 'add',
+        show: true,
+        class: 'btn-primary',
+        action: () => this.add()
+      },
+      {
+        label: 'Exporter',
+        icon: 'file_download',
+        show: true,
+        class: 'btn-green',
+        action: () => console.log('Export action plans')
+      },
+
+    ]
   }
 
   clearFilters(): void {
@@ -315,7 +350,7 @@ export class PlanActionPageComponent {
   }
 
   getReadableStatut(status: Status): string {
-    return statusLabels[status] || status;
+    return StatusLabels[status] || status;
   }
 
 

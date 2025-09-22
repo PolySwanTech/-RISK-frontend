@@ -17,10 +17,15 @@ export class ActionPlanService {
   }
 
   getActionPlan(id: string) {
-    // const allPlans = this.getActionsPlan();
-    // return allPlans.find(plan => plan.id === id);
-
     return this.http.get<ActionPlan>(`${this.base}/${id}`);
+  }
+
+  startActionPlan(id: string) {
+    return this.http.put(`${this.base + '/start/' + id}`, null);
+  }
+
+  endActionPlan(id: string) {
+    return this.http.put(`${this.base + '/end/' + id}`, null);
   }
 
   getActionsPlan() {
@@ -38,5 +43,13 @@ export class ActionPlanService {
 
   finishAction(actionId : string){
     return this.http.put(this.base + '/actions/finish/' + actionId, null);
+  }
+
+  delete(id : string){
+    return this.http.put(this.base + '/' + id + '/deactivate', {})
+  }
+
+  abandonAction(id : string){
+    return this.http.put(this.base + '/action/' + id + '/deactivate', {})
   }
 }

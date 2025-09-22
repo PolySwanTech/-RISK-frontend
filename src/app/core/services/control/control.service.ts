@@ -41,11 +41,16 @@ export class ControlService {
     return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`, { params: params });
   }
 
-  getAllExecutions(controlId?: string) {
-    return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${controlId ? `?controlId=${controlId}` : ''}`);
+  getAllExecutions(controlId?: string, isHistory: boolean = false) {
+    let params = [];
+    if (controlId) params.push(`controlId=${controlId}`);
+    params.push(`isHistory=${isHistory}`); // ajoute le paramètre pour le backend
+    const queryString = params.length ? `?${params.join('&')}` : '';
+
+    return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${queryString}`);
   }
 
-  getAllTemplatesByProcessAndRisk(selectedProcess: Process, selectedRisk: RiskTemplate) {
+  getAllTemplatesByProcessAndRisk(selectedProcess: any, selectedRisk: RiskTemplate) {
     return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`)
   }
 
@@ -90,5 +95,13 @@ export class ControlService {
 
   createMethodology(data: ControlMethodologyCreateDto) {
     return this.http.post(`${this.baseUrlMeth}`, data);
+  }
+
+  suspendControl(controlId: string) {
+    return this.http.patch(`${this.baseUrlTemp}/${controlId}/suspend`, {});
+  }
+
+  activateControl(controlId: string) {
+    return this.http.patch(`${this.baseUrlTemp}/${controlId}/activate`, {});
   }
 }

@@ -22,7 +22,9 @@
           <input type="text" [(ngModel)]="range.libelle" />
         </td>
         <td>
-          <input type="number" [value]="range.min" [readonly]="i === 0" (input)="updateMin(i, $event)" />
+          <input type="number" [min]="(i > 0 ? list[i - 1].min : 0) + 1"
+            [max]="(i < list.length - 1 ? list[i + 1].min : 0) - 1" [value]="range.min" [readonly]="i === 0"
+            (input)="updateMin(i, $event)" />
         </td>
         <td>
           @if(i == list.length - 1){

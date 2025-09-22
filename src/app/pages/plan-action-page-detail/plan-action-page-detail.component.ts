@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +14,6 @@ import { ActionPlanService } from '../../core/services/action-plan/action-plan.s
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
-import { AuthService } from '../../core/services/auth/auth.service';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
 import { firstValueFrom } from 'rxjs';
@@ -23,16 +22,26 @@ import { FichiersComponent } from '../../shared/components/fichiers/fichiers.com
 import { FileService } from '../../core/services/file/file.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
+import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
+import { AddActionDialogComponent } from '../../features/action-plan/add-action-dialog/add-action-dialog.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { AuditService } from '../../core/services/audit/audit.service';
+import { AuditPanelComponent } from '../../shared/components/audit/audit-panel/audit-panel.component';
+import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
+import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
 
 @Component({
   selector: 'app-plan-action-page-detail',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, AuditButtonComponent,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
 export class PlanActionPageDetailComponent {
+
+  @ViewChild('auditDrawer') auditDrawer!: MatDrawer;
+
 
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
@@ -40,6 +49,8 @@ export class PlanActionPageDetailComponent {
   private router = inject(Router);
   private fileService = inject(FileService);
   private dialog = inject(MatDialog);
+  private snackBarService = inject(SnackBarService)
+  private auditService = inject(AuditService);
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -50,32 +61,92 @@ export class PlanActionPageDetailComponent {
 
   validator: string = '';
 
-  goBackButtons: GoBackButton[] = [
-    {
-      label: "Exporter",
-      icon: 'file_download',
-      class: 'btn-green',
-      show: true,
-      action: () => this.export()
-    }
-  ];
+  goBackButtons: GoBackButton[] = []
+
+  statusEnum = Status;
+  targetTypeEnum = TargetType;
+
+  abandonedActions: Action[] = []
+  actions: Action[] = []
+
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
   }
 
+  isNotStarted() {
+    return this.actionPlan && this.actionPlan.status == Status.NOT_STARTED || false;
+  }
+
   getActionPlan(id: string) {
-    this.actionPlanService.getActionPlan(id).subscribe(
-      resp => {
-        this.actionPlan = resp;
-        if (this.actionPlan?.actions?.length) {
-          this.totalActions = this.actionPlan.actions.length;
-          this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-          this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-          this.updateStatus();
+    this.actionPlanService.getActionPlan(id).subscribe(resp => {
+      this.actionPlan = resp;
+
+      // Todo: métriques doivent être calculées côté backend
+      if (this.actionPlan?.actions?.length) {
+        this.totalActions = this.actionPlan.actions.length;
+        this.completedActions = this.getCompletedCount(this.actionPlan.actions);
+        this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
+      }
+
+      this.actions = this.actionPlan.actions.filter(a => a.actif == true);
+
+      // TODO : récupérer les actions abandonnées
+      this.abandonedActions = this.actionPlan.actions.filter(a => a.actif == false);
+
+      // règles d’affichage
+      const st = this.actionPlan?.status;
+
+      const canStart = st === Status.NOT_STARTED;
+
+      const canEnd =
+        st !== Status.ACHIEVED &&
+        st !== Status.NOT_STARTED &&
+        st !== (Status as any).CANCELLED
+
+      this.goBackButtons = [
+        {
+          label: 'Exporter',
+          icon: 'file_download',
+          class: 'btn-green',
+          show: true,
+          action: () => this.export()
+        },
+        {
+          label: 'Démarrer',
+          icon: 'play_arrow',
+          class: 'btn-blue',
+          show: !!canStart,
+          action: () => this.startActionPlan()
+        },
+        {
+          label: 'Terminer',
+          icon: 'check',
+          class: 'btn-primary',
+          show: !!canEnd,
+          action: () => this.endActionPlan()
+        }
+      ];
+    });
+  }
+
+  openAddActionDialog() {
+    this.dialog.open(AddActionDialogComponent,
+      {
+        width: '400px',
+        data: {
+          actionPlanId: this.actionPlan?.id
         }
       }
-    )
+    ).afterClosed().subscribe(result => {
+      if (result) {
+        this.ngOnInit();
+      }
+    });
+  }
+
+  canAbandonAction(action: Action) {
+    return action.performedAt == null && this.actionPlan?.status != Status.ACHIEVED && this.actionPlan?.status != Status.CANCELLED
   }
 
   validateAction(actionId: string) {
@@ -85,27 +156,30 @@ export class PlanActionPageDetailComponent {
     )
   }
 
+  abandon(action: Action) {
+    this.auditService.openAuditDialog(action.id, TargetType.ACTION_PLAN)
+      .afterClosed()
+      .subscribe(result => {
+        if (result) {
+          this.actionPlanService.abandonAction(action.id).subscribe(
+            _ => {
+              this.snackBarService.info("Action abandonnée avec succès.")
+              this.ngOnInit();
+            }
+          )
+        }
+        else {
+          this.snackBarService.info("Action non-abandonnée.")
+        }
+      })
+  }
+
   getCompletedCount(actions: Action[]): number {
     return actions.filter(a => a.performedAt).length;
   }
 
   getCompletionRate(actions: Action[]): number {
     return actions.length ? Math.round((this.getCompletedCount(actions) / actions.length) * 100) : 0;
-  }
-
-  updateStatus() {
-    const completed = this.completedActions;
-    const total = this.totalActions;
-
-    if (total === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === total) {
-      this.actionPlan!.status = Status.ACHIEVED;
-    } else {
-      this.actionPlan!.status = Status.IN_PROGRESS;
-    }
   }
 
   getReadableStatut(status: Status): string {
@@ -188,8 +262,39 @@ export class PlanActionPageDetailComponent {
   export() {
   }
 
+  startActionPlan() {
+    if (this.actionPlan && this.actionPlan.status === Status.NOT_STARTED) {
+      this.actionPlanService.startActionPlan(this.actionPlan.id!).subscribe(
+        _ => {
+          this.snackBarService.success("Le plan d'action a bien été démarré, vous pouvez commencer à réaliser les actions.");
+          this.ngOnInit()
+        }
+      )
+    }
+  }
+
+  endActionPlan() {
+    if (this.actionPlan && this.actionPlan.status !== Status.ACHIEVED && this.actionPlan.status !== Status.NOT_STARTED) {
+      this.actionPlanService.endActionPlan(this.actionPlan.id!).subscribe(
+        _ => {
+          this.snackBarService.success("Le plan d'action a bien été cloturé.");
+          this.ngOnInit()
+        }
+      )
+    }
+  }
+
   goToIncident() {
     this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
+  }
+
+  openAuditPanel() {
+    if (this.auditDrawer.opened) {
+      this.auditDrawer.close();
+    }
+    else{
+      this.auditDrawer.open();
+    }
   }
 
 }

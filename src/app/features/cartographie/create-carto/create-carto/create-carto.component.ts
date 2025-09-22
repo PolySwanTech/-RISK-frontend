@@ -9,8 +9,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-create-carto',
   standalone: true,
-  imports: [ChooseTypeCartoComponent, GoBackComponent, SelectRiskProcessComponent,
-    MatCardModule, CreateEvaluationComponent],
+  imports: [GoBackComponent, MatCardModule, CreateEvaluationComponent],
   templateUrl: './create-carto.component.html',
   styleUrl: './create-carto.component.scss'
 })
@@ -18,8 +17,6 @@ export class CreateCartoComponent {
 
 
   steps = [
-    'Type de cartographie',
-    'Choix de cartographie',
     'Sélection',
     'Évaluation',
     'Résultats'

@@ -3,13 +3,11 @@ import { CreateProcessComponent } from '../process/create-process/create-process
 import { CreateRisksComponent } from './risks/create-risks/create-risks.component';
 import { CreateRisksEvaluationsComponent } from './risks/risk-evaluation/create-risks-evaluations/create-risks-evaluations.component';
 import { RiskDetailComponent } from './risks/risk-detail/risk-detail.component';
-import { createComponent } from '@angular/core';
-import { ListProcessComponent } from '../process/list-process/list-process.component';
-import { CartographieComponent } from '../../pages/cartographie/cartographie.component';
 import { CreateEvaluationComponent } from '../cartographie/create-evaluation/create-evaluation.component';
+import { ReglagesComponent } from './reglages/reglages.component';
 
 export const reglagesRoute: Routes = [
-  { path: '', component: ListProcessComponent },
+  { path: '', component: ReglagesComponent },
   {
     path: 'risks',
     children: [

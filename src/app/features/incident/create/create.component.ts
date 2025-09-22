@@ -23,12 +23,16 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
-import { firstValueFrom, forkJoin, map, Subscription, tap } from 'rxjs';
+import { firstValueFrom, forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
+import { Dialog } from '@angular/cdk/dialog';
+import { MatDialog } from '@angular/material/dialog';
+import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
 
 
 @Component({
@@ -44,14 +48,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     MatStepperModule,
     MatRadioModule,
     SelectUsersComponent,
-    ButtonAddFileComponent,
     GoBackComponent,
     NgIf,
     NgFor,
-    SelectArborescenceComponent,
     MatIconModule,
     MatTooltipModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatChipsModule,
+    MatChipListbox
   ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
@@ -62,42 +66,51 @@ export class CreateComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
+  private dialog = inject(MatDialog)
   private incidentId = this.route.snapshot.queryParams['id'];
 
   incident: Incident | null = null;
   selectedUser: string | null = null;
   title = "Ajout d'un incident";
 
+  today = new Date();
+
+  selectedBPR: any = null
+
 
   incidentForm1 = this._formBuilder.group({
     reference: [''],
     titre: ['', Validators.required],
-    teamId: ['', Validators.required],
     commentaire: ['', Validators.required],
     location: ['', Validators.required],
   });
 
   incidentForm2 = this._formBuilder.group({
     dateDeDeclaration: [new Date().toISOString().split('T')[0], Validators.required],
-    dateDeSurvenance: ['', Validators.required],
-    dateDeDetection: ['', Validators.required],
-    dateDeCloture: ['']
+    dateDeSurvenance: [
+      '',
+      [Validators.required, this.maxDateValidator(new Date())]
+    ],
+    dateDeDetection: [
+      '',
+      [Validators.required, this.maxDateValidator(new Date())]
+    ],
   });
 
   incidentForm3 = this._formBuilder.group<{
+    teamId: FormControl<string | null>,
+    processId: FormControl<string | null>;
     riskId: FormControl<string | null>;
     intervenant: FormControl<string | null>;
     files: FormControl<string | null>;
     cause: FormControl<Cause | null>;
-    consequences: FormControl<string[]>;
-    processId: FormControl<string | null>;
   }>({
+    teamId: new FormControl('', Validators.required),
+    processId: new FormControl(null, Validators.required),
     riskId: new FormControl(''),
     intervenant: new FormControl(null),
     files: new FormControl(null),
     cause: new FormControl(null, Validators.required),
-    consequences: new FormControl<string[]>([], { validators: [Validators.required], nonNullable: true }),
-    processId: new FormControl(null, Validators.required),
   });
 
   listRisks: any[] = [];
@@ -124,10 +137,10 @@ export class CreateComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.hasTeam = false;
 
-    
+
     // D'abord charger les équipes
     await this.fetchTeams();
-    
+
     // Ensuite charger l'incident ou l'arbre
     if (this.incidentId) {
       this.title = "Modification d'un incident";
@@ -137,18 +150,25 @@ export class CreateComponent implements OnInit {
     }
   }
 
+  // Validator personnalisé pour les dates
+  maxDateValidator(maxDate: Date) {
+    return (control: any) => {
+      if (!control.value) return null; // Ne pas valider si vide
+      const inputDate = new Date(control.value);
+      return inputDate <= maxDate ? null : { maxDate: true };
+    };
+  }
+
   private loadTrees(processRootId?: string /** optionnel */) {
     /* on renvoie un Observable<void> qui émet quand tout est chargé */
     return forkJoin({
       processes: this.processService.getProcessTree(processRootId),
       risks: this.riskService.getRisksTree(processRootId),
-      consequences: this.consequenceService.getAll(),
       causes: this.causeService.getAll()
     }).pipe(
-      tap(({ processes, risks, consequences, causes }) => {
+      tap(({ processes, risks, causes }) => {
         this.listProcess = processes;
         this.listRisks = risks;
-        this.listConsequence = consequences;
         this.listCauses = causes;
       }),
       /* on ne renvoie plus de valeur (juste la fin du chargement) */
@@ -158,10 +178,10 @@ export class CreateComponent implements OnInit {
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
+      console.log(incident)
       this.incidentForm1.patchValue({
         reference: incident.reference,
         titre: incident.title,
-        teamId: incident.teamId,
         commentaire: incident.commentaire,
         location: incident.location
       });
@@ -169,20 +189,34 @@ export class CreateComponent implements OnInit {
         dateDeDeclaration: this.toInputDate(incident.declaredAt),
         dateDeSurvenance: this.toInputDate(incident.survenueAt),
         dateDeDetection: this.toInputDate(incident.detectedAt),
-        dateDeCloture: this.toInputDate(incident.closedAt),
       });
 
       const wantedBuId = incident.teamId;
 
       this.loadTrees(wantedBuId).subscribe(() => {
         this.incidentForm3.patchValue({
+          teamId: incident.teamId,
+          processId: incident.process,
           riskId: incident.risk,
           cause: incident.cause,
-          consequences: incident.consequences.map((c: any) => c.id),
-          processId: incident.process,
           intervenant: incident.intervenant,
         });
       });
+
+      if (incident.riskName) {
+        this.selectedBPR = {
+          bu: {
+            name: incident.teamName
+          },
+          process: {
+            name: incident.processName
+          },
+          risk: {
+            name: incident.riskName
+          }
+        }
+      }
+
       this.incident = incident;
       this.selectedUser = incident.intervenant || null;
     });
@@ -237,39 +271,49 @@ export class CreateComponent implements OnInit {
     this.incidentForm3.get('intervenant')!.setValue(event.id);
   }
 
-  private convertFormToIncident() {
+  private convertFormToIncident(isDraft: boolean = false) {
     return {
       reference: this.incidentForm1.value.reference || "",
       state: "",
-      title: this.incidentForm1.value.titre!,
-      location: this.incidentForm1.value.location!,
-      commentaire: this.incidentForm1.value.commentaire!,
-      teamId: this.incidentForm1.value.teamId!,
+      title: this.incidentForm1.value.titre || (isDraft ? null : ""),
+      location: this.incidentForm1.value.location || (isDraft ? null : ""),
+      commentaire: this.incidentForm1.value.commentaire || (isDraft ? null : ""),
       declaredAt: new Date(this.incidentForm2.value.dateDeDeclaration!),
-      survenueAt: new Date(this.incidentForm2.value.dateDeSurvenance!),
-      detectedAt: new Date(this.incidentForm2.value.dateDeDetection!),
-      closedAt: this.incidentForm2.value.dateDeCloture ? new Date(this.incidentForm2.value.dateDeCloture) : null,
-      riskId: this.incidentForm3.value.riskId!,
-      processId: this.incidentForm3.value.processId!,
-      consequences: this.incidentForm3.value.consequences!,
-      cause: this.incidentForm3.value.cause!,
+      survenueAt: this.incidentForm2.value.dateDeSurvenance ? new Date(this.incidentForm2.value.dateDeSurvenance) : null,
+      detectedAt: this.incidentForm2.value.dateDeDetection ? new Date(this.incidentForm2.value.dateDeDetection) : null,
+      teamId: this.incidentForm3.value.teamId || (isDraft ? null : ""),
+      riskId: this.incidentForm3.value.riskId || null,
+      processId: this.incidentForm3.value.processId || null,
+      cause: this.incidentForm3.value.cause || null,
       intervenant: this.incidentForm3.value.intervenant || null,
     };
   }
 
   addIncident() {
 
-    const incident = this.convertFormToIncident();
+    if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
+      console.error("Formulaire invalide pour la soumission");
+      return;
+    }
+
+
+
+    const incident = this.convertFormToIncident(false);
     incident.state = State.SUBMIT
+
+    console.log(incident)
+
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
+          next: resp => {
+            this.afterCreation("Modification réussie", this.incidentId);
+          },
           error: err => {
             console.error("Erreur lors de la modification de l'incident", err);
           }
         },
       );
-      this.router.navigate(['incident']);
     }
     else {
       this.incidentService.saveIncident(incident).subscribe(
@@ -286,31 +330,25 @@ export class CreateComponent implements OnInit {
   }
 
   addDraft() {
-    const incident = this.convertFormToIncident();
+    const incident = this.convertFormToIncident(true);
+
     incident.state = State.DRAFT;
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
         {
-          error: err => {
-            console.error("Erreur lors de la modification de l'incident", err);
-          }
-        },
-      );
-      this.router.navigate(['incident']);
-    }
-    else {
-      this.incidentService.saveIncident(incident).subscribe(
-        {
           next: resp => {
-            this.afterCreation("Création réussie", resp);
+            this.afterCreation("Modification réussie", this.incidentId);
           },
-          error: err => {
-            console.error("Erreur lors de la création de l'incident", err);
-          }
-        },
-      );
+          error: err => console.error('Erreur update draft', err)
+        });
+    } else {
+      this.incidentService.saveIncident(incident).subscribe({
+        next: resp => this.afterCreation('Création réussie', resp),
+        error: err => console.error('Erreur création draft', err)
+      });
     }
   }
+
 
   afterCreation(title: string, incidentId: string) {
     this.confirmService.openConfirmDialog(title, "Allez vers la consultation ?", true)
@@ -329,9 +367,9 @@ export class CreateComponent implements OnInit {
 
   private toInputDate(d?: string | Date | null): string | null {
     if (!d) return '';
-    return (d instanceof Date ? d : new Date(d))
-      .toISOString()
-      .split('T')[0];
+
+    const date = d instanceof Date ? d : new Date(d);
+    return date.toLocaleDateString('sv-SE');
   }
 
   onFilesChange(event: any) {
@@ -340,5 +378,30 @@ export class CreateComponent implements OnInit {
 
   compareById = (a: { id: string } | null, b: { id: string } | null) =>
     a && b ? a.id === b.id : a === b;
+
+
+  private _iso(v: any) {
+    return v?.toISOString ? v.toISOString() : v;
+  }
+
+  selectBPR(event: any) {
+    this.selectedBPR = event;
+    this.incidentForm3.get('teamId')?.setValue(event.bu.id)
+    this.incidentForm3.get('processId')?.setValue(event.process.id)
+    this.incidentForm3.get('riskId')?.setValue(event.risk.id)
+  }
+
+  create() {
+    const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
+      minWidth: '750px',
+      height: '600px',
+      maxHeight: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe(event => {
+      this.selectBPR(event);
+    });
+  }
+
 
 }

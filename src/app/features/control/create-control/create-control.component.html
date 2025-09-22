@@ -1,5 +1,4 @@
-<h2>Formulaire de création d'un contrôle</h2>
-
+<app-popup-header [title]="'Créer un contrôle'" [showClose]="true" (close)="closePopup()"></app-popup-header>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
   <div class="row-add">
@@ -80,7 +79,6 @@
       [list]="listRisks" />
   </div>
   }
-
 
   <button mat-raised-button class="btn-primary" type="submit">Créer</button>
 </form>

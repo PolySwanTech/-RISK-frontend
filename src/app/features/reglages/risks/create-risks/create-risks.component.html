@@ -7,10 +7,7 @@
 
       <!-- le stepper n’est affiché que lorsque l’objet risk est prêt -->
       @if (risk) {
-      <mat-stepper [linear]="false" #stepper>
-        <!-- ───────────────────── 1. Informations de base ───────────────────── -->
-        <mat-step [stepControl]="infoForm">
-          <form [formGroup]="infoForm">
+      <form [formGroup]="infoForm">
             <!-- Titre --------------------------------------------------------- -->
             <mat-form-field class="full-width">
               <mat-label>Titre du risque</mat-label>
@@ -21,8 +18,8 @@
             <mat-form-field class="full-width">
               <mat-label>Catégorie&nbsp;Bâloise</mat-label>
               <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
-                <mat-option *ngFor="let cat of bal1" [value]="cat">
-                  {{ cat }}
+                <mat-option *ngFor="let cat of bal1" [value]="cat.libelle">
+                  {{ cat.label }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -33,8 +30,8 @@
               <mat-select formControlName="balois2" (selectionChange)="onCategoryChange($event.value, 2)">
                 <!-- on envoie ici l’OBJET L2 complet,
                        car risk.categoryL2 est de type BaloiseCategoryL2 -->
-                <mat-option *ngFor="let sub of bal2" [value]="sub">
-                  {{ sub }}
+                <mat-option *ngFor="let sub of bal2" [value]="sub.libelle">
+                  {{ sub.label }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -51,7 +48,7 @@
               </mat-select>
             </mat-form-field>
 
-            <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length && listProcess.length > 0"
+            <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length > 0"
               [id]="infoForm.get('processId')!.value" (changeValue)="onProcessSelected($event)"
               placeholder="Sélectionnez un processus" [list]="listProcess">
             </app-select-arborescence>
@@ -73,8 +70,6 @@
               </button>
             </div>
           </form>
-        </mat-step>
-      </mat-stepper>
       }
     </div>
   </section>

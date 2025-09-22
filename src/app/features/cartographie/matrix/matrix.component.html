@@ -16,16 +16,13 @@
 
             <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
               (click)="openColorOverlay($event, cell)" class="matrix-cell">
-
-              <!-- Overlay de sélection de couleur -->
-              <div *ngIf="activeCell === cell" class="color-overlay" [ngStyle]="overlayPosition">
-                <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
-                  (click)="selectColor(cell, risk)">
-                  {{ risk.name }}
-                </div>
-              </div>
-
             </td>
+            <div *ngIf="activeCell" class="color-overlay" [ngStyle]="overlayPosition">
+              <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
+                (click)="selectColor(activeCell, risk)">
+                {{ risk.name }}
+              </div>
+            </div>
           </tr>
 
           <!-- ligne d’entête des colonnes PROBABILITÉ -->
@@ -57,8 +54,9 @@
   }
 
 </section>
-
+@if(modifPlan){
 <h2>⚙️ Paramétrage des Sévérités</h2>
 <app-matrix-settings [list]="rowLabels" [type]="'SEVERITY'"></app-matrix-settings>
 <h2>⚙️ Paramétrage des Fréquences</h2>
 <app-matrix-settings [list]="colLabels" [type]="'FREQUENCY'"></app-matrix-settings>
+}

@@ -15,6 +15,7 @@ export interface FileEntity {
   size: number | null;
   etag: string | null;
   uploadedAt: string | null; // Instant côté back → string ISO
+  uploadedBy: string | null;
   descriptif?: string | null;
 }
 
@@ -26,7 +27,8 @@ export interface UploadedFile {
   contentType: string;
   size: number;
   etag: string;
-  uploadedAt: Date; // on convertit en Date
+  uploadedAt: Date;
+  uploadedBy: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -53,6 +55,7 @@ export class FileService {
           size: f.size ?? 0,
           etag: f.etag ?? '',
           uploadedAt: f.uploadedAt ? new Date(f.uploadedAt) : new Date(0),
+          uploadedBy: f.uploadedBy ?? 'inconnu',
         }))
       )
     );

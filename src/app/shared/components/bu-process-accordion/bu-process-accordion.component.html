@@ -1,0 +1,156 @@
+<div class="bp-wrapper" *ngIf="currentNodes?.length">
+
+  <div class="search-section">
+    <div class="search-input-wrapper">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input type="text" placeholder="Rechercher un risque" [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
+        class="search-input">
+      <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </div>
+
+    <!-- Résultats de recherche -->
+    <div *ngIf="showSearchResults" class="search-results">
+
+      <div *ngIf="isSearching" class="search-loading">
+        <mat-spinner diameter="24"></mat-spinner>
+        <div class="search-loading-text">Recherche en cours...</div>
+      </div>
+
+      <div *ngIf="!isSearching && searchResults.length === 0" class="search-empty">
+        Aucun résultat trouvé pour "<strong>{{ searchQuery }}</strong>"
+      </div>
+
+      <div *ngFor="let result of searchResults; let last = last" class="search-result-item"
+        (click)="selectSearchResult(result)" [class.search-result-item-last]="last">
+        <div class="search-result-header">
+          <strong class="search-result-name">{{ result.name }}</strong>
+          <span class="search-result-type" [ngClass]="{
+                  'type-risque': result.displayType === 'Risque',
+                  'type-processus': result.displayType === 'Processus',
+                  'type-bu': result.displayType !== 'Risque' && result.displayType !== 'Processus'
+                }">
+            {{ result.displayType }}
+          </span>
+        </div>
+        <div class="search-result-path">{{ result.fullPath }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation normale -->
+  <div *ngIf="!showSearchResults && currentNodes?.length" class="breadcrumb">
+    <button mat-button (click)="jumpTo(-1)">
+      <mat-icon>home</mat-icon>
+      <span>Accueil</span>
+    </button>
+    <button mat-button *ngFor="let c of breadcrumb; let i = index" (click)="jumpTo(i)">
+      <mat-icon>chevron_right</mat-icon>
+      <span>{{ c.name }}</span>
+    </button>
+  </div>
+
+  <div class="list-panel">
+
+    <div>
+      <div class="panel-title">
+        <div>
+          {{ getViewTitle() }}
+          <span *ngIf="breadcrumbDisplay"> de « {{ breadcrumbDisplay }} »</span>
+        </div>
+
+        <div class="panel-title-actions">
+          <button *ngIf="breadcrumb.length > 0" mat-stroked-button (click)="back()">
+            <mat-icon>arrow_back</mat-icon> Retour
+          </button>
+        </div>
+      </div>
+
+      <mat-list class="custom-list">
+        @for(node of currentNodes; track node.id){
+        <mat-list-item [matTooltip]="getTooltip(view)" (click)="view === 'risks' ? selectRisk(node) : viewNextLevel(node)">
+          <div class="node-content">
+            <div class="node-content-wrapper">
+              <h3 class="node-title">{{ node.name }}</h3>
+              <mat-chip *ngIf="node.lm" selected class="lm-chip">LM</mat-chip>
+            </div>
+          </div>
+
+          <div class="node-actions">
+            <button *ngIf="hasChildren(node)" mat-stroked-button class="btn-hierarchy"
+              (click)="enterNode(node); $event.stopPropagation()">
+              <mat-icon>account_tree</mat-icon>
+              Voir la hiérarchie
+            </button>
+
+            <button *ngIf="canViewNextLevel(node)" mat-stroked-button color="primary"
+              (click)="viewNextLevel(node); $event.stopPropagation()">
+              <mat-icon>visibility</mat-icon>
+              {{ getNextLevelButtonText(node) }}
+            </button>
+
+            <button *ngIf="view === 'risks'" mat-stroked-button color="accent"
+              (click)="consultationMode == 'admin' ? navToRisk(node.id) : selectRisk(node); $event.stopPropagation()">
+              <mat-icon>{{ consultationMode == 'admin' ? 'visibility' : 'check'}}</mat-icon> {{ consultationMode == 'admin' ? 'Consulter le risque' : 'Sélectionner le risque' }}
+            </button>
+
+            @if(consultationMode === 'admin' && view && view !== 'risks'){
+            <button mat-icon-button (click)="$event.stopPropagation()" [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu">
+              <ng-container *ngIf="view && view === 'bu'">
+
+                <button mat-menu-item (click)="goToMatrixPage(node.id)">
+                  <mat-icon>grid_on</mat-icon>
+                  <span>Voir la matrice</span>
+                </button>
+
+                <button mat-menu-item (click)="openEntityDialog(node, $event)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Modifier</span>
+                </button>
+
+                <button mat-menu-item (click)="deleteBu(node.id)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Supprimer</span>
+                </button>
+
+              </ng-container>
+
+              <ng-container *ngIf="view === 'process'">
+
+                <button mat-menu-item (click)="addRisk(node.id)">
+                  <mat-icon>add</mat-icon>
+                  <span>Nouveau risque</span>
+                </button>
+
+                <button mat-menu-item (click)="openProcessDialog(node, $event)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Modifier</span>
+                </button>
+
+                <button mat-menu-item (click)="deleteProcess(node.id)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Supprimer</span>
+                </button>
+
+              </ng-container>
+            </mat-menu>
+            }
+
+          </div>
+        </mat-list-item>
+        }
+
+      </mat-list>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!currentNodes?.length" class="empty">
+  <mat-spinner></mat-spinner>
+  Chargement des données...
+</div>

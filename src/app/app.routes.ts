@@ -18,23 +18,26 @@ import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
 import { CreateEvaluationComponent } from './features/cartographie/create-evaluation/create-evaluation.component';
 import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
 import { CreateCartoComponent } from './features/cartographie/create-carto/create-carto/create-carto.component';
+import { TodoComponent } from './pages/todo/todo.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
   { path: 'risk/:id', component : RiskPageComponent, canActivate : [AuthGuard] },
-  { path: 'cartographie', component: CartographieComponent, canActivate: [AuthGuard]},
+  { path: 'cartographie', component: CartographieComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CARTOGRAPHIE } },
   { path: 'cartographie/create', component: CreateCartoComponent, canActivate: [AuthGuard] },
   { path: 'cartographie/consulter', component: SelectCartoComponent, canActivate: [AuthGuard] },
   { path: 'cartographie/evaluation', component: CreateEvaluationComponent, canActivate: [AuthGuard] },
   { path: 'calcul', component : CalculInputParametersComponent, canActivate : [AuthGuard] },
-  { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard] },
+  { path: 'calcul/view/:id', component : CalculViewComponent, canActivate : [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CALCUL_FONDS_PROPRE } },
+  { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CALCUL_FONDS_PROPRE } },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },
   { path: 'incident', children: incidentRoute, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_INCIDENTS } },
   { path: 'reglages', children: reglagesRoute },
   { path: 'permissions', children: permissionRoutes, canActivate: [AuthGuard] },
   { path: 'organigramme', children: organigrammeRoutes, canActivate: [AuthGuard] },
-  { path: 'action-plan', children: actionPlanRoutes, canActivate: [AuthGuard] },
-  { path: 'control', children: controlRoutes, canActivate: [AuthGuard] },
+  { path: 'action-plan', children: actionPlanRoutes, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_ACTION_PLAN } },
+  { path: 'control', children: controlRoutes, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CONTROLES } },
+  { path: 'todo', component: TodoComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_TODO } },
 ];

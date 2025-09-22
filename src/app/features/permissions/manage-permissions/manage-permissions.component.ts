@@ -7,12 +7,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
-import { permissionLabels, PermissionName } from '../../../core/enum/permission.enum';
+import { PermissionLabels, PermissionName } from '../../../core/enum/permission.enum';
 import { RoleService } from '../../../core/services/role/role.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateRoleDialogComponent } from '../role/create-role-dialog/create-role-dialog.component';
-import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Role } from '../../../core/models/TeamMember';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+
 
 @Component({
   selector: 'app-manage-permissions',
@@ -26,6 +28,7 @@ import { Role } from '../../../core/models/TeamMember';
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
+    GoBackComponent
   ],
   templateUrl: './manage-permissions.component.html',
   styleUrls: ['./manage-permissions.component.scss']
@@ -37,15 +40,27 @@ export class ManagePermissionsComponent implements OnInit {
   permissions: PermissionName[] = [];
   selectedRole: Role | null = null;
   dialog = inject(MatDialog);
-  confirmService = inject(ConfirmService);
   searchQuery: string | Role | null = null;
+  private snackBarService = inject(SnackBarService);
+
+  goBackButtons: GoBackButton[] = [
+    {
+      label: "Ajouter un rôle",
+      icon: "add",
+      class: "btn-primary",
+      show: true,
+      permission : PermissionName.MANAGE_USERS,
+      action: () => this.create()
+    }
+  ]
+
 
   constructor(
     private roleService: RoleService,
   ) { }
 
   formatPermission(p: PermissionName) {
-    return permissionLabels[p] || p;
+    return PermissionLabels[p] || p;
   }
 
   ngOnInit(): void {
@@ -65,8 +80,8 @@ export class ManagePermissionsComponent implements OnInit {
     this.permissions = permissions as PermissionName[];
   }
 
-  selectUser(user: Role): void {
-    this.selectedRole = user;
+  selectRole(role: Role): void {
+    this.selectedRole = role;
   }
 
   hasPermission(permissionName: PermissionName): boolean {
@@ -88,9 +103,15 @@ export class ManagePermissionsComponent implements OnInit {
   savePermissions(): void {
     if (!this.selectedRole) return;
 
-    this.roleService.updateRolePermissions(this.selectedRole.name, this.selectedRole.permissions).subscribe(() => {
-      alert(`Permissions mises à jour pour ${this.selectedRole!.name}`);
-    });
+    this.roleService.updateRolePermissions(this.selectedRole.name, this.selectedRole.permissions).subscribe({
+      next: () => {
+        this.snackBarService.success(`Permissions mises à jour pour ${this.selectedRole!.name}`);
+      },
+      error: () => {
+        this.snackBarService.error(`Erreur lors de la mise à jour des permissions pour ${this.selectedRole!.name}`);
+      }
+    }
+    );
   }
 
   filterBySearch(): void {
@@ -117,10 +138,10 @@ export class ManagePermissionsComponent implements OnInit {
       .subscribe(name => {
         if (name) {
           this.roleService.create({ name: name, permissions: [] }).subscribe(role => {
+            this.selectedRole = role
             this.roles.push(role);
-            this.filteredRoles.push(role);
-            this.selectedRole = role;
-            this.confirmService.openConfirmDialog('Création réussie', 'Rôle créé avec succès.')
+            this.searchQuery = role.name
+            this.snackBarService.info('Rôle créé avec succès.')
           });
         }
       });

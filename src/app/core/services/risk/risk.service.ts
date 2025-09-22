@@ -3,32 +3,43 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
 import { Observable } from 'rxjs';
+import { RiskLevel, RiskLevelEnum } from '../../enum/riskLevel.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RiskService {
-  
+
 
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/taxonomie';
+  baseUrlEvaluations = environment.apiUrl + '/evaluations';
 
   getById(id: string) {
     return this.http.get<RiskTemplate>(this.baseUrl + '/' + id)
   }
 
   save(dto: RiskTemplateCreateDto) {
-  return this.http.post<RiskTemplate>(this.baseUrl, dto);
-}
+    return this.http.post<RiskTemplate>(this.baseUrl, dto);
+  }
 
-  getAll() {
-    return this.http.get<RiskTemplate[]>(this.baseUrl)
+  getAll(buId?: string): Observable<RiskTemplate[]> {
+    let params = new HttpParams();
+    if (buId) {
+      params = params.append('buId', buId);
+    }
+    return this.http.get<RiskTemplate[]>(this.baseUrl, { params });
   }
 
   getRisksTree(processId?: string) {
     let params = new HttpParams();
     const option = processId ? { params: params.set('processId', processId) } : {};
     return this.http.get<any[]>(this.baseUrl + '/tree', option)
+  }
+
+  getRisksTreeByProcessId(processId: string) {
+    let params = new HttpParams();
+    return this.http.get<any[]>(this.baseUrl + '/tree/process', { params: params.set('processId', processId) })
   }
 
   getAllByProcess(processId: string = "", year: number = new Date().getFullYear()) {
@@ -46,7 +57,18 @@ export class RiskService {
 
   getRiskOfIncident(incidentId: string) {
     const params = new HttpParams().set('incidentId', incidentId);
-    return this.http.get<RiskTemplate>(`${this.baseUrl}/incident`, {params : params});
+    return this.http.get<RiskTemplate>(`${this.baseUrl}/incident`, { params: params });
   }
-  
+
+
+  saveEvaluation(riskId: string, evaluation: RiskLevelEnum, indicators: any[], brut: boolean) {
+    console.log({ riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
+    return this.http.post(this.baseUrlEvaluations, { riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
+  }
+
+  getEvaluationsByBu(buId: string) {
+    const params = new HttpParams().set("buId", buId);
+    return this.http.get<any>(this.baseUrlEvaluations + '/by-bu', { params: params })
+  }
+
 }

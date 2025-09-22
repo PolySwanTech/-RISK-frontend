@@ -20,9 +20,11 @@ import { RiskMatrixComponent } from '../../features/cartographie/risk-matrix/ris
 import { RiskTemplate } from '../../core/models/RiskTemplate';
 import { Process } from '../../core/models/Process';
 import { ProcessService } from '../../core/services/process/process.service';
-import { RiskLevelScores, RiskLevel, RiskLevelEnum } from '../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelEnum } from '../../core/enum/riskLevel.enum';
 import { MatrixService } from '../../core/services/matrix/matrix.service';
 import { GoBackComponent } from "../../shared/components/go-back/go-back.component";
+import { BusinessUnit } from '../../core/models/BusinessUnit';
+import { ConfirmService } from '../../core/services/confirm/confirm.service';
 
 @Component({
   selector: 'app-risk-page',
@@ -37,7 +39,6 @@ import { GoBackComponent } from "../../shared/components/go-back/go-back.compone
   templateUrl: './risk-page.component.html',
   styleUrl: './risk-page.component.scss'
 })
-// ...imports inchangés...
 
 export class RiskPageComponent implements OnInit {
   selectedNiveau: RiskLevel | null = null;
@@ -46,6 +47,8 @@ export class RiskPageComponent implements OnInit {
   risks: RiskTemplate[] = [];
   filteredRisks: RiskTemplate[] = [];
   buNameList: string[] = [];
+
+  businessUnit: BusinessUnit | null = null;
 
   selectedRisk: RiskTemplate | null = null;
   processMap: Record<string, Process> = {};
@@ -58,6 +61,7 @@ export class RiskPageComponent implements OnInit {
   goBackButtons: GoBackButton[] = [];
 
   private riskService = inject(RiskService);
+  private confirmService = inject(ConfirmService);
   private entitiesSrv = inject(EntitiesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -66,13 +70,15 @@ export class RiskPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.goBackButtons = [
-      { label: 'Ajouter un Risque', icon: 'add', class: 'btn-primary', action: () => this.goToAddRisk(), show: true },
+      { label: 'Ajouter un risque', icon: 'add', class: 'btn-primary', action: () => this.goToAddRisk(), show: true },
       { label: 'Exporter', icon: 'file_download', class: 'btn-green', action: () => this.exportData(), show: true },
-      { label: 'Actualiser', icon: 'refresh', class: 'btn-primary', action: () => this.refreshData(), show: true }
     ];
 
     this.buId = this.route.snapshot.paramMap.get('id')!;
-    this.entitiesSrv.findById(this.buId).subscribe(resp => this.buName = resp.name);
+    this.entitiesSrv.findById(this.buId).subscribe(resp => {
+      this.businessUnit = resp;
+      this.buName = this.businessUnit.name
+    });
 
     this.matrixService.getDefaultMatrix(this.buId).subscribe({
       next: resp => this.matrixData = resp,
@@ -152,6 +158,15 @@ export class RiskPageComponent implements OnInit {
   }
 
   goToAddRisk(): void {
-    this.router.navigate(['reglages', 'risks', 'create']);
+    if(this.businessUnit?.process.length === 0) {
+      this.confirmService.openConfirmDialog("Impossible d'ajouter un risque", "Cette business unit ne contient aucun processus. Veuillez d'abord ajouter un processus avant de créer un risque.")
+        .subscribe(res => {
+          if(res) {
+            this.router.navigate(['reglages'], { queryParams: { buId: this.buId } });
+          }
+        })
+      return;
+    }
+    this.router.navigate(['reglages', 'risks', 'create'], { queryParams: { buId: this.buId } });
   }
 }

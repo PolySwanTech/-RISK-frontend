@@ -21,8 +21,12 @@ import { MatrixService } from '../../../core/services/matrix/matrix.service';
 export class MatrixComponent {
   @Input() modifPlan = true;
 
-  @Input() set risks(value: RiskTemplate[]) {
-    this._risks = this.arrayToMatrixMap(value);
+  @Input() set risks(value: RiskTemplate[] | null | undefined) {
+    if (value?.length) {
+      this._risks = this.arrayToMatrixMap(value);
+    } else {
+      this._risks = {}; // reset si rien
+    }
   }
 
   rowLabels: Range[] = [];
@@ -39,13 +43,12 @@ export class MatrixComponent {
   overlayPosition: any = {};
 
   openColorOverlay(event: MouseEvent, cell: any) {
+    if(this.modifPlan === false) return;
     event.stopPropagation(); // éviter fermeture immédiate
     this.activeCell = cell;
-
-    // Positionner l’overlay exactement là où la souris a cliqué
     this.overlayPosition = {
-      top: `${event.clientY - 50}px`,
-      left: `${event.clientX}px`,
+      top: `${event.clientY - 300}px`,
+      left: `${event.clientX - 250}px`,
     };
   }
 
@@ -62,11 +65,9 @@ export class MatrixComponent {
   }
 
   @Input() set matrixData(value: any) {
-
-    this._matrixData = value;
-
-    this.buildMatrixFromCells(value.cells || []);
-  }
+  this._matrixData = value ?? {};
+  this.buildMatrixFromCells(value?.cells || []);
+}
 
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService);
@@ -98,7 +99,7 @@ export class MatrixComponent {
     this.rowLabels = Array(maxImpact).fill('');
     this.colLabels = Array(maxProb).fill('');
 
-    const riskMap = new Map<string, {color: string, level: string}>();
+    const riskMap = new Map<string, { color: string, level: string }>();
 
     cells.forEach(cell => {
       const key = `${cell.riskLevel.color}|${cell.riskLevel.level}`;
@@ -144,17 +145,16 @@ export class MatrixComponent {
   }
 
   cellStyle(cell: any) {
-    // si le backend t’envoie déjà la couleur (ex: cell.riskLevel.color), utilise-la :
-    const bg = cell.riskLevel.color;
-    return {
-      backgroundColor: bg,
-      border: '1px solid #ccc',
-      width: '60px',
-      height: '60px',
-      position: 'relative',
-      cursor: this.modifPlan ? 'pointer' : 'default',
-    };
-  }
+  const bg = cell?.riskLevel?.color || '#fff'; // blanc si rien
+  return {
+    backgroundColor: bg,
+    border: '1px solid #ccc',
+    width: '60px',
+    height: '60px',
+    position: 'relative',
+    cursor: this.modifPlan ? 'pointer' : 'default',
+  };
+}
 
   setColor(cell: any) {
     if (!this.modifPlan || !this.selectedColor) return;
@@ -170,7 +170,7 @@ export class MatrixComponent {
     arr.forEach(risk => {
       let impact = 0;
       // let frequency = risk.dmr.at(-1)?.probability;
-      let frequency = risk.riskBrut![0].probability;
+      let frequency = risk.riskBrut![0]?.probability;
 
       if (!impact || !frequency) {
         // const last = risk.dmr?.at(-1);

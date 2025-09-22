@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SuiviIncidentService } from '../../../../core/services/suivi-incident/suivi-incident.service';
 import { IncidentHistory } from '../../../../core/models/IncidentHistory';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-list-suivi',
@@ -28,6 +29,7 @@ export class ListSuiviComponent implements OnInit {
   private router = inject(Router);
   private suiviService = inject(SuiviIncidentService);
   private confirmService = inject(ConfirmService);
+  private snackBarService = inject(SnackBarService);
 
   @Input() closed: boolean = false;
 
@@ -38,6 +40,7 @@ export class ListSuiviComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSuivi();
+    this.message = '';
   }
 
   getSuivi() {
@@ -46,7 +49,7 @@ export class ListSuiviComponent implements OnInit {
         this.suivis = data;
       },
       error: (err) => {
-        alert("Une erreur est survenue lors de la récupération des suivis.");
+        this.snackBarService.error("Une erreur est survenue lors de la récupération des suivis.");
       }
     });
   }

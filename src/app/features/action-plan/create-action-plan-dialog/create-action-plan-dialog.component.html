@@ -1,6 +1,5 @@
+<app-popup-header [title]="'Créer un plan d\'action'" [showClose]="true" (close)="closePopup()"></app-popup-header>
 <div class="container">
-  <h2>Créer un Plan d'Action</h2>
-
   <form (ngSubmit)="submitActionPlan()">
 
     <!-- Référence de l'incident -->
@@ -46,7 +45,7 @@
 
       <!-- Risk -->
       <mat-form-field appearance="outline">
-        <mat-label>Risk</mat-label>
+        <mat-label>Risque</mat-label>
         <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}"
           [disabled]="data && data.incidentId">
           <mat-option *ngFor="let risk of risks" [value]="risk">

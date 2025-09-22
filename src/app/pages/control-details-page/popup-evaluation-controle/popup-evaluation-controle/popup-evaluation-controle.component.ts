@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
@@ -7,38 +7,45 @@ import { ControlService } from '../../../../core/services/control/control.servic
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
+import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
+import { MatIcon } from '@angular/material/icon';
+import { FichiersComponent } from '../../../../shared/components/fichiers/fichiers.component';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { TargetType } from '../../../../core/enum/targettype.enum';
+import { FileService } from '../../../../core/services/file/file.service';
+import { PopupHeaderComponent } from '../../../../shared/components/popup-header/popup-header.component';
+import { MatCardModule } from '@angular/material/card';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
   selector: 'app-popup-evaluation-controle',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIcon, PopupHeaderComponent, MatCardModule],
   templateUrl: './popup-evaluation-controle.component.html',
   styleUrls: ['./popup-evaluation-controle.component.scss']
 })
 export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
-  @Input() showAsCard: boolean = false;
-  @Input() evaluationView: ControlEvaluationView | null = null;
+  showAsCard: boolean = false;
+  evaluationView: ControlEvaluationView | null = null;
+  executionId!: string;
+  canValidate: boolean = false;
 
-  @Input() initialMode?: PopupMode;
-
-  @Input() executionId!: string;
-
-  @Input() canValidate: boolean = false;
+  private dialog = inject(MatDialog);
+  private fileService = inject(FileService);
 
   @Output() close = new EventEmitter<void>();
-  @Output() submitted = new EventEmitter<void>();
-  @Output() reviewed = new EventEmitter<void>();
-
   @Output() evaluateRequested = new EventEmitter<void>();
   @Output() openDetailsRequested = new EventEmitter<void>();
 
-  @Input() showNoEvalText = false;
-  @Input() showEvaluateButton = true;
+  showNoEvalText = false;
+  showEvaluateButton = true;
 
   mode: PopupMode = 'FORM';
+  controlId : string = '';
   blockers: ControlExecution[] = [];
   evalDetails?: ControlEvaluationView;
   reviewComment = '';
@@ -54,19 +61,25 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   private controlService = inject(ControlService);
   private confirmService = inject(ConfirmService);
+  private snackBarService = inject(SnackBarService);
+  dialogRef = inject(MatDialogRef<PopupEvaluationControleComponent>);
+
+  actionTaken: 'valid' | 'reexam' | null = null;
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, ) {
+  }
 
   ngOnInit(): void {
-    if (this.showAsCard) return;
-
-    window.addEventListener('keydown', this.onKeyDown);
-
-    if (this.initialMode === 'DETAILS') {
-      this.openDetails(this.executionId);
-      return;
+    if (this.data) {
+      this.executionId = this.data.executionId;
+      this.mode = this.data.mode;
+      this.controlId = this.data.controlId;
+      if (this.data.mode === 'FORM') this.startEvaluationFor(this.executionId);
+      if (this.data.mode === 'DETAILS') this.openDetails(this.executionId);
+      this.evaluationView = this.data.evaluationView;
+      this.canValidate = this.data.canValidate;
+      this.actionTaken = this.data.action;
     }
-
-    this.evaluationData.executionId = this.executionId;
-    this.loadBlockersThenDecide(this.executionId);
   }
 
   ngOnDestroy(): void {
@@ -115,35 +128,68 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     this.mode = 'FORM';
   }
 
+  handleAction() {
+    if (this.actionTaken === 'valid') {
+      this.approve();  // Appel de la logique de validation
+    } else if (this.actionTaken === 'reexam') {
+      this.requestReexam();  // Appel de la logique de réexamen
+    } else if (this.actionTaken == 'eval') {
+      this.submit();
+    }
+  }
 
   submit(): void {
     this.controlService.createEvaluation(this.evaluationData).subscribe(() => {
-      this.submitted.emit();
-      this.close.emit();
+      this.dialogRef.close();
     });
   }
 
   approve(): void {
     if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
+    if (!this.reviewComment.trim()) { this.snackBarService.info('Commentaire obligatoire'); return; }
     this.controlService.reviewEvaluationApprove(this.evalDetails.id, this.reviewComment).subscribe(() => {
-      this.reviewComment = '';
-      this.reviewed.emit();
-      this.close.emit();
+      this.dialogRef.close();
     });
   }
 
   requestReexam(): void {
     if (!this.evalDetails?.id) return;
-    if (!this.reviewComment.trim()) { alert('Commentaire obligatoire'); return; }
+    if (!this.reviewComment.trim()) { this.snackBarService.info('Commentaire obligatoire'); return; }
     this.controlService.reviewEvaluationReexam(this.evalDetails.id, this.reviewComment).subscribe(() => {
-      this.reviewComment = '';
-      this.reviewed.emit();
-      this.close.emit();
+      this.dialogRef.close();
     });
   }
 
-  cancel(): void { this.close.emit(); }
+  async viewFiles(closed: boolean = false) {
+
+    let target = TargetType.CONTROL
+    let files = await firstValueFrom(this.fileService.getFiles(target, this.executionId))
+
+    this.dialog.open(FichiersComponent,
+      {
+        width: '400px',
+        data: {
+          files: files,
+          targetType: target,
+          targetId: this.executionId,
+          closed: closed
+        }
+      }
+    )
+      .afterClosed().subscribe(_ => {
+        if (!closed) {
+          // this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
+          //   result => {
+          //     if (result) {
+          //       this.validateAction(actionId);
+          //     }
+          //   }
+          // )
+        }
+      });
+  }
+
+  cancel(): void { this.dialogRef.close(); }
 
   get evalLabel(): string {
     const v = (this.evaluationView?.evaluation || '').toUpperCase();
@@ -167,16 +213,14 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   }
   get reviewBadgeClass(): string {
     const s = this.evaluationView?.reviewStatus;
-    if (s === 'APPROVED') return 'pill-success';
-    if (s === 'REEXAM_REQUESTED') return 'pill-warning';
-    if (s === 'PENDING') return 'pill-default';
+    if (s === ReviewStatus.APPROVED) return 'pill-success';
+    if (s === ReviewStatus.REEXAM_REQUESTED) return 'pill-warning';
+    if (s === ReviewStatus.PENDING) return 'pill-default';
+    if (s === ReviewStatus.REJECTED) return 'pill-danger';
     return 'pill-default';
   }
-  get reviewBadgeLabel(): string {
-    const s = this.evaluationView?.reviewStatus;
-    if (s === 'APPROVED') return 'Validée';
-    if (s === 'REEXAM_REQUESTED') return 'Réexamen demandé';
-    if (s === 'PENDING') return 'En attente de validation';
-    return '—';
-  }
+ get reviewBadgeLabel(): string {
+     const s = this.evaluationView?.reviewStatus;
+     return s ? ReviewStatusLabels[s] : '—';
+   }
 }

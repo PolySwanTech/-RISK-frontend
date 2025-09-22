@@ -1,0 +1,10 @@
+<mat-card-header style="display: flex; align-items: center; justify-content: space-between;">
+    <mat-card-title class="files-header">
+        <h2 style="margin-block: 0px;">{{title}}</h2>
+    </mat-card-title>
+    @if(showClose) {
+    <button mat-icon-button aria-label="Fermer" (click)="close.emit()" class="close-popup-btn">
+        <mat-icon>close</mat-icon>
+    </button>
+    }
+</mat-card-header>

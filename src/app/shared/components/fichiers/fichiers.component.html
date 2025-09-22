@@ -1,11 +1,7 @@
 <mat-card class="files-card" style="height: 600px;">
 
     <mat-card-content style="display: flex; flex-direction: column; height: 97%;">
-        <mat-card-header>
-            <mat-card-title class="files-header">
-                <span>Pièces jointes</span>
-            </mat-card-title>
-        </mat-card-header>
+        <app-popup-header [title]="'Pièces jointes'" [showClose]="data != null" (close)="closePopup()"></app-popup-header>
         <!-- Zone de dépôt -->
         @if(!closed){
         <div class="upload-zone" (click)="fileInput.click()" (dragover)="onDragOver($event)"
@@ -57,7 +53,7 @@
                             <div class="file-name">{{ file.filename }}</div>
                             <div class="file-details">
                                 {{ formatFileSize(file.size) }} •
-                                Ajouté le {{ formatDate(file.uploadedAt) }}
+                                Ajouté le {{ formatDate(file.uploadedAt) }} Par {{ file.uploadedBy }}
                             </div>
                         </div>
                     </div>
@@ -65,11 +61,11 @@
                         <button mat-icon-button matTooltip="Télécharger" (click)="downloadFile(file)">
                             <mat-icon>download</mat-icon>
                         </button>
-                        @if(!closed){
+                        <!-- @if(!closed){
                         <button mat-icon-button color="warn" matTooltip="Supprimer" (click)="deleteFile(file.id)">
                             <mat-icon>delete</mat-icon>
                         </button>
-                        }
+                        } -->
                     </div>
                 </div>
             </mat-card>

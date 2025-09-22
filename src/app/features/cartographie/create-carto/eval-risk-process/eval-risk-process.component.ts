@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-eval-risk-process',
@@ -11,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 export class EvalRiskProcessComponent {
 
   @Output() evaluationSaved = new EventEmitter<void>();
+  private snackBarService = inject(SnackBarService);
 
   severities = ['Faible', 'Modéré', 'Significatif', 'Élevé', 'Critique'];
   frequencies = ['Rare', 'Peu fréquent', 'Fréquent', 'Très fréquent'];
@@ -25,7 +27,7 @@ export class EvalRiskProcessComponent {
   saveEvaluation() {
     // TODO: Implement the logic to save the evaluation
     // TODO: appel API
-    alert("Évaluation sauvegardée avec succès !");
+    this.snackBarService.success("Évaluation sauvegardée avec succès !");
     this.evaluationSaved.emit();
   }
 }

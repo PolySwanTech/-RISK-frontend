@@ -3,6 +3,11 @@
   top: 0;
   z-index : 1000;
   left: 260px;
+  transition: left 0.3s ease;
+}
+
+.sticky-close {
+  left: 0px;
 }
 
 .header {

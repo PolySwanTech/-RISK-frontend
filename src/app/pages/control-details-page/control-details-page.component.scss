@@ -53,7 +53,7 @@ $gray-600: #475569;
 .control-details-page {
   min-height: 100vh;
   background: $gray-50;
-  
+
 
   .main-content {
     max-width: 1280px;
@@ -281,13 +281,6 @@ $gray-600: #475569;
     margin-top: 5%;
   }
 
-  .btn-primary {
-    background: $brand;
-    color: #fff;
-    border-color: $brand;
-    width: 50%;
-  }
-
   .btn-outline {
     background: #fff;
     color: $gray-700;
@@ -329,9 +322,14 @@ $gray-600: #475569;
     }
   }
 
+  .card.is-purple {
+    border-left: 6px solid #6f66f1;
+    /* bandeau latéral violet */
+  }
+
   .control-hero {
-    background: linear-gradient(135deg, #6f66f1 0%, #715cf0 25%, #7b56ea 55%, #8a4fd6 100%) !important;
-    border: none !important;
+    // background: linear-gradient(135deg, #6f66f1 0%, #715cf0 25%, #7b56ea 55%, #8a4fd6 100%) !important;
+    // border: none !important;
     border-radius: 18px !important;
     box-shadow: 0 10px 24px rgba(80, 56, 216, .25) !important;
     color: #fff;
@@ -353,7 +351,7 @@ $gray-600: #475569;
       display: flex;
       align-items: center;
       gap: .5rem;
-      color: #fff !important;
+      color: #000 !important;
       margin-bottom: 2%;
     }
 
@@ -757,7 +755,7 @@ $gray-600: #475569;
 /* Flèches flottantes – très visibles */
 .car-fab {
   position: absolute;
-  top: calc(67% + 8px);
+  top: calc(75% + 8px);
   /* centre verticalement par rapport au viewport */
   transform: translateY(-50%);
   width: 46px;
@@ -784,35 +782,61 @@ $gray-600: #475569;
 
 /* ----- Carte méta (ligne "Clôturé • Planifiée… • … • Attribuée…") ----- */
 .meta-card {
-  @extend %card;                 /* même base que les autres cartes */
-  position: relative;            /* nécessaire pour le bandeau */
-  overflow: hidden;              /* pour respecter les arrondis */
-  margin: 0 2px 12px;            /* compact comme Évaluation/Validation */
-  background: #fbfdff;           /* léger ton bleuté déjà utilisé */
+  @extend %card;
+  /* même base que les autres cartes */
+  position: relative;
+  /* nécessaire pour le bandeau */
+  overflow: hidden;
+  /* pour respecter les arrondis */
+  margin: 0 2px 12px;
+  /* compact comme Évaluation/Validation */
+  background: #fbfdff;
+  /* léger ton bleuté déjà utilisé */
   border-color: $gray-200;
 
   /* Bandeau couleur à gauche (état) */
   &::before {
     content: "";
     position: absolute;
-    top: 0; left: 0;
-    width: 8px;                 /* épaisseur du bandeau */
+    top: 0;
+    left: 0;
+    width: 8px;
+    /* épaisseur du bandeau */
     height: 100%;
-    background: $gray-200;       /* neutre par défaut */
+    background: $gray-200;
+    /* neutre par défaut */
     border-top-left-radius: 12px;
     border-bottom-left-radius: 12px;
   }
-  &.stripe--success::before { background: #22c55e; }  /* Clôturé (vert) */
-  &.stripe--pending::before { background: #93c5fd; }  /* En attente (bleu ciel) */
-  &.stripe--danger::before  { background: #ef4444; }  /* En cours / Réexamen (rouge) */
-  &.stripe--neutral::before { background: #e5e7eb; }  /* Par défaut */
+
+  &.stripe--success::before {
+    background: #22c55e;
+  }
+
+  /* Clôturé (vert) */
+  &.stripe--pending::before {
+    background: #93c5fd;
+  }
+
+  /* En attente (bleu ciel) */
+  &.stripe--danger::before {
+    background: #ef4444;
+  }
+
+  /* En cours / Réexamen (rouge) */
+  &.stripe--neutral::before {
+    background: #e5e7eb;
+  }
+
+  /* Par défaut */
 
   .card-content.meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 14px;          /* compacité */
+    padding: 12px 14px;
+    /* compacité */
   }
 
   .meta-left {
@@ -842,7 +866,8 @@ $gray-600: #475569;
     flex: 0 0 auto;
 
     .btn {
-      padding: .42rem .8rem;     /* même gabarit que les CTA des cartes */
+      padding: .42rem .8rem;
+      /* même gabarit que les CTA des cartes */
     }
   }
 }
@@ -850,11 +875,13 @@ $gray-600: #475569;
 /* Optionnel : harmonise le badge statut avec tes chips */
 .meta-card .badge {
   @extend .badge;
-  border-color: transparent;     /* comme les autres */
+  border-color: transparent;
+  /* comme les autres */
 }
 
 .field.full-width {
-  grid-column: span 2;   /* prend toute la largeur */
+  grid-column: span 2;
+  /* prend toute la largeur */
 }
 
 /* Sur mobile: un poil plus petites et plus proches des bords */
@@ -883,12 +910,14 @@ $gray-600: #475569;
 /* Section des deux cartes côte à côte */
 .hero-section {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Carte héro plus large, méthodologie plus petite */
+  grid-template-columns: 1fr 1fr;
+  /* Carte héro plus large, méthodologie plus petite */
   gap: 1.5rem;
   margin-bottom: 2rem;
 
   @media(max-width: 1024px) {
-    grid-template-columns: 1fr; /* Sur mobile : une seule colonne */
+    grid-template-columns: 1fr;
+    /* Sur mobile : une seule colonne */
   }
 }
 
@@ -899,29 +928,45 @@ $gray-600: #475569;
 .methodology-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Prend toute la hauteur disponible */
-  
+  height: 100%;
+  /* Prend toute la hauteur disponible */
+
   /* Assure-toi que la carte méthodologie prend la même hauteur */
   app-methodology-card {
     height: 100%;
     display: flex;
     flex-direction: column;
-    
+
     /* Si la carte methodology a une classe CSS spécifique, force sa hauteur */
     .card {
       height: 100%;
       display: flex;
       flex-direction: column;
-      
+
       .card-content {
-        flex: 1; /* Prend tout l'espace disponible */
+        flex: 1;
+        /* Prend tout l'espace disponible */
       }
     }
   }
 }
+
 .control-details-page .content-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
 }
 
+.meta-right .btn-evaluer {
+  font-size: 1rem;
+  /* taille du texte */
+  padding: .6rem 1rem;
+  /* hauteur/largeur */
+  line-height: 1.25;
+  /* évite le texte coupé */
+  min-height: 40px;
+  /* assure une hauteur mini */
+  white-space: nowrap;
+  /* évite le retour à la ligne */
+  background: $brand;
+}

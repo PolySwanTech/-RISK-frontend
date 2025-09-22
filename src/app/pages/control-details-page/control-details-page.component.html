@@ -13,7 +13,7 @@
       <div class="main-column">
         <div class="hero-section">
           <!-- === Carte héro (inchangée) === -->
-          <div class="card card-overview hero control-hero">
+          <div class="card is-purple card-overview hero control-hero">
             <div class="card-content">
 
               <div class="hero-head">
@@ -46,7 +46,7 @@
 
                 <div class="field">
                   <label>Périodicité</label>
-                  <div class="value">{{ control ? recurenceLabels[control.frequency] : '—' }}</div>
+                  <div class="value">{{ control ? recurrenceLabels[control.frequency] : '—' }}</div>
                 </div>
 
                 <div class="field">
@@ -123,19 +123,21 @@
                         </div>
                         <div class="meta-sub">Attribuée à {{ s.exec.performedBy || '—' }}</div>
                       </div>
-
                       <div class="meta-right">
-                        <button class="btn btn-primary" *ngIf="!s.view"
-                          (click)="evaluateExec(s.exec.id)">Évaluer</button>
+                        <button class="btn btn-evaluer"
+                                *ngIf="!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED'"
+                                (click)="evaluateExec(s.exec.id, 'eval');">
+                          {{ s.view?.reviewStatus === 'REEXAM_REQUESTED' ? 'Réévaluer' : 'Évaluer' }}
+                        </button>
                       </div>
                     </div>
                   </div>
 
                   <!-- Cartes visibles seulement quand il y a des données -->
                   <ng-container *ngIf="s.view">
-                    <app-popup-evaluation-controle [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true"
-                      (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id)">
-                    </app-popup-evaluation-controle>
+                    <app-evaluation-card [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true" [executionId]="s.exec.id"
+                      (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id, $event)">
+                    </app-evaluation-card>
                   </ng-container>
                 </div>
               </div>
@@ -165,9 +167,4 @@
   [frequence]="control!.frequency" [isEditing]="false" (close)="showPopup = false"
   (planifier)="handlePlanification($event)" [lastPlannedAt]="controlExecutions?.[0]?.plannedAt">
 </app-planifier-execution-popup>
-
-<app-popup-evaluation-controle *ngIf="showEvaluationPopup && selectedExecutionId" [executionId]="selectedExecutionId!"
-  [initialMode]="forceDetails ? 'DETAILS' : undefined" [canValidate]="true" (submitted)="handleEvaluationSubmitted()"
-  (reviewed)="handleEvaluationSubmitted()" (close)="showEvaluationPopup = false">
-</app-popup-evaluation-controle>
 }

@@ -1,22 +1,6 @@
 <section class="dashboard-container">
     <!-- En-tête avec titre et boutons d'action -->
-    <mat-card class="dashboard-header-card">
-        <mat-card-content class="dashboard-header">
-            <h1>Liste des incidents</h1>
-            <div class="header-controls">
-                <button mat-raised-button class="btn-primary add-button" (click)="add()"
-                    *appHasPermission="'ENTER_INCIDENT'"><mat-icon>add</mat-icon>Ajouter un incident</button>
-                <button mat-raised-button (click)="exportExcel()" class="btn-green">
-                    <mat-icon>file_download</mat-icon>
-                    Exporter
-                </button>
-                <button (click)="refreshData()" mat-raised-button class="btn-primary">
-                    <mat-icon>refresh</mat-icon>
-                    Actualiser
-                </button>
-            </div>
-        </mat-card-content>
-    </mat-card>
+    <app-go-back [title]="'Liste des incidents'" [buttons]="goBackButtons"></app-go-back>
 
     <!-- Section des filtres -->
     <mat-card class="filters-card">
@@ -66,7 +50,6 @@
                         {{column.header}}
                     </th>
                     <td mat-cell *matCellDef="let row" (click)="onRowClick(row)" [innerHTML]="column.cell(row)">
-
                     </td>
                 </ng-container>
                 }
