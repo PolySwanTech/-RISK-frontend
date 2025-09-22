@@ -62,7 +62,6 @@ export class RiskService {
 
 
   saveEvaluation(riskId: string, evaluation: RiskLevelEnum, indicators: any[], brut: boolean) {
-    console.log({ riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
     return this.http.post(this.baseUrlEvaluations, { riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
   }
 

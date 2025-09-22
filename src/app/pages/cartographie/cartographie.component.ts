@@ -76,7 +76,6 @@ export class CartographieComponent implements OnInit {
     // if(this.selectedBuId){
     //   this.riskService.getEvaluationsByBu(this.selectedBuId).subscribe(
     //     resp => {
-    //       console.log(resp)
     //     }
     //   )
     // }

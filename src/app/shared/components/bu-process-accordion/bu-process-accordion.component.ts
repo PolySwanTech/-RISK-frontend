@@ -86,7 +86,6 @@ export class BuProcessAccordionComponent {
   ngOnInit() {
     this.entityService.loadEntitiesTree().subscribe((entitiesTree: any) => {
       this.entities = entitiesTree;
-      console.log('➡️ Entités chargées :', entitiesTree);
       this.fetchProcesses(entitiesTree);
     });
   }
@@ -122,7 +121,6 @@ export class BuProcessAccordionComponent {
           });
         }
       });
-      console.log('➡️ Cache des risques construit :', this.allRisks.length, 'risques');
     });
   }
 
@@ -206,7 +204,6 @@ export class BuProcessAccordionComponent {
       buMap.get(buName)!.push(process);
     });
 
-    console.log(allEntities);
     this.hierarchicalProcesses = allEntities.map(entity => {
       const processes = buMap.get(entity.name) || [];
       return {
@@ -219,7 +216,6 @@ export class BuProcessAccordionComponent {
         children: this.buildBUChildren(processes)
       };
     });
-    console.log('➡️ hiérarchie des processus construite :', this.hierarchicalProcesses);
   }
 
   private buildBuHierarchy(buChildren: any[], buMap: Map<string, Process[]>): ProcessNode[] {
@@ -281,7 +277,6 @@ export class BuProcessAccordionComponent {
 
   // ---- Navigation avec les flèches (descente dans la hiérarchie) ----
   enterNode(node: ProcessNode) {
-    console.log('Entering node:', node, 'Current view:', this.view);
 
     let children: ProcessNode[] = [];
     let newView: 'bu' | 'process' | 'risks' = this.view; // On garde la même vue par défaut
@@ -290,20 +285,16 @@ export class BuProcessAccordionComponent {
       // Navigation dans les sous-BU - on reste en vue BU
       children = node.buChildren;
       newView = 'bu';
-      console.log('Navigating to sub-BUs:', children);
     } else if (this.view === 'process' && node.children?.length) {
       // Navigation dans les sous-processus - on reste en vue process
       children = node.children;
       newView = 'process';
-      console.log('Navigating to sub-processes:', children);
     } else if (this.view === 'risks' && node.enfants?.length) {
       // Navigation dans les sous-risques - on reste en vue risks
       children = node.enfants;
       newView = 'risks';
-      console.log('Navigating to sub-risks:', children);
     } else {
       // Nœud feuille - émettre l'événement approprié
-      console.log('Leaf node reached, emitting selection');
       this.emitSelection(node);
       return;
     }
@@ -317,14 +308,11 @@ export class BuProcessAccordionComponent {
         nodes: children,
         type: newView // Le type correspond à la vue, pas au type du nœud
       });
-      console.log('Updated breadcrumb:', this.breadcrumb);
-      console.log('New view:', this.view);
     }
   }
 
   // ---- Navigation avec les boutons "Voir les ..." (passage d'un type à l'autre) ----
   viewNextLevel(node: ProcessNode) {
-    console.log('Viewing next level for:', node, 'Current view:', this.view);
 
     if (this.view === 'bu') {
       // De BU vers processus
@@ -336,7 +324,6 @@ export class BuProcessAccordionComponent {
   }
 
   private viewProcesses(bu: ProcessNode) {
-    console.log('Viewing processes for BU:', bu);
 
     // Vérifier d'abord dans `children` (processus construits via buildBUChildren)
     let processes = bu.children;
@@ -356,14 +343,12 @@ export class BuProcessAccordionComponent {
         type: 'process' // On passe en vue process
       }];
       this.buSelected.emit(bu);
-      console.log('Switched to process view, breadcrumb:', this.breadcrumb);
     } else {
       this.snackBarService.info('Aucun processus associé à cette BU.')
     }
   }
 
   private viewRisks(process: ProcessNode) {
-    console.log('Viewing risks for process:', process);
 
     this.riskService.getRisksTreeByProcessId(process.id).subscribe({
       next: (risks) => {
@@ -383,7 +368,6 @@ export class BuProcessAccordionComponent {
             nodes: riskNodes,
             type: 'risks' // On passe en vue risks
           });
-          console.log('Switched to risks view, breadcrumb:', this.breadcrumb);
         } else {
           this.snackBarService.info('Aucun risque associé à ce processus.');
         }
@@ -411,25 +395,21 @@ export class BuProcessAccordionComponent {
 
   // ---- Navigation dans le fil d'Ariane ----
   jumpTo(index: number) {
-    console.log('Jumping to index:', index, 'Current breadcrumb:', this.breadcrumb);
 
     if (index === -1) {
       // Retour à la vue initiale
       this.view = 'bu';
       this.breadcrumb = [];
       this.currentNodes = this.hierarchicalProcesses;
-      console.log('Reset to initial BU view');
     } else {
       this.breadcrumb = this.breadcrumb.slice(0, index + 1);
       const target = this.breadcrumb[index];
       this.currentNodes = target.nodes;
       this.view = target.type;
-      console.log('Jumped to:', target, 'New view:', this.view);
     }
   }
 
   back() {
-    console.log('Going back, current breadcrumb:', this.breadcrumb);
 
     if (this.breadcrumb.length > 0) {
       this.breadcrumb.pop();
@@ -438,12 +418,10 @@ export class BuProcessAccordionComponent {
         const last = this.breadcrumb[this.breadcrumb.length - 1];
         this.currentNodes = last.nodes;
         this.view = last.type;
-        console.log('Went back to:', last, 'New view:', this.view);
       } else {
         // Retour à la vue initiale des BU
         this.view = 'bu';
         this.currentNodes = this.hierarchicalProcesses;
-        console.log('Went back to initial BU view');
       }
     }
   }
@@ -494,10 +472,6 @@ export class BuProcessAccordionComponent {
   selectRisk(node: ProcessNode) {
     const firstProcess = this.breadcrumb.find(b => b.type === 'process');
     const firstRisks = this.breadcrumb.find(b => b.type === 'risks');
-
-    console.log('➡️ Bu sélectionné:', firstProcess);
-    console.log('➡️ Process sélectionné:', firstRisks);
-    console.log('➡️ Risque sélectionné:', node);
 
     const obj = {
       bu: firstProcess,
@@ -562,12 +536,9 @@ export class BuProcessAccordionComponent {
 
     this.searchResults = [
       ...riskResults.slice(0, 5),
-      // ...processResults.slice(0, 5),
-      // ...buResults.slice(0, 5)
     ];
 
     this.isSearching = false;
-    console.log('➡️ Résultats de recherche:', this.searchResults);
   }
 
   private searchInBuHierarchy(buList: any[], results: any[]): void {
@@ -593,8 +564,6 @@ export class BuProcessAccordionComponent {
   }
 
   selectSearchResult(result: any): void {
-    console.log('➡️ Sélection depuis la recherche:', result);
-
     if (result.type === 'risk') {
       // Sélectionner directement le risque avec son contexte
       const obj = {

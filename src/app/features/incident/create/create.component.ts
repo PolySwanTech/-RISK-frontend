@@ -178,7 +178,6 @@ export class CreateComponent implements OnInit {
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
-      console.log(incident)
       this.incidentForm1.patchValue({
         reference: incident.reference,
         titre: incident.title,
@@ -296,12 +295,8 @@ export class CreateComponent implements OnInit {
       return;
     }
 
-
-
     const incident = this.convertFormToIncident(false);
     incident.state = State.SUBMIT
-
-    console.log(incident)
 
     if (this.incidentId) {
       this.incidentService.updateIncident(this.incidentId, incident).subscribe(
