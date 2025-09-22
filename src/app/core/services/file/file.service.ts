@@ -5,6 +5,8 @@ import { environment } from '../../../environments/environment';
 import { TargetType } from '../../enum/targettype.enum';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { FichiersComponent } from '../../../shared/components/fichiers/fichiers.component';
 
 // modèle tel que renvoyé par le back (nullable possible)
 export interface FileEntity {
@@ -33,8 +35,24 @@ export interface UploadedFile {
 
 @Injectable({ providedIn: 'root' })
 export class FileService {
+
+  openFiles(files : UploadedFile[], target : TargetType, targetId : string) {
+    return this.dialog.open(FichiersComponent,
+      {
+        width: '400px',
+        data: {
+          files: files,
+          targetType: target,
+          targetId: targetId,
+          closed: true
+        }
+      }
+    )
+  }
+
   private baseUrl = environment.apiUrl + '/files';
   private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
 
   /** POST /files/upload/{type}/{id} */
   uploadFile(file: File, type: TargetType, targetId: string) {
