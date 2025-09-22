@@ -39,13 +39,13 @@ mat-card{
 
   }
 
-
-
-  .status-realise {
-    @include chip(#d1fae5, #065f46, #a7f3d0);
-  }
-
-
-  .status-non-realise {
-    @include chip(#fee2e2, #991b1b, #fecaca);
+  .chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+  background-color: #fff; // léger, pas plein
+  color: #333;
   }

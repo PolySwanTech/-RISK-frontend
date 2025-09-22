@@ -29,27 +29,11 @@
           </a>
         </ng-container>
 
-        <!-- ✅ Incidents -->
-        <ng-container *appHasPermission="'VIEW_INCIDENTS'">
-          <a mat-list-item routerLink="/incident">
-            <mat-icon>warning</mat-icon>
-            <span>{{ 'MENU.INCIDENTS' | translate }}</span>
-          </a>
-        </ng-container>
-
-        <!-- ✅ Cartographie -->
+         <!-- ✅ Cartographie -->
         <ng-container *appHasPermission="'VIEW_CARTOGRAPHIE'">
           <a mat-list-item routerLink="/cartographie">
             <mat-icon>analytics</mat-icon>
             <span>Cartographie</span>
-          </a>
-        </ng-container>
-
-        <!-- ✅ Plan d'action -->
-        <ng-container *appHasPermission="'VIEW_ACTION_PLAN'">
-          <a mat-list-item routerLink="/action-plan/list">
-            <mat-icon>pie_chart</mat-icon>
-            <span>Plans d'action</span>
           </a>
         </ng-container>
 
@@ -58,6 +42,22 @@
           <a mat-list-item routerLink="/control/chart">
             <mat-icon>bar_chart</mat-icon>
             <span>Contrôles</span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Incidents -->
+        <ng-container *appHasPermission="'VIEW_INCIDENTS'">
+          <a mat-list-item routerLink="/incident">
+            <mat-icon>warning</mat-icon>
+            <span>{{ 'MENU.INCIDENTS' | translate }}</span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Plan d'action -->
+        <ng-container *appHasPermission="'VIEW_ACTION_PLAN'">
+          <a mat-list-item routerLink="/action-plan/list">
+            <mat-icon>pie_chart</mat-icon>
+            <span>Plans d'action</span>
           </a>
         </ng-container>
 
