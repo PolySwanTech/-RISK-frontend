@@ -104,4 +104,9 @@ export class ControlService {
   activateControl(controlId: string) {
     return this.http.patch(`${this.baseUrlTemp}/${controlId}/activate`, {});
   }
+
+  getLastExecution(controlId: string) {
+    const params = new HttpParams().set("controlId", controlId);
+    return this.http.get<ControlExecution>(this.baseUrlExec + '/last', { params: params })
+  }
 }

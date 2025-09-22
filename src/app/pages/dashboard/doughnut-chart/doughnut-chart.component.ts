@@ -1,8 +1,9 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit } from '@angular/core';
 import { ChartOptions, ChartType } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
+import { IncidentService } from '../../../core/services/incident/incident.service';
 
 @Component({
   selector: 'app-doughnut-chart',
@@ -11,8 +12,11 @@ import { MatCardModule } from '@angular/material/card';
   templateUrl: './doughnut-chart.component.html',
   styleUrls: ['./doughnut-chart.component.scss']
 })
-export class DoughnutChartComponent implements OnChanges {
-  @Input() incidents: Incident[] = [];
+export class DoughnutChartComponent implements OnInit{
+
+  private incidentService = inject(IncidentService);
+
+  incidents: Incident[] = [];
 
   doughnutChartType: ChartType = 'doughnut';
   doughnutChartLabels: string[] = ['Nouveaux', 'Clôturés'];
@@ -32,7 +36,7 @@ export class DoughnutChartComponent implements OnChanges {
     layout: {
       padding: {
         top: 30,
-        bottom: 30 
+        bottom: 30
       }
     },
     plugins: {
@@ -65,24 +69,29 @@ export class DoughnutChartComponent implements OnChanges {
     }
   };
 
-  ngOnChanges() {
-    if (!this.incidents?.length) return;
+  ngOnInit(): void {
+    this.incidentService.loadIncidents().subscribe(
+      res => {
+        this.incidents = res
+        if (!this.incidents?.length) return;
 
-    let countNew = 0;
-    let countClosed = 0;
-    for (const incident of this.incidents) {
-      const state = incident.state?.toUpperCase?.();
-      if (state === 'DRAFT') countNew++;
-      else if (state === 'CLOSED') countClosed++;
-    }
+        let countNew = 0;
+        let countClosed = 0;
+        for (const incident of this.incidents) {
+          const state = incident.state?.toUpperCase?.();
+          if (state === 'DRAFT') countNew++;
+          else if (state === 'CLOSED') countClosed++;
+        }
 
-    this.doughnutChartDataFull = {
-      labels: ['Brouillons', 'Clôturés'],
-      datasets: [{
-        data: [countNew, countClosed],
-        backgroundColor: ['#66bb6a', '#ef5350'],
-        hoverOffset: 20
-      }]
-    };
+        this.doughnutChartDataFull = {
+          labels: ['Brouillons', 'Clôturés'],
+          datasets: [{
+            data: [countNew, countClosed],
+            backgroundColor: ['#66bb6a', '#ef5350'],
+            hoverOffset: 20
+          }]
+        };
+      }
+    )
   }
 }

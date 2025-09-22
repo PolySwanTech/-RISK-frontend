@@ -1,6 +1,6 @@
 import { organigrammeRoutes } from './features/organigramme/organigramme.routes';
 import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
+import { HomeComponent } from './pages/dashboard/home/home.component';
 import { authRoutes } from './features/auth/auth.routes';
 import { userRoutes } from './features/user/user.routes'
 import { incidentRoute } from './features/incident/incident.routes';

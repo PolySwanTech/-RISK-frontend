@@ -1,8 +1,9 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit } from '@angular/core';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
+import { IncidentService } from '../../../core/services/incident/incident.service';
 
 @Component({
   selector: 'app-bar-chart',
@@ -11,9 +12,11 @@ import { MatCardModule } from '@angular/material/card';
   templateUrl: './bar-chart.component.html',
   styleUrls: ['./bar-chart.component.scss']
 })
-export class BarChartComponent implements OnInit, OnChanges {
+export class BarChartComponent implements OnInit{
 
-  @Input() incidents: Incident[] = [];
+  private incidentService = inject(IncidentService);
+
+  incidents: Incident[] = [];
 
   barChartType: ChartType = 'bar';
   barChartOptions: ChartConfiguration<'bar'>['options'] = {
@@ -54,32 +57,33 @@ export class BarChartComponent implements OnInit, OnChanges {
 
 
   ngOnInit(): void {
-  }
+    this.incidentService.loadIncidents().subscribe(
+      res => {
+        this.incidents = res;
+        if (!this.incidents?.length) {
+          return;
+        }
 
-  ngOnChanges() {
-    if (!this.incidents?.length) {
-      return;
-    }
+        // Calcul des données par trimestre
+        const quarterlyCounts = [0, 0, 0, 0];
+        for (const incident of this.incidents) {
+          const rawDate = incident.survenueAt || incident.declaredAt;
+          const date = rawDate ? new Date(rawDate) : null;
+          if (!date || isNaN(date.getTime())) continue;
+          const quarter = Math.floor(date.getMonth() / 3);
+          quarterlyCounts[quarter]++;
+        }
 
-    // Calcul des données par trimestre
-    const quarterlyCounts = [0, 0, 0, 0];
-    for (const incident of this.incidents) {
-      const rawDate = incident.survenueAt || incident.declaredAt;
-      const date = rawDate ? new Date(rawDate) : null;
-      if (!date || isNaN(date.getTime())) continue;
-      const quarter = Math.floor(date.getMonth() / 3);
-      quarterlyCounts[quarter]++;
-    }
-
-    // Important : recréer l'objet `barChartData` pour déclencher le rafraîchissement du graphique
-    this.barChartData = {
-      labels: ['T1', 'T2', 'T3', 'T4'],
-      datasets: [{
-        data: quarterlyCounts,
-        label: 'Nombre d’incidents',
-        backgroundColor: '#42A5F5'
-      }]
-    };
-
+        // Important : recréer l'objet `barChartData` pour déclencher le rafraîchissement du graphique
+        this.barChartData = {
+          labels: ['T1', 'T2', 'T3', 'T4'],
+          datasets: [{
+            data: quarterlyCounts,
+            label: 'Nombre d’incidents',
+            backgroundColor: '#42A5F5'
+          }]
+        };
+      }
+    )
   }
 }

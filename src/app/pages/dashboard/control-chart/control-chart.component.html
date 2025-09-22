@@ -4,8 +4,8 @@
     </mat-card-header>
   
     <mat-button-toggle-group [(ngModel)]="groupByLevel" (change)="updateChart()" class="toggle-switch">
-      <mat-button-toggle [value]="false">Par statut</mat-button-toggle>
-      <mat-button-toggle [value]="true">Par niveau</mat-button-toggle>
+      <mat-button-toggle [value]="false" (click)="updateChart()">Par statut</mat-button-toggle>
+      <mat-button-toggle [value]="true" (click)="updateChart()">Par niveau</mat-button-toggle>
     </mat-button-toggle-group>
   
     <mat-card-content>

@@ -6,8 +6,10 @@ import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatDialog } from '@angular/material/dialog';
-import { ControlService } from '../../../../core/services/control/control.service';
+import { ControlService } from '../../../core/services/control/control.service';
+import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
+import { Status, StatusLabels } from '../../../core/enum/status.enum';
 
 @Component({
   selector: 'app-control-chart',
@@ -17,14 +19,16 @@ import { ControlService } from '../../../../core/services/control/control.servic
   styleUrls: ['./control-chart.component.scss']
 })
 export class ControlChartComponent implements OnInit {
+
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
-  dialog = inject(MatDialog);
-
-  @Input() createControl = false;
+  controlService = inject(ControlService);
 
   groupByLevel = false;
-  controls: any[] = [];
+  controls: ControlTemplate[] = [];
+
+  statusLabels = StatusLabels;
+  degreeLabels = DegreeLabels;
 
   pieChartData = {
     labels: [] as string[],
@@ -70,33 +74,62 @@ export class ControlChartComponent implements OnInit {
     }
   };
 
-
-  controlService = inject(ControlService);
-
   ngOnInit() {
     this.controlService.getAllTemplates().subscribe(data => {
-      this.controls = data;
-      this.controlService.getAllExecutions().subscribe(data => {
-        this.controls = this.controls.concat(data);
-        this.updateChart();
-      });
+      this.controls = data
+      this.controls.forEach(c => {
+        this.controlService.getLastExecution(c.id.id).subscribe(data => {
+          c.execution = data;
+          this.updateChart();
+        });
+      })
     });
   }
 
   updateChart() {
-    const counts: Record<string, number> = {};
 
-    this.controls.forEach(control => {
-      const key = this.groupByLevel
-        ? control.level?.toString().trim()
-        : control.status?.toString().trim();
+    if (this.groupByLevel) {
+      const counts: Record<Degree, number> = {
+        [Degree.LEVEL_1]: 0,
+        [Degree.LEVEL_2]: 0,
+      };
 
-      if (!key) return;
-      counts[key] = (counts[key] || 0) + 1;
-    });
+      this.controls.forEach(control => {
+        counts[control.controlLevel] = (counts[control.controlLevel] || 0) + 1;
+      });
+      this.pieChartData.labels = Object.keys(counts).map(
+        degree => this.formatDegree(degree as Degree)
+      );
+      this.pieChartData.datasets[0].data = Object.values(counts);
+      this.chart?.update();
+    }
+    else {
+      const counts: Record<Status, number> = {
+        [Status.ACHIEVED]: 0,
+        [Status.IN_PROGRESS]: 0,
+        [Status.NOT_ACHIEVED]: 0,
+        [Status.NOT_STARTED]: 0,
+        [Status.CANCELLED]: 0
+      };
 
-    this.pieChartData.labels = Object.keys(counts);
-    this.pieChartData.datasets[0].data = Object.values(counts);
-    this.chart?.update();
+      this.controls.forEach(control => {
+        if (control.execution)
+          counts[control.execution.status] = (counts[control.execution.status] || 0) + 1;
+      });
+      this.pieChartData.labels = Object.keys(counts).map(
+        statusKey => this.formatStatus(statusKey as Status)
+      );
+      this.pieChartData.datasets[0].data = Object.values(counts);
+      this.chart?.update();
+    }
+  }
+
+
+  formatStatus(status: Status) {
+    return this.statusLabels[status] || 'Inconnu'
+  }
+
+  formatDegree(degree: Degree) {
+    return this.degreeLabels[degree] || 'Inconnu'
   }
 }
