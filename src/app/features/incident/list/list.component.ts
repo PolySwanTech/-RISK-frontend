@@ -100,7 +100,7 @@ export class ListComponent implements OnInit {
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
-  displayedColumns = ['select', ...this.columns.map(c => c.columnDef), 'actions'];
+  displayedColumns = ['select', ...this.columns.map(c => c.columnDef)];
   dataSource = new MatTableDataSource<Incident>([]);
   selectedIncident: Incident | null = null;
   incidents: Incident[] = [];
@@ -162,20 +162,6 @@ export class ListComponent implements OnInit {
     this.router.navigate(
       ['incident', 'create']
     );
-  }
-
-  delete(incidentId: string) {
-
-    this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
-      .subscribe(res => {
-        if (res) {
-          this.incidentService.deleteIncident(incidentId).subscribe(() => {
-            this.loadIncidents();
-          }, error => {
-            console.error('Error deleting incident:', error);
-          });
-        }
-      })
   }
   
   toggleIncidentSelection(incidentId: string) {

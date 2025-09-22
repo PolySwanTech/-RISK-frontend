@@ -31,7 +31,6 @@ import { TargetType } from '../../../core/enum/targettype.enum';
 
 
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { RiskService } from '../../../core/services/risk/risk.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 
 
@@ -63,7 +62,6 @@ export class ViewComponent implements OnInit {
   private router = inject(Router);
   private entitiesService = inject(EntitiesService);
   private impactService = inject(OperatingLossService);
-  private riskService = inject(RiskService);
 
 
   incident: Incident | undefined

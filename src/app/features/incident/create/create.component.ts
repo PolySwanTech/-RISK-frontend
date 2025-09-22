@@ -199,7 +199,7 @@ export class CreateComponent implements OnInit {
           processId: incident.process,
           riskId: incident.risk,
           cause: incident.cause,
-          intervenant: incident.intervenant,
+          intervenant: incident.intervenantId,
         });
       });
 
@@ -218,7 +218,7 @@ export class CreateComponent implements OnInit {
       }
 
       this.incident = incident;
-      this.selectedUser = incident.intervenant || null;
+      this.selectedUser = incident.intervenantId || null;
     });
   }
 
