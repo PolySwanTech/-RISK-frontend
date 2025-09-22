@@ -63,7 +63,7 @@ export class ControlDetailsPageComponent implements OnInit {
     {
       label: 'Voir tout l’historique',
       icon: 'history',
-      class: 'btn-secondary',
+      class: 'btn-purple',
       show: true,
       action: () => this.viewFullHistory()
     }
