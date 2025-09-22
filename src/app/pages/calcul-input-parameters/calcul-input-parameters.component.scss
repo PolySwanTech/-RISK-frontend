@@ -19,7 +19,7 @@ body {
 
 .content-header {
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
     padding-bottom: 20px;
@@ -60,37 +60,37 @@ body {
 .btn-primary {
     background: #4a90e2;
     color: white;
-}
 
-.btn-primary:hover {
-    background: #357abd;
+    &:hover {
+        background: #357abd;
+    }
 }
 
 .btn-success {
     background: #28a745;
     color: white;
-}
 
-.btn-success:hover {
-    background: #218838;
+    &:hover {
+        background: #218838;
+    }
 }
 
 .btn-danger {
     background: #dc3545;
     color: white;
-}
 
-.btn-danger:hover {
-    background: #c82333;
+    &:hover {
+        background: #c82333;
+    }
 }
 
 .btn-secondary {
     background: #6c757d;
     color: white;
-}
 
-.btn-secondary:hover {
-    background: #5a6268;
+    &:hover {
+        background: #5a6268;
+    }
 }
 
 /* Form Sections */
@@ -100,6 +100,20 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     overflow: hidden;
+}
+
+.other-fields {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+
+    .section-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
 }
 
 .section-header {
@@ -124,92 +138,223 @@ body {
     padding: 20px;
 }
 
-/* Form Grid */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+/* Financial Cards Styles */
+.financial-cards-grid {
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
+    align-items: flex-start;
+    /* Permet aux cartes de rester alignées en haut */
 }
 
+.financial-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    flex: 1 1 300px;
+    /* Flexible mais minimum 300px */
+    min-width: 300px;
+    max-width: calc(50% - 10px);
+    /* Maximum 2 par rangée sur grands écrans */
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    &.expanded {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        transform: none;
+        flex: 1 1 100%;
+        /* Prend toute la largeur quand expanded */
+        max-width: 100%;
+
+        .card-header::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .card-body {
+            max-height: 500px;
+            padding: 20px;
+        }
+    }
+}
+
+.card-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    color: white;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 8px solid white;
+        transition: transform 0.3s ease;
+    }
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: capitalize;
+}
+
+.card-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+.card-currency {
+    font-size: 1rem;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.card-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    background: #f8f9fa;
+}
+
+.card-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    input {
+        padding: 10px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        transition: border-color 0.3s;
+        background: white;
+
+        &:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+    }
+}
+
+/* Form Group (for other fields) */
 .form-group {
     display: flex;
     flex-direction: column;
-}
 
-.form-group label {
-    font-weight: 500;
-    color: #495057;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
+    label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
 
-.form-group input,
-.form-group select {
-    padding: 10px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    transition: border-color 0.3s;
-}
+    input,
+    select {
+        padding: 10px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        transition: border-color 0.3s;
 
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        &:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+    }
 }
 
 .required {
     color: #dc3545;
 }
 
+
+
 .currency-suffix {
     position: relative;
+
+    &::after {
+        content: "M€";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 0.85rem;
+        pointer-events: none;
+    }
+
+    input {
+        padding-right: 35px;
+    }
 }
 
-.currency-suffix::after {
-    content: "M€";
-    position: relative;
-    right: 30px;
-    color: #6c757d;
-    font-size: 0.85rem;
-    pointer-events: none;
-}
+.card-fields {
+    .currency-suffix {
+        &::after {
+            top: 70%;
+        }
+    }
 
-.currency-suffix input {
-    padding-right: 35px;
 }
 
 .percentage-suffix {
     position: relative;
-}
 
-.percentage-suffix::after {
-    content: "%";
-   position: relative;
-    right: 20px;
-    color: #6c757d;
-    font-size: 0.85rem;
-    pointer-events: none;
-}
+    &::after {
+        content: "%";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 0.85rem;
+        pointer-events: none;
+    }
 
-.percentage-suffix input {
-    padding-right: 25px;
+    input {
+        padding-right: 25px;
+    }
 }
 
 /* Losses History */
 .losses-grid {
     display: flex;
     flex-wrap: wrap;
-    /* empêche le retour à la ligne */
     justify-content: start;
     gap: 15px;
     margin-top: 10px;
     overflow-x: auto;
-    /* permet le scroll horizontal si trop d’éléments */
     padding-bottom: 10px;
 }
-
 
 .year-input {
     text-align: center;
@@ -228,18 +373,18 @@ body {
     align-items: center;
     gap: 10px;
     margin-top: 5px;
-}
 
-.checkbox-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #4a90e2;
-}
+    input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #4a90e2;
+    }
 
-.checkbox-group label {
-    margin: 0;
-    font-size: 0.9rem;
-    cursor: pointer;
+    label {
+        margin: 0;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
 }
 
 .help-text {
@@ -261,7 +406,6 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
-
     .main-content {
         margin-left: 0;
     }
@@ -277,11 +421,20 @@ body {
         justify-content: flex-start;
     }
 
-    .form-grid {
-        grid-template-columns: 1fr;
+    .financial-cards-grid {
+        flex-direction: column;
+
+        .financial-card {
+            flex: 1 1 auto;
+            max-width: 100%;
+        }
     }
 
     .losses-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .other-fields .section-content {
+        grid-template-columns: 1fr;
     }
 }

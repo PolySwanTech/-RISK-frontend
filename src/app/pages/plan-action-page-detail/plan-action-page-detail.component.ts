@@ -115,7 +115,7 @@ export class PlanActionPageDetailComponent {
         {
           label: 'Démarrer',
           icon: 'play_arrow',
-          class: 'btn-blue',
+          class: 'btn-purple',
           show: !!canStart,
           action: () => this.startActionPlan()
         },

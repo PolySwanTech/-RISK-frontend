@@ -40,7 +40,7 @@ export class CalculViewComponent {
     {
       label: 'Lancer le calcul',
       icon: 'play_arrow',
-      class: 'btn-primary', // ou 'mat-primary' selon ton style
+      class: 'btn-purple',
       show: true,
       action: () => this.goToCalcul()
     },

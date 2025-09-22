@@ -34,7 +34,15 @@
             </ng-container>
             <!-- Ligne en-tête -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="openProcessDialog(row)" class="row-clickable"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="openProcessDialog(row)"
+                class="row-clickable"></tr>
+            <tr class="mat-row no-data-row" *matNoDataRow>
+                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                    <div class="no-data">
+                        <span>Aucun résultat trouvé.</span>
+                    </div>
+                </td>
+            </tr>
 
         </table>
 

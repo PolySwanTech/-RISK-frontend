@@ -1,8 +1,7 @@
 <div class="body-container">
 
-    <app-go-back [title]="`Calcul des fonds propres - Méthode Standard SMA`"
-        [buttons]="goBackButtons"></app-go-back>
- 
+    <app-go-back [title]="`Calcul des fonds propres - Méthode Standard SMA`" [buttons]="goBackButtons"></app-go-back>
+
     <!-- Tabs -->
     <mat-tab-group class="main-tabs">
         <!-- Synthèse des résultats -->
@@ -95,6 +94,14 @@
 
                             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                            <tr class="mat-row no-data-row" *matNoDataRow>
+                                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                                    <div class="no-data">
+                                        <span>Aucun résultat trouvé.</span>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </mat-card-content>
                 </mat-card>
@@ -124,6 +131,13 @@
 
                             <tr mat-header-row *matHeaderRowDef="['categorie', 'valeur']"></tr>
                             <tr mat-row *matRowDef="let row; columns: ['categorie', 'valeur']"></tr>
+                            <tr class="mat-row no-data-row" *matNoDataRow>
+                                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                                    <div class="no-data">
+                                        <span>Aucun résultat trouvé.</span>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </mat-card-content>
                 </mat-card>
@@ -144,6 +158,14 @@
 
                             <tr mat-header-row *matHeaderRowDef="['categorie', 'valeur']"></tr>
                             <tr mat-row *matRowDef="let row; columns: ['categorie', 'valeur']"></tr>
+
+                            <tr class="mat-row no-data-row" *matNoDataRow>
+                                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                                    <div class="no-data">
+                                        <span>Aucun résultat trouvé.</span>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </mat-card-content>
                 </mat-card>
@@ -164,6 +186,13 @@
 
                             <tr mat-header-row *matHeaderRowDef="['categorie', 'valeur']"></tr>
                             <tr mat-row *matRowDef="let row; columns: ['categorie', 'valeur']"></tr>
+                            <tr class="mat-row no-data-row" *matNoDataRow>
+                                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                                    <div class="no-data">
+                                        <span>Aucun résultat trouvé.</span>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </mat-card-content>
                 </mat-card>
@@ -192,6 +221,13 @@
 
                     <tr mat-header-row *matHeaderRowDef="['annee', 'perte']"></tr>
                     <tr mat-row *matRowDef="let row; columns: ['annee', 'perte'];"></tr>
+                    <tr class="mat-row no-data-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                            <div class="no-data">
+                                <span>Aucun résultat trouvé.</span>
+                            </div>
+                        </td>
+                    </tr>
                 </table>
             </div>
         </mat-tab>
@@ -223,6 +259,13 @@
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumnsBi"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumnsBi;"></tr>
+                    <tr class="mat-row no-data-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                            <div class="no-data">
+                                <span>Aucun résultat trouvé.</span>
+                            </div>
+                        </td>
+                    </tr>
                 </table>
                 <h3>Exemple de calcul du BIC</h3>
                 <p>
@@ -280,6 +323,13 @@
 
                             <tr mat-header-row *matHeaderRowDef="displayedColumnsC16"></tr>
                             <tr mat-row *matRowDef="let row; columns: displayedColumnsC16;"></tr>
+                            <tr class="mat-row no-data-row" *matNoDataRow>
+                                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                                    <div class="no-data">
+                                        <span>Aucun résultat trouvé.</span>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </mat-tab>
 
@@ -297,6 +347,13 @@
 
                             <tr mat-header-row *matHeaderRowDef="displayedColumnsC17"></tr>
                             <tr mat-row *matRowDef="let row; columns: displayedColumnsC17;"></tr>
+                            <tr class="mat-row no-data-row" *matNoDataRow>
+                                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                                    <div class="no-data">
+                                        <span>Aucun résultat trouvé.</span>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </mat-tab>
                 </mat-tab-group>

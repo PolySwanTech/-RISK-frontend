@@ -1,6 +1,7 @@
+ <app-go-back [title]="'Liste des incidents'" [buttons]="goBackButtons"></app-go-back>
 <section class="dashboard-container">
     <!-- En-tête avec titre et boutons d'action -->
-    <app-go-back [title]="'Liste des incidents'" [buttons]="goBackButtons"></app-go-back>
+   
 
     <!-- Section des filtres -->
     <mat-card class="filters-card">
@@ -54,38 +55,39 @@
                 </ng-container>
                 }
                 <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                    <th mat-header-cell *matHeaderCellDef> Actions </th>
 
-                <td mat-cell *matCellDef="let row">
-                    <button mat-icon-button
-                            aria-label="Actions"
-                            [matMenuTriggerFor]="rowMenu"
+                    <td mat-cell *matCellDef="let row">
+                        <button mat-icon-button aria-label="Actions" [matMenuTriggerFor]="rowMenu"
                             (click)="selectedIncident = row">
 
-                    <mat-icon>more_vert</mat-icon>
-                    </button>
-                </td>
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                    </td>
                 </ng-container>
 
                 <mat-menu #rowMenu="matMenu">
-                <button *ngIf="selectedIncident && isUpdatable(selectedIncident!)" mat-menu-item (click)="edit(selectedIncident!)">
-                    <mat-icon>edit</mat-icon>
-                    <span>Modifier</span>
-                </button>
+                    <button *ngIf="selectedIncident && isUpdatable(selectedIncident!)" mat-menu-item
+                        (click)="edit(selectedIncident!)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Modifier</span>
+                    </button>
 
-                <button mat-menu-item (click)="delete(selectedIncident!.id)">
-                    <mat-icon>delete</mat-icon>
-                    <span>Supprimer</span>
-                </button>
+                    <button mat-menu-item (click)="delete(selectedIncident!.id)">
+                        <mat-icon>delete</mat-icon>
+                        <span>Supprimer</span>
+                    </button>
                 </mat-menu>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus">
                 </tr>
 
-                <tr class="mat-row" *matNoDataRow>
-                    <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center;">
-                        Aucun résultat trouvé.
+                <tr class="mat-row no-data-row" *matNoDataRow>
+                    <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                        <div class="no-data">
+                            <span>Aucun résultat trouvé.</span>
+                        </div>
                     </td>
                 </tr>
 

@@ -1,6 +1,7 @@
+<app-go-back [title]="'Liste des plans d\'action'" [buttons]="goBackButtons"></app-go-back>
 <section class="dashboard-container">
     <!-- En-tête avec titre et boutons d'action -->
-    <app-go-back [title]="'Liste des plans d\'action'" [buttons]="goBackButtons"></app-go-back>
+
 
     <!-- Section des filtres -->
     <mat-card class="filters-card">
@@ -65,9 +66,11 @@
                     matTooltip="Cliquez pour voir plus">
                 </tr>
 
-                <tr class="mat-row" *matNoDataRow>
-                    <td class="mat-cell" [attr.colspan]="displayedColumns.length" style="text-align: center;">
-                        Aucun résultat trouvé.
+                <tr class="mat-row no-data-row" *matNoDataRow>
+                    <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                        <div class="no-data">
+                            <span>Aucun résultat trouvé.</span>
+                        </div>
                     </td>
                 </tr>
 
