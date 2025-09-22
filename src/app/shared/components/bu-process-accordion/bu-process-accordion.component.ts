@@ -358,7 +358,7 @@ export class BuProcessAccordionComponent {
       this.buSelected.emit(bu);
       console.log('Switched to process view, breadcrumb:', this.breadcrumb);
     } else {
-      alert('Aucun processus associé à cette BU.');
+      this.snackBarService.info('Aucun processus associé à cette BU.')
     }
   }
 
@@ -385,12 +385,12 @@ export class BuProcessAccordionComponent {
           });
           console.log('Switched to risks view, breadcrumb:', this.breadcrumb);
         } else {
-          alert('Aucun risque associé à ce processus.');
+          this.snackBarService.info('Aucun risque associé à ce processus.');
         }
       },
       error: (error) => {
         console.error('Erreur lors du chargement des risques:', error);
-        alert('Erreur lors du chargement des risques.');
+        this.snackBarService.info("Erreur lors du chargement des risques");
       }
     });
   }
