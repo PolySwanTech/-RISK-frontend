@@ -93,9 +93,9 @@ scFields: FinancialGroup[] = [
     value: 0,
     expanded: false,
     group: [
-      { name: 'revenus_autres_membres_ips', label: "Autres revenus d'exploitation des membres de la même IPS", value: 0 },
-      { name: 'profits_actifs_non_courants', label: "Profits des actifs non courants et groupes destinés à la vente ne relevant pas des opérations abandonnées", value: 0 },
-      { name: 'autres_revenus', label: "Autres", value: 0 }
+      { name: 'revenus_autres_membres_ips', label: "Revenus d'autres membres IPS", value: 0 },
+      { name: 'profits_actifs_non_courants', label: "Profits sur actifs non courants (hors opérations abandonnées)", value: 0 },
+      { name: 'autres_revenus', label: "Autres revenus", value: 0 }
     ]
   },
   {
@@ -104,10 +104,10 @@ scFields: FinancialGroup[] = [
     value: 0,
     expanded: false,
     group: [
-      { name: 'charges_autres_membres_ips', label: "Autres charges d'exploitation des membres de la même IPS", value: 0 },
-      { name: 'pertes_evenements_risque', label: "Pertes, dépenses, provisions et autres impacts financiers liés aux événements de risque opérationnel", value: 0 },
-      { name: 'pertes_actifs_non_courants', label: "Pertes des actifs non courants et groupes destinés à la vente ne relevant pas des opérations abandonnées", value: 0 },
-      { name: 'autres_charges', label: "Autres", value: 0 }
+      { name: 'charges_autres_membres_ips', label: "Charges d'autres membres IPS", value: 0 },
+      { name: 'pertes_evenements_risque', label: "Pertes liées aux risques opérationnels", value: 0 },
+      { name: 'pertes_actifs_non_courants', label: "Pertes sur actifs non courants (hors opérations abandonnées)", value: 0 },
+      { name: 'autres_charges', label: "Autres charges", value: 0 }
     ]
   },
   {
@@ -116,7 +116,7 @@ scFields: FinancialGroup[] = [
     value: 0,
     expanded: false,
     group: [
-      { name: 'revenus_commissions_frais', label: "Revenus de commissions et frais", value: 0 }
+      { name: 'revenus_commissions_frais', label: "Revenus de commissions", value: 0 }
     ]
   },
   {
@@ -125,7 +125,7 @@ scFields: FinancialGroup[] = [
     value: 0,
     expanded: false,
     group: [
-      { name: 'charges_commissions_frais', label: "Charges de commissions et frais", value: 0 }
+      { name: 'charges_commissions_frais', label: "Charges de commissions", value: 0 }
     ]
   }
 ];
@@ -133,26 +133,26 @@ scFields: FinancialGroup[] = [
 fcFields: FinancialGroup[] = [
   {
     name: 'groupe_resultat_trading',
-    displayName: "Résultat net applicable au portefeuille de trading",
+    displayName: "Résultat net du portefeuille de trading",
     value: 0,
     expanded: false,
     group: [
-      { name: 'gains_pertes_actifs_passifs_trading', label: "Gains ou pertes sur actifs et passifs financiers détenus à des fins de trading, net", value: 0 },
-      { name: 'gains_pertes_hedge_trading', label: "Portefeuille de trading - Gains ou pertes issus de la comptabilité de couverture, net", value: 0 },
-      { name: 'differences_change_trading', label: "Portefeuille de trading - Différences de change [gain ou perte], net", value: 0 }
+      { name: 'gains_pertes_actifs_passifs_trading', label: "Gains/pertes sur actifs et passifs de trading", value: 0 },
+      { name: 'gains_pertes_hedge_trading', label: "Trading - Couverture (net)", value: 0 },
+      { name: 'differences_change_trading', label: "Trading - Différences de change (net)", value: 0 }
     ]
   },
   {
     name: 'groupe_resultat_bancaire',
-    displayName: "Résultat net applicable au portefeuille bancaire",
+    displayName: "Résultat net du portefeuille bancaire",
     value: 0,
     expanded: false,
     group: [
-      { name: 'gains_pertes_derecognition', label: "Gains ou pertes sur la radiation d'actifs et passifs financiers non évalués à la juste valeur par le résultat, net", value: 0 },
-      { name: 'gains_pertes_actifs_non_trading_fv', label: "Gains ou pertes sur actifs financiers non-trading évalués de manière obligatoire à la juste valeur par le résultat, net", value: 0 },
-      { name: 'gains_pertes_designated_fv', label: "Gains ou pertes sur actifs et passifs financiers désignés à la juste valeur par le résultat, net", value: 0 },
-      { name: 'gains_pertes_hedge_banking', label: "Portefeuille bancaire - Gains ou pertes issus de la comptabilité de couverture, net", value: 0 },
-      { name: 'differences_change_banking', label: "Portefeuille bancaire - Différences de change [gain ou perte], net", value: 0 }
+      { name: 'gains_pertes_derecognition', label: "Gains/pertes sur radiation d'actifs et passifs (hors JVPR)", value: 0 },
+      { name: 'gains_pertes_actifs_non_trading_fv', label: "Gains/pertes sur actifs non-trading évalués à la JVPR", value: 0 },
+      { name: 'gains_pertes_designated_fv', label: "Gains/pertes sur actifs et passifs désignés à la JVPR", value: 0 },
+      { name: 'gains_pertes_hedge_banking', label: "Bancaire - Couverture (net)", value: 0 },
+      { name: 'differences_change_banking', label: "Bancaire - Différences de change (net)", value: 0 }
     ]
   }
 ];
