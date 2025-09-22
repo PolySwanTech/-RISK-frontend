@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Cartography } from '../../core/models/Cartography';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -16,8 +15,6 @@ import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
-import { RiskService } from '../../core/services/risk/risk.service';
 import { ListProcessComponent } from '../../features/process/list-process/list-process.component';
 
 @Component({

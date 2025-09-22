@@ -24,6 +24,7 @@ import { ControlExecution } from '../../core/models/ControlExecution';
 import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../core/enum/evaluation-controle.enum';
 import { PopUpDetailExecutionComponent } from '../../features/control/pop-up-detail-execution/pop-up-detail-execution.component';
+import { Priority } from '../../core/enum/Priority';
 
 @Component({
   selector: 'app-executions-list',
@@ -72,7 +73,7 @@ export class ExecutionsListComponent {
     {
       columnDef: 'priority',
       header: 'Priorité',
-      cell: (execution: ControlExecution) => this.formatPriority(execution.priority) || '',
+      cell: (execution: ControlExecution) => this.getPriorityBarHtml(execution.priority),
       filterType: 'select',
       icon: 'priority_high'
     },
@@ -97,9 +98,16 @@ export class ExecutionsListComponent {
     {
       columnDef: 'evaluation',
       header: 'Évaluation',
-      cell: (execution: ControlExecution) =>  EvaluationControlLabels[execution.evaluation] || '',
+      cell: (execution: ControlExecution) => `<span class="badge ${this.getEvalClass(execution.evaluation)}">
+       ${EvaluationControlLabels[execution.evaluation] || ''}
+     </span>`,
       filterType: 'select',
       icon: 'grading',
+      options: [
+        { value: EvaluationControl.CONFORME, label: EvaluationControlLabels[EvaluationControl.CONFORME] || '' },
+        { value: EvaluationControl.PARTIELLEMENT_CONFORME, label: EvaluationControlLabels[EvaluationControl.PARTIELLEMENT_CONFORME] || '' },
+        { value: EvaluationControl.NON_CONFORME, label: EvaluationControlLabels[EvaluationControl.NON_CONFORME] || '' }
+      ]
     },
     {
       columnDef: 'performedBy',
@@ -142,16 +150,69 @@ export class ExecutionsListComponent {
   getStatusClass(status?: Status): string {
     if (!status) return 'status-default';
     switch (status) {
-      case Status.ACHIEVED: return 'status-realise';
-      case Status.IN_PROGRESS: return 'status-en-cours';
-      case Status.NOT_ACHIEVED: return 'status-non-realise';
+      case Status.ACHIEVED: return 'achieved';
+      case Status.IN_PROGRESS: return 'in_progress';
+      case Status.NOT_ACHIEVED: return 'not_achieved';
       default: return 'status-default';
     }
   }
 
+  getEvalClass(evalu?: EvaluationControl): string {
+    if (!evalu) return 'status-default';
+    switch (evalu) {
+      case EvaluationControl.CONFORME: return 'achieved';
+      case EvaluationControl.PARTIELLEMENT_CONFORME: return 'partially_achieved';
+      case EvaluationControl.NON_CONFORME: return 'not_achieved';
+      default: return 'status-default';
+    }
+  }
+
+  getPriorityClass(prio?: Priority): string {
+    if (!prio) return 'status-default';
+    switch (prio) {
+      case Priority.MAXIMUM: return 'maximum';
+      case Priority.MEDIUM: return 'medium';
+      case Priority.MINIMAL: return 'minimal';
+      default: return 'status-default';
+    }
+  }
+
+  getPriorityBarHtml(priority: Priority): string {
+    const priorityConfig = {
+      [Priority.MAXIMUM]: {
+        label: 'Maximale',
+        class: 'elevee',
+        ariaLabel: 'Priorité élevée - Niveau 3 sur 3'
+      },
+      [Priority.MEDIUM]: {
+        label: 'Moyenne',
+        class: 'moyen',
+        ariaLabel: 'Priorité moyenne - Niveau 2 sur 3'
+      },
+      [Priority.MINIMAL]: {
+        label: 'Minimale',
+        class: 'faible',
+        ariaLabel: 'Priorité faible - Niveau 1 sur 3'
+      }
+    };
+
+    const config = priorityConfig[priority] || priorityConfig[Priority.MEDIUM];
+
+    return `
+      <div class="priority-container">
+        <div class="priority-bar ${config.class}" 
+             role="progressbar" 
+             aria-label="${config.ariaLabel}"
+             title="${config.label}">
+        </div>
+        <span class="priority-label ${config.class}">${config.label}</span>
+      </div>
+    `;
+  }
+
   getEvaluationLabel(v?: EvaluationControl | null): string {
-  return v ? EvaluationControlLabels[v] : '';
-}
+    return v ? EvaluationControlLabels[v] : '';
+  }
 
   formatPriority(p?: string) { return p === 'MINIMAL' ? 'Faible' : p === 'MEDIUM' ? 'Moyenne' : 'Élevée'; }
 
