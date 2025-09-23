@@ -32,12 +32,13 @@ import { TargetType } from '../../../core/enum/targettype.enum';
 
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 
 type ImpactRow = {
   bl: string;
   brut: number;
-  net: number; 
+  net: number;
   final: number;
   nonFinancialLabels: string[];
 };
@@ -62,6 +63,7 @@ export class ViewComponent implements OnInit {
   private router = inject(Router);
   private entitiesService = inject(EntitiesService);
   private impactService = inject(OperatingLossService);
+  private authService = inject(AuthService);
 
 
   incident: Incident | undefined
@@ -84,46 +86,46 @@ export class ViewComponent implements OnInit {
   impactDataSource = new MatTableDataSource<ImpactRow>([]);
   currentRisk: RiskTemplate | undefined;
 
+  planActionId: string | null = null;
 
-  
   columns = [
-  {
-    columnDef: 'bl',
-    header: 'Business Line',
-    cell: (row: ImpactRow) => row.bl,
-    filterType: 'text',
-    icon: 'business'
-  },
-  {
-    columnDef: 'brut',
-    header: 'Montant brut',
-    cell: (row: ImpactRow) => row.brut,
-    type: 'currency',
-    icon: 'euro'
-  },
-  {
-    columnDef: 'net',
-    header: 'Montant net',
-    cell: (row: ImpactRow) => row.net,
-    type: 'currency',
-    icon: 'euro'
-  },
-  {
-    columnDef: 'final',
-    header: 'Montant final',
-    cell: (row: ImpactRow) => row.final,
-    type: 'currency',
-    icon: 'euro'
-  },
-  // {
-  //   columnDef: 'nonFinancial',
-  //   header: 'Impacts non financiers',
-  //   cell: (row: ImpactRow) => row.nonFinancialLabels.join(', ') || '—',
-  //   filterType: 'text',
-  //   icon: 'tips_and_updates'
-  // }
-];
-displayedImpactColumns = this.columns.map(c => c.columnDef);
+    {
+      columnDef: 'bl',
+      header: 'Business Line',
+      cell: (row: ImpactRow) => row.bl,
+      filterType: 'text',
+      icon: 'business'
+    },
+    {
+      columnDef: 'brut',
+      header: 'Montant brut',
+      cell: (row: ImpactRow) => row.brut,
+      type: 'currency',
+      icon: 'euro'
+    },
+    {
+      columnDef: 'net',
+      header: 'Montant net',
+      cell: (row: ImpactRow) => row.net,
+      type: 'currency',
+      icon: 'euro'
+    },
+    {
+      columnDef: 'final',
+      header: 'Montant final',
+      cell: (row: ImpactRow) => row.final,
+      type: 'currency',
+      icon: 'euro'
+    },
+    // {
+    //   columnDef: 'nonFinancial',
+    //   header: 'Impacts non financiers',
+    //   cell: (row: ImpactRow) => row.nonFinancialLabels.join(', ') || '—',
+    //   filterType: 'text',
+    //   icon: 'tips_and_updates'
+    // }
+  ];
+  displayedImpactColumns = this.columns.map(c => c.columnDef);
 
 
   ngOnInit(): void {
@@ -134,32 +136,57 @@ displayedImpactColumns = this.columns.map(c => c.columnDef);
     this.loadIncident(this.idIncident)
 
 
-  if (this.idIncident) {
-    this.impactService.listByIncident(this.idIncident).subscribe(result => {
-    this.operatingLosses = result;
-    this.impactRows = this.buildImpactRows(this.operatingLosses);
-    this.impactDataSource.data = this.impactRows;
-  });
-}
+    if (this.idIncident) {
+      this.impactService.listByIncident(this.idIncident).subscribe(result => {
+        this.operatingLosses = result;
+        this.impactRows = this.buildImpactRows(this.operatingLosses);
+        this.impactDataSource.data = this.impactRows;
+      });
+    }
 
   }
 
   async loadIncident(id: string) {
     this.incident = await firstValueFrom(this.incidentService.getIncidentById(id));
+    try {
+      const actionPlan = await firstValueFrom(this.actionPlanService.getActionPlanByIncident(id));
+      this.planActionId = actionPlan?.id ?? '';
+    } catch (error) {
+      console.log('Erreur lors de la récupération du plan d’action :', error);
+      this.planActionId = null;
+    }
+    console.log(this.planActionId)
     this.extractTokenInfo();
     this.goBackButtons = [
       {
-        label: "Plan d'action",
+        label: "Consulter le plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
-        show: this.canShowActions() && !this.isDraft(),
-        action: () => this.addActionPlan()
+        show: this.canShowActions() && !this.isDraft() && this.planActionId != null,
+        permission: 'VIEW_ACTION_PLAN',
+        action: () => this.gotoActionPlan(this.planActionId as string)
+      },
+      {
+        label: "Créer un plan d'action",
+        icon: 'playlist_add_check',
+        class: 'btn-primary',
+        show: this.canShowActions() && !this.isDraft() && this.planActionId == null,
+        permission: ['VIEW_ACTION_PLAN', 'CREATE_ACTION_PLAN'],
+        action: () => this.addActionPlan(this.incident)
       },
       {
         label: "Modifier",
         icon: 'edit',
         class: 'btn-green',
-        show: this.canShowActions(),
+        show: this.canShowActions() && !this.isDraft(),
+        permission: 'UPDATE_INCIDENT',
+        action: () => this.goToModification()
+      },
+      {
+        label: "Modifier",
+        icon: 'edit',
+        class: 'btn-green',
+        show: this.isDraft(),
         action: () => this.goToModification()
       },
       {
@@ -181,6 +208,7 @@ displayedImpactColumns = this.columns.map(c => c.columnDef);
         icon: 'lock',
         class: 'btn-red',
         show: this.canClose(),
+        permission: 'CLOSED_INCIDENT',
         action: () => this.closeIncident()
       },
 
@@ -260,44 +288,44 @@ displayedImpactColumns = this.columns.map(c => c.columnDef);
   }
 
 
-private toNumber(v: any): number {
-  const n = typeof v === 'number' ? v : (v == null ? 0 : Number(v));
-  return Number.isFinite(n) ? n : 0;
-}
-
-// “Financier” si au moins un montant est présent
-private isFinancial(loss: OperatingLoss): boolean {
-  return !!(this.toNumber((loss as any).montantBrut) ||
-            this.toNumber((loss as any).montantNet)  ||
-            this.toNumber((loss as any).montantFinal));
-}
-
-// Libellé d’un impact non financier
-private impactLabel(loss: OperatingLoss): string {
-  return (loss as any).label || (loss as any).libelle || (loss as any).description || 'Impact';
-}
-
-private buildImpactRows(losses: OperatingLoss[]): ImpactRow[] {
-  const byBL = new Map<string, ImpactRow>();
-
-  for (const loss of losses ?? []) {
-    const bl = (loss as any).entityName || (loss as any).businessLine || 'Non assigné';
-    if (!byBL.has(bl)) {
-      byBL.set(bl, { bl, brut: 0, net: 0, final: 0, nonFinancialLabels: [] });
-    }
-    const row = byBL.get(bl)!;
-
-    if (this.isFinancial(loss)) {
-      row.brut += this.toNumber((loss as any).montantBrut);
-      row.net   += this.toNumber((loss as any).montantNet);
-      row.final += this.toNumber((loss as any).montantFinal);
-    } else {
-      row.nonFinancialLabels.push(this.impactLabel(loss));
-    }
+  private toNumber(v: any): number {
+    const n = typeof v === 'number' ? v : (v == null ? 0 : Number(v));
+    return Number.isFinite(n) ? n : 0;
   }
 
-  return Array.from(byBL.values()).sort((a, b) => a.bl.localeCompare(b.bl));
-}
+  // “Financier” si au moins un montant est présent
+  private isFinancial(loss: OperatingLoss): boolean {
+    return !!(this.toNumber((loss as any).montantBrut) ||
+      this.toNumber((loss as any).montantNet) ||
+      this.toNumber((loss as any).montantFinal));
+  }
+
+  // Libellé d’un impact non financier
+  private impactLabel(loss: OperatingLoss): string {
+    return (loss as any).label || (loss as any).libelle || (loss as any).description || 'Impact';
+  }
+
+  private buildImpactRows(losses: OperatingLoss[]): ImpactRow[] {
+    const byBL = new Map<string, ImpactRow>();
+
+    for (const loss of losses ?? []) {
+      const bl = (loss as any).entityName || (loss as any).businessLine || 'Non assigné';
+      if (!byBL.has(bl)) {
+        byBL.set(bl, { bl, brut: 0, net: 0, final: 0, nonFinancialLabels: [] });
+      }
+      const row = byBL.get(bl)!;
+
+      if (this.isFinancial(loss)) {
+        row.brut += this.toNumber((loss as any).montantBrut);
+        row.net += this.toNumber((loss as any).montantNet);
+        row.final += this.toNumber((loss as any).montantFinal);
+      } else {
+        row.nonFinancialLabels.push(this.impactLabel(loss));
+      }
+    }
+
+    return Array.from(byBL.values()).sort((a, b) => a.bl.localeCompare(b.bl));
+  }
 
 
 
@@ -319,46 +347,35 @@ private buildImpactRows(losses: OperatingLoss[]): ImpactRow[] {
     });
   }
 
-  addActionPlan() {
-    if (this.incident == null) {
-      return;
-    }
-
-    this.actionPlanService.getActionPlanByIncident(this.incident.id).subscribe(
+  getPlanActionId(incidentId: string) {
+    this.actionPlanService.getActionPlanByIncident(incidentId).subscribe(
       {
         next: actionPlan => {
-          if (actionPlan) {
-            this.confirmService.openConfirmDialog("Plan d'action existant", "Un plan d'action existe déjà pour cet incident.", true).subscribe(
-              value => {
-                if (value) {
-                  this.router.navigate(['action-plan', actionPlan.id]);
-                }
-              }
-            );
-          }
-        },
-        error: _ => {
-          this.confirmService.openConfirmDialog("Créer un plan d'action", "Voulez-vous créer un plan d'action pour cet incident ?", true).subscribe(
-            value => {
-              if (value) {
-                if (this.incident) {
-                  this.dialog.open(CreateActionPlanDialogComponent, {
-                    width: '800px !important',
-                    height: '550px',
-                    minWidth: '800px',
-                    maxWidth: '800px',
-                    data: {
-                      incidentId: this.incident.id,
-                      reference: this.incident.reference
-                    }
-                  })
-                }
-              }
-            }
-          );
+          console.log(actionPlan)
+          this.planActionId = actionPlan.id;
         }
       });
   }
+
+  gotoActionPlan(planActionId: string) {
+    this.router.navigate(['action-plan', planActionId]);
+  }
+
+  addActionPlan(incident: any) {
+    this.dialog.open(CreateActionPlanDialogComponent, {
+      width: '800px !important',
+      height: '550px',
+      minWidth: '800px',
+      maxWidth: '800px',
+      data: {
+        incidentId: incident.id,
+        reference: incident.reference
+      }
+    })
+  }
+
+
+
 
   getLineColor(from: Date | string, to: Date | string): string {
     const date1 = new Date(from);

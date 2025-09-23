@@ -247,6 +247,7 @@ export class PlanActionPageComponent implements OnInit {
         icon: 'add',
         show: true,
         class: 'btn-primary',
+        permission: 'CREATE_ACTION_PLAN',
         action: () => this.add()
       },
       {

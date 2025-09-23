@@ -23,7 +23,7 @@
         </button>
       </ng-container>
       }
-      @else if(btn.permission){
+      @else if(btn.show && btn.permission){
       <ng-container *appHasPermission="btn.permission">
         <button mat-raised-button [ngClass]="btn.class" (click)="btn.action()">
           @if(btn.icon){

@@ -21,6 +21,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Router } from '@angular/router';
 import { CreateProcessComponent } from '../../../features/process/create-process/create-process.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { error } from 'jquery';
 
 export interface ProcessNode {
   id: string;
@@ -727,6 +728,22 @@ export class BuProcessAccordionComponent {
 
   navToRisk(id: string) {
     this.router.navigate(['reglages', 'risks', id]);
+  }
+
+  addProcess(buId : string) {
+    this.dialog.open(CreateProcessComponent,
+      {
+        width: '800px',
+        data: { buId : buId }
+      }
+    ).afterClosed().subscribe(p => {
+      this.processService.createProcess(p).subscribe(resp => {
+        this.ngOnInit();
+      },
+      error => {
+        this.ngOnInit();
+      })
+    })
   }
 
   getTooltip(view: string): string {

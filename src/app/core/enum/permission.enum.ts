@@ -8,6 +8,19 @@ export enum PermissionName {
   VIEW_CALCUL_FONDS_PROPRE = 'VIEW_CALCUL_FONDS_PROPRE',
 
   CREATE_INCIDENT = 'CREATE_INCIDENT',
+  UPDATE_INCIDENT = 'UPDATE_INCIDENT',
+  CLOSED_INCIDENT = 'CLOSED_INCIDENT',
+
+  CREATE_AUDIT_COMMENTAIRE = 'CREATE_AUDIT_COMMENTAIRE',
+
+  CREATE_ACTION_PLAN = 'CREATE_ACTION_PLAN',
+  UPDATE_ACTION_PLAN = 'UPDATE_ACTION_PLAN',
+
+  CREATE_CONTROLE = 'CREATE_CONTROLE',
+  UPDATE_CONTROLE = 'UPDATE_CONTROLE',
+  VALIDER_CONTROLE = 'VALIDER_CONTROLE',
+
+  CREATE_CARTOGRAPHIE = 'CREATE_CARTOGRAPHIE',
 
   VIEW_REPORTS = 'VIEW_REPORTS',
   TRACK_INCIDENT = 'TRACK_INCIDENT',
@@ -21,7 +34,6 @@ export enum PermissionName {
   SUGGEST_CORRECTIVE_MEASURES = 'SUGGEST_CORRECTIVE_MEASURES',
   PARTICIPATE_RISK_ASSESSMENT = 'PARTICIPATE_RISK_ASSESSMENT',
   FILL_MATRIX = 'FILL_MATRIX',
-  CREATE_CARTOGRAPHIE = 'CREATE_CARTOGRAPHIE',
   MANAGE_CRITICAL_INCIDENTS = 'MANAGE_CRITICAL_INCIDENTS',
   MONITOR_SENSITIVE_INCIDENTS = 'MONITOR_SENSITIVE_INCIDENTS',
   PREPARE_REPORTS = 'PREPARE_REPORTS',
@@ -44,9 +56,21 @@ export const PermissionLabels: PermissionLabelsType = {
   [PermissionName.VIEW_ACTION_PLAN]: 'Voir le plan d’action',
   [PermissionName.VIEW_CONTROLES]: 'Voir les contrôles',
   [PermissionName.VIEW_CALCUL_FONDS_PROPRE]: 'Voir le calcul des fonds propres',
-
   
   [PermissionName.CREATE_INCIDENT]: 'Saisir un incident',
+  [PermissionName.UPDATE_INCIDENT]: 'Modifier un incident',
+  [PermissionName.CLOSED_INCIDENT]: 'Clôturer un incident',
+
+  [PermissionName.CREATE_AUDIT_COMMENTAIRE]: 'Ajouter un commentaire d’audit',
+  [PermissionName.CREATE_ACTION_PLAN]: 'Créer un plan d’action',
+  [PermissionName.UPDATE_ACTION_PLAN]: 'Modifier un plan d’action',
+
+  [PermissionName.CREATE_CONTROLE]: 'Créer un contrôle',
+  [PermissionName.UPDATE_CONTROLE]: 'Modifier un contrôle',
+  [PermissionName.VALIDER_CONTROLE]: 'Valider un contrôle',
+
+  [PermissionName.CREATE_CARTOGRAPHIE]: 'Créer une cartographie des risques',
+
   [PermissionName.TRACK_INCIDENT]: 'Suivre un incident',
   [PermissionName.ATTACH_DOCUMENT]: 'Joindre un document',
   [PermissionName.ANALYZE_INCIDENT]: 'Analyser un incident',
@@ -58,7 +82,6 @@ export const PermissionLabels: PermissionLabelsType = {
   [PermissionName.SUGGEST_CORRECTIVE_MEASURES]: 'Suggérer des mesures correctives',
   [PermissionName.PARTICIPATE_RISK_ASSESSMENT]: 'Participer à l’évaluation des risques',
   [PermissionName.FILL_MATRIX]: 'Remplir la matrice des risques',
-  [PermissionName.CREATE_CARTOGRAPHIE]: 'Créer une cartographie des risques',
   [PermissionName.MANAGE_CRITICAL_INCIDENTS]: 'Gérer les incidents critiques',
   [PermissionName.MONITOR_SENSITIVE_INCIDENTS]: 'Suivre les incidents sensibles',
   [PermissionName.PREPARE_REPORTS]: 'Préparer des rapports',

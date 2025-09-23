@@ -108,6 +108,11 @@
                   <span>Voir la matrice</span>
                 </button>
 
+                <button mat-menu-item (click)="addProcess(node.id)">
+                  <mat-icon>add</mat-icon>
+                  <span>Nouveau process</span>
+                </button>
+
                 <button mat-menu-item (click)="openEntityDialog(node, $event)">
                   <mat-icon>edit</mat-icon>
                   <span>Modifier</span>

@@ -29,12 +29,13 @@ import { AuditService } from '../../core/services/audit/audit.service';
 import { AuditPanelComponent } from '../../shared/components/audit/audit-panel/audit-panel.component';
 import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
 import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
+import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 
 @Component({
   selector: 'app-plan-action-page-detail',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
     MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, AuditButtonComponent,
-    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule],
+    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule, HasPermissionDirective],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
@@ -117,6 +118,7 @@ export class PlanActionPageDetailComponent {
           icon: 'play_arrow',
           class: 'btn-purple',
           show: !!canStart,
+          permission: 'UPDATE_ACTION_PLAN',
           action: () => this.startActionPlan()
         },
         {
@@ -124,6 +126,7 @@ export class PlanActionPageDetailComponent {
           icon: 'check',
           class: 'btn-primary',
           show: !!canEnd,
+          permission: 'UPDATE_ACTION_PLAN',
           action: () => this.endActionPlan()
         }
       ];
