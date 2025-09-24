@@ -222,6 +222,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         icon: 'add',
         action: () => this.create(),
         show: true,
+        permission: 'CREATE_CONTROLE',
         class: 'btn-primary'
       },
       {
