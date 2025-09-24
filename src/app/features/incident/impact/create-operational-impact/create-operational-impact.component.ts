@@ -2,8 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { forkJoin, of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { firstValueFrom, forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { ActivatedRoute } from '@angular/router';
 
@@ -21,6 +21,8 @@ import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 import { OperatingLossState, OperatingLossStateLabels } from '../../../../core/enum/operatingLossState.enum';
 import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
+import { FileService } from '../../../../core/services/file/file.service';
+import { TargetType } from '../../../../core/enum/targettype.enum';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
@@ -73,11 +75,16 @@ export class CreateOperationalImpactComponent implements OnInit {
   private amountService = inject(AmountService);
   private equipeService = inject(EntitiesService);
   private snackBarService = inject(SnackBarService);
+  private fileService = inject(FileService);
 
   businessUnits: BusinessUnit[] = [];
   allBusinessUnits: BusinessUnit[] = [];
 
   goBackButtons: GoBackButton[] = [];
+
+  TargetType = TargetType;
+
+  attachedCounts: Record<string, number> = {};
   
 
   // ---------- Contexte Incident/BU ----------
@@ -319,6 +326,8 @@ export class CreateOperationalImpactComponent implements OnInit {
   
         // Charger les montants pour chaque OperatingLoss
         losses.forEach((l) => this.loadAmountsForOperatingLoss(l.id));
+
+        this.loadAttachedCountsForAllImpacts(losses);
   
         this.isLoadingExisting = false;
       });
@@ -721,4 +730,39 @@ export class CreateOperationalImpactComponent implements OnInit {
     this.formData = { financialImpacts: [], nonFinancialImpacts: [] };
     this.errors = {};
   }
+
+  openFilesDialog(impactId: string) {
+  const ref = this.fileService.openFiles([], TargetType.IMPACT, impactId, /* closed: */ false);
+
+  // rafraîchit le compteur quand on revient du dialog
+  ref.afterClosed()
+    .pipe(
+      switchMap(() => this.fileService.getFiles(TargetType.IMPACT, impactId)),
+      catchError(() => of([]))
+    )
+    .subscribe(files => {
+      this.attachedCounts[impactId] = files.length;
+    });
+}
+
+  private loadAttachedCountsForAllImpacts(losses: OperatingLoss[]) {
+  if (!losses?.length) {
+    this.attachedCounts = {};
+    return;
+  }
+
+  const calls = losses.map(l =>
+    this.fileService.getFiles(TargetType.IMPACT, l.id).pipe(
+      catchError(() => of([])),                     // si erreur: 0
+      map(files => ({ id: l.id, count: files.length }))
+    )
+  );
+
+  forkJoin(calls).subscribe(rows => {
+    const mapCounts: Record<string, number> = {};
+    rows.forEach(r => (mapCounts[r.id] = r.count));
+    this.attachedCounts = mapCounts;
+  });
+}
+  
 }

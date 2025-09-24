@@ -203,17 +203,7 @@ export class PlanActionPageDetailComponent {
     var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
     let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId))
 
-    this.dialog.open(FichiersComponent,
-      {
-        width: '400px',
-        data: {
-          files: files,
-          targetType: targetType,
-          targetId: actionId,
-          closed: closed
-        }
-      }
-    ).afterClosed().subscribe(result => {
+    this.fileService.openFiles(files, targetType, actionId).afterClosed().subscribe(result => {
       if (!closed) {
         this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
           result => {

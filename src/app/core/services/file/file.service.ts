@@ -18,7 +18,7 @@ export interface FileEntity {
   etag: string | null;
   uploadedAt: string | null; // Instant côté back → string ISO
   uploadedBy: string | null;
-  descriptif?: string | null;
+  description?: string | null;
 }
 
 // ce que ton UI consomme
@@ -31,20 +31,21 @@ export interface UploadedFile {
   etag: string;
   uploadedAt: Date;
   uploadedBy: string;
+  description: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class FileService {
 
-  openFiles(files : UploadedFile[], target : TargetType, targetId : string) {
+  openFiles(files : UploadedFile[], target : TargetType, targetId : string, closed : boolean = false) {
     return this.dialog.open(FichiersComponent,
       {
-        width: '400px',
+        width: '600px',
         data: {
           files: files,
           targetType: target,
           targetId: targetId,
-          closed: true
+          closed: closed
         }
       }
     )
@@ -55,9 +56,11 @@ export class FileService {
   private dialog = inject(MatDialog);
 
   /** POST /files/upload/{type}/{id} */
-  uploadFile(file: File, type: TargetType, targetId: string) {
+  uploadFile(file: File, type: TargetType, targetId: string, description: string = '') {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('description', description);
+    
     return this.http.post<void>(`${this.baseUrl}/upload/${type}/${targetId}`, formData);
   }
 
@@ -74,6 +77,7 @@ export class FileService {
           etag: f.etag ?? '',
           uploadedAt: f.uploadedAt ? new Date(f.uploadedAt) : new Date(0),
           uploadedBy: f.uploadedBy ?? 'inconnu',
+          description: f.description ?? '',
         }))
       )
     );

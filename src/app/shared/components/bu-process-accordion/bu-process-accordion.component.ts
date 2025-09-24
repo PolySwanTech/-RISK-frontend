@@ -13,7 +13,6 @@ import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { PopupEvaluationControleComponent } from '../../../pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
