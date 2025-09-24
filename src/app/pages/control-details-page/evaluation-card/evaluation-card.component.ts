@@ -14,12 +14,13 @@ import { FichiersComponent } from '../../../shared/components/fichiers/fichiers.
 import { MatDialog } from '@angular/material/dialog';
 import { FileService } from '../../../core/services/file/file.service';
 import { ReviewStatus, ReviewStatusLabels } from '../../../core/enum/reviewStatus.enum';
+import { HasPermissionDirective } from "../../../core/directives/has-permission.directive";
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
   selector: 'app-evaluation-card',
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, HasPermissionDirective],
   templateUrl: './evaluation-card.component.html',
   styleUrl: './evaluation-card.component.scss'
 })

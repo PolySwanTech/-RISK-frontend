@@ -18,7 +18,7 @@ export class HasPermissionDirective {
       permissions = [permissions];
     }
 
-    const hasAny = permissions.some(p => this.authService.hasPermission(p));
+    const hasAny = permissions.every(p => this.authService.hasPermission(p));
     this.viewContainer.clear();
     if (hasAny) {
       this.viewContainer.createEmbeddedView(this.templateRef);

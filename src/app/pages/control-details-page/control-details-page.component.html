@@ -124,11 +124,14 @@
                         <div class="meta-sub">Attribuée à {{ s.exec.performedBy || '—' }}</div>
                       </div>
                       <div class="meta-right">
-                        <button class="btn btn-evaluer"
-                                *ngIf="!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED'"
+                        @if(!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED'){
+                          <button class="btn btn-evaluer"
+                                *appHasPermission="'UPDATE_CONTROLE'"
                                 (click)="evaluateExec(s.exec.id, 'eval');">
                           {{ s.view?.reviewStatus === 'REEXAM_REQUESTED' ? 'Réévaluer' : 'Évaluer' }}
                         </button>
+                        }
+                        
                       </div>
                     </div>
                   </div>

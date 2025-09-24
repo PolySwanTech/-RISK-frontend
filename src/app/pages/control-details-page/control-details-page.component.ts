@@ -10,7 +10,7 @@ import { ControlExecution } from '../../core/models/ControlExecution';
 import { ControlEvaluationView } from '../../core/models/ControlEvaluation';
 
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
-import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { PopupEvaluationControleComponent } from './popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 
 import { catchError, forkJoin, of } from 'rxjs';
@@ -18,6 +18,7 @@ import { RecurrenceLabels } from '../../core/enum/recurrence.enum';
 import { MethodologyCardComponent } from './methodology-card/methodology-card.component';
 import { EvaluationCardComponent } from './evaluation-card/evaluation-card.component';
 import { MatDialog } from '@angular/material/dialog';
+import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 
 @Component({
   selector: 'app-control-details-page',
@@ -28,8 +29,9 @@ import { MatDialog } from '@angular/material/dialog';
     GoBackComponent,
     EvaluationCardComponent,
     RouterModule,
-    MethodologyCardComponent
-  ],
+    MethodologyCardComponent,
+    HasPermissionDirective
+],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
 })
@@ -52,18 +54,19 @@ export class ControlDetailsPageComponent implements OnInit {
   evaluationCache: Record<string, ControlEvaluationView | null> = {};
 
   // Boutons GoBack (seulement Planifier + Historique)
-  goBackButtons = [
+  goBackButtons : GoBackButton[] = [
     {
       label: 'Planifier exécution',
       icon: 'calendar_today',
-      class: 'btn-primary',
+      class: 'btn-purple',
       show: true,
+      permission: 'CREATE_CONTROLE',
       action: () => this.scheduleExecution()
     },
     {
       label: 'Voir tout l’historique',
       icon: 'history',
-      class: 'btn-purple',
+      class: 'btn-primary',
       show: true,
       action: () => this.viewFullHistory()
     }
