@@ -29,7 +29,7 @@
           </a>
         </ng-container>
 
-         <!-- ✅ Cartographie -->
+        <!-- ✅ Cartographie -->
         <ng-container *appHasPermission="'VIEW_CARTOGRAPHIE'">
           <a mat-list-item routerLink="/cartographie">
             <mat-icon>analytics</mat-icon>
@@ -70,25 +70,26 @@
         </ng-container>
 
         <!-- ✅ Menu Admin -->
+        @if(isAdmin()){
         <a mat-list-item [matMenuTriggerFor]="menu">
           <mat-icon>settings</mat-icon>
           <span>{{ 'MENU.ADMIN' | translate }}</span>
         </a>
         <mat-menu #menu="matMenu">
-          <button routerLink="/reglages" mat-menu-item>
+          <button routerLink="/reglages" *appHasPermission="'VIEW_PARAMETRAGE'" mat-menu-item>
             <mat-icon>settings</mat-icon>
             <span>{{ 'MENU.SETTINGS' | translate }}</span>
           </button>
-          <button mat-menu-item routerLink="/user/list">
+          <button mat-menu-item *appHasPermission="'VIEW_GESTION_UTILISATEURS'" routerLink="/user/list">
             <mat-icon>group</mat-icon>
             <span>{{ 'MENU.USERS' | translate }}</span>
           </button>
-          <button mat-menu-item routerLink="/permissions">
+          <button mat-menu-item *appHasPermission="'VIEW_GESTION_PERMISSIONS'" routerLink="/permissions">
             <mat-icon>lock</mat-icon>
             <span>{{ 'MENU.PERMISSIONS' | translate }}</span>
           </button>
         </mat-menu>
-
+        }
       </ng-container>
       }
 

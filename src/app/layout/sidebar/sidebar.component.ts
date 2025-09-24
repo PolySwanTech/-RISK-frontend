@@ -71,6 +71,10 @@ export class SidebarComponent implements OnInit {
 
   }
 
+  isAdmin() : boolean {
+    return this.authService.hasPermission('VIEW_PARAMETRAGE') || this.authService.hasPermission('VIEW_GESTION_UTILISATEURS') || this.authService.hasPermission('VIEW_GESTION_PERMISSIONS');
+  }
+
   changeLang(lang: any) {
     this.translate.use(lang ? lang : 'fr');
   }

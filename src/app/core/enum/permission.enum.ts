@@ -7,6 +7,10 @@ export enum PermissionName {
   VIEW_CONTROLES = 'VIEW_CONTROLES',
   VIEW_CALCUL_FONDS_PROPRE = 'VIEW_CALCUL_FONDS_PROPRE',
 
+  VIEW_PARAMETRAGE = 'VIEW_PARAMETRAGE',
+  VIEW_GESTION_UTILISATEURS = 'VIEW_GESTION_UTILISATEURS',
+  VIEW_GESTION_PERMISSIONS = 'VIEW_GESTION_PERMISSIONS',
+
   CREATE_INCIDENT = 'CREATE_INCIDENT',
   UPDATE_INCIDENT = 'UPDATE_INCIDENT',
   CLOSED_INCIDENT = 'CLOSED_INCIDENT',
@@ -56,6 +60,9 @@ export const PermissionLabels: PermissionLabelsType = {
   [PermissionName.VIEW_ACTION_PLAN]: 'Voir le plan d’action',
   [PermissionName.VIEW_CONTROLES]: 'Voir les contrôles',
   [PermissionName.VIEW_CALCUL_FONDS_PROPRE]: 'Voir le calcul des fonds propres',
+  [PermissionName.VIEW_PARAMETRAGE]: 'Voir le paramétrage',
+  [PermissionName.VIEW_GESTION_UTILISATEURS]: 'Voir la gestion des utilisateurs',
+  [PermissionName.VIEW_GESTION_PERMISSIONS]: 'Voir la gestion des permissions',
   
   [PermissionName.CREATE_INCIDENT]: 'Saisir un incident',
   [PermissionName.UPDATE_INCIDENT]: 'Modifier un incident',
