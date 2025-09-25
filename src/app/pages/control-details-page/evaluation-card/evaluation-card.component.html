@@ -40,7 +40,7 @@
             </ng-container>
 
             <!-- Actions de validation : visibles quand une évaluation existe et qu'elle est en attente -->
-            @if(evaluationView?.reviewStatus === 'PENDING' && canValidate) {
+            @if(evaluationView?.reviewStatus === 'PENDING' && canValidate && sameCreator()) {
             <div class="rv-actions rv-actions-inline" *appHasPermission="'VALIDER_CONTROLE'">
                 <button class="btn btn-primary" (click)="handleAction('valid');">Valider</button>
                 <button class="btn btn-outline warning" (click)="handleAction('reexam');">Demander un

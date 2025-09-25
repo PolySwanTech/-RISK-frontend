@@ -134,6 +134,7 @@
                             <mat-icon>assessment</mat-icon>
                             Impacts de l'incident
                         </h3>
+                        @if(incident.state !== 'DRAFT'){
                         <mat-card style="margin-bottom: 20px;">
                             <div class="table-container">
                                 <table mat-table [dataSource]="impactDataSource" class="mat-elevation-z4">
@@ -174,6 +175,12 @@
                             <mat-icon>visibility</mat-icon>
                         </button>
                         }
+                    }
+                    @else {
+                        <div class="empty" style="margin: 20px 0;">
+                            <span>Aucun impact n'est disponible pour un incident en brouillon.</span>
+                        </div>
+                    }
                     </div>
                 </mat-card-content>
             </mat-card>

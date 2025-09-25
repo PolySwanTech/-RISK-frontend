@@ -56,8 +56,18 @@
     </mat-form-field>
   </div>
 
+  <button style="margin-bottom: 10px;" mat-stroked-button (click)="create()">
+    <mat-icon>add</mat-icon>
+    Associer BU / Processus / Risque *
+  </button>
+  <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
+    <mat-chip> Equipe : {{ selectedBPR.bu.name }}</mat-chip>
+    <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
+    <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
+  </mat-chip-listbox>
 
-  <div class="row-add">
+
+  <!-- <div class="row-add">
     <mat-form-field appearance="outline">
       <mat-label>Entité Responsable</mat-label>
       <mat-select formControlName="buId" (selectionChange)="onTeamChange($event)">
@@ -78,7 +88,7 @@
     <app-select-arborescence appearance="outline" placeholder="Sélectionnez un risque" [id]="form.get('riskId')!.value" (changeValue)="onSelectionRisk($event)"
       [list]="listRisks" />
   </div>
-  }
+  } -->
 
   <button mat-raised-button class="btn-primary" type="submit">Créer</button>
 </form>

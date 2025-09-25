@@ -19,6 +19,7 @@ import { MethodologyCardComponent } from './methodology-card/methodology-card.co
 import { EvaluationCardComponent } from './evaluation-card/evaluation-card.component';
 import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
+import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-control-details-page',
@@ -41,6 +42,7 @@ export class ControlDetailsPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
 
   control: ControlTemplate | null = null;
   controlExecutions: ControlExecution[] | null = null;
@@ -55,21 +57,6 @@ export class ControlDetailsPageComponent implements OnInit {
 
   // Boutons GoBack (seulement Planifier + Historique)
   goBackButtons : GoBackButton[] = [
-    {
-      label: 'Planifier exécution',
-      icon: 'calendar_today',
-      class: 'btn-purple',
-      show: true,
-      permission: 'CREATE_CONTROLE',
-      action: () => this.scheduleExecution()
-    },
-    {
-      label: 'Voir tout l’historique',
-      icon: 'history',
-      class: 'btn-primary',
-      show: true,
-      action: () => this.viewFullHistory()
-    }
   ];
 
   // === Carrousel (4 dernières exécutions) ===
@@ -94,7 +81,31 @@ export class ControlDetailsPageComponent implements OnInit {
   loadControl(id: string): void {
     this.controlService.getControl(id).subscribe(control => {
       this.control = control;
+      this.goBackButtons = [{
+      label: 'Planifier exécution',
+      icon: 'calendar_today',
+      class: 'btn-purple',
+      show: this.sameCreator() ,
+      permission: 'CREATE_CONTROLE',
+      action: () => this.scheduleExecution()
+    },
+    {
+      label: 'Voir tout l’historique',
+      icon: 'history',
+      class: 'btn-primary',
+      show: true,
+      action: () => this.viewFullHistory()
+    }];
     });
+  }
+
+ sameCreator(){
+   return this.authService.sameUserName(this.control?.creator || '');
+  }
+
+  sameEvaluator(s : string){
+    console.log(s);
+   return this.authService.sameUserName(s);
   }
 
   loadControlExecutions(id: string): void {
@@ -102,6 +113,8 @@ export class ControlDetailsPageComponent implements OnInit {
       this.controlExecutions = [...executions].sort((a, b) =>
         new Date(b.plannedAt as any).getTime() - new Date(a.plannedAt as any).getTime()
       );
+
+      console.log(this.controlExecutions);
 
       const calls = executions.map(e =>
         this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
