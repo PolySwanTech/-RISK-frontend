@@ -13,7 +13,6 @@ import { actionPlanRoutes } from './features/action-plan/action-plan.routes';
 import { controlRoutes } from './features/control/control.routes';
 import { RiskPageComponent } from './pages/risk-page/risk-page.component';
 import { CartographieComponent } from './pages/cartographie/cartographie.component';
-import { CalculInputParametersComponent } from './pages/calcul-input-parameters/calcul-input-parameters.component';
 import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
 import { CreateEvaluationComponent } from './features/cartographie/create-evaluation/create-evaluation.component';
 import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
@@ -28,8 +27,6 @@ export const routes: Routes = [
   { path: 'cartographie/create', component: CreateCartoComponent, canActivate: [AuthGuard] },
   { path: 'cartographie/consulter', component: SelectCartoComponent, canActivate: [AuthGuard] },
   { path: 'cartographie/evaluation', component: CreateEvaluationComponent, canActivate: [AuthGuard] },
-  { path: 'calcul', component : CalculInputParametersComponent, canActivate : [AuthGuard] },
-  { path: 'calcul/view/:id', component : CalculViewComponent, canActivate : [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CALCUL_FONDS_PROPRE } },
   { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CALCUL_FONDS_PROPRE } },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },

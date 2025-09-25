@@ -32,4 +32,8 @@ export class CalculService {
     return this.http.get<SmaResult>(`${this.baseUrl}/${inputId}/result`);
   }
 
+  getValues(){
+    return this.http.get<any>(this.baseUrl)
+  }
+
 }
