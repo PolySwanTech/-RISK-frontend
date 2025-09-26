@@ -104,7 +104,6 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   sameEvaluator(s : string){
-    console.log(s);
    return this.authService.sameUserName(s);
   }
 
@@ -113,8 +112,6 @@ export class ControlDetailsPageComponent implements OnInit {
       this.controlExecutions = [...executions].sort((a, b) =>
         new Date(b.plannedAt as any).getTime() - new Date(a.plannedAt as any).getTime()
       );
-
-      console.log(this.controlExecutions);
 
       const calls = executions.map(e =>
         this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
