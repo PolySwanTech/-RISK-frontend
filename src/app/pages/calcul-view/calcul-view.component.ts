@@ -5,17 +5,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
-import { Router } from '@angular/router';
 import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { CalculService } from '../../core/services/calcul/calcul.service';
-import { SmaInputCreateDto, SmaLossUpsert } from '../../core/models/Sma';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
 import { MatInputModule } from '@angular/material/input';
 import { ChartConfiguration, ChartEvent, ChartOptions } from 'chart.js';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 interface DataItem {
   id: number;
@@ -81,26 +78,17 @@ export class CalculViewComponent {
 
   private calculService = inject(CalculService);
   private confirmService = inject(ConfirmService);
-  private fb = inject(FormBuilder);
 
   businessIndicator = 0;
   businessIndicatorComponent = 0;
   internalLossMultiplier = 0;
   ORC = 0;
   RWA = 0;
+  variationRWA = 0;
 
   allYearsData: YearTabData[] = []
 
   years: number[] = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
-
-  formData: any = {
-    period_year: new Date().getFullYear(),
-    pertes_annuelles: {},
-    ratio_cet1: 8.0,
-    exemption_ilm: false
-  };
-
-  pertesForm: FormGroup;
 
   lineChartData: ChartConfiguration<'line'>['data'] = {
     labels: [],
@@ -112,6 +100,11 @@ export class CalculViewComponent {
         backgroundColor: 'rgba(63,81,181,0.3)',
         fill: true,
         tension: 0.3
+      },
+      {
+        label: 'BI (M€)',
+        data: [],            // valeurs BI
+        backgroundColor: '#f44336'
       }
     ]
   };
@@ -128,6 +121,65 @@ export class CalculViewComponent {
       intersect: false   // ← pas besoin de cliquer pile sur le point
     }
   };
+
+  barLineChartData: ChartConfiguration<'bar' | 'line'>['data'] = {
+    labels: [], // 3 dernières années
+    datasets: [
+      {
+        type: 'bar',
+        label: 'RWA (M€)',
+        data: [],
+        backgroundColor: 'rgba(63,81,181,0.6)',
+        borderRadius: 6
+      },
+      {
+        type: 'line',
+        label: 'Tendance',
+        data: [],
+        borderColor: '#f44336',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.3, // arrondi de la courbe
+        pointBackgroundColor: '#f44336'
+      }
+    ]
+  };
+
+  barLineChartOptions: ChartOptions<'bar' | 'line'> = {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function (context) {
+            const year = context.label;
+            const result = context.chart.data.datasets[0].data[context.dataIndex]; // juste la valeur par défaut
+            // Si tu as accès à annualResult via closure
+            const annualResult = (context.chart as any).annualResult as any;
+            const r = annualResult ? annualResult[year] : null;
+            if (!r) return `${context.dataset.label}: ${context.parsed.y}`;
+            return [
+              `RWA: ${r.rwa} M€`,
+              `BI: ${r.bi} M€`,
+              `BIC: ${r.bic} M€`,
+              `ILM: ${r.ilm}`,
+              `ORC: ${r.orc}`
+            ];
+          },
+          title: function (context) {
+            // context[0].label -> valeur de l'axe X (année)
+            return `Année ${context[0].label}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true }
+    }
+  };
+
 
   goBackButtons = [
     {
@@ -163,25 +215,9 @@ export class CalculViewComponent {
 
   displayedColumnsBi = ['intervalle', 'coefficient'];
 
-  constructor() {
-    // Construire le formulaire dynamique dans le constructeur
-    const controls = this.years.reduce((acc, year) => {
-      acc['perte_' + year] = new FormControl(this.formData.pertes_annuelles[year] || null);
-      return acc;
-    }, {} as { [key: string]: FormControl });
-
-    this.pertesForm = this.fb.group(controls);
-
-    this.pertesForm.valueChanges.subscribe(values => {
-      for (const key in values) {
-        if (values.hasOwnProperty(key)) {
-          const year = key.replace('perte_', '');
-          this.formData.pertes_annuelles[year] = values[key];
-        }
-      }
-      this.updateChart();
-    });
-  }
+  annualLossesDetected: { [year: number]: number } = {};
+  annualLossesDeclared: { [year: number]: number } = {};
+  annualResult: { [year: number]: any } = {};
 
   updateChart() {
     this.lineChartData = {
@@ -189,32 +225,55 @@ export class CalculViewComponent {
       datasets: [
         {
           ...this.lineChartData.datasets[0],
-          data: this.years.map(year => Number(this.formData.pertes_annuelles[year] || 0))
+          data: this.years.map(year => Number(this.annualLossesDetected[year] || 0))
+        },
+        {
+          ...this.lineChartData.datasets[1], // BI
+          data: this.years.map(year => Number(this.annualLossesDeclared[year] || 0))
         }
       ]
     };
+
+    this.barLineChartData = {
+      ...this.barLineChartData,
+      datasets: [
+        {
+          ...this.barLineChartData.datasets[0],
+          data: this.years.map(year => Number(this.annualResult[year]?.rwa || 0))
+        },
+        {
+          ...this.barLineChartData.datasets[1],
+          data: this.years.map(year => Number(this.annualResult[year]?.rwa || 0))
+        }
+      ]
+    };
+
+    this.barLineChartOptions.plugins!.tooltip!.callbacks!.label = (context) => {
+      const year = +context.label;
+      const r = this.annualResult[year];
+      if (!r) return `${context.dataset.label}: ${context.parsed.y}`;
+      return [
+        `RWA: ${r.rwa.toFixed(2)} M€`,
+        `BI: ${r.bi.toFixed(2)} M€`,
+        `BIC: ${r.bic.toFixed(2)} M€`,
+        `ILM: ${r.ilm.toFixed(2)}`,
+        `ORC: ${r.orc.toFixed(2)}`
+      ];
+    };
   }
 
-  rebuildYears(losses: any[]) {
-    losses.forEach(l => {
-      this.pertesForm.get(`perte_${l.lossYear}`)?.setValue(l.amount);
-      // if (this.formData.pertes_annuelles[`perte_${l.lossYear}`] === undefined) this.formData.pertes_annuelles[`perte_${l.lossYear}`] = l.amount;
-    });
-    this.lineChartData.labels = this.years.map(String);
+  rebuildYears() {
+    this.lineChartData.labels = this.years;
+    this.barLineChartData.labels = this.years;
+    this.updateChart();
   }
 
   validateLosses() {
     this.confirmService.openConfirmDialog("Confirmation", "Confirmer la sauvegarde des pertes ?")
       .subscribe(res => {
         if (res) {
-          const lossesList = Object.entries(this.formData.pertes_annuelles).map(
-            ([year, value]) => ({
-              lossYear: +year,
-              amount: +(value as string)
-            })
-          );
-
-          this.calculService.saveLosses(lossesList).subscribe();
+          this.calculService.saveLosses(this.annualLossesDeclared).subscribe();
+          this.calculService.saveLosses(this.annualLossesDetected).subscribe();
         }
       })
   }
@@ -263,18 +322,39 @@ export class CalculViewComponent {
       });
     });
 
+
+    // TODO : Ajouter la méthode pour recuperer les pertes declarées / detectées
+
     this.calculService.getLosses().subscribe(losses => {
-      this.rebuildYears(losses);
+      losses.forEach(
+        l => {
+          this.annualLossesDeclared[l.lossYear] = l.amount;
+          this.annualLossesDetected[l.lossYear] = l.amount * 1.5;
+        }
+      )
+      this.updateChart();
     })
 
     this.calculService.getResult().subscribe(results => {
-      this.businessIndicator = results[0].bi;
-      this.businessIndicatorComponent = results[0].bic;
-      this.internalLossMultiplier = results[0].ilm;
-      this.ORC = results[0].orc;
-      this.RWA = results[0].rwa;
+      results.forEach(
+        r => {
+          this.annualResult[r.lossYear] = r;
+        }
+      )
+      if (results.length >= 2) {
+        const lastYear = this.annualResult[2025].rwa;
+        const prevYear = this.annualResult[2024].rwa;
+        this.variationRWA = ((lastYear - prevYear) / prevYear) * 100; // variation %
+      }
+      this.businessIndicator = this.annualResult[2025].bi;
+      this.businessIndicatorComponent = this.annualResult[2025].bic;
+      this.internalLossMultiplier = this.annualResult[2025].ilm;
+      this.ORC = this.annualResult[2025].orc;
+      this.RWA = this.annualResult[2025].rwa;
+      this.updateChart();
     })
 
+    this.rebuildYears();
   }
 
   goToCalcul() {
@@ -307,19 +387,23 @@ export class CalculViewComponent {
     const index = Math.floor(relativeX * (this.years.length));
     if (index >= 0 && index < this.years.length) {
       const selectedYear = this.years[index];
-      if (this.formData.pertes_annuelles[selectedYear] !== undefined && this.formData.pertes_annuelles[selectedYear] !== null) {
-        alert(`Une valeur existe déjà pour l'année ${selectedYear}: ${this.formData.pertes_annuelles[selectedYear]}`);
+      if (this.annualLossesDeclared[selectedYear] !== undefined && this.annualLossesDeclared[selectedYear] !== null) {
+        alert(`Une valeur existe déjà pour l'année ${selectedYear}: ${this.annualLossesDeclared[selectedYear]}`);
         return;
       }
       const value = prompt(`Nouvelle valeur pour l'année ${selectedYear}`);
 
       if (value !== null) {
-        this.pertesForm.get('perte_' + selectedYear)?.setValue(value);
-        // Le subscribe valueChanges prendra le relais pour mettre à jour formData et redraw le chart
+        this.annualLossesDeclared[selectedYear] = +value
+        this.annualLossesDetected[selectedYear] = +value
       }
     } else {
       console.warn('Index hors limites :', index);
     }
+  }
+
+  addLoss() {
+
   }
 
   exportExcel() {

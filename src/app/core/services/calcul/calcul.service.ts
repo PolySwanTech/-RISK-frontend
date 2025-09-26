@@ -20,11 +20,11 @@ export class CalculService {
     return this.http.get<any[]>(this.baseUrl + '/losses')
   }
 
-  saveLosses(losses: any[]) {
+  saveLosses(losses: { [year: number]: number }) {
     return this.http.post<any[]>(this.baseUrl, losses);
   }
 
-  getResult(){
+  getResult() {
     return this.http.get<any[]>(this.baseUrl + '/result')
   }
 

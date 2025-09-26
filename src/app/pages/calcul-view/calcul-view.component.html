@@ -16,10 +16,15 @@
                         <mat-card-content>
                             <div class="main-amount">
                                 {{ formatCurrency(RWA) }}
-                                <span class="percentage-change">-2.3% vs précédent</span>
+                                <span
+                                    [ngClass]="variationRWA > 0 ? 'percentage-change-red' : 'percentage-change-green'">
+                                    {{ variationRWA | number:'1.2-2' }}% vs précédent
+                                </span>
                             </div>
                             <div class="chart-placeholder">
-                                [Graphique d'évolution sur 3 ans]
+                                <canvas baseChart [data]="barLineChartData" [options]="barLineChartOptions"
+                                    [type]="'bar'">
+                                </canvas>
                             </div>
                         </mat-card-content>
                     </mat-card>
@@ -55,7 +60,7 @@
                 </div>
 
                 <!-- Historique des calculs SMA -->
-                <mat-card class="history-card">
+                <!-- <mat-card class="history-card">
                     <mat-card-header>
                         <mat-card-title>Historique des calculs SMA</mat-card-title>
                     </mat-card-header>
@@ -108,7 +113,7 @@
                             </tr>
                         </table>
                     </mat-card-content>
-                </mat-card>
+                </mat-card> -->
             </div>
         </mat-tab>
 
@@ -214,6 +219,7 @@
                         <!-- Graphique -->
                         <div class="chart-container">
                             <button class="btn btn-primary" (click)="validateLosses()">Valider les pertes</button>
+                            <button class="btn btn-primary" (click)="addLoss()">Ajouter une perte</button>
                             <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line"
                                 (chartClick)="onChartClick($event)">
                             </canvas>
