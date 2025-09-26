@@ -123,7 +123,7 @@ export class CreateEvaluationComponent implements OnInit {
   gotoSteppe3(event: any) {
     this.highestRiskLevelNet = this.highestRiskLevel;
     if (this.highestRiskLevel && this.selectedBU) {
-      this.riskService.saveEvaluation(this.selectedRisk.id, this.highestRiskLevel, this.indicators, true).subscribe(
+      this.evaluationSrv.saveEvaluation(this.selectedRisk.id, this.highestRiskLevel, this.indicators, true).subscribe(
         _ => {
           this.snackBarService.info("Evaluation sauvegarder");
           event.next();
@@ -379,7 +379,7 @@ export class CreateEvaluationComponent implements OnInit {
     };
 
     if (this.highestRiskLevelNet) {
-      this.riskService.saveEvaluation(this.selectedRisk.id, this.highestRiskLevelNet, [], false).subscribe(
+      this.evaluationSrv.saveEvaluation(this.selectedRisk.id, this.highestRiskLevelNet, [], false).subscribe(
         _ => {
           this.snackBarService.info("Evaluation sauvegarder");
           stepper.next();

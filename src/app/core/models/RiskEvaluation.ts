@@ -20,3 +20,21 @@ export interface RiskEvaluation {
   createdAt    : Date;      // ISO
   riskId : string; // UUID du risque
 }
+
+/** --- objet retourné par l’API --- */
+export interface RiskEvaluationDto {
+  id           : string;      
+  evaluation      : RiskLevel;
+  evaluatorId   : string;   
+  evaluatorName    : string;   
+  createdAt    : Date;
+  riskId : string;
+  commentaire : string;
+  exercicePeriod: ExercicePeriod;
+  brut: boolean;
+}
+
+export interface ExercicePeriod {
+  start: Date;
+  end: Date;
+}
