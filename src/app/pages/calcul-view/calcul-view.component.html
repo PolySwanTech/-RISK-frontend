@@ -15,7 +15,7 @@
                         </mat-card-header>
                         <mat-card-content>
                             <div class="main-amount">
-                                {{ formatCurrency(exigenceFinale) }}
+                                {{ formatCurrency(RWA) }}
                                 <span class="percentage-change">-2.3% vs précédent</span>
                             </div>
                             <div class="chart-placeholder">
@@ -40,11 +40,15 @@
                             </div>
                             <div class="indicator-item">
                                 <div class="indicator-label">Internal Loss Multiplier (ILM)</div>
-                                <div class="indicator-value">{{ internalLossMultiplier }}</div>
+                                <div class="indicator-value">{{ internalLossMultiplier | number : '1.2-2' }}</div>
                             </div>
                             <div class="indicator-item">
                                 <div class="indicator-label">Exigence finale</div>
-                                <div class="indicator-value">{{ formatCurrency(exigenceFinale) }}</div>
+                                <div class="indicator-value">{{ formatCurrency(ORC) }}</div>
+                            </div>
+                            <div class="indicator-item">
+                                <div class="indicator-label">RWA opérationnel</div>
+                                <div class="indicator-value">{{ formatCurrency(RWA) }}</div>
                             </div>
                         </mat-card-content>
                     </mat-card>
@@ -114,7 +118,7 @@
                 @for(yearData of allYearsData; let y = $index; track yearData) {
                 <mat-tab [label]="yearData.label">
 
-                    <p style="text-align : center;"> BI = <b>{{yearData.bi}} M€ </b></p>
+                    <p style="text-align : center;"> BI = <b>{{yearData.bi | number : "1.2-2"}} M€ </b></p>
 
                     <div class="main-accordion">
                         @for(section of yearData.sections; let i = $index; track section) {
@@ -158,7 +162,7 @@
 
                         <div class="bic-hover-container">
                             <p class="bic-value" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave()">
-                                BIC = <b>{{ getBic() | number:'1.2-2' }}</b>
+                                BIC = <b>{{ businessIndicatorComponent | number:'1.2-2' }}</b>
                                 <span>
                                     <mat-icon>info</mat-icon>
                                 </span>
@@ -169,7 +173,7 @@
                                 top: biCardY + 'px',
                                 left: (biCardX + 20) + 'px'
                                 }" (mouseenter)="biCardVisible = true" (mouseleave)="biCardVisible = false">
-                                <p>BI Moyen : <b> {{ getAverageBiOverLast3Years() | number:'1.2-2' }}</b> M€</p>
+                                <p>BI Moyen : <b> {{ businessIndicator | number:'1.2-2' }}</b> M€</p>
                                 <h4>Tranches BI et coefficients marginaux (αi)</h4>
                                 <table mat-table [dataSource]="tranchesBI" class="bi-table" matSort>
                                     <ng-container matColumnDef="intervalle">
@@ -205,37 +209,13 @@
         <mat-tab label="Composante ILM">
             <!-- Historique des pertes -->
             <div class="form-section">
-                <div class="section-header">
-                    <h2 class="section-title">📈 Historique des Pertes</h2>
-                </div>
-
-                <div class="form-group">
-                    <label>Ratio CET1 exigé <span class="required">*</span></label>
-                    <div class="percentage-suffix">
-                        <input type="number" [(ngModel)]="formData.ratio_cet1" name="ratio_cet1" step="0.01" min="0"
-                            max="100" required>
-                    </div>
-                    <p class="help-text">Valeur par défaut : 8.00%</p>
-                </div>
-
                 <div class="section-content">
                     <div class="form-group">
-                        <!-- <button class="btn btn-success" (click)="importData()">📥 Importer</button> -->
-
-                        <div class="losses-grid">
-                            <div class="year-input" *ngFor="let year of years">
-                                <div class="year-label">{{ year }}</div>
-                                <div class="currency-suffix">
-                                    <input type="number" [(ngModel)]="formData.pertes_annuelles[year]"
-                                        name="perte_{{year}}" (ngModelChange)="updateChart()" step="0.01"
-                                        placeholder="0.00">
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Graphique -->
-                        <div style="margin-top: 20px;">
-                            <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line">
+                        <div class="chart-container">
+                            <button class="btn btn-primary" (click)="validateLosses()">Valider les pertes</button>
+                            <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line"
+                                (chartClick)="onChartClick($event)">
                             </canvas>
                         </div>
                     </div>

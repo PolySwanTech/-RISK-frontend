@@ -437,20 +437,24 @@ h2 {
   font-size: 28px;
 }
 
-
-/* Losses History */
-.losses-grid {
+.form-group {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
-  gap: 15px;
-  margin-top: 10px;
-  overflow-x: auto;
-  padding-bottom: 10px;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.chart-container {
+  flex: 2;
+  width: 95%;
 }
 
 .year-input {
-  text-align: center;
+  flex: 0 0 auto; // Empêche le shrink
+}
+
+mat-form-field {
+  width: 120px; // largeur fixe ou ajustable des champs
 }
 
 .year-label {

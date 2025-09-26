@@ -12,28 +12,20 @@ export class CalculService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl + '/sma/inputs';
 
-  createInput(dto: SmaInputCreateDto) {
-    return this.http.post<SmaInput>(`${this.baseUrl}`, dto);
-  }
-
-  upsertLosses(inputId: string, losses: SmaLossUpsert[]) {
-    return this.http.post<SmaLoss[]>(`${this.baseUrl}/${inputId}/losses`, losses);
-  }
-
-  getPayload(inputId: string) {
-    return this.http.get<SmaPayload>(`${this.baseUrl}/${inputId}`);
-  }
-
-  getLatestPayload() {
-    return this.http.get<SmaPayload>(`${this.baseUrl}/latest/payload`);
-  }
-
-  getResult(inputId: string) {
-    return this.http.get<SmaResult>(`${this.baseUrl}/${inputId}/result`);
-  }
-
-  getValues(){
+  getValues() {
     return this.http.get<any>(this.baseUrl)
+  }
+
+  getLosses() {
+    return this.http.get<any[]>(this.baseUrl + '/losses')
+  }
+
+  saveLosses(losses: any[]) {
+    return this.http.post<any[]>(this.baseUrl, losses);
+  }
+
+  getResult(){
+    return this.http.get<any[]>(this.baseUrl + '/result')
   }
 
 }
