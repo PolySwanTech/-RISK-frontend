@@ -1,3 +1,4 @@
+import { Permission } from './../../../core/models/permission';
 import { Component, inject, OnInit } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
@@ -67,7 +68,6 @@ export class ViewComponent implements OnInit {
 
 
   incident: Incident | undefined
-  userRole: string | undefined;
   userTeam: string | undefined;
   message: string = "";
   idIncident: string = "";
@@ -87,6 +87,8 @@ export class ViewComponent implements OnInit {
   currentRisk: RiskTemplate | undefined;
 
   planActionId: string | null = null;
+
+  permissions: string[] = [];
 
   columns = [
     {
@@ -143,7 +145,6 @@ export class ViewComponent implements OnInit {
         this.impactDataSource.data = this.impactRows;
       });
     }
-
   }
 
   async loadIncident(id: string) {
@@ -155,23 +156,21 @@ export class ViewComponent implements OnInit {
       console.log('Erreur lors de la récupération du plan d’action :', error);
       this.planActionId = null;
     }
-    console.log(this.planActionId)
-    this.extractTokenInfo();
     this.goBackButtons = [
       {
         label: "Consulter le plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
-        show: this.canShowActions() && !this.isDraft() && this.planActionId != null,
-        permission: 'VIEW_ACTION_PLAN',
+        show: this.canShowActions() && !this.isDraft() && this.planActionId != null && (this.sameCreator() || this.sameIntervenant()),
+        permission: {teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN']},
         action: () => this.gotoActionPlan(this.planActionId as string)
       },
       {
         label: "Créer un plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
-        show: this.canShowActions() && !this.isDraft() && this.planActionId == null,
-        permission: ['VIEW_ACTION_PLAN', 'CREATE_ACTION_PLAN'],
+        show: this.canShowActions() && !this.isDraft() && this.planActionId == null && (this.sameCreator() || this.sameIntervenant()),
+        permission: {teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN', 'CREATE_ACTION_PLAN']},
         action: () => this.addActionPlan(this.incident)
       },
       {
@@ -179,21 +178,21 @@ export class ViewComponent implements OnInit {
         icon: 'edit',
         class: 'btn-green',
         show: this.canShowActions() && !this.isDraft(),
-        permission: 'UPDATE_INCIDENT',
+        permission: {teamId: this.incident?.teamId, permissions: ['UPDATE_INCIDENT']},
         action: () => this.goToModification()
       },
       {
         label: "Modifier",
         icon: 'edit',
         class: 'btn-green',
-        show: this.isDraft(),
+        show: this.isDraft() && this.sameCreator(),
         action: () => this.goToModification()
       },
       {
         label: "Supprimer",
         icon: 'delete',
         class: 'btn-red',
-        show: this.isDraft(),
+        show: this.isDraft() && this.sameCreator(),
         action: () => this.delete()
       },
       {
@@ -207,13 +206,23 @@ export class ViewComponent implements OnInit {
         label: 'Clôturer',
         icon: 'lock',
         class: 'btn-red',
-        show: this.canClose(),
-        permission: 'CLOSED_INCIDENT',
+        show: this.canClose() && (this.sameCreator() || this.sameIntervenant()),
+        permission: {teamId: this.incident?.teamId, permissions: ['CLOSED_INCIDENT']},
         action: () => this.closeIncident()
       },
 
     ];
   }
+
+  sameCreator(){
+   return this.authService.sameUser(this.incident?.creatorId || '');
+  }
+
+  sameIntervenant(){
+   return this.authService.sameUser(this.incident?.intervenantId || '');
+  }
+
+
 
   canShowActions(): boolean {
     return this.incident?.state !== State.VALIDATE && this.incident?.state !== State.CLOSED;
@@ -239,19 +248,9 @@ export class ViewComponent implements OnInit {
     });
   }
 
-  extractTokenInfo(): void {
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      console.warn("Aucun token trouvé");
-      return;
-    }
-
-    const base64Payload = token.split('.')[1];
-    const jsonPayload = new TextDecoder().decode(
-      Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
-    );
-    const payload = JSON.parse(jsonPayload);
-    this.userRole = payload.roles?.[0]?.role_name;
+ async extractTokenInfo() {
+    this.permissions = await this.authService.getPermissionsByTeam(this.incident?.teamId ?? '');
+    console.log('Permissions de la team:', this.permissions);
   }
 
   canClose() {

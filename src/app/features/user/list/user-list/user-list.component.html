@@ -1,5 +1,7 @@
 <app-go-back [title]="'Liste des utilisateurs'" [buttons]="goBackButtons"></app-go-back>
 <div class="dashboard-container">
+    <mat-card>
+
     
     <div class="table-container">
         <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
@@ -37,4 +39,5 @@
 
         <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
     </div>
+    </mat-card>
 </div>

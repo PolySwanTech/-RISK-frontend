@@ -82,6 +82,7 @@ export class PlanActionPageDetailComponent {
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(resp => {
       this.actionPlan = resp;
+      console.log(this.actionPlan);
 
       // Todo: métriques doivent être calculées côté backend
       if (this.actionPlan?.actions?.length) {
@@ -118,7 +119,7 @@ export class PlanActionPageDetailComponent {
           icon: 'play_arrow',
           class: 'btn-purple',
           show: !!canStart,
-          permission: 'UPDATE_ACTION_PLAN',
+          permission: {teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']},
           action: () => this.startActionPlan()
         },
         {
@@ -126,7 +127,7 @@ export class PlanActionPageDetailComponent {
           icon: 'check',
           class: 'btn-primary',
           show: !!canEnd,
-          permission: 'UPDATE_ACTION_PLAN',
+          permission: {teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']},
           action: () => this.endActionPlan()
         }
       ];

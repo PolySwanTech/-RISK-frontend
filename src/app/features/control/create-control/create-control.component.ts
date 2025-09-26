@@ -18,12 +18,14 @@ import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 import { MatIconModule } from '@angular/material/icon';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
+import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
+import { MatChipListbox, MatChip } from "@angular/material/chips";
 
 @Component({
   selector: 'app-create-control',
@@ -36,8 +38,10 @@ import { PopupHeaderComponent } from '../../../shared/components/popup-header/po
     MatDatepickerModule,
     MatNativeDateModule,
     FormsModule, MatButtonModule, ReactiveFormsModule,
-    SelectArborescenceComponent, MatIconModule, PopupHeaderComponent
-  ],
+    SelectArborescenceComponent, MatIconModule, PopupHeaderComponent,
+    MatChipListbox,
+    MatChip
+],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
 })
@@ -52,6 +56,7 @@ export class CreateControlComponent {
   confirmService = inject(ConfirmService);
   snackBarService = inject(SnackBarService)
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
 
   form: FormGroup = this.fb.group({
     libelle: ['', Validators.required],
@@ -73,6 +78,8 @@ export class CreateControlComponent {
   priorities = Object.values(Priority);
   types = Object.values(Type);
   levels = Object.values(Degree);
+
+  selectedBPR: any;
 
   get buIdValue() {
     return this.form.get('buId')?.value;
@@ -178,5 +185,23 @@ export class CreateControlComponent {
   }
 
   trackById = (index: number, item: { id: string }) => item.id;
+
+  selectBPR(event: any) {
+    this.selectedBPR = event;
+    this.form.get('processId')?.setValue(event.process.id)
+    this.form.get('riskId')?.setValue(event.risk.id)
+  }
+
+  create() {
+    const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
+      minWidth: '750px',
+      height: '600px',
+      maxHeight: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe(event => {
+      this.selectBPR(event);
+    });
+  }
 
 }

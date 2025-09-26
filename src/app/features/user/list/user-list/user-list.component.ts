@@ -12,6 +12,7 @@ import { CreateUserComponent } from '../../create/create-user/create-user.compon
 import { MatButtonModule } from '@angular/material/button';
 import { Utilisateur } from '../../../../core/models/Utilisateur';
 import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-user-list',
@@ -22,7 +23,7 @@ import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-
     MatTableModule, GoBackComponent,
     MatPaginatorModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule, MatCardModule
   ]
 })
 export class UserListComponent implements OnInit, AfterViewInit {
