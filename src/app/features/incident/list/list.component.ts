@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, inject, OnInit, resource, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, resource, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Incident } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
@@ -17,7 +16,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { State, StateLabels } from '../../../core/enum/state.enum';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -29,6 +27,8 @@ import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { ActivatedRoute, Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-list',
@@ -48,7 +48,7 @@ export class ListComponent implements OnInit {
   private incidentService = inject(IncidentService)
   private datePipe = inject(DatePipe)
   private router = inject(Router);
-  private confirmService = inject(ConfirmService)
+  private route = inject(ActivatedRoute);
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -102,6 +102,7 @@ export class ListComponent implements OnInit {
 
   displayedColumns = ['select', ...this.columns.map(c => c.columnDef)];
   dataSource = new MatTableDataSource<Incident>([]);
+  filteredByRisk = false;
   selectedIncident: Incident | null = null;
   incidents: Incident[] = [];
 
@@ -121,26 +122,58 @@ export class ListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadIncidents();
+     this.route.queryParams.subscribe(params => {
+      const riskId = params['riskId'];
+      const processId = params['processId'];
 
-    this.goBackButtons = [
-      {
-        label: 'Créer un incident',
-        icon: 'add',
-        class: 'btn-primary',
-        show: true,
-        permission: 'CREATE_INCIDENT',
-        action: () => this.add()
-      },
-      {
-        label: 'Exporter',
-        icon: 'file_download',
-        class: 'btn-green',
-        show: true,
-        action: () => this.exportExcel()
+      if (riskId && processId) {
+        this.filteredByRisk = true;
+        this.incidentService.getIncidentByProcessAndRisk(processId, riskId).subscribe(data => {
+          this.incidents = data;
+          this.dataSource.data = data;
+        });
+
+        this.goBackButtons = [
+          {
+            label: 'Voir tous les incidents',
+            icon: 'list',
+            class: 'btn-primary',
+            show: true,
+            action: () => this.clearRiskFilter()
+          },
+          {
+            label: 'Exporter',
+            icon: 'file_download',
+            class: 'btn-green',
+            show: true,
+            action: () => this.exportExcel()
+          }
+        ];
+      } else {
+        this.filteredByRisk = false;
+        this.loadIncidents();
+
+        this.goBackButtons = [
+          {
+            label: 'Créer un incident',
+            icon: 'add',
+            class: 'btn-primary',
+            show: true,
+            permission: 'CREATE_INCIDENT',
+            action: () => this.add()
+          },
+          {
+            label: 'Exporter',
+            icon: 'file_download',
+            class: 'btn-green',
+            show: true,
+            action: () => this.exportExcel()
+          }
+        ];
       }
-    ];
+    });
   }
+
 
   refreshData() {
     this.ngOnInit();
@@ -149,6 +182,10 @@ export class ListComponent implements OnInit {
   // This method will be triggered when a row is clicked
   onRowClick(incident: Incident) {
     this.router.navigate(['incident', incident.id]);
+  }
+
+  clearRiskFilter() {
+    this.router.navigate(['incident']);
   }
 
   loadIncidents() {
