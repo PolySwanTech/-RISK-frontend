@@ -1,7 +1,7 @@
 import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatButtonModule, MatIconButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,7 +14,6 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
-import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
@@ -37,8 +36,7 @@ import { MatChipListbox, MatChip } from "@angular/material/chips";
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule, MatButtonModule, ReactiveFormsModule,
-    SelectArborescenceComponent, MatIconModule, PopupHeaderComponent,
+    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, PopupHeaderComponent,
     MatChipListbox,
     MatChip
 ],
@@ -90,53 +88,6 @@ export class CreateControlComponent {
   recurences = Object.values(Recurrence);
 
   ngOnInit() {
-    this.fetchTeams();
-  }
-
-  fetchTeams(): void {
-    this.buService.loadEntities().subscribe({
-      next: teams => {
-        this.listEntities = teams.filter(team => team.process && team.process.length > 0);
-      },
-      error: err => {
-        console.error("Erreur lors du chargement des équipes", err);
-      }
-    });
-  }
-
-  onTeamChange(event: any) {
-    const buId: string = event.value;
-    this.form.get('buId')?.setValue(buId);
-    this.form.get('buId')?.markAsDirty();
-
-    this.listProcess = [];
-    this.listRisks = [];
-    this.form.get('processId')?.reset();
-    this.form.get('riskId')?.reset();
-    this.processService.getProcessTree(buId).subscribe(data => {
-      this.listProcess = data;
-    });
-  }
-
-  onSelectionProcess(value: any) {
-    this.form.get('processId')?.setValue(value.id);
-    this.form.get('processId')?.markAsDirty();
-    this.form.get('processId')?.updateValueAndValidity();
-
-    this.listRisks = [];
-    this.riskService.getRisksTree(value.id).subscribe(data => {
-      this.listRisks = data;
-      if (this.listRisks.length === 0) {
-        this.snackBarService.error("Attention, il n'y a pas de risque associé à ce processus, vous pouvez en ajouter un dans la consultation des risques.");
-      }
-    });
-    this.form.value.processId = value.id;
-  }
-
-  onSelectionRisk(event: RiskTemplate) {
-    this.form.get('riskId')?.setValue(event.id);
-    this.form.get('riskId')?.markAsDirty();
-    this.form.get('riskId')?.updateValueAndValidity();
   }
 
   getTypeLabel(type: Type): string {
@@ -169,6 +120,8 @@ export class CreateControlComponent {
       riskId: this.form.value.riskId,
     };
 
+    console.log("Payload création contrôle : ", payload);
+
     this.controlService.createControl(payload).subscribe({
       next: () => {
         this.snackBarService.success("Le contrôle a bien été ajouté");
@@ -188,6 +141,7 @@ export class CreateControlComponent {
 
   selectBPR(event: any) {
     this.selectedBPR = event;
+    this.form.get('buId')?.setValue(event.bu.id)
     this.form.get('processId')?.setValue(event.process.id)
     this.form.get('riskId')?.setValue(event.risk.id)
   }
