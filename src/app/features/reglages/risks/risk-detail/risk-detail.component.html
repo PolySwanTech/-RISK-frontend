@@ -3,16 +3,16 @@
   <div class="container body-container">
     <app-go-back
       [title]="'Détails du risque'"
-      [subtitle]="risk.reference | uppercase"
+      [subtitle]="risk.riskReference.reference | uppercase"
       [buttons]="goBackButtons">
     </app-go-back>
 
     <!-- ---------------- HEADER ------------------- -->
     <div class="header">
-      <div class="risk-id">{{ risk.reference | uppercase }}</div>
-      <h1 class="risk-title">{{ risk.libellePerso }}</h1>
+      <div class="risk-id">{{ risk.riskReference.reference | uppercase }}</div>
+      <h1 class="risk-title">{{ risk.riskReference.libelle }}</h1>
       <div class="risk-category">
-        Catégorie baloise: {{ risk.category.parent ? risk.category.parent + ' > ' + (risk.category.label || '') : (risk.category.label || '') }}
+        Catégorie baloise: {{ risk.riskReference.category.parent ? risk.riskReference.category.parent + ' > ' + (risk.riskReference.category.label || '') : (risk.riskReference.category.label || '') }}
       </div>
     </div>
 
@@ -23,7 +23,7 @@
         <div class="card">
           <h2 class="card-title">Description du Risque</h2>
           <p class="risk-description">
-            {{ risk.description || '—' }}
+            {{ risk.riskReference.description || '—' }}
           </p>
 
           <!-- Mini métriques -->
@@ -45,13 +45,6 @@
           <div class="metric">
             <div class="metric-value">{{ risk.processName || 'N/R' }}</div>
             <div class="metric-label">Processus affilié</div>
-          </div>
-
-          <div class="metric">
-            <div class="metric-value">
-              {{ risk.id.version | date : 'dd/MM/yyyy' }}
-            </div>
-            <div class="metric-label">Version</div>
           </div>
         </div>
       </div>
@@ -121,7 +114,7 @@
 <mat-accordion>
   <mat-expansion-panel 
     *ngFor="let control of risk.dmr?.controls" 
-    (opened)="loadControlExecutions(control.id.id)">
+    (opened)="loadControlExecutions(control.id)">
     
     <!-- ===== HEADER ===== -->
     <mat-expansion-panel-header>
@@ -142,7 +135,7 @@
           </div>
           <div class="metric">
             <div class="metric-value badge status">
-              {{ getStatusLabel(controlExecutions[control.id.id]?.[0]?.status) }}
+              {{ getStatusLabel(controlExecutions[control.id]?.[0]?.status) }}
             </div>
           </div>
         </mat-panel-description>
@@ -157,9 +150,9 @@
       </ul>
 
       <!-- Dernières exécutions -->
-      <div class="executions" *ngIf="controlExecutions[control.id.id]?.length; else noExec">
+      <div class="executions" *ngIf="controlExecutions[control.id]?.length; else noExec">
         <h4>📊 Dernières exécutions</h4>
-        <div *ngFor="let exec of controlExecutions[control.id.id] | slice:0:3" class="execution-item">
+        <div *ngFor="let exec of controlExecutions[control.id] | slice:0:3" class="execution-item">
           <div class="exec-header">
             <div>
               <div class="exec-status">Statut : 

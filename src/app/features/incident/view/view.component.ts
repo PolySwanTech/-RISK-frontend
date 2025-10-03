@@ -1,4 +1,3 @@
-import { Permission } from './../../../core/models/permission';
 import { Component, inject, OnInit } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';

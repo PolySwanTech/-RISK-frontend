@@ -42,8 +42,8 @@
               <mat-select formControlName="parentRisk">
                 <mat-option [value]="undefined">Aucun</mat-option>
                 <!-- on utilise risk.id pour lier le risque parent -->
-                <mat-option *ngFor="let r of risks" [value]="r.id.id">
-                  {{ r.libellePerso }}
+                <mat-option *ngFor="let r of risks" [value]="r.id">
+                  {{ r.riskReference.libelle }}
                 </mat-option>
               </mat-select>
             </mat-form-field>

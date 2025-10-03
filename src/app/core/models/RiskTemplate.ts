@@ -1,50 +1,31 @@
 import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
+import { RiskReferentiel } from "./RiskReferentiel";
 
 
-// -------------  TYPES COMPLÉMENTAIRES -------------
-export interface RiskId {
-  /** UUID généré côté back */
-  id: string;
-  /** Instant ISO 8601 retourné par le back */
-  version: string;
-}
 
 export interface Dmr {
   controls: ControlTemplate[];
   attenuationMetrics: AttenuationMetrics[];
 }
 
-
-
 // -------------  MODÈLE PRINCIPAL -------------
 export class RiskTemplate {
 
-  /** Identifiant composite (UUID + version) */
-  id!: RiskId;
+  id!: string;
 
-  reference = '';
-  libellePerso = '';
-  description = '';
-
-  /** Set côté back → tableau côté front  */
-  // impactTypes: RiskImpactType[] = [];
+  riskReference!: RiskReferentiel;
 
   /** actif par défaut */
   active = true;
 
-  /** UUID du créateur */
   creator!: string;
 
-  category!: BaloiseCategoryDto;
-
-  /** nom de la BU et du process (injectés par le back) */
   buName: string = '';
   processName: string = '';
-  processId?: string; // UUID du process
+  processId?: string;
 
-  /** relations */
   parent: RiskTemplate | null = null; 
   children: RiskTemplate[] = []; 
 
@@ -73,16 +54,6 @@ export class RiskTemplate {
 
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
-  libellePerso:        string;
-  category: BaloiseCategoryDto;
-  description: string;
   processId:   string;                 // UUID
   parent? : string | null; // optionnel, pour les risques enfants
-}
-
-export interface BaloiseCategoryDto {
-  libelle: string;
-  definition: string | null;
-  parent: string | null;
-  label: string;
 }

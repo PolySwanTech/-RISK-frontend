@@ -20,7 +20,6 @@ import { ExecutionMode, ExecutionModeLabels } from '../../../core/enum/exceution
 export class MethodologyCardComponent implements OnInit {
 
   @Input({ required: true }) controlId!: string;
-  @Input({ required: true }) controlVersion!: Date | string;
 
   loading = true;
   submitting = false;
@@ -57,14 +56,9 @@ export class MethodologyCardComponent implements OnInit {
     if (this.form.invalid || this.submitting) return;
     this.submitting = true;
 
-    const versionIso =
-      typeof this.controlVersion === 'string'
-        ? this.controlVersion
-        : this.controlVersion.toISOString();
 
     const payload: ControlMethodologyCreateDto = {
       controlTemplateId: this.controlId,
-      controlTemplateVersion: versionIso,
       controlNature: this.form.value.controlNature,
       executionMode: this.form.value.executionMode,
       scope: this.form.value.scope || '',

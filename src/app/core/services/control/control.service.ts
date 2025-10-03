@@ -4,7 +4,6 @@ import { environment } from '../../../environments/environment';
 import { ControlTemplate, ControlTemplateCreateDto } from '../../models/ControlTemplate';
 import { ControlExecution } from '../../models/ControlExecution';
 import { RiskTemplate } from '../../models/RiskTemplate';
-import { Process } from '../../models/Process';
 import { ControlEvaluation } from '../../models/ControlEvaluation';
 import { Observable } from 'rxjs';
 import { ControlMethodology, ControlMethodologyCreateDto } from '../../models/ControlMethodology';

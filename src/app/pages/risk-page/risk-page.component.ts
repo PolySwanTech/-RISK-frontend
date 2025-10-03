@@ -142,7 +142,7 @@ export class RiskPageComponent implements OnInit {
     }
 
     // --- Sync sélection ---
-    if (this.selectedRisk && !list.some(r => r.id.id === this.selectedRisk!.id.id && r.id.version === this.selectedRisk!.id.version)) {
+    if (this.selectedRisk && !list.some(r => r.id === this.selectedRisk!.id)) {
       this.selectedRisk = null;
     }
 

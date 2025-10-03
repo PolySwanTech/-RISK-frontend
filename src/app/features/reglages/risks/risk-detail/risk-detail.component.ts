@@ -92,11 +92,11 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
           this.loading = false;
 
           risk.dmr?.controls?.forEach(control => {
-            this.loadControlExecutions(control.id.id);
+            this.loadControlExecutions(control.id);
           });
 
-          this.incidentService.getIncidentByProcessAndRisk(risk.processId || '', risk.id.id).subscribe(incidents => {this.linkedIncidents = incidents;});
-          this.riskEvaluationService.getEvaluationsByRisk(risk.id.id).subscribe(evals => {this.riskEvaluations = evals; this.groupEvaluations();});
+          this.incidentService.getIncidentByProcessAndRisk(risk.processId || '', risk.id).subscribe(incidents => {this.linkedIncidents = incidents;});
+          this.riskEvaluationService.getEvaluationsByRisk(risk.id).subscribe(evals => {this.riskEvaluations = evals; this.groupEvaluations();});
         },
         error: () => {
           this.loading = false;
@@ -197,7 +197,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   goToIncidents(): void {
     if (!this.risk) return;
     this.router.navigate(['incident'], {
-      queryParams: { riskId: this.risk.id.id, processId: this.risk!.processId }
+      queryParams: { riskId: this.risk.id, processId: this.risk!.processId }
     });
   }
     

@@ -159,7 +159,7 @@ export class ControlDetailsPageComponent implements OnInit {
         canValidate: true
       }
     }).afterClosed().subscribe(() => {
-      this.loadControlExecutions(this.control!.id.id);
+      this.loadControlExecutions(this.control!.id);
     });
   }
 
@@ -167,25 +167,25 @@ export class ControlDetailsPageComponent implements OnInit {
     this.dialog.open(PopupEvaluationControleComponent, {
       data: {
         action: action,
-        controlId : this.control?.id.id,
+        controlId : this.control?.id,
         executionId: executionId,
         mode: 'FORM',
         canValidate: true
       }
     }).afterClosed().subscribe(() => {
-      this.loadControlExecutions(this.control!.id.id);
+      this.loadControlExecutions(this.control!.id);
     });
   }
 
   handlePlanification(payload: any): void {
     if (!this.control) return;
-    const reload = () => this.loadControlExecutions(this.control!.id.id);
+    const reload = () => this.loadControlExecutions(this.control!.id);
     if (payload.id) this.controlService.updateExecution(payload).subscribe(reload);
     else this.controlService.createExecution(payload).subscribe(reload);
   }
 
   handleEvaluationSubmitted(): void {
-    if (this.control) this.loadControlExecutions(this.control.id.id);
+    if (this.control) this.loadControlExecutions(this.control.id);
   }
 
   /** === ACTIONS === */
@@ -193,7 +193,7 @@ export class ControlDetailsPageComponent implements OnInit {
   scheduleExecution(): void { this.showPopup = true; }
 
   viewFullHistory(): void {
-    if (this.control) this.router.navigate(['control', 'details', this.control.id.id, 'executions']);
+    if (this.control) this.router.navigate(['control', 'details', this.control.id, 'executions']);
   }
 
 
