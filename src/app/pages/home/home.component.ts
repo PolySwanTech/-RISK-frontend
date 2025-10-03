@@ -6,8 +6,6 @@ import { ActionPlanChartComponent } from "../../features/action-plan/action-plan
 import { ControlChartComponent } from "../../features/control/control-chart/control-chart/control-chart.component";
 import { IncidentService } from '../../core/services/incident/incident.service';
 import { Incident } from '../../core/models/Incident';
-import { BarChartComponent } from "../../features/incident/bar-chart/bar-chart.component";
-import { DoughnutChartComponent } from "../../features/incident/doughnut-chart/doughnut-chart.component";
 import { MatIconModule } from '@angular/material/icon';
 import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,18 +13,23 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { Filter } from '../../core/enum/filter.enum';
 import { FilterTableComponent } from "../../shared/components/filter-table/filter-table.component";
+import { BarChartComponent } from '../../features/dashboard/bar-chart/bar-chart.component';
+import { DoughnutChartComponent } from '../../features/dashboard/doughnut-chart/doughnut-chart.component';
+import { BaloiseCategoryChartComponent } from "../../features/dashboard/baloise-category-chart/baloise-category-chart.component";
 
 @Component({
   selector: 'app-home',
   imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent,
     BarChartComponent, DoughnutChartComponent, MatIconModule,
-    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent],
+    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent, BaloiseCategoryChartComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
 
   incidents: Incident[] = [];
+  selectedMode: 'month' | 'quarter' | 'year' = 'month';
+
 
   filtersConfig: Filter[] = [
     {
@@ -67,7 +70,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadIncidents() {
-    this.incidentService.loadIncidents().subscribe(data => {
+    this.incidentService.loadIncidentsFull().subscribe(data => {
       this.incidents = data;
     });
   }

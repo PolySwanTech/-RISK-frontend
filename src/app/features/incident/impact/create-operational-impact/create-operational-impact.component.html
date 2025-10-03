@@ -206,7 +206,7 @@
 
                     <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
                       <input type="checkbox"
-                          [checked]="selectedAmounts[impact.id]?.[amount.id]"
+                          [checked]="selectedAmounts[impact.id][amount.id]"
                           (change)="toggleAmountSelection(impact.id, amount.id)" />
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Type</label>
@@ -451,7 +451,7 @@
 
                     <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
                       <input type="checkbox"
-                          [checked]="selectedAmounts[impact.id]?.[amount.id]"
+                          [checked]="selectedAmounts[impact.id][amount.id]"
                           (change)="toggleAmountSelection(impact.id, amount.id)" />
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Type</label>

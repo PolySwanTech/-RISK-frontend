@@ -33,14 +33,23 @@
     <app-control-chart></app-control-chart>
   </div>
 
+  <!-- Graphiques incidents -->
   <div class="graphs-container">
-
     @if(incidents && incidents.length > 0) {
       <app-bar-chart [incidents]="incidents"></app-bar-chart>
       <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
+
     } @else {
       <p class="no-incidents">Aucun incident à afficher.</p>
     }
-
   </div>
+
+  <div class="graphs-container">
+    @if(incidents && incidents.length > 0) {
+      <app-baloise-category-chart [incidents]="incidents"></app-baloise-category-chart>
+    } @else {
+      <p class="no-incidents">Aucun incident à afficher.</p>
+    }
+  </div>
+
 </section>

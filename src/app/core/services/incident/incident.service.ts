@@ -18,6 +18,10 @@ export class IncidentService {
     return this.http.get<Incident[]>(this.baseUrl);
   }
 
+  loadIncidentsFull(): Observable<Incident[]> {
+  return this.http.get<Incident[]>(`${this.baseUrl}?completeDto=true`);
+}
+
   deleteIncident(id: string) {
     return this.http.delete(this.baseUrl + `/${id}`)
   }
