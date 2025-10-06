@@ -1,5 +1,5 @@
 <div class="body-container">
-  <app-go-back [title]="'Création d\'un risque'" />
+  <app-go-back [title]="'Création d\'un évenement de risque'" />
 
   <section>
     <div class="form-container">
@@ -14,28 +14,6 @@
               <input matInput formControlName="libellePerso" placeholder="Entrez le titre du risque" />
             </mat-form-field>
 
-            <!-- Catégorie L1 -------------------------------------------------- -->
-            <mat-form-field class="full-width">
-              <mat-label>Catégorie&nbsp;Bâloise</mat-label>
-              <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
-                <mat-option *ngFor="let cat of bal1" [value]="cat.libelle">
-                  {{ cat.label }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <!-- Sous-catégorie L2 -------------------------------------------- -->
-            <mat-form-field class="full-width" *ngIf="bal2.length > 0">
-              <mat-label>Sous-catégorie&nbsp;Bâloise</mat-label>
-              <mat-select formControlName="balois2" (selectionChange)="onCategoryChange($event.value, 2)">
-                <!-- on envoie ici l’OBJET L2 complet,
-                       car risk.categoryL2 est de type BaloiseCategoryL2 -->
-                <mat-option *ngFor="let sub of bal2" [value]="sub.libelle">
-                  {{ sub.label }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
             <!-- Parent ----------------------------------------------------- -->
             <mat-form-field class="full-width">
               <mat-label>Risque parent</mat-label>
@@ -43,7 +21,7 @@
                 <mat-option [value]="undefined">Aucun</mat-option>
                 <!-- on utilise risk.id pour lier le risque parent -->
                 <mat-option *ngFor="let r of risks" [value]="r.id">
-                  {{ r.riskReference.libelle }}
+                  {{ r.libelle }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -52,12 +30,6 @@
               [id]="infoForm.get('processId')!.value" (changeValue)="onProcessSelected($event)"
               placeholder="Sélectionnez un processus" [list]="listProcess">
             </app-select-arborescence>
-
-            <!-- Description --------------------------------------------------- -->
-            <mat-form-field class="full-width">
-              <mat-label>Description du risque</mat-label>
-              <textarea matInput formControlName="description" placeholder="Entrez la description"></textarea>
-            </mat-form-field>
 
             <div class="actions">
 

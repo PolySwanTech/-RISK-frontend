@@ -14,7 +14,6 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 import { RiskService } from '../../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
 
-import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
 import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
@@ -23,20 +22,16 @@ import { RiskCategoryService } from '../../../../core/services/risk/risk-categor
 import { SelectArborescenceComponent } from '../../../../shared/components/select-arborescence/select-arborescence.component';
 import { BaloiseCategoryDto, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
 import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
-
 @Component({
-  selector: 'app-create-risks',
+  selector: 'app-create-risks-referentiel',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule, ReactiveFormsModule, SelectArborescenceComponent,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatStepperModule, MatButtonModule, GoBackComponent
-  ],
-  templateUrl: './create-risks.component.html',
-  styleUrl: './create-risks.component.scss'
+    MatStepperModule, MatButtonModule, GoBackComponent],
+  templateUrl: './create-risks-referentiel.component.html',
+  styleUrl: './create-risks-referentiel.component.scss'
 })
-export class CreateRisksComponent implements OnInit {
-
+export class CreateRisksReferentielComponent {
   /* ---------------- services ---------------- */
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -49,13 +44,12 @@ export class CreateRisksComponent implements OnInit {
   private readonly procSrv = inject(ProcessService);
 
   /* ---------------- données ----------------- */
-  risks: RiskReferentiel[] = [];
   listProcess: Process[] = [];
 
   bal1: BaloiseCategoryDto[] = [];
   bal2: BaloiseCategoryDto[] = [];
 
-  pageTitle = 'Création d\'un évenement de risque';
+  pageTitle = 'Création d\'un risque référentiel';
   dialogLabel = { title: 'Création', message: 'création' };
 
   riskLevels = Object.values(RiskLevelEnum);
@@ -65,18 +59,18 @@ export class CreateRisksComponent implements OnInit {
 
 
   /** instance courante (vide ou chargée) */
-  risk: RiskTemplate = new RiskTemplate();
+  risk: RiskReferentiel = new RiskReferentiel();
 
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
-    parentRisk: this.fb.control<string | null>(null),
     libellePerso: this.fb.nonNullable.control<string>(''),
-    processId: this.fb.control<string | null>(null, Validators.required),
+    balois1: this.fb.nonNullable.control<BaloiseCategoryDto | null>(null, Validators.required),
+    balois2: this.fb.control<BaloiseCategoryDto | null>(null),
+    description: this.fb.nonNullable.control<string>(''),
   });
 
   ngOnInit(): void {
-    this.riskReferentielSrv.getAll().subscribe(risks => this.risks = risks);
-
+    this.riskCategoryService.getAll().subscribe(data => this.bal1 = data);
     const processId = this.route.snapshot.queryParams["processId"];
     const buId = this.route.snapshot.queryParams["buId"];
     const id = this.route.snapshot.paramMap.get('id');
@@ -85,31 +79,32 @@ export class CreateRisksComponent implements OnInit {
       this.listProcess = list
     });
 
-    if (processId) {
-      this.infoForm.get('processId')?.setValue(processId);
-    }
-
     if (id && id !== 'create') {
       this.loadRiskById(id);
     }
   }
 
   private loadRiskById(id: string): void {
-    this.riskSrv.getById(id).subscribe(r => {
-      this.risk = new RiskTemplate(r);
-      this.pageTitle = `Mise à jour du risque : ${this.risk.riskReferentiel.libelle}`;
+    this.riskReferentielSrv.getById(id).subscribe(r => {
+      this.risk = r;
+      this.pageTitle = `Mise à jour du risque : ${this.risk.libelle}`;
       this.dialogLabel = { title: 'Mise à jour', message: 'mise à jour' };
 
       this.infoForm.patchValue({
-        libellePerso: this.risk.libelle,
-        parentRisk: this.risk.riskReferentiel.libelle,
-        processId: this.risk.processId ?? null,
+        balois1: this.risk.category ?? null,
+        balois2: this.risk.category ?? null,
+        description: this.risk.description,
       });
     });
   }
 
-  onProcessSelected(process: Process) {
-    this.infoForm.get('processId')?.setValue(process.id);
+  onCategoryChange(baloise: BaloiseCategoryDto, level: number): void {
+    if (level === 1 && baloise?.libelle) {
+      this.riskCategoryService.getByParent(baloise.libelle).subscribe(children => {
+        this.bal2 = children;                         // options du niveau 2
+        this.infoForm.patchValue({ balois2: null });  // reset du select niveau 2
+      });
+    }
   }
 
 
@@ -119,15 +114,24 @@ export class CreateRisksComponent implements OnInit {
       return;
     }
 
-    const payload: RiskTemplateCreateDto = {
+    const cat1 = this.infoForm.get('balois1')?.value;
+    const cat2 = this.infoForm.get('balois2')?.value;
+    const category = cat2 ?? cat1;
+
+    if (!category) {
+      console.error('Catégorie obligatoire !');
+      return;
+    }
+
+
+
+    const payload: RiskReferentielCreateDto = {
       libelle: this.infoForm.get('libellePerso')!.value!,
-      processId: this.infoForm.get('processId')!.value!,
-      riskReferentielId: this.infoForm.get('parentRisk')!.value!
+      category: category!,
+      description: this.infoForm.get('description')!.value!,
     };
 
-    console.log(payload);
-
-    this.riskSrv.save(payload).subscribe(riskId => {
+    this.riskReferentielSrv.create(payload).subscribe(riskId => {
       this.confirm.openConfirmDialog(
         this.dialogLabel.title,
         `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,

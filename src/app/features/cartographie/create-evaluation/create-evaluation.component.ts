@@ -203,7 +203,7 @@ export class CreateEvaluationComponent implements OnInit {
 
   getProcessByRisks(risk: RiskTemplate) {
     this.selectedRisk = risk;
-    this.processService.getAllByRisks(risk.id.id).subscribe(processes => {
+    this.processService.getAllByRisks(risk.id).subscribe(processes => {
       this.processes = processes;
     });
   }

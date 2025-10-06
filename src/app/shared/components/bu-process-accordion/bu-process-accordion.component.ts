@@ -735,6 +735,11 @@ export class BuProcessAccordionComponent {
     this.router.navigate(['reglages', 'risks', 'create'], { queryParams: { processId: id } });
   }
 
+  addRiskReferentiel(id: string): void {
+    this.router.navigate(['reglages', 'risks', 'create-referentiel'], { queryParams: { processId: id } });
+  }
+
+
   navToRisk(id: string) {
     this.router.navigate(['reglages', 'risks', id]);
   }

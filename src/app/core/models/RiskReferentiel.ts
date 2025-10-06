@@ -5,6 +5,7 @@ export class RiskReferentiel {
     reference!: string;
     libelle: string = '';
     description: string = '';
+    active: boolean = true;
     category!: BaloiseCategoryDto;
 
 

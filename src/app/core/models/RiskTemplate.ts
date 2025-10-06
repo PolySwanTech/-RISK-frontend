@@ -15,7 +15,11 @@ export class RiskTemplate {
 
   id!: string;
 
-  riskReference!: RiskReferentiel;
+  libelle!: string;
+
+  reference!: string;
+
+  riskReferentiel!: RiskReferentiel;
 
   /** actif par défaut */
   active = true;
@@ -25,9 +29,6 @@ export class RiskTemplate {
   buName: string = '';
   processName: string = '';
   processId?: string;
-
-  parent: RiskTemplate | null = null; 
-  children: RiskTemplate[] = []; 
 
   riskNet?: RiskEvaluation[];
   riskBrut?: RiskEvaluation[];
@@ -54,6 +55,7 @@ export class RiskTemplate {
 
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
+  libelle: string;
+  riskReferentielId: string;
   processId:   string;                 // UUID
-  parent? : string | null; // optionnel, pour les risques enfants
 }

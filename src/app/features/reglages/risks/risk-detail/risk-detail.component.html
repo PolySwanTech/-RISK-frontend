@@ -3,16 +3,16 @@
   <div class="container body-container">
     <app-go-back
       [title]="'Détails du risque'"
-      [subtitle]="risk.riskReference.reference | uppercase"
+      [subtitle]="risk.riskReferentiel.reference | uppercase"
       [buttons]="goBackButtons">
     </app-go-back>
 
     <!-- ---------------- HEADER ------------------- -->
     <div class="header">
-      <div class="risk-id">{{ risk.riskReference.reference | uppercase }}</div>
-      <h1 class="risk-title">{{ risk.riskReference.libelle }}</h1>
+      <div class="risk-id">{{ risk.riskReferentiel.reference | uppercase }}</div>
+      <h1 class="risk-title">{{ risk.riskReferentiel.libelle }}</h1>
       <div class="risk-category">
-        Catégorie baloise: {{ risk.riskReference.category.parent ? risk.riskReference.category.parent + ' > ' + (risk.riskReference.category.label || '') : (risk.riskReference.category.label || '') }}
+        Catégorie baloise: {{ risk.riskReferentiel.category.parent ? risk.riskReferentiel.category.parent + ' > ' + (risk.riskReferentiel.category.label || '') : (risk.riskReferentiel.category.label || '') }}
       </div>
     </div>
 
@@ -23,7 +23,7 @@
         <div class="card">
           <h2 class="card-title">Description du Risque</h2>
           <p class="risk-description">
-            {{ risk.riskReference.description || '—' }}
+            {{ risk.riskReferentiel.description || '—' }}
           </p>
 
           <!-- Mini métriques -->

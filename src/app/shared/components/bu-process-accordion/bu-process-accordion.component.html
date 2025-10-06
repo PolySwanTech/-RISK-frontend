@@ -129,7 +129,12 @@
 
                 <button mat-menu-item (click)="addRisk(node.id)">
                   <mat-icon>add</mat-icon>
-                  <span>Nouveau risque</span>
+                  <span>Nouvel événement de risque</span>
+                </button>
+
+                <button mat-menu-item (click)="addRiskReferentiel(node.id)">
+                  <mat-icon>add</mat-icon>
+                  <span>Nouveau référentiel de risque</span>
                 </button>
 
                 <button mat-menu-item (click)="openProcessDialog(node, $event)">

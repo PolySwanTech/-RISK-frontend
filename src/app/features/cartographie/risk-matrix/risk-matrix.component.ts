@@ -23,8 +23,8 @@ export class RiskMatrixComponent {
 
   /* ----------- actions ----------- */
   onModifyClick(): void {
-    if (this.riskData?.id?.id) {
-      this.onModify.emit(this.riskData.id.id);
+    if (this.riskData?.id) {
+      this.onModify.emit(this.riskData.id);
     }
   }
 

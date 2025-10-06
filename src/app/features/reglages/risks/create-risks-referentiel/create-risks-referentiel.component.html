@@ -1,0 +1,59 @@
+<div class="body-container">
+  <app-go-back [title]="'Création d\'un risque référentiel'" />
+
+  <section>
+    <div class="form-container">
+      <h2>{{ pageTitle }}</h2>
+
+      <!-- le stepper n’est affiché que lorsque l’objet risk est prêt -->
+      @if (risk) {
+      <form [formGroup]="infoForm">
+            <!-- Titre --------------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Titre du risque</mat-label>
+              <input matInput formControlName="libellePerso" placeholder="Entrez le titre du risque" />
+            </mat-form-field>
+
+            <!-- Catégorie L1 -------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Catégorie&nbsp;Bâloise</mat-label>
+              <mat-select formControlName="balois1" (selectionChange)="onCategoryChange($event.value, 1)">
+                <mat-option *ngFor="let cat of bal1" [value]="cat.libelle">
+                  {{ cat.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Sous-catégorie L2 -------------------------------------------- -->
+            <mat-form-field class="full-width" *ngIf="bal2.length > 0">
+              <mat-label>Sous-catégorie&nbsp;Bâloise</mat-label>
+              <mat-select formControlName="balois2" (selectionChange)="onCategoryChange($event.value, 2)">
+                <!-- on envoie ici l’OBJET L2 complet,
+                       car risk.categoryL2 est de type BaloiseCategoryL2 -->
+                <mat-option *ngFor="let sub of bal2" [value]="sub.libelle">
+                  {{ sub.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Description --------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Description du risque</mat-label>
+              <textarea matInput formControlName="description" placeholder="Entrez la description"></textarea>
+            </mat-form-field>
+
+            <div class="actions">
+
+              <button mat-raised-button class="btn-red" matStepperPrevious *ngIf="risk.id">
+                Annuler
+              </button>
+
+              <button mat-raised-button class="btn-primary" (click)="submit()" [disabled]="infoForm.invalid">
+                Soumettre
+              </button>
+            </div>
+          </form>
+      }
+    </div>
+  </section>
+</div>
