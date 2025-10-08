@@ -63,10 +63,6 @@ export class AuthService {
     this.router.navigate(['auth', 'login'])
   }
 
-  setPermissions(permissions: { [teamId: string]: string[] }): void {
-    this.permissions = permissions;
-  }
-
   getUUID(): string | null {
     const token: any = this.decryptToken();
     return token?.uuid || null;
@@ -97,29 +93,18 @@ export class AuthService {
   }
 
   getPermissionsByTeam(teamId: string): string[] {
-  const permsByTeam = this.getPermissions();
-  return permsByTeam[teamId] ?? [];
-}
-
-sameUser(userId: string): boolean {
-  const id = this.getUUID();
-  return id == userId;
-}
-
-sameUserName(username: string): boolean {
-  const name = this.getName();
-  return name == username;
-}
-
-  setUtilisateur(user: Utilisateur): void {
-    this.utilisateurConnecte = user;
+    const permsByTeam = this.getPermissions();
+    return permsByTeam[teamId] ?? [];
   }
 
-  getUtilisateur(): Utilisateur {
-    return this.utilisateurConnecte;
+  sameUser(userId: string): boolean {
+    const id = this.getUUID();
+    return id == userId;
   }
 
-  getUserById(id: string) {
-    return this.http.get<Utilisateur>(`${this.base}/${id}`)
+  sameUserName(username: string): boolean {
+    const name = this.getName();
+    return name == username;
   }
+
 }

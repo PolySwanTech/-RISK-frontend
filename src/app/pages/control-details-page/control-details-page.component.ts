@@ -1,4 +1,3 @@
-import { ControlEvaluation } from './../../core/models/ControlEvaluation';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';

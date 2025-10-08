@@ -1,3 +1,4 @@
+import { OperatingLossState } from "../enum/operatingLossState.enum";
 import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
@@ -19,12 +20,19 @@ export class RiskTemplate {
 
   reference!: string;
 
+  description?: string;
+
   riskReferentiel!: RiskReferentiel;
+
+  declaredAt!: Date;
+
+  attachmentState!: OperatingLossState;
 
   /** actif par défaut */
   active = true;
 
-  creator!: string;
+  creatorName!: string;
+  creatorId!: string;
 
   buName: string = '';
   processName: string = '';
@@ -44,9 +52,6 @@ export class RiskTemplate {
     return this.dmr?.attenuationMetrics ?? [];
   }
 
-  /** profondeur dans l’arborescence */
-  level: number = 0;
-
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
     Object.assign(this, init);
@@ -57,5 +62,6 @@ export class RiskTemplate {
 export interface RiskTemplateCreateDto {
   libelle: string;
   riskReferentielId: string;
-  processId:   string;                 // UUID
+  processId:   string;
+  description: string | null;    
 }

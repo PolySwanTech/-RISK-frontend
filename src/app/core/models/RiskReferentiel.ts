@@ -7,7 +7,9 @@ export class RiskReferentiel {
     description: string = '';
     active: boolean = true;
     category!: BaloiseCategoryDto;
-
+    creatorId!: string;
+    creatorName!: string;
+    declaredAt!: Date;
 
 }
 

@@ -9,7 +9,6 @@ import { IncidentService } from '../../../core/services/incident/incident.servic
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
-import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
@@ -22,7 +21,6 @@ import { Consequence } from '../../../core/models/Consequence';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
-import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 import { firstValueFrom, forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
@@ -30,9 +28,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
-import { Dialog } from '@angular/cdk/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
+import { SelectRiskEventComponent } from '../../../shared/components/select-risk-event/select-risk-event.component';
 
 
 @Component({
@@ -75,7 +73,9 @@ export class CreateComponent implements OnInit {
 
   today = new Date();
 
-  selectedBPR: any = null
+  selectedBP: any = null
+  risk: any = null;
+
 
 
   incidentForm1 = this._formBuilder.group({
@@ -136,12 +136,18 @@ export class CreateComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.hasTeam = false;
-
-
-    // D'abord charger les équipes
     await this.fetchTeams();
 
-    // Ensuite charger l'incident ou l'arbre
+    const draft = sessionStorage.getItem('incident_draft');
+    if (draft) {
+      const data = JSON.parse(draft);
+      this.incidentForm1.patchValue(data.incidentForm1);
+      this.incidentForm2.patchValue(data.incidentForm2);
+      this.incidentForm3.patchValue(data.incidentForm3);
+      this.selectedBP = data.selectedBP;
+      sessionStorage.removeItem('incident_draft');
+    }
+
     if (this.incidentId) {
       this.title = "Modification d'un incident";
       this.loadIncident(this.incidentId);
@@ -150,17 +156,15 @@ export class CreateComponent implements OnInit {
     }
   }
 
-  // Validator personnalisé pour les dates
   maxDateValidator(maxDate: Date) {
     return (control: any) => {
-      if (!control.value) return null; // Ne pas valider si vide
+      if (!control.value) return null; 
       const inputDate = new Date(control.value);
       return inputDate <= maxDate ? null : { maxDate: true };
     };
   }
 
-  private loadTrees(processRootId?: string /** optionnel */) {
-    /* on renvoie un Observable<void> qui émet quand tout est chargé */
+  private loadTrees(processRootId?: string ) {
     return forkJoin({
       processes: this.processService.getProcessTree(processRootId),
       risks: this.riskService.getRisksTree(processRootId),
@@ -171,7 +175,6 @@ export class CreateComponent implements OnInit {
         this.listRisks = risks;
         this.listCauses = causes;
       }),
-      /* on ne renvoie plus de valeur (juste la fin du chargement) */
       map(() => void 0)
     );
   }
@@ -204,15 +207,12 @@ export class CreateComponent implements OnInit {
       });
 
       if (incident.riskName) {
-        this.selectedBPR = {
+        this.selectedBP = {
           bu: {
             name: incident.teamName
           },
           process: {
             name: incident.processName
-          },
-          risk: {
-            name: incident.riskName
           }
         }
       }
@@ -380,15 +380,10 @@ export class CreateComponent implements OnInit {
     a && b ? a.id === b.id : a === b;
 
 
-  private _iso(v: any) {
-    return v?.toISOString ? v.toISOString() : v;
-  }
-
-  selectBPR(event: any) {
-    this.selectedBPR = event;
+  selectBP(event: any) {
+    this.selectedBP = event;
     this.incidentForm3.get('teamId')?.setValue(event.bu.id)
     this.incidentForm3.get('processId')?.setValue(event.process.id)
-    this.incidentForm3.get('riskId')?.setValue(event.risk.id)
   }
 
   create() {
@@ -396,10 +391,38 @@ export class CreateComponent implements OnInit {
       minWidth: '750px',
       height: '600px',
       maxHeight: '600px',
+      data:{
+        stopAtProcess : true
+      }
     });
 
     dialogRef.afterClosed().subscribe(event => {
-      this.selectBPR(event);
+      this.selectBP(event);
+    });
+  }
+
+  openRiskEventDialog() {
+    const processId = this.incidentForm3.get('processId')?.value;
+
+    const draftIncident = {
+      incidentForm1: this.incidentForm1.value,
+      incidentForm2: this.incidentForm2.value,
+      incidentForm3: this.incidentForm3.value,
+      selectedBP: this.selectedBP
+    };
+    sessionStorage.setItem('incident_draft', JSON.stringify(draftIncident));
+
+    const dialogRef = this.dialog.open(SelectRiskEventComponent, {
+      minWidth: '650px',
+      height: '550px',
+      data: processId ? { processId } : null
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.risk = result;
+        this.incidentForm3.get('riskId')?.setValue(result.id);
+      }
     });
   }
 

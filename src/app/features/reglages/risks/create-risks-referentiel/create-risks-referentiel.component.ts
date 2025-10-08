@@ -71,7 +71,6 @@ export class CreateRisksReferentielComponent {
 
   ngOnInit(): void {
     this.riskCategoryService.getAll().subscribe(data => this.bal1 = data);
-    const processId = this.route.snapshot.queryParams["processId"];
     const buId = this.route.snapshot.queryParams["buId"];
     const id = this.route.snapshot.paramMap.get('id');
 

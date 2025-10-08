@@ -12,7 +12,7 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
@@ -55,11 +55,13 @@ export interface ProcessNode {
 export class BuProcessAccordionComponent {
   @Input() consultationMode: 'admin' | 'selection' = 'selection';
   @Input() buId = '';
+
   @Output() processSelected = new EventEmitter<ProcessNode>();
   @Output() buSelected = new EventEmitter<ProcessNode>();
   @Output() riskSelected = new EventEmitter<any>();
 
   private riskService = inject(RiskService);
+  public data = inject(MAT_DIALOG_DATA, { optional: true }) as { stopAtProcess?: boolean } | null;
   private entityService = inject(EntitiesService);
   private processService = inject(ProcessService);
   private dialogRef = inject(MatDialogRef<BuProcessAccordionComponent>, { optional: true });
@@ -77,6 +79,10 @@ export class BuProcessAccordionComponent {
   hierarchicalProcesses: any[] = [];
   filteredProcesses: ProcessNode[] = [];
 
+  stopAtProcess: boolean = false;
+  searchText: string = "Rechercher un risque";
+
+
   // Recherche globale
   searchQuery: string = '';
   searchResults: any[] = [];
@@ -90,6 +96,10 @@ export class BuProcessAccordionComponent {
       console.log('➡️ Entités chargées :', entitiesTree);
       this.fetchProcesses(entitiesTree);
     });
+    if(this.data?.stopAtProcess){
+      this.stopAtProcess = this.data.stopAtProcess
+      this.searchText = "Rechercher un processus"
+    }
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -403,7 +413,22 @@ export class BuProcessAccordionComponent {
       // De BU vers processus
       this.viewProcesses(node);
     } else if (this.view === 'process') {
-      // De processus vers risques
+      // si on veut s'arrêter au processus, on émet et on s'arrête
+      if (this.stopAtProcess || this.consultationMode === 'selection') {
+        const result = {
+        bu: this.breadcrumb.find(b => b.type === 'process' || b.type === 'bu'),
+        process: node
+      };
+
+      // Si ouvert dans un dialog → on ferme
+      if (this.dialogRef) {
+        this.dialogRef.close(result);
+      } else {
+        this.processSelected.emit(node);
+      }
+      return;
+    }
+      // Sinon, comportement normal : on affiche les risques
       this.viewRisks(node);
     }
   }
@@ -442,7 +467,7 @@ export class BuProcessAccordionComponent {
       next: (risks) => {
         const riskNodes = risks.map(r => ({
           id: r.id,
-          name: r.name,
+          name: r.libelle,
           enfants: r.enfants,
           type: 'risk' as const
         }));
@@ -594,13 +619,41 @@ export class BuProcessAccordionComponent {
   // ---- Fonctions de recherche ----
   onSearchInput(event: any): void {
     this.searchQuery = event.target.value.trim();
-
     if (this.searchQuery.length >= 2) {
-      this.performSearch();
+      this.stopAtProcess ? this.performSearchProcess() : this.performSearch();
     } else {
       this.clearSearch();
     }
   }
+
+  private performSearchProcess(): void {
+  this.isSearching = true;
+  this.showSearchResults = true;
+
+  // Recherche dans tous les processus disponibles
+  const processResults = this.processes
+    .filter(p =>
+      p.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    )
+    .map(p => {
+      // Trouver la BU associée
+      const bu = this.findBuByProcessId(p.id);
+      return {
+        id: p.id,
+        name: p.name,
+        buId: bu?.id,
+        buName: bu?.name,
+        displayType: 'Processus',
+        fullPath: bu ? `${bu.name} > ${p.name}` : p.name,
+        type: 'process'
+      };
+    });
+
+  this.searchResults = processResults.slice(0, 10); // Limiter à 10 résultats
+  this.isSearching = false;
+  console.log('➡️ Résultats de recherche de processus:', this.searchResults);
+}
+
 
   private performSearch(): void {
     this.isSearching = true;
@@ -608,11 +661,11 @@ export class BuProcessAccordionComponent {
 
     // Rechercher dans les risques
     const riskResults = this.allRisks.filter(risk =>
-      risk.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      risk.libelle.toLowerCase().includes(this.searchQuery.toLowerCase())
     ).map(risk => ({
       ...risk,
       displayType: 'Risque',
-      fullPath: `${risk.buName} > ${risk.processName} > ${risk.name}`
+      fullPath: `${risk.buName} > ${risk.processName} > ${risk.libelle}`
     }));
 
     this.searchResults = [
@@ -630,31 +683,31 @@ export class BuProcessAccordionComponent {
   }
 
   selectSearchResult(result: any): void {
-    console.log('➡️ Sélection depuis la recherche:', result);
+  console.log('➡️ Sélection depuis la recherche:', result);
 
-    if (result.type === 'risk') {
-      // Sélectionner directement le risque avec son contexte
-      const obj = {
-        bu: { id: result.buId, name: result.buName },
-        process: { id: result.processId, name: result.processName },
-        risk: result
-      };
-
-      if (this.consultationMode == 'admin') {
-        this.navToRisk(result.id);
-      }
-      else {
-        if (this.dialogRef) {
-          this.dialogRef.close(obj);
-        }
-        else {
-          this.riskSelected.emit(obj);
-        }
-      }
-    }
-
-    this.clearSearch();
+  if (result.type === 'risk') {
+    const obj = {
+      bu: { id: result.buId, name: result.buName },
+      process: { id: result.processId, name: result.processName },
+      risk: result
+    };
+    if (this.dialogRef) this.dialogRef.close(obj);
+    else this.riskSelected.emit(obj);
   }
+
+  if (result.type === 'process') {
+    const obj = {
+      bu: { id: result.buId, name: result.buName },
+      process: result
+    };
+
+    if (this.dialogRef) this.dialogRef.close(obj);
+    else this.processSelected.emit(result);
+  }
+
+  this.clearSearch();
+}
+
 
   deleteBu(id: string) {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")

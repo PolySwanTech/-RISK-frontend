@@ -31,6 +31,11 @@
               placeholder="Sélectionnez un processus" [list]="listProcess">
             </app-select-arborescence>
 
+            <mat-form-field class="full-width">
+              <mat-label>Description *</mat-label>
+              <input matInput formControlName="description" placeholder="Saisir une description"/>
+            </mat-form-field>
+
             <div class="actions">
 
               <button mat-raised-button class="btn-red" matStepperPrevious *ngIf="risk.id">

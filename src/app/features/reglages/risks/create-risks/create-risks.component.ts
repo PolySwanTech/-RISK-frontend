@@ -19,7 +19,6 @@ import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
 import { Process } from '../../../../core/models/Process';
-import { RiskCategoryService } from '../../../../core/services/risk/risk-category.service';
 import { SelectArborescenceComponent } from '../../../../shared/components/select-arborescence/select-arborescence.component';
 import { BaloiseCategoryDto, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
 import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
@@ -45,7 +44,6 @@ export class CreateRisksComponent implements OnInit {
   private readonly riskSrv = inject(RiskService);
   private riskReferentielSrv = inject(RiskReferentielService)
   private readonly confirm = inject(ConfirmService);
-  private readonly riskCategoryService = inject(RiskCategoryService);
   private readonly procSrv = inject(ProcessService);
 
   /* ---------------- données ----------------- */
@@ -62,6 +60,8 @@ export class CreateRisksComponent implements OnInit {
   impactTypes = Object.values(RiskImpactType);
   riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
+  redirectUrl?: string;
+
 
 
   /** instance courante (vide ou chargée) */
@@ -69,9 +69,10 @@ export class CreateRisksComponent implements OnInit {
 
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
-    parentRisk: this.fb.control<string | null>(null),
+    parentRisk: this.fb.control<string>(''),
     libellePerso: this.fb.nonNullable.control<string>(''),
     processId: this.fb.control<string | null>(null, Validators.required),
+    description: this.fb.control<string | null>(null)
   });
 
   ngOnInit(): void {
@@ -79,14 +80,22 @@ export class CreateRisksComponent implements OnInit {
 
     const processId = this.route.snapshot.queryParams["processId"];
     const buId = this.route.snapshot.queryParams["buId"];
+    const libelle = this.route.snapshot.queryParams["libelle"]
+    const redirect = this.route.snapshot.queryParams["redirect"];
     const id = this.route.snapshot.paramMap.get('id');
 
     this.procSrv.getProcessTree(buId).subscribe(list => {
       this.listProcess = list
     });
 
+    this.redirectUrl = redirect;
+
     if (processId) {
       this.infoForm.get('processId')?.setValue(processId);
+    }
+
+    if (libelle) {
+      this.infoForm.get('libellePerso')?.setValue(libelle);
     }
 
     if (id && id !== 'create') {
@@ -97,13 +106,14 @@ export class CreateRisksComponent implements OnInit {
   private loadRiskById(id: string): void {
     this.riskSrv.getById(id).subscribe(r => {
       this.risk = new RiskTemplate(r);
-      this.pageTitle = `Mise à jour du risque : ${this.risk.riskReferentiel.libelle}`;
+      this.pageTitle = `Mise à jour du risque : ${this.risk.riskReferentiel?.libelle ?? ''}`;
       this.dialogLabel = { title: 'Mise à jour', message: 'mise à jour' };
 
       this.infoForm.patchValue({
         libellePerso: this.risk.libelle,
         parentRisk: this.risk.riskReferentiel.libelle,
         processId: this.risk.processId ?? null,
+        description: this.risk.description
       });
     });
   }
@@ -122,7 +132,8 @@ export class CreateRisksComponent implements OnInit {
     const payload: RiskTemplateCreateDto = {
       libelle: this.infoForm.get('libellePerso')!.value!,
       processId: this.infoForm.get('processId')!.value!,
-      riskReferentielId: this.infoForm.get('parentRisk')!.value!
+      riskReferentielId: this.infoForm.get('parentRisk')!.value!,
+      description: this.infoForm.get('description')?.value ?? null,
     };
 
     console.log(payload);
@@ -133,7 +144,11 @@ export class CreateRisksComponent implements OnInit {
         `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
         false
       );
-      this.router.navigate(['reglages', 'risks', riskId]);
+      if (this.redirectUrl) {
+        this.router.navigateByUrl(this.redirectUrl);
+      } else {
+        this.router.navigate(['reglages', 'risks', riskId]);
+      }
     });
   }
 }

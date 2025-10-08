@@ -94,12 +94,19 @@
           <form [formGroup]="incidentForm3">
             <button style="margin-bottom: 20px;" mat-stroked-button (click)="create()">
               <mat-icon>add</mat-icon>
-              Associer BU / Processus / Risque *
+              Associer BU / Processus *
             </button>
-            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
-              <mat-chip> Equipe : {{ selectedBPR.bu.name }}</mat-chip>
-              <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
-              <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
+            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBP">
+              <mat-chip> Equipe : {{ selectedBP.bu.name }}</mat-chip>
+              <mat-chip> Processus : {{ selectedBP.process.name }}</mat-chip>
+            </mat-chip-listbox>
+
+            <button style="margin-bottom: 20px;" mat-stroked-button (click)="openRiskEventDialog()">
+              <mat-icon>add</mat-icon>
+              Associer Risque *
+            </button>
+            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="risk">
+              <mat-chip> Risk : {{ risk.libelle }}</mat-chip>
             </mat-chip-listbox>
 
             <mat-form-field>

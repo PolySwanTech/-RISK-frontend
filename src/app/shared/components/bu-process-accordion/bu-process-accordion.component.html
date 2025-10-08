@@ -3,7 +3,7 @@
   <div class="search-section">
     <div class="search-input-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
-      <input type="text" placeholder="Rechercher un risque" [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
+      <input type="text" placeholder= {{searchText}} [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
         class="search-input">
       <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
         <mat-icon>clear</mat-icon>
