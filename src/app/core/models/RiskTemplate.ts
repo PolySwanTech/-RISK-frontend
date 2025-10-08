@@ -1,52 +1,42 @@
+import { OperatingLossState } from "../enum/operatingLossState.enum";
 import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
+import { RiskReferentiel } from "./RiskReferentiel";
 
 
-// -------------  TYPES COMPLÉMENTAIRES -------------
-export interface RiskId {
-  /** UUID généré côté back */
-  id: string;
-  /** Instant ISO 8601 retourné par le back */
-  version: string;
-}
 
 export interface Dmr {
   controls: ControlTemplate[];
   attenuationMetrics: AttenuationMetrics[];
 }
 
-
-
 // -------------  MODÈLE PRINCIPAL -------------
 export class RiskTemplate {
 
-  /** Identifiant composite (UUID + version) */
-  id!: RiskId;
+  id!: string;
 
-  reference = '';
-  libellePerso = '';
-  description = '';
+  libelle!: string;
 
-  /** Set côté back → tableau côté front  */
-  // impactTypes: RiskImpactType[] = [];
+  reference!: string;
+
+  description?: string;
+
+  riskReferentiel!: RiskReferentiel;
+
+  declaredAt!: Date;
+
+  attachmentState!: OperatingLossState;
 
   /** actif par défaut */
   active = true;
 
-  /** UUID du créateur */
-  creator!: string;
+  creatorName!: string;
+  creatorId!: string;
 
-  category!: BaloiseCategoryDto;
-
-  /** nom de la BU et du process (injectés par le back) */
   buName: string = '';
   processName: string = '';
-  processId?: string; // UUID du process
-
-  /** relations */
-  parent: RiskTemplate | null = null; 
-  children: RiskTemplate[] = []; 
+  processId?: string;
 
   riskNet?: RiskEvaluation[];
   riskBrut?: RiskEvaluation[];
@@ -62,9 +52,6 @@ export class RiskTemplate {
     return this.dmr?.attenuationMetrics ?? [];
   }
 
-  /** profondeur dans l’arborescence */
-  level: number = 0;
-
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
     Object.assign(this, init);
@@ -73,16 +60,8 @@ export class RiskTemplate {
 
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
-  libellePerso:        string;
-  category: BaloiseCategoryDto;
-  description: string;
-  processId:   string;                 // UUID
-  parent? : string | null; // optionnel, pour les risques enfants
-}
-
-export interface BaloiseCategoryDto {
   libelle: string;
-  definition: string | null;
-  parent: string | null;
-  label: string;
+  riskReferentielId: string;
+  processId:   string;
+  description: string | null;    
 }

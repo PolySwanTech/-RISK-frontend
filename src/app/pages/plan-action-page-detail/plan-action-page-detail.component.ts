@@ -29,12 +29,13 @@ import { AuditService } from '../../core/services/audit/audit.service';
 import { AuditPanelComponent } from '../../shared/components/audit/audit-panel/audit-panel.component';
 import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
 import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
+import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 
 @Component({
   selector: 'app-plan-action-page-detail',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
     MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, AuditButtonComponent,
-    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule],
+    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule, HasPermissionDirective],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
@@ -81,6 +82,7 @@ export class PlanActionPageDetailComponent {
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(resp => {
       this.actionPlan = resp;
+      console.log(this.actionPlan);
 
       // Todo: métriques doivent être calculées côté backend
       if (this.actionPlan?.actions?.length) {
@@ -117,6 +119,7 @@ export class PlanActionPageDetailComponent {
           icon: 'play_arrow',
           class: 'btn-purple',
           show: !!canStart,
+          permission: {teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']},
           action: () => this.startActionPlan()
         },
         {
@@ -124,6 +127,7 @@ export class PlanActionPageDetailComponent {
           icon: 'check',
           class: 'btn-primary',
           show: !!canEnd,
+          permission: {teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']},
           action: () => this.endActionPlan()
         }
       ];
@@ -203,17 +207,7 @@ export class PlanActionPageDetailComponent {
     var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
     let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId))
 
-    this.dialog.open(FichiersComponent,
-      {
-        width: '400px',
-        data: {
-          files: files,
-          targetType: targetType,
-          targetId: actionId,
-          closed: closed
-        }
-      }
-    ).afterClosed().subscribe(result => {
+    this.fileService.openFiles(files, targetType, actionId).afterClosed().subscribe(result => {
       if (!closed) {
         this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
           result => {

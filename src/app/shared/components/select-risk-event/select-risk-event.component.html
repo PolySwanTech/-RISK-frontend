@@ -1,0 +1,68 @@
+<div class="bp-wrapper">
+
+  <div class="search-section">
+    <div class="search-input-wrapper">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        type="text"
+        [placeholder]="searchText"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput($event)"
+        class="search-input"
+      />
+      <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </div>
+
+    <div *ngIf="showSearchResults" class="search-results">
+      <div *ngIf="isSearching" class="search-loading">
+        <mat-spinner diameter="24"></mat-spinner>
+        <div class="search-loading-text">Recherche en cours...</div>
+      </div>
+
+      <div *ngIf="!isSearching && searchResults.length === 0" class="search-empty">
+        Aucun événement trouvé pour "<strong>{{ searchQuery }}</strong>"
+        <div class="create-btn-wrapper">
+          <button mat-flat-button color="primary" (click)="createNewEvent()">
+            <mat-icon>add</mat-icon> Créer un nouvel événement de risque
+          </button>
+        </div>
+      </div>
+
+      <div *ngFor="let result of searchResults" class="search-result-item" (click)="selectEvent(result)">
+        <div class="search-result-header">
+          <strong class="search-result-name">{{ result.libelle }}</strong>
+          <span class="search-result-type type-risque">Événement</span>
+        </div>
+        <div class="search-result-path">{{ result.description }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!showSearchResults" class="list-panel">
+    <div class="panel-title">Liste des événements de risque</div>
+
+    <mat-list class="custom-list">
+      <mat-list-item *ngFor="let event of allEvents" (click)="selectEvent(event)">
+        <div class="node-content">
+          <div class="node-content-wrapper">
+            <h3 class="node-title">{{ event.libelle }}</h3>
+            <p class="node-subtitle">{{ event.description }}</p>
+          </div>
+        </div>
+
+        <div class="node-actions">
+          <button mat-stroked-button color="primary" (click)="selectEvent(event); $event.stopPropagation()">
+            <mat-icon>check</mat-icon> Sélectionner
+          </button>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </div>
+</div>
+
+<div *ngIf="isSearching && !allEvents.length" class="empty">
+  <mat-spinner></mat-spinner>
+  Chargement des événements...
+</div>

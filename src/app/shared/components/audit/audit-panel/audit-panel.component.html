@@ -7,5 +7,5 @@
     }
   </ul>
 
-  <button mat-raised-button (click)="addAudit()">Ajouter un commentaire</button>
+  <button *appHasPermission="'CREATE_AUDIT_COMMENTAIRE'" mat-raised-button (click)="addAudit()">Ajouter un commentaire</button>
 </div>

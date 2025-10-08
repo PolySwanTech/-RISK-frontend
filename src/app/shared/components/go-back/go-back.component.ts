@@ -58,6 +58,6 @@ export interface GoBackButton {
   icon?: string;
   class?: string;
   show?: boolean; // condition d’affichage
-  permission?: PermissionNameType | PermissionNameType[];
+  permission?: PermissionNameType | PermissionNameType[] | { teamId?: string, permissions: PermissionNameType | PermissionNameType[] };
   action: () => void;
 }

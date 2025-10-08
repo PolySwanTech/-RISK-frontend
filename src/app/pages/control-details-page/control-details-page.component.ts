@@ -1,4 +1,3 @@
-import { ControlEvaluation } from './../../core/models/ControlEvaluation';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -10,7 +9,7 @@ import { ControlExecution } from '../../core/models/ControlExecution';
 import { ControlEvaluationView } from '../../core/models/ControlEvaluation';
 
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
-import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { PopupEvaluationControleComponent } from './popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 
 import { catchError, forkJoin, of } from 'rxjs';
@@ -18,6 +17,8 @@ import { RecurrenceLabels } from '../../core/enum/recurrence.enum';
 import { MethodologyCardComponent } from './methodology-card/methodology-card.component';
 import { EvaluationCardComponent } from './evaluation-card/evaluation-card.component';
 import { MatDialog } from '@angular/material/dialog';
+import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
+import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-control-details-page',
@@ -28,8 +29,9 @@ import { MatDialog } from '@angular/material/dialog';
     GoBackComponent,
     EvaluationCardComponent,
     RouterModule,
-    MethodologyCardComponent
-  ],
+    MethodologyCardComponent,
+    HasPermissionDirective
+],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
 })
@@ -39,6 +41,7 @@ export class ControlDetailsPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
 
   control: ControlTemplate | null = null;
   controlExecutions: ControlExecution[] | null = null;
@@ -52,21 +55,7 @@ export class ControlDetailsPageComponent implements OnInit {
   evaluationCache: Record<string, ControlEvaluationView | null> = {};
 
   // Boutons GoBack (seulement Planifier + Historique)
-  goBackButtons = [
-    {
-      label: 'Planifier exécution',
-      icon: 'calendar_today',
-      class: 'btn-primary',
-      show: true,
-      action: () => this.scheduleExecution()
-    },
-    {
-      label: 'Voir tout l’historique',
-      icon: 'history',
-      class: 'btn-secondary',
-      show: true,
-      action: () => this.viewFullHistory()
-    }
+  goBackButtons : GoBackButton[] = [
   ];
 
   // === Carrousel (4 dernières exécutions) ===
@@ -91,7 +80,30 @@ export class ControlDetailsPageComponent implements OnInit {
   loadControl(id: string): void {
     this.controlService.getControl(id).subscribe(control => {
       this.control = control;
+      this.goBackButtons = [{
+      label: 'Planifier exécution',
+      icon: 'calendar_today',
+      class: 'btn-purple',
+      show: this.sameCreator() ,
+      permission: 'CREATE_CONTROLE',
+      action: () => this.scheduleExecution()
+    },
+    {
+      label: 'Voir tout l’historique',
+      icon: 'history',
+      class: 'btn-primary',
+      show: true,
+      action: () => this.viewFullHistory()
+    }];
     });
+  }
+
+ sameCreator(){
+   return this.authService.sameUserName(this.control?.creator || '');
+  }
+
+  sameEvaluator(s : string){
+   return this.authService.sameUserName(s);
   }
 
   loadControlExecutions(id: string): void {
@@ -146,7 +158,7 @@ export class ControlDetailsPageComponent implements OnInit {
         canValidate: true
       }
     }).afterClosed().subscribe(() => {
-      this.loadControlExecutions(this.control!.id.id);
+      this.loadControlExecutions(this.control!.id);
     });
   }
 
@@ -154,25 +166,25 @@ export class ControlDetailsPageComponent implements OnInit {
     this.dialog.open(PopupEvaluationControleComponent, {
       data: {
         action: action,
-        controlId : this.control?.id.id,
+        controlId : this.control?.id,
         executionId: executionId,
         mode: 'FORM',
         canValidate: true
       }
     }).afterClosed().subscribe(() => {
-      this.loadControlExecutions(this.control!.id.id);
+      this.loadControlExecutions(this.control!.id);
     });
   }
 
   handlePlanification(payload: any): void {
     if (!this.control) return;
-    const reload = () => this.loadControlExecutions(this.control!.id.id);
+    const reload = () => this.loadControlExecutions(this.control!.id);
     if (payload.id) this.controlService.updateExecution(payload).subscribe(reload);
     else this.controlService.createExecution(payload).subscribe(reload);
   }
 
   handleEvaluationSubmitted(): void {
-    if (this.control) this.loadControlExecutions(this.control.id.id);
+    if (this.control) this.loadControlExecutions(this.control.id);
   }
 
   /** === ACTIONS === */
@@ -180,7 +192,7 @@ export class ControlDetailsPageComponent implements OnInit {
   scheduleExecution(): void { this.showPopup = true; }
 
   viewFullHistory(): void {
-    if (this.control) this.router.navigate(['control', 'details', this.control.id.id, 'executions']);
+    if (this.control) this.router.navigate(['control', 'details', this.control.id, 'executions']);
   }
 
 

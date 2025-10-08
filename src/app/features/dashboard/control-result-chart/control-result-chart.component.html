@@ -1,0 +1,15 @@
+<mat-card class="chart-container mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>🥧 Répartition des résultats de contrôle</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="doughnut-chart-container">
+      <canvas baseChart
+              [data]="data"
+              [options]="options"
+              [type]="'doughnut'">
+      </canvas>
+    </div>
+  </mat-card-content>
+</mat-card>

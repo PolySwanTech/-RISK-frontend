@@ -1,32 +1,37 @@
- <app-go-back [title]="'Liste des incidents'" [buttons]="goBackButtons"></app-go-back>
+<app-go-back [title]="'Liste des incidents'" [buttons]="goBackButtons"></app-go-back>
 <section class="dashboard-container">
     <!-- En-tête avec titre et boutons d'action -->
    
 
     <!-- Section des filtres -->
-    <mat-card class="filters-card">
-        <mat-card-content class="dashboard-header">
-            <div class="filters-section" style="width: 100%;">
-                <div class="filters-header">
-                    <div>
-                        <mat-icon>filter_alt</mat-icon>
-                        <span class="filters-title">Filtres</span>
-                    </div>
-                    <mat-button-toggle-group [(ngModel)]="filterMode" exclusive>
-                        <mat-button-toggle value="general">Mode général</mat-button-toggle>
-                        <mat-button-toggle value="detailed">Filtres détaillés</mat-button-toggle>
-                    </mat-button-toggle-group>
-                </div>
-
-                <app-filter-table *ngIf="filterMode === 'detailed'" [availableFilters]="filtersConfig"
-                    (filtersChanged)="handleFiltersChanged($event)">
-                </app-filter-table>
-                <app-global-search-bar *ngIf="filterMode === 'general'" [(model)]="searchQuery"
-                    [placeholder]="'Rechercher des incidents'" (modelChange)="onSearchFiles($event)"
-                    (cleared)="clearSearch()" />
+    <mat-card class="filters-card" *ngIf="!filteredByRisk">
+    <mat-card-content class="dashboard-header">
+        <div class="filters-section" style="width: 100%;">
+        <div class="filters-header">
+            <div>
+            <mat-icon>filter_alt</mat-icon>
+            <span class="filters-title">Filtres</span>
             </div>
-        </mat-card-content>
+            <mat-button-toggle-group [(ngModel)]="filterMode" exclusive>
+            <mat-button-toggle value="general">Mode général</mat-button-toggle>
+            <mat-button-toggle value="detailed">Filtres détaillés</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+
+        <app-filter-table *ngIf="filterMode === 'detailed'"
+            [availableFilters]="filtersConfig"
+            (filtersChanged)="handleFiltersChanged($event)">
+        </app-filter-table>
+
+        <app-global-search-bar *ngIf="filterMode === 'general'"
+            [(model)]="searchQuery"
+            [placeholder]="'Rechercher des incidents'"
+            (modelChange)="onSearchFiles($event)"
+            (cleared)="clearSearch()" />
+        </div>
+    </mat-card-content>
     </mat-card>
+
 
     <mat-card>
         <div class="table-container">
@@ -54,30 +59,6 @@
                     </td>
                 </ng-container>
                 }
-                <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef> Actions </th>
-
-                    <td mat-cell *matCellDef="let row">
-                        <button mat-icon-button aria-label="Actions" [matMenuTriggerFor]="rowMenu"
-                            (click)="selectedIncident = row">
-
-                            <mat-icon>more_vert</mat-icon>
-                        </button>
-                    </td>
-                </ng-container>
-
-                <mat-menu #rowMenu="matMenu">
-                    <button *ngIf="selectedIncident && isUpdatable(selectedIncident!)" mat-menu-item
-                        (click)="edit(selectedIncident!)">
-                        <mat-icon>edit</mat-icon>
-                        <span>Modifier</span>
-                    </button>
-
-                    <button mat-menu-item (click)="delete(selectedIncident!.id)">
-                        <mat-icon>delete</mat-icon>
-                        <span>Supprimer</span>
-                    </button>
-                </mat-menu>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;" matTooltip="Cliquez pour voir plus">

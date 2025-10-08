@@ -102,11 +102,14 @@
                 <mat-tab label="Actions à réaliser">
                     <mat-card-header>
                         <mat-card-title>
-                            <button mat-raised-button class="btn-primary"
-                                *ngIf="actionPlan.status == statusEnum.NOT_STARTED" (click)="openAddActionDialog()">
+                            @if(actionPlan.status == statusEnum.NOT_STARTED){
+                            <button mat-raised-button class="btn-primary" *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                (click)="openAddActionDialog()">
                                 <mat-icon>add</mat-icon>
                                 <span>Ajouter</span>
                             </button>
+                            }
+
                             <div *ngIf="actionPlan.status != statusEnum.NOT_STARTED"></div>
                             <div class="progression-section">
                                 <label>Progression globale</label>
@@ -129,18 +132,21 @@
                                             <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy'
                                                 }})</span>
                                         </p>
-                                        <button *ngIf="canAbandonAction(action)" mat-icon-button class="btn-red"
+                                        @if(canAbandonAction(action)){
+                                        <button *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}" mat-icon-button class="btn-red"
                                             matTooltip="Abandonner" (click)="abandon(action)">
                                             <mat-icon>delete</mat-icon>
                                         </button>
+                                        }
                                     </div>
-                                    <ng-container
-                                        *ngIf="!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED">
-                                        <button mat-raised-button class="btn-primary" (click)="viewFiles(action.id)">
-                                            <mat-icon>upload</mat-icon>
-                                            Déposer un justificatif
-                                        </button>
-                                    </ng-container>
+                                    @if(!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED){
+                                    <button mat-raised-button *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                        class="btn-primary" (click)="viewFiles(action.id)">
+                                        <mat-icon>upload</mat-icon>
+                                        Déposer un justificatif
+                                    </button>
+                                    }
+
                                     <ng-container *ngIf="action.performedAt">
                                         <p class="validated">
                                             ✔ Terminé par <strong>{{ action.performedBy }}</strong>

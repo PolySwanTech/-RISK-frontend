@@ -3,7 +3,7 @@
   <div class="search-section">
     <div class="search-input-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
-      <input type="text" placeholder="Rechercher un risque" [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
+      <input type="text" placeholder= {{searchText}} [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
         class="search-input">
       <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
         <mat-icon>clear</mat-icon>
@@ -108,6 +108,11 @@
                   <span>Voir la matrice</span>
                 </button>
 
+                <button mat-menu-item (click)="addProcess(node.id)">
+                  <mat-icon>add</mat-icon>
+                  <span>Nouveau process</span>
+                </button>
+
                 <button mat-menu-item (click)="openEntityDialog(node, $event)">
                   <mat-icon>edit</mat-icon>
                   <span>Modifier</span>
@@ -124,7 +129,12 @@
 
                 <button mat-menu-item (click)="addRisk(node.id)">
                   <mat-icon>add</mat-icon>
-                  <span>Nouveau risque</span>
+                  <span>Nouvel événement de risque</span>
+                </button>
+
+                <button mat-menu-item (click)="addRiskReferentiel(node.id)">
+                  <mat-icon>add</mat-icon>
+                  <span>Nouveau référentiel de risque</span>
                 </button>
 
                 <button mat-menu-item (click)="openProcessDialog(node, $event)">

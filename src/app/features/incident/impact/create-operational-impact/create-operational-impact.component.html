@@ -157,7 +157,7 @@
 
               <div class="op-field">
                 <label class="op-label">Type</label>
-                <input class="op-input" [value]="impact.type?.label" disabled />
+                <input class="op-input" [value]="impact.type.label" disabled />
               </div>
             </div>
 
@@ -206,11 +206,11 @@
 
                     <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
                       <input type="checkbox"
-                          [checked]="selectedAmounts[impact.id]?.[amount.id]"
+                          [checked]="selectedAmounts[impact.id][amount.id]"
                           (change)="toggleAmountSelection(impact.id, amount.id)" />
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Type</label>
-                        <input class="op-input" [value]="amount.amountType?.label || amount.amountType" disabled />
+                        <input class="op-input" [value]="amount.amountType.label || amount.amountType" disabled />
                       </div>
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Réf. comptable</label>
@@ -227,6 +227,22 @@
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="op-divider"></div>
+              <h4 class="op-h4">Pièces jointes</h4>
+
+              <div class="op-attachments-row">
+                <button type="button"
+                        class="btn btn--primary"
+                        (click)="openFilesDialog(impact.id)">
+                  Consulter / Joindre des fichiers
+                </button>
+
+                <!-- (optionnel) petit compteur si déjà chargés -->
+                <span class="op-meta" *ngIf="attachedCounts?.[impact.id] !== undefined">
+                  {{ attachedCounts[impact.id] }} fichier(s)
+                </span>
               </div>
 
 
@@ -402,7 +418,7 @@
 
                   <div class="op-field">
                     <label class="op-label">Type</label>
-                    <input class="op-input" [value]="impact.type?.label" disabled />
+                    <input class="op-input" [value]="impact.type.label" disabled />
                   </div>
                 </div>
 
@@ -435,11 +451,11 @@
 
                     <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
                       <input type="checkbox"
-                          [checked]="selectedAmounts[impact.id]?.[amount.id]"
+                          [checked]="selectedAmounts[impact.id][amount.id]"
                           (change)="toggleAmountSelection(impact.id, amount.id)" />
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Type</label>
-                        <input class="op-input" [value]="amount.amountType?.label || amount.amountType" disabled />
+                        <input class="op-input" [value]="amount.amountType.label || amount.amountType" disabled />
                       </div>
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Date</label>
@@ -452,6 +468,22 @@
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="op-divider"></div>
+              <h4 class="op-h4">Pièces jointes</h4>
+
+              <div class="op-attachments-row">
+                <button type="button"
+                        class="btn btn--primary"
+                        (click)="openFilesDialog(impact.id)">
+                  Consulter / Joindre des fichiers
+                </button>
+
+                <!-- (optionnel) petit compteur si déjà chargés -->
+                <span class="op-meta" *ngIf="attachedCounts?.[impact.id] !== undefined">
+                  {{ attachedCounts[impact.id] }} fichier(s)
+                </span>
               </div>
 
               <!-- Bouton pour ajouter -->

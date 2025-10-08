@@ -14,12 +14,14 @@ import { FichiersComponent } from '../../../shared/components/fichiers/fichiers.
 import { MatDialog } from '@angular/material/dialog';
 import { FileService } from '../../../core/services/file/file.service';
 import { ReviewStatus, ReviewStatusLabels } from '../../../core/enum/reviewStatus.enum';
+import { HasPermissionDirective } from "../../../core/directives/has-permission.directive";
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
   selector: 'app-evaluation-card',
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, HasPermissionDirective],
   templateUrl: './evaluation-card.component.html',
   styleUrl: './evaluation-card.component.scss'
 })
@@ -62,6 +64,7 @@ export class EvaluationCardComponent {
   private fileService = inject(FileService);
   private confirmService = inject(ConfirmService);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
 
   actionTaken: 'valid' | 'reexam' | null = null;
 
@@ -100,6 +103,10 @@ export class EvaluationCardComponent {
         this.mode = 'FORM';
       }
     });
+  }
+
+  sameCreator(){
+   return this.authService.sameUserName(this.evaluationView?.performedBy || '');
   }
 
   openDetails(executionId: string): void {

@@ -1,9 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
+import { RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
 import { Observable } from 'rxjs';
-import { RiskLevel, RiskLevelEnum } from '../../enum/riskLevel.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +12,6 @@ export class RiskService {
 
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/taxonomie';
-  baseUrlEvaluations = environment.apiUrl + '/evaluations';
 
   getById(id: string) {
     return this.http.get<RiskTemplate>(this.baseUrl + '/' + id)
@@ -49,7 +47,7 @@ export class RiskService {
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params })
   }
 
-  getByParent(parentId: RiskId) {
+  getByParent(parentId: string) {
     let params = new HttpParams();
     params = params.append('parentId', parentId.toString());
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params: params });
@@ -59,15 +57,4 @@ export class RiskService {
     const params = new HttpParams().set('incidentId', incidentId);
     return this.http.get<RiskTemplate>(`${this.baseUrl}/incident`, { params: params });
   }
-
-
-  saveEvaluation(riskId: string, evaluation: RiskLevelEnum, indicators: any[], brut: boolean) {
-    return this.http.post(this.baseUrlEvaluations, { riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
-  }
-
-  getEvaluationsByBu(buId: string) {
-    const params = new HttpParams().set("buId", buId);
-    return this.http.get<any>(this.baseUrlEvaluations + '/by-bu', { params: params })
-  }
-
 }

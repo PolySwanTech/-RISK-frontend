@@ -71,6 +71,14 @@
                         <mat-card-content>
                             <div class="info-pairs-grid">
                                 <div class="info-field">
+                                    <label>Créateur</label>
+                                    <div class="info-box">{{ incident.creatorName }}</div>
+                                </div>
+                                <div class="info-field">
+                                    <label>Intervenant</label>
+                                    <div class="info-box">{{ incident.intervenantName }}</div>
+                                </div>
+                                <div class="info-field">
                                     <label>Localisation</label>
                                     <div class="info-box">{{ incident.location ? incident.location : 'N/R' }}</div>
                                 </div>
@@ -126,7 +134,8 @@
                             <mat-icon>assessment</mat-icon>
                             Impacts de l'incident
                         </h3>
-                        <mat-card>
+                        @if(incident.state !== 'DRAFT'){
+                        <mat-card style="margin-bottom: 20px;">
                             <div class="table-container">
                                 <table mat-table [dataSource]="impactDataSource" class="mat-elevation-z4">
 
@@ -166,6 +175,12 @@
                             <mat-icon>visibility</mat-icon>
                         </button>
                         }
+                    }
+                    @else {
+                        <div class="empty" style="margin: 20px 0;">
+                            <span>Aucun impact n'est disponible pour un incident en brouillon.</span>
+                        </div>
+                    }
                     </div>
                 </mat-card-content>
             </mat-card>

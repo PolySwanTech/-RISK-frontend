@@ -10,6 +10,76 @@
   margin-bottom: 20px;
 }
 
+.file-item {
+  position: relative; /* pour positionner les actions en bas-droite */
+}
+
+.file-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 36px; /* réserve l'espace pour les actions BR */
+}
+
+.file-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.file-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0; /* ellipsis possible */
+}
+
+.file-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+.file-right .file-meta {
+  white-space: nowrap;
+  opacity: .8;
+  font-size: 12px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0 8px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 10px;
+  background: rgba(0,0,0,.08);
+  font-size: 11px;
+}
+
+.file-row-desc {
+  padding-left: 52px; /* aligne la description sous le titre, après l’icône */
+}
+
+.description-field {
+  width: 100%;
+}
+
+.file-actions-br {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.files-separator {
+  margin: 8px 0 12px;
+  opacity: .6;
+}
+
+
 .files-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
@@ -79,8 +149,26 @@
 
 .file-content {
   display: flex;
-  align-items: center;
   gap: 16px;
+}
+
+.files-card {
+  position: relative;
+}
+
+.files-card .mat-card-content {
+  padding-bottom: 72px; /* ajuste si besoin */
+}
+
+.floating-save {
+  position: absolute;
+  left: 45%;
+  bottom: 16px;
+  z-index: 10; /* au-dessus du contenu */
+}
+
+.floating-save .mat-mdc-fab {
+  box-shadow: 0 6px 18px rgba(0,0,0,.2);
 }
 
 .file-icon {
@@ -126,6 +214,16 @@ $file-colors: (
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;          /* prend la place dispo */
+  display: inline-block;
+}
+
+.file-desc {
+  font-size: 12px;          /* plus petit */
+  opacity: .85;             /* un peu atténué */
+  margin-left: 52px;        /* aligne sous le bloc titre (40px icône + 12px gap) */
+  margin-top: -4px;         /* optionnel: resserrer verticalement */
+  word-break: break-word;   /* évite le débordement sur mots longs */
 }
 
 .file-details {
@@ -267,5 +365,10 @@ $file-colors: (
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
+}
+
+app-popup-header{
+  border-bottom: 2px solid #e9ecef;
   margin-bottom: 20px;
 }

@@ -82,7 +82,7 @@
           </div>
 
           <div class="methodology-wrapper">
-            <app-methodology-card *ngIf="control" [controlId]="control.id.id" [controlVersion]="control.id.version">
+            <app-methodology-card *ngIf="control" [controlId]="control.id" >
             </app-methodology-card>
           </div>
         </div>
@@ -121,14 +121,17 @@
                           <span class="meta-date" *ngIf="s.view?.reviewedAt">• Validée le {{ s.view?.reviewedAt |
                             date:'dd/MM/yyyy' }}</span>
                         </div>
-                        <div class="meta-sub">Attribuée à {{ s.exec.performedBy || '—' }}</div>
+                        <div class="meta-sub">Attribuée à {{ s.exec.evaluator || '—' }}</div>
                       </div>
                       <div class="meta-right">
-                        <button class="btn btn-evaluer"
-                                *ngIf="!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED'"
+                        @if((!s.view || s.view?.reviewStatus === 'REEXAM_REQUESTED') && sameEvaluator(s.exec.evaluator)){
+                          <button class="btn btn-evaluer"
+                                *appHasPermission="'UPDATE_CONTROLE'"
                                 (click)="evaluateExec(s.exec.id, 'eval');">
                           {{ s.view?.reviewStatus === 'REEXAM_REQUESTED' ? 'Réévaluer' : 'Évaluer' }}
                         </button>
+                        }
+                        
                       </div>
                     </div>
                   </div>
@@ -163,7 +166,7 @@
 </div>
 
 <!-- Popups -->
-<app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id.id" [controlVersion]="control!.id.version"
+<app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id"
   [frequence]="control!.frequency" [isEditing]="false" (close)="showPopup = false"
   (planifier)="handlePlanification($event)" [lastPlannedAt]="controlExecutions?.[0]?.plannedAt">
 </app-planifier-execution-popup>

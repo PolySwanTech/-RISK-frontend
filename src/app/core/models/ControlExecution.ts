@@ -16,6 +16,7 @@ export class ControlExecution {
     performedBy: string;
     status: Status
     evaluation: EvaluationControl;
+    evaluator : string;
     resume : string;
     comments: string;
 
@@ -30,6 +31,7 @@ export class ControlExecution {
         performedBy: string,
         status: Status,
         evaluation: EvaluationControl,
+        evaluator: string,
         resume: string,
         comments: string
     ) {
@@ -43,6 +45,7 @@ export class ControlExecution {
         this.performedBy = performedBy;
         this.status = status;
         this.evaluation = evaluation;
+        this.evaluator = evaluator;
         this.resume = resume;
         this.comments = comments;
     }

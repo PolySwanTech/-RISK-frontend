@@ -12,13 +12,12 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { PopupEvaluationControleComponent } from '../../../pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreateProcessComponent } from '../../../features/process/create-process/create-process.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -55,18 +54,22 @@ export interface ProcessNode {
 })
 export class BuProcessAccordionComponent {
   @Input() consultationMode: 'admin' | 'selection' = 'selection';
+  @Input() buId = '';
+
   @Output() processSelected = new EventEmitter<ProcessNode>();
   @Output() buSelected = new EventEmitter<ProcessNode>();
   @Output() riskSelected = new EventEmitter<any>();
 
   private riskService = inject(RiskService);
+  public data = inject(MAT_DIALOG_DATA, { optional: true }) as { stopAtProcess?: boolean } | null;
   private entityService = inject(EntitiesService);
   private processService = inject(ProcessService);
   private dialogRef = inject(MatDialogRef<BuProcessAccordionComponent>, { optional: true });
   private dialog = inject(MatDialog);
-  private snackBarService = inject(SnackBarService)
-  private confirmService = inject(ConfirmService)
-  private router = inject(Router)
+  private snackBarService = inject(SnackBarService);
+  private confirmService = inject(ConfirmService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   view: 'bu' | 'process' | 'risks' = 'bu';
   breadcrumb: { id: string; name: string; nodes: ProcessNode[], type: 'bu' | 'process' | 'risks' }[] = [];
@@ -75,6 +78,10 @@ export class BuProcessAccordionComponent {
   processes: Process[] = [];
   hierarchicalProcesses: any[] = [];
   filteredProcesses: ProcessNode[] = [];
+
+  stopAtProcess: boolean = false;
+  searchText: string = "Rechercher un risque";
+
 
   // Recherche globale
   searchQuery: string = '';
@@ -88,6 +95,10 @@ export class BuProcessAccordionComponent {
       this.entities = entitiesTree;
       this.fetchProcesses(entitiesTree);
     });
+    if(this.data?.stopAtProcess){
+      this.stopAtProcess = this.data.stopAtProcess
+      this.searchText = "Rechercher un processus"
+    }
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -96,9 +107,81 @@ export class BuProcessAccordionComponent {
       this.buildHierarchy(allEntities);
       this.filteredProcesses = [...this.hierarchicalProcesses];
       this.currentNodes = this.hierarchicalProcesses;
+      
       // Charger tous les risques pour la recherche
       this.loadAllRisks();
+      
+      // Vérifier les query params après avoir construit la hiérarchie
+      this.checkQueryParams();
     });
+  }
+
+  // Vérifier et traiter les query params
+  private checkQueryParams(): void {
+    this.route.queryParams.subscribe(params => {
+      const buId = params['buId'] || this.buId;
+      if (buId) {
+        console.log('➡️ BU ID trouvé dans les query params:', buId);
+        this.navigateToBuFromQueryParam(buId);
+      }
+    });
+  }
+
+  // Naviguer vers les processus d'une BU depuis les query params
+  private navigateToBuFromQueryParam(buId: string): void {
+    // Chercher la BU dans la hiérarchie
+    const bu = this.findBuById(buId);
+    
+    if (bu) {
+      console.log('➡️ BU trouvée:', bu);
+      
+      // Naviguer directement vers les processus de cette BU
+      this.viewProcesses(bu);
+      
+      // Optionellement, nettoyer le query param après navigation
+      // this.router.navigate([], { 
+      //   relativeTo: this.route, 
+      //   queryParams: { buId: null }, 
+      //   queryParamsHandling: 'merge' 
+      // });
+    } else {
+      console.warn('➡️ BU non trouvée avec l\'ID:', buId);
+      this.snackBarService.error('Unité métier non trouvée');
+    }
+  }
+
+  // Rechercher une BU par son ID dans toute la hiérarchie
+  private findBuById(buId: string): any {
+    // Chercher dans les BU principales
+    for (let bu of this.hierarchicalProcesses) {
+      if (bu.id === buId) {
+        return bu;
+      }
+      
+      // Chercher récursivement dans les sous-BU
+      const foundInChildren = this.findBuByIdInChildren(bu.buChildren || [], buId);
+      if (foundInChildren) {
+        return foundInChildren;
+      }
+    }
+    return null;
+  }
+
+  // Recherche récursive dans les sous-BU
+  private findBuByIdInChildren(buChildren: any[], buId: string): any {
+    for (let child of buChildren) {
+      if (child.id === buId) {
+        return child;
+      }
+      
+      if (child.buChildren?.length) {
+        const found = this.findBuByIdInChildren(child.buChildren, buId);
+        if (found) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
 
   // Charger tous les risques pour la recherche globale
@@ -318,7 +401,22 @@ export class BuProcessAccordionComponent {
       // De BU vers processus
       this.viewProcesses(node);
     } else if (this.view === 'process') {
-      // De processus vers risques
+      // si on veut s'arrêter au processus, on émet et on s'arrête
+      if (this.stopAtProcess || this.consultationMode === 'selection') {
+        const result = {
+        bu: this.breadcrumb.find(b => b.type === 'process' || b.type === 'bu'),
+        process: node
+      };
+
+      // Si ouvert dans un dialog → on ferme
+      if (this.dialogRef) {
+        this.dialogRef.close(result);
+      } else {
+        this.processSelected.emit(node);
+      }
+      return;
+    }
+      // Sinon, comportement normal : on affiche les risques
       this.viewRisks(node);
     }
   }
@@ -344,7 +442,7 @@ export class BuProcessAccordionComponent {
       }];
       this.buSelected.emit(bu);
     } else {
-      this.snackBarService.info('Aucun processus associé à cette BU.')
+      this.snackBarService.info('Aucun processus associé à cette BU.');
     }
   }
 
@@ -354,7 +452,7 @@ export class BuProcessAccordionComponent {
       next: (risks) => {
         const riskNodes = risks.map(r => ({
           id: r.id,
-          name: r.name,
+          name: r.libelle,
           enfants: r.enfants,
           type: 'risk' as const
         }));
@@ -480,11 +578,11 @@ export class BuProcessAccordionComponent {
     }
 
     if (this.consultationMode == 'admin') {
-      this.navToRisk(node.id)
+      this.navToRisk(node.id);
     }
     else {
       if (this.dialogRef) {
-        this.dialogRef.close(obj)
+        this.dialogRef.close(obj);
       }
       else {
         this.riskSelected.emit(obj);
@@ -495,13 +593,41 @@ export class BuProcessAccordionComponent {
   // ---- Fonctions de recherche ----
   onSearchInput(event: any): void {
     this.searchQuery = event.target.value.trim();
-
     if (this.searchQuery.length >= 2) {
-      this.performSearch();
+      this.stopAtProcess ? this.performSearchProcess() : this.performSearch();
     } else {
       this.clearSearch();
     }
   }
+
+  private performSearchProcess(): void {
+  this.isSearching = true;
+  this.showSearchResults = true;
+
+  // Recherche dans tous les processus disponibles
+  const processResults = this.processes
+    .filter(p =>
+      p.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    )
+    .map(p => {
+      // Trouver la BU associée
+      const bu = this.findBuByProcessId(p.id);
+      return {
+        id: p.id,
+        name: p.name,
+        buId: bu?.id,
+        buName: bu?.name,
+        displayType: 'Processus',
+        fullPath: bu ? `${bu.name} > ${p.name}` : p.name,
+        type: 'process'
+      };
+    });
+
+  this.searchResults = processResults.slice(0, 10); // Limiter à 10 résultats
+  this.isSearching = false;
+  console.log('➡️ Résultats de recherche de processus:', this.searchResults);
+}
+
 
   private performSearch(): void {
     this.isSearching = true;
@@ -509,52 +635,18 @@ export class BuProcessAccordionComponent {
 
     // Rechercher dans les risques
     const riskResults = this.allRisks.filter(risk =>
-      risk.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      risk.libelle.toLowerCase().includes(this.searchQuery.toLowerCase())
     ).map(risk => ({
       ...risk,
       displayType: 'Risque',
-      fullPath: `${risk.buName} > ${risk.processName} > ${risk.name}`
+      fullPath: `${risk.buName} > ${risk.processName} > ${risk.libelle}`
     }));
-
-    // Rechercher dans les processus
-    const processResults = this.processes.filter(process =>
-      process.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-    ).map(process => {
-      const bu = this.findBuByProcessId(process.id);
-      return {
-        ...process,
-        type: 'process',
-        displayType: 'Processus',
-        buName: bu?.name || 'BU inconnue',
-        fullPath: `${bu?.name || 'BU inconnue'} > ${process.name}`
-      };
-    });
-
-    // Rechercher dans les BU
-    const buResults: any[] = [];
-    this.searchInBuHierarchy(this.hierarchicalProcesses, buResults);
 
     this.searchResults = [
       ...riskResults.slice(0, 5),
     ];
 
     this.isSearching = false;
-  }
-
-  private searchInBuHierarchy(buList: any[], results: any[]): void {
-    buList.forEach(bu => {
-      if (bu.name.toLowerCase().includes(this.searchQuery.toLowerCase())) {
-        results.push({
-          ...bu,
-          displayType: 'Unité Métier',
-          fullPath: bu.name
-        });
-      }
-
-      if (bu.buChildren?.length) {
-        this.searchInBuHierarchy(bu.buChildren, results);
-      }
-    });
   }
 
   clearSearch(): void {
@@ -564,6 +656,7 @@ export class BuProcessAccordionComponent {
   }
 
   selectSearchResult(result: any): void {
+<<<<<<< HEAD
     if (result.type === 'risk') {
       // Sélectionner directement le risque avec son contexte
       const obj = {
@@ -592,27 +685,33 @@ export class BuProcessAccordionComponent {
     }
 
     this.clearSearch();
+=======
+  console.log('➡️ Sélection depuis la recherche:', result);
+
+  if (result.type === 'risk') {
+    const obj = {
+      bu: { id: result.buId, name: result.buName },
+      process: { id: result.processId, name: result.processName },
+      risk: result
+    };
+    if (this.dialogRef) this.dialogRef.close(obj);
+    else this.riskSelected.emit(obj);
+>>>>>>> b8d05a1b5dd3417915c4399bb18f5712dffc3dc9
   }
 
-  private navigateToProcessRisks(process: any): void {
-    const bu = this.findBuByProcessId(process.id);
-    if (bu) {
-      // Construire le breadcrumb pour arriver aux risques
-      this.view = 'risks';
-      this.breadcrumb = [
-        { id: bu.id, name: bu.name, nodes: [], type: 'process' },
-      ];
+  if (result.type === 'process') {
+    const obj = {
+      bu: { id: result.buId, name: result.buName },
+      process: result
+    };
 
-      this.viewRisks(process);
-    }
+    if (this.dialogRef) this.dialogRef.close(obj);
+    else this.processSelected.emit(result);
   }
 
-  private navigateToBuProcesses(bu: any): void {
-    // Naviguer vers les processus de cette BU
-    this.view = 'process';
-    this.breadcrumb = [];
-    this.viewProcesses(bu);
-  }
+  this.clearSearch();
+}
+
 
   deleteBu(id: string) {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")
@@ -633,37 +732,36 @@ export class BuProcessAccordionComponent {
 
   openEntityDialog(entite?: any, event?: Event) {
     if (event) {
-      event.stopPropagation(); // Empêche la propagation du clic
+      event.stopPropagation();
     }
     this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
-      data: entite || null // Passe l'entité si c'est une modification, sinon null
+      data: entite || null
     }).afterClosed().subscribe(bu => {
       if (bu) {
         if (bu.id) {
-          // modification
           this.entityService.update(bu).subscribe(_ => {
-            this.ngOnInit()
-            this.snackBarService.info("Entité modifiée avec succès !")
-          })
+            this.ngOnInit();
+            this.snackBarService.info("Entité modifiée avec succès !");
+          });
         }
         else {
           this.entityService.save(bu).subscribe(_ => {
-            this.ngOnInit()
-            this.snackBarService.info("Entité ajoutée avec succès !")
-          })
+            this.ngOnInit();
+            this.snackBarService.info("Entité ajoutée avec succès !");
+          });
         }
       }
     });
   }
 
   goToMatrixPage(buId: any) {
-    this.router.navigate(['risk', buId])
+    this.router.navigate(['risk', buId]);
   }
 
   openProcessDialog(process?: any, event?: Event) {
     if (event) {
-      event.stopPropagation(); // Empêche la propagation du clic
+      event.stopPropagation();
     }
     this.dialog.open(CreateProcessComponent, {
       width: '600px !important',
@@ -694,30 +792,51 @@ export class BuProcessAccordionComponent {
     this.router.navigate(['reglages', 'risks', 'create'], { queryParams: { processId: id } });
   }
 
+  addRiskReferentiel(id: string): void {
+    this.router.navigate(['reglages', 'risks', 'create-referentiel'], { queryParams: { processId: id } });
+  }
+
+
   navToRisk(id: string) {
     this.router.navigate(['reglages', 'risks', id]);
   }
 
-  getTooltip(view: string): string {
-  const isAdmin = this.consultationMode === 'admin';
-
-  switch (view) {
-    case 'bu':
-      return isAdmin
-        ? 'Consulter les processus de la BU'
-        : 'Sélectionner la BU';
-    case 'process':
-      return isAdmin
-        ? 'Consulter les risques du processus'
-        : 'Sélectionner le processus';
-    case 'risks':
-      return isAdmin
-        ? 'Consulter le risque'
-        : 'Sélectionner le risque';
-    default:
-      return isAdmin
-        ? 'Gérer l’élément'
-        : 'Voir les détails de l’élément';
+  addProcess(buId: string) {
+    this.dialog.open(CreateProcessComponent,
+      {
+        width: '800px',
+        data: { buId: buId }
+      }
+    ).afterClosed().subscribe(p => {
+      this.processService.createProcess(p).subscribe(resp => {
+        this.ngOnInit();
+      },
+        error => {
+          this.ngOnInit();
+        });
+    });
   }
-}
+
+  getTooltip(view: string): string {
+    const isAdmin = this.consultationMode === 'admin';
+
+    switch (view) {
+      case 'bu':
+        return isAdmin
+          ? 'Consulter les processus de la BU'
+          : 'Sélectionner la BU';
+      case 'process':
+        return isAdmin
+          ? 'Consulter les risques du processus'
+          : 'Sélectionner le processus';
+      case 'risks':
+        return isAdmin
+          ? 'Consulter le risque'
+          : 'Sélectionner le risque';
+      default:
+        return isAdmin
+          ? 'Gérer l\'élément'
+          : 'Voir les détails de l\'élément';
+    }
+  }
 }

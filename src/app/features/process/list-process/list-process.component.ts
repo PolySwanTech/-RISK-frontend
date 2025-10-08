@@ -6,11 +6,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ActivatedRoute } from '@angular/router';
-import { BusinessUnit } from '../../../core/models/BusinessUnit';
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
 
 @Component({
   selector: 'app-list-process',
@@ -33,7 +32,7 @@ export class ListProcessComponent implements OnInit {
 
   buId: string = ''
 
-  private riskService = inject(RiskService);
+  private riskEvaluationService = inject(RiskEvaluationService);
   private route = inject(ActivatedRoute);
 
   allRisks: any[] = [];
@@ -45,7 +44,7 @@ export class ListProcessComponent implements OnInit {
       this.buId = param["buId"];
 
       if (this.buId) {
-        this.riskService.getEvaluationsByBu(this.buId).subscribe(buEval => {
+        this.riskEvaluationService.getEvaluationsByBu(this.buId).subscribe(buEval => {
           this.allRisks = buEval.evaluations;
         });
       } else {

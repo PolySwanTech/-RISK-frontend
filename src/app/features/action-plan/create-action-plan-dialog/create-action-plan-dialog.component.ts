@@ -58,7 +58,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   actionPlan: ActionPlan = new ActionPlan(
     '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', null, '', new Date(), true);
+    '', '', '', null, '', new Date(), true);
 
   actions: Action[] = []
 
@@ -130,7 +130,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
       priority: this.actionPlan.priority,
       echeance: this.actionPlan.echeance,
       userInCharge: this.actionPlan.userInCharge,
-      taxonomieId: this.actionPlan.taxonomie?.id.id ?? null,
+      taxonomieId: this.actionPlan.taxonomie?.id ?? null,
       incidentId               // undefined si pas d’incident
     };
 

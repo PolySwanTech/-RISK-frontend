@@ -1,15 +1,18 @@
 <ng-container *ngIf="!loading && risk; else spinner">
   <!-- =============== CONTAINER =================== -->
   <div class="container body-container">
-    <app-go-back [title]="'Détails du risque'" [subtitle]="risk.reference | uppercase"
-      [buttons]="goBackButtons"></app-go-back>
+    <app-go-back
+      [title]="'Détails du risque'"
+      [subtitle]="risk.riskReferentiel.reference | uppercase"
+      [buttons]="goBackButtons">
+    </app-go-back>
 
     <!-- ---------------- HEADER ------------------- -->
     <div class="header">
-      <div class="risk-id">{{ risk.reference| uppercase }}</div>
-      <h1 class="risk-title">{{ risk.libellePerso }}</h1>
+      <div class="risk-id">{{ risk.riskReferentiel.reference | uppercase }}</div>
+      <h1 class="risk-title">{{ risk.riskReferentiel.libelle }}</h1>
       <div class="risk-category">
-        {{ 'Catégorie baloise: ' + (risk.category.parent || '')  + ' > ' + (risk.category.label || '') }}
+        Catégorie baloise: {{ risk.riskReferentiel.category.parent ? risk.riskReferentiel.category.parent + ' > ' + (risk.riskReferentiel.category.label || '') : (risk.riskReferentiel.category.label || '') }}
       </div>
     </div>
 
@@ -20,86 +23,209 @@
         <div class="card">
           <h2 class="card-title">Description du Risque</h2>
           <p class="risk-description">
-            {{ risk.description || '—' }}
+            {{ risk.riskReferentiel.description || '—' }}
           </p>
 
-          <!-- Mini métriques : adaptables à tes données -->
-          <div class="metrics">
-            <div class="metric">
-              <div class="metric-value">
-                <!-- {{ frequency }}% -->
-              </div>
-              <div class="metric-label">Fréquence</div>
-            </div>
-            <div class="metric">
-              <div class="metric-value">{{ risk.processName || 'N/R' }}</div>
-              <div class="metric-label">Processus affilié</div>
-            </div>
-            <div class="metric">
-              <div class="metric-value">{{ risk.id.version | date : 'dd/MM/yyyy' }}</div>
-              <div class="metric-label">Version</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ----- ÉVALUATION CARD -------------- -->
-        <div class="card">
-          <h2 class="card-title">Évaluation du Risque</h2>
-          <div class="risk-level">
-            @if(risk.riskBrut && risk.riskBrut.length){
-            <div>
-              Risque brut
-              <span class="risk-badge" [ngClass]="risk.riskBrut[0].evaluation.name | lowercase">
-                {{ risk.riskBrut[0].evaluation.name | lowercase }}
+          <!-- Mini métriques -->
+        <div class="metrics">
+          <!-- Badge combiné brute/nette -->
+          <div class="metric">
+            <div class="metric-value risk-dual-badge">
+              <span class="left">
+                {{ getEvaluationLabel(groupedEvaluations?.[0]?.brut?.evaluation?.name) }}
+              </span>
+              <span class="separator">|</span>
+              <span class="right">
+                {{ getEvaluationLabel(groupedEvaluations?.[0]?.net?.evaluation?.name) }}
               </span>
             </div>
-            <span class="arrow">→</span>
-            <div>
-              Dernière évaluation
-              <!-- <span>{{ risk.riskBrut.[0] | date : 'dd/MM/yyyy' }}</span>
-              <span class="risk-badge" [ngClass]="risk.riskNet[0].evaluation| lowercase">
-              {{ risk.riskNet[0].evaluation| lowercase}}
-              </span> -->
-            </div>
-            }
-            @else{
-            <span>Aucune évaluation pour le moment</span>
-            }
+            <div class="metric-label">Évaluations (Brute | Nette)</div>
+          </div>
+
+          <div class="metric">
+            <div class="metric-value">{{ risk.processName || 'N/R' }}</div>
+            <div class="metric-label">Processus affilié</div>
           </div>
         </div>
+      </div>
+
+      <!-- ----- Incident CARD -------------- -->
+      <div class="card">
+        <h2 class="card-title">Incidents liés</h2>
+
+        <ng-container *ngIf="linkedIncidents && linkedIncidents.length; else noInc">
+          <div class="incidents-grid">
+            <div *ngFor="let incident of linkedIncidents | slice:0:2" class="incident-card">
+              <div class="incident-header">
+                <span class="incident-ref">#{{ incident.reference }}</span>
+                <span class="incident-date">{{ incident.declaredAt | date:'dd/MM/yyyy' }}</span>
+              </div>
+
+              <div class="incident-footer">
+                <span class="incident-status badge" [ngClass]="incident?.state">
+                  {{ getStateLabel(incident.state) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton voir tous -->
+          <div class="see-all">
+            <button (click)="goToIncidents()">Voir tous les incidents liés</button>
+          </div>
+        </ng-container>
+
+        <ng-template #noInc>
+          <p class="no-exec">Aucun incident lié.</p>
+        </ng-template>
+      </div>
+
       </div>
 
       <!-- ---------------- TABS ------------------- -->
       <div class="tabs">
         <div class="tab-nav">
-          <button class="tab-btn" [class.active]="activeTab==='controls'" (click)="selectTab('controls')">
+          <button
+            class="tab-btn"
+            [class.active]="activeTab==='controls'"
+            (click)="selectTab('controls')">
             Contrôles
           </button>
-          <button class="tab-btn" [class.active]="activeTab==='evaluations'" (click)="selectTab('evaluations')">
+          <button
+            class="tab-btn"
+            [class.active]="activeTab==='evaluations'"
+            (click)="selectTab('evaluations')">
             Évaluations
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="activeTab==='mitigations'"
+            (click)="selectTab('mitigations')">
+            Mesures d'atténuations
           </button>
         </div>
 
-        <!-- ----- Tab « Contrôles » -->
-        <div id="controls" class="tab-content" [class.active]="activeTab==='controls'">
-          <div class="card full-width">
-            <h3 class="card-title">Contrôles en place</h3>
-            <!-- À remplacer par *ngFor sur risk.controlTemplates -->
-            <p>Aucun contrôle enregistré.</p>
+       <!-- ----- Tab « Contrôles » -->
+<div id="controls" class="tab-content" [class.active]="activeTab==='controls'">
+  <div class="card full-width">
+    <h3 class="card-title">Contrôles en place</h3>
+
+    <ng-container *ngIf="risk.dmr?.controls && risk.dmr?.controls?.length; else noControls">
+<mat-accordion>
+  <mat-expansion-panel 
+    *ngFor="let control of risk.dmr?.controls" 
+    (opened)="loadControlExecutions(control.id)">
+    
+    <!-- ===== HEADER ===== -->
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <span class="control-title">{{ control.libelle }}</span>
+      </mat-panel-title>
+
+      <!-- Contenu header sous forme de "metrics" -->
+      <mat-panel-description class="control-metrics">
+          <div class="metric">
+            <div class="metric-value badge type">{{ getControlTypeLabel(control.controlType) }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value badge freq">{{ getFrequencyLabel(control.frequency) }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value badge level">{{ getControlLevelLabel(control.controlLevel) }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value badge status">
+              {{ getStatusLabel(controlExecutions[control.id]?.[0]?.status) }}
+            </div>
+          </div>
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+
+
+    <!-- ===== DETAIL ===== -->
+    <div class="control-detail">
+      <h4>Description</h4>
+      <ul class="control-info">
+        <li> {{ control.description }}</li>
+      </ul>
+
+      <!-- Dernières exécutions -->
+      <div class="executions" *ngIf="controlExecutions[control.id]?.length; else noExec">
+        <h4>📊 Dernières exécutions</h4>
+        <div *ngFor="let exec of controlExecutions[control.id] | slice:0:3" class="execution-item">
+          <div class="exec-header">
+            <div>
+              <div class="exec-status">Statut : 
+                <span class="badge" [ngClass]="exec.status">
+                  {{ getStatusLabel(exec.status) }}
+                </span>
+              </div>
+              <div class="exec-eval" *ngIf="controlEvaluationCache[exec.id]">
+                Évaluation : 
+                <span class="badge eval">
+                  {{ evalLabel(controlEvaluationCache[exec.id]?.evaluation) }}
+                </span>
+              </div>
+            </div>
+            <div>            
+              <div class="exec-responsible"> Éxecuté par: <strong>{{ exec.performedBy || 'N/R' }}</strong> le {{ exec.plannedAt | date:'dd/MM/yyyy' }} </div>
+            </div>
           </div>
         </div>
+      </div>
+      <ng-template #noExec>
+        <p class="no-exec">Aucune exécution trouvée.</p>
+      </ng-template>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
+
+    </ng-container>
+
+    <ng-template #noControls>
+      <p>Aucun contrôle enregistré.</p>
+    </ng-template>
+  </div>
+</div>
 
         <!-- ----- Tab « Évaluations » -->
         <div id="evaluations" class="tab-content" [class.active]="activeTab==='evaluations'">
           <div class="card full-width">
             <h3 class="card-title">Historique des évaluations</h3>
-            <div *ngFor="let eval of risk.riskBrut" class="incident">
-              <div class="incident-date">{{ eval.createdAt | date : 'dd/MM/yyyy' }}</div>
-              <div class="incident-title">Score net : {{ eval.evaluation }}</div>
-              <div class="evaluateur">Evaluateur : {{ eval.evaluator.username || 'N/R' }}</div>
+
+            <div *ngFor="let group of groupedEvaluations" class="incident">
+              <div class="incident-date">
+                Période : {{ group.brut?.exercicePeriod?.start | date:'dd/MM/yyyy' }}
+                -
+                {{ group.brut?.exercicePeriod?.end | date:'dd/MM/yyyy' }}
+              </div>
+
+              <div class="incident-title">
+                <span>Brute : {{ group.brut ? getEvaluationLabel(group.brut.evaluation.name) : 'N/R' }}</span>
+              </div>
+              <div class="incident-title">
+                <span>Nette : {{ group.net ? getEvaluationLabel(group.net.evaluation.name) : 'N/R' }}</span>
+              </div>
+
+              <div class="evaluateur">
+                Évaluateur :
+                {{ group.net?.evaluatorName || group.brut?.evaluatorName || 'N/R' }}
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- ----- Tab « Mesures d'atténuations » -->
+        <!-- <div id="mitigations" class="tab-content" [class.active]="activeTab==='mitigations'">
+          <div class="card full-width">
+            <h3 class="card-title">Mesures d'atténuations en place</h3>
+            <div *ngFor="let ma of risk.dmr?.attenuationMetrics" class="incident">
+              <div class="incident-date">Libellé :  {{ ma.libelle }}</div>
+              <div class="incident-title">Description : {{ ma.description }}</div>
+              <div class="evaluateur">Référence : {{ ma.reference }}</div>
+            </div>
+          </div>
+        </div> -->
       </div>
     </div>
   </div>

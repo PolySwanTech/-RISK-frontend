@@ -4,10 +4,11 @@ import { AuditService } from '../../../../core/services/audit/audit.service';
 import { DatePipe } from '@angular/common';
 import { TargetType } from '../../../../core/enum/targettype.enum';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
+import { HasPermissionDirective } from "../../../../core/directives/has-permission.directive";
 
 @Component({
   selector: 'app-audit-panel',
-  imports: [DatePipe],
+  imports: [DatePipe, HasPermissionDirective],
   templateUrl: './audit-panel.component.html',
   styleUrls: ['./audit-panel.component.scss']
 })
