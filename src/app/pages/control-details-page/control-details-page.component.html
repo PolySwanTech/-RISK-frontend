@@ -68,7 +68,7 @@
 
                 <div class="field">
                   <label>Statut</label>
-                  <div class="status-pill" [ngClass]="getStatusClass(currentOrLatestExecution?.status)">
+                  <div [ngClass]="'badge ' + getStatusClass(currentOrLatestExecution?.status)">
                     {{ currentOrLatestExecution?.status ? formatStatus(currentOrLatestExecution!.status) : '—' }}
                   </div>
                 </div>
