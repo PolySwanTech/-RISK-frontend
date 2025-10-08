@@ -70,7 +70,7 @@
               <mat-select [value]="selectedRisk" (selectionChange)="onSelectRisk($event.value)">
                 @for (option of filteredRisks; track option) {
                 <mat-option [value]="option">
-                  {{ option.riskReference.reference + ' - ' + option.riskReference.libelle }}
+                  {{ option.riskReferentiel.reference + ' - ' + option.riskReferentiel.libelle }}
                 </mat-option>
                 }
               </mat-select>
