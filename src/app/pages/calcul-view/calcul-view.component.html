@@ -58,62 +58,6 @@
                         </mat-card-content>
                     </mat-card>
                 </div>
-
-                <!-- Historique des calculs SMA -->
-                <!-- <mat-card class="history-card">
-                    <mat-card-header>
-                        <mat-card-title>Historique des calculs SMA</mat-card-title>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <table mat-table [dataSource]="historiqueCalculs" class="history-table">
-                            <ng-container matColumnDef="periode">
-                                <th mat-header-cell *matHeaderCellDef>PÉRIODE</th>
-                                <td mat-cell *matCellDef="let element">{{ element.periode }}</td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="bi">
-                                <th mat-header-cell *matHeaderCellDef>BI</th>
-                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.bi) }}</td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="bic">
-                                <th mat-header-cell *matHeaderCellDef>BIC</th>
-                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.bic) }}</td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="ilm">
-                                <th mat-header-cell *matHeaderCellDef>ILM</th>
-                                <td mat-cell *matCellDef="let element">{{ element.ilm }}</td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="exigenceFinale">
-                                <th mat-header-cell *matHeaderCellDef>EXIGENCE FINALE</th>
-                                <td mat-cell *matCellDef="let element">{{ formatCurrency(element.exigenceFinale) }}</td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="statut">
-                                <th mat-header-cell *matHeaderCellDef>STATUT</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <span class="status-badge" [class.valid]="element.statut === 'Valide'"
-                                        [class.submitted]="element.statut === 'Soumis'">
-                                        {{ element.statut }}
-                                    </span>
-                                </td>
-                            </ng-container>
-
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-                            <tr class="mat-row no-data-row" *matNoDataRow>
-                                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
-                                    <div class="no-data">
-                                        <span>Aucun résultat trouvé.</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </mat-card-content>
-                </mat-card> -->
             </div>
         </mat-tab>
 
