@@ -82,7 +82,6 @@ export class PlanActionPageDetailComponent {
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(resp => {
       this.actionPlan = resp;
-      console.log(this.actionPlan);
 
       // Todo: métriques doivent être calculées côté backend
       if (this.actionPlan?.actions?.length) {
