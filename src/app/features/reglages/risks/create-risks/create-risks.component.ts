@@ -79,6 +79,7 @@ export class CreateRisksComponent implements OnInit {
     this.riskReferentielSrv.getAll().subscribe(risks => this.risks = risks);
 
     const processId = this.route.snapshot.queryParams["processId"];
+    const parentRisk = this.route.snapshot.queryParams["riskReferentielId"];
     const buId = this.route.snapshot.queryParams["buId"];
     const libelle = this.route.snapshot.queryParams["libelle"]
     const redirect = this.route.snapshot.queryParams["redirect"];
@@ -96,6 +97,10 @@ export class CreateRisksComponent implements OnInit {
 
     if (libelle) {
       this.infoForm.get('libellePerso')?.setValue(libelle);
+    }
+
+    if (parentRisk) {
+      this.infoForm.get('parentRisk')?.setValue(parentRisk);
     }
 
     if (id && id !== 'create') {
@@ -144,11 +149,12 @@ export class CreateRisksComponent implements OnInit {
         `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
         false
       );
+
       if (this.redirectUrl) {
-        this.router.navigateByUrl(this.redirectUrl);
+        this.router.navigateByUrl(`${this.redirectUrl}?createdEventId=${riskId}`);
       } else {
         this.router.navigate(['reglages', 'risks', riskId]);
       }
-    });
+    })
   }
 }
