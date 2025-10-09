@@ -78,7 +78,7 @@ export class ControlChartComponent implements OnInit {
     this.controlService.getAllTemplates().subscribe(data => {
       this.controls = data
       this.controls.forEach(c => {
-        this.controlService.getLastExecution(c.id.id).subscribe(data => {
+        this.controlService.getLastExecution(c.id).subscribe(data => {
           c.execution = data;
           this.updateChart();
         });

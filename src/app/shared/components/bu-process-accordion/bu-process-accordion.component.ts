@@ -95,7 +95,7 @@ export class BuProcessAccordionComponent {
       this.entities = entitiesTree;
       this.fetchProcesses(entitiesTree);
     });
-    if(this.data?.stopAtProcess){
+    if (this.data?.stopAtProcess) {
       this.stopAtProcess = this.data.stopAtProcess
       this.searchText = "Rechercher un processus"
     }
@@ -107,10 +107,10 @@ export class BuProcessAccordionComponent {
       this.buildHierarchy(allEntities);
       this.filteredProcesses = [...this.hierarchicalProcesses];
       this.currentNodes = this.hierarchicalProcesses;
-      
+
       // Charger tous les risques pour la recherche
       this.loadAllRisks();
-      
+
       // Vérifier les query params après avoir construit la hiérarchie
       this.checkQueryParams();
     });
@@ -131,13 +131,13 @@ export class BuProcessAccordionComponent {
   private navigateToBuFromQueryParam(buId: string): void {
     // Chercher la BU dans la hiérarchie
     const bu = this.findBuById(buId);
-    
+
     if (bu) {
       console.log('➡️ BU trouvée:', bu);
-      
+
       // Naviguer directement vers les processus de cette BU
       this.viewProcesses(bu);
-      
+
       // Optionellement, nettoyer le query param après navigation
       // this.router.navigate([], { 
       //   relativeTo: this.route, 
@@ -157,7 +157,7 @@ export class BuProcessAccordionComponent {
       if (bu.id === buId) {
         return bu;
       }
-      
+
       // Chercher récursivement dans les sous-BU
       const foundInChildren = this.findBuByIdInChildren(bu.buChildren || [], buId);
       if (foundInChildren) {
@@ -173,7 +173,7 @@ export class BuProcessAccordionComponent {
       if (child.id === buId) {
         return child;
       }
-      
+
       if (child.buChildren?.length) {
         const found = this.findBuByIdInChildren(child.buChildren, buId);
         if (found) {
@@ -404,18 +404,18 @@ export class BuProcessAccordionComponent {
       // si on veut s'arrêter au processus, on émet et on s'arrête
       if (this.stopAtProcess || this.consultationMode === 'selection') {
         const result = {
-        bu: this.breadcrumb.find(b => b.type === 'process' || b.type === 'bu'),
-        process: node
-      };
+          bu: this.breadcrumb.find(b => b.type === 'process' || b.type === 'bu'),
+          process: node
+        };
 
-      // Si ouvert dans un dialog → on ferme
-      if (this.dialogRef) {
-        this.dialogRef.close(result);
-      } else {
-        this.processSelected.emit(node);
+        // Si ouvert dans un dialog → on ferme
+        if (this.dialogRef) {
+          this.dialogRef.close(result);
+        } else {
+          this.processSelected.emit(node);
+        }
+        return;
       }
-      return;
-    }
       // Sinon, comportement normal : on affiche les risques
       this.viewRisks(node);
     }
@@ -601,32 +601,32 @@ export class BuProcessAccordionComponent {
   }
 
   private performSearchProcess(): void {
-  this.isSearching = true;
-  this.showSearchResults = true;
+    this.isSearching = true;
+    this.showSearchResults = true;
 
-  // Recherche dans tous les processus disponibles
-  const processResults = this.processes
-    .filter(p =>
-      p.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-    )
-    .map(p => {
-      // Trouver la BU associée
-      const bu = this.findBuByProcessId(p.id);
-      return {
-        id: p.id,
-        name: p.name,
-        buId: bu?.id,
-        buName: bu?.name,
-        displayType: 'Processus',
-        fullPath: bu ? `${bu.name} > ${p.name}` : p.name,
-        type: 'process'
-      };
-    });
+    // Recherche dans tous les processus disponibles
+    const processResults = this.processes
+      .filter(p =>
+        p.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      )
+      .map(p => {
+        // Trouver la BU associée
+        const bu = this.findBuByProcessId(p.id);
+        return {
+          id: p.id,
+          name: p.name,
+          buId: bu?.id,
+          buName: bu?.name,
+          displayType: 'Processus',
+          fullPath: bu ? `${bu.name} > ${p.name}` : p.name,
+          type: 'process'
+        };
+      });
 
-  this.searchResults = processResults.slice(0, 10); // Limiter à 10 résultats
-  this.isSearching = false;
-  console.log('➡️ Résultats de recherche de processus:', this.searchResults);
-}
+    this.searchResults = processResults.slice(0, 10); // Limiter à 10 résultats
+    this.isSearching = false;
+    console.log('➡️ Résultats de recherche de processus:', this.searchResults);
+  }
 
 
   private performSearch(): void {
@@ -656,61 +656,30 @@ export class BuProcessAccordionComponent {
   }
 
   selectSearchResult(result: any): void {
-<<<<<<< HEAD
+    console.log('➡️ Sélection depuis la recherche:', result);
+
     if (result.type === 'risk') {
-      // Sélectionner directement le risque avec son contexte
       const obj = {
         bu: { id: result.buId, name: result.buName },
         process: { id: result.processId, name: result.processName },
         risk: result
       };
+      if (this.dialogRef) this.dialogRef.close(obj);
+      else this.riskSelected.emit(obj);
+    }
 
-      if (this.consultationMode == 'admin') {
-      this.navToRisk(result.id)
-    }
-    else {
-      if (this.dialogRef) {
-        this.dialogRef.close(obj)
-      }
-      else {
-        this.riskSelected.emit(obj);
-      }
-    }
-    } else if (result.type === 'process') {
-      // Naviguer vers les risques de ce processus
-      this.navigateToProcessRisks(result);
-    } else if (result.type === 'bu') {
-      // Naviguer vers les processus de cette BU
-      this.navigateToBuProcesses(result);
+    if (result.type === 'process') {
+      const obj = {
+        bu: { id: result.buId, name: result.buName },
+        process: result
+      };
+
+      if (this.dialogRef) this.dialogRef.close(obj);
+      else this.processSelected.emit(result);
     }
 
     this.clearSearch();
-=======
-  console.log('➡️ Sélection depuis la recherche:', result);
-
-  if (result.type === 'risk') {
-    const obj = {
-      bu: { id: result.buId, name: result.buName },
-      process: { id: result.processId, name: result.processName },
-      risk: result
-    };
-    if (this.dialogRef) this.dialogRef.close(obj);
-    else this.riskSelected.emit(obj);
->>>>>>> b8d05a1b5dd3417915c4399bb18f5712dffc3dc9
   }
-
-  if (result.type === 'process') {
-    const obj = {
-      bu: { id: result.buId, name: result.buName },
-      process: result
-    };
-
-    if (this.dialogRef) this.dialogRef.close(obj);
-    else this.processSelected.emit(result);
-  }
-
-  this.clearSearch();
-}
 
 
   deleteBu(id: string) {

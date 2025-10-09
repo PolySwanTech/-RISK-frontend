@@ -1,25 +1,27 @@
-import { MatButtonModule } from '@angular/material/button';
-import { Component, inject, OnInit } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { ActionPlanChartComponent } from "../../features/action-plan/action-plan-chart/action-plan-chart/action-plan-chart.component";
-import { ControlChartComponent } from "../../features/control/control-chart/control-chart/control-chart.component";
-import { IncidentService } from '../../core/services/incident/incident.service';
-import { Incident } from '../../core/models/Incident';
-import { MatIconModule } from '@angular/material/icon';
-import { MatOptionModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
-import { Filter } from '../../core/enum/filter.enum';
-import { FilterTableComponent } from "../../shared/components/filter-table/filter-table.component";
-import { BarChartComponent } from '../../features/dashboard/bar-chart/bar-chart.component';
-import { DoughnutChartComponent } from '../../features/dashboard/doughnut-chart/doughnut-chart.component';
-import { BaloiseCategoryChartComponent } from "../../features/dashboard/baloise-category-chart/baloise-category-chart.component";
+import { Component, OnInit, inject } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatOptionModule } from "@angular/material/core";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatSelectModule } from "@angular/material/select";
+import { Filter } from "../../../core/enum/filter.enum";
+import { PermissionName } from "../../../core/enum/permission.enum";
+import { Incident } from "../../../core/models/Incident";
+import { IncidentService } from "../../../core/services/incident/incident.service";
+import { BaloiseCategoryChartComponent } from "../../../features/dashboard/baloise-category-chart/baloise-category-chart.component";
+import { BarChartComponent } from "../../../features/dashboard/bar-chart/bar-chart.component";
+import { DoughnutChartComponent } from "../../../features/dashboard/doughnut-chart/doughnut-chart.component";
+import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
+import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
+import { ActionPlanChartComponent } from "../action-plan-chart/action-plan-chart.component";
+import { ControlChartComponent } from "../control-chart/control-chart.component";
 
 @Component({
   selector: 'app-home',
   imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent,
-    BarChartComponent, DoughnutChartComponent, MatIconModule,
+    BarChartComponent, DoughnutChartComponent, MatIconModule, GoBackComponent,
     MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent, BaloiseCategoryChartComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
