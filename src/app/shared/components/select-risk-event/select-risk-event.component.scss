@@ -264,7 +264,7 @@ mat-list::-webkit-scrollbar-thumb:hover,
 
 /* Texte principal */
 .wrapper,
-.wrapper * {
+.wrapper mat-icon {
   color: #2c3e50 !important;
 }
 
@@ -304,4 +304,8 @@ button[mat-flat-button][color="primary"],
 button[mat-stroked-button][color="primary"] {
   background-color: #e8f0fe !important;
   border-color: #c7d2fe !important;
+}
+
+.referentiel-content{
+  display: contents;
 }

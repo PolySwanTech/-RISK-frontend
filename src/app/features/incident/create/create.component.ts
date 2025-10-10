@@ -55,7 +55,8 @@ import { RiskSelectionMode } from '../../../core/enum/riskSelection.enum';
     MatTooltipModule,
     MatDatepickerModule,
     MatChipsModule,
-    MatChipListbox
+    MatChipListbox,
+    MatTooltipModule
   ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
@@ -233,7 +234,7 @@ export class CreateComponent implements OnInit {
     }
 
       if (incident.riskName) {
-        this.selectedBP = { bu: { name: incident.teamName }, process: { name: incident.processName } }
+        this.selectedBP = { bu: { name: incident.teamName }, process: { name: incident.processName }, risk: {name: incident.riskName} }
       }
 
       this.incident = incident;
@@ -403,6 +404,7 @@ export class CreateComponent implements OnInit {
     this.selectedBP = event;
     this.incidentForm3.get('teamId')?.setValue(event.bu.id)
     this.incidentForm3.get('processId')?.setValue(event.process.id)
+    this.incidentForm3.get('riskId')?.setValue(event.risk.id)
   }
 
   create() {
@@ -411,7 +413,7 @@ export class CreateComponent implements OnInit {
       height: '600px',
       maxHeight: '600px',
       data:{
-        stopAtProcess : true
+        stopAtProcess : false
       }
     });
 
@@ -444,6 +446,7 @@ export class CreateComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.risk = result;
+        
         this.incidentForm3.get('riskId')?.setValue(result.id);
       }
     });
@@ -462,6 +465,17 @@ export class CreateComponent implements OnInit {
       },
       error: (err) => console.error('❌ Erreur lors du chargement du risque créé :', err)
     });
+  }
+
+  createNewEvent(): void {
+    // const queryParams: any = {
+    //   redirect: this.router.url,
+    //   riskReferentielId: this.selections.referentiel?.id,
+    // };
+    // if (this.processId) queryParams.processId = this.processId;
+    // if (this.searchQuery?.trim()) queryParams.libelle = this.searchQuery.trim();
+    
+    this.router.navigate(['reglages', 'risks', 'create']);
   }
 
 }
