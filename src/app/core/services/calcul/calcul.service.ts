@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { SmaInput, SmaInputCreateDto, SmaLoss, SmaLossUpsert, SmaPayload } from '../../models/Sma';
-import { SmaResult } from '../../models/SmaResult';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +18,7 @@ export class CalculService {
     return this.http.get<any[]>(this.baseUrl + '/losses')
   }
 
-  saveLosses(losses: { [year: number]: number }) {
+  saveLosses(losses: { lossYear: number, amount: number }[]) {
     return this.http.post<any[]>(this.baseUrl, losses);
   }
 

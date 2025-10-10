@@ -160,12 +160,17 @@
             <div class="form-section">
                 <div class="section-content">
                     <div class="form-group">
+                        <select [(ngModel)]="selectedYear">
+                            @for(year of years; track year){
+                            <option [value]="year">{{year}}</option>
+                            }
+                        </select>
                         <!-- Graphique -->
                         <div class="chart-container">
-                            <button class="btn btn-primary" (click)="validateLosses()">Valider les pertes</button>
-                            <button class="btn btn-primary" (click)="addLoss()">Ajouter une perte</button>
-                            <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line"
-                                (chartClick)="onChartClick($event)">
+                            <button mat-button class="btn btn-primary" (click)="validateLosses()">Valider les
+                                pertes</button>
+                            <button mat-button class="btn btn-primary" (click)="addLoss()">Ajouter une perte</button>
+                            <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line">
                             </canvas>
                         </div>
                     </div>

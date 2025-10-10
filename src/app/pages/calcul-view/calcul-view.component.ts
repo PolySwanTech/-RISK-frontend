@@ -90,6 +90,8 @@ export class CalculViewComponent {
 
   years: number[] = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
 
+  selectedYear: number = -1
+
   lineChartData: ChartConfiguration<'line'>['data'] = {
     labels: [],
     datasets: [
@@ -183,13 +185,6 @@ export class CalculViewComponent {
 
   goBackButtons = [
     {
-      label: 'Lancer le calcul',
-      icon: 'play_arrow',
-      class: 'btn-purple',
-      show: true,
-      action: () => this.goToCalcul()
-    },
-    {
       label: 'Rapport C16',
       icon: 'download',
       class: 'btn-green', // tu peux garder ce nom si tu l’as stylé dans ton CSS
@@ -215,8 +210,8 @@ export class CalculViewComponent {
 
   displayedColumnsBi = ['intervalle', 'coefficient'];
 
-  annualLossesDetected: { [year: number]: number } = {};
-  annualLossesDeclared: { [year: number]: number } = {};
+  annualLossesDetected: { lossYear: number, amount: number }[] = [];
+  annualLossesDeclared: { lossYear: number, amount: number }[] = [];
   annualResult: { [year: number]: any } = {};
 
   updateChart() {
@@ -225,11 +220,15 @@ export class CalculViewComponent {
       datasets: [
         {
           ...this.lineChartData.datasets[0],
-          data: this.years.map(year => Number(this.annualLossesDetected[year] || 0))
+          data: this.years.map(year =>
+            Number(this.annualLossesDetected.find(l => l.lossYear === year)?.amount || 0)
+          )
         },
         {
-          ...this.lineChartData.datasets[1], // BI
-          data: this.years.map(year => Number(this.annualLossesDeclared[year] || 0))
+          ...this.lineChartData.datasets[1],
+          data: this.years.map(year =>
+            Number(this.annualLossesDeclared.find(l => l.lossYear === year)?.amount || 0)
+          )
         }
       ]
     };
@@ -261,6 +260,7 @@ export class CalculViewComponent {
       ];
     };
   }
+
 
   rebuildYears() {
     this.lineChartData.labels = this.years;
@@ -326,14 +326,17 @@ export class CalculViewComponent {
     // TODO : Ajouter la méthode pour recuperer les pertes declarées / detectées
 
     this.calculService.getLosses().subscribe(losses => {
-      losses.forEach(
-        l => {
-          this.annualLossesDeclared[l.lossYear] = l.amount;
-          this.annualLossesDetected[l.lossYear] = l.amount * 1.5;
-        }
-      )
+      this.annualLossesDeclared = [];
+      this.annualLossesDetected = [];
+
+      losses.forEach(l => {
+        this.annualLossesDeclared.push({ lossYear: l.lossYear, amount: l.amount });
+        this.annualLossesDetected.push({ lossYear: l.lossYear, amount: l.amount * 1.5 });
+      });
+
       this.updateChart();
-    })
+    });
+
 
     this.calculService.getResult().subscribe(results => {
       results.forEach(
@@ -357,54 +360,35 @@ export class CalculViewComponent {
     this.rebuildYears();
   }
 
-  goToCalcul() {
-    console.log("calcul")
-  }
+  addLoss() {
+    const value = prompt(`Nouvelle valeur pour l'année ${this.selectedYear}`);
+    const year = +this.selectedYear;
+    if (value !== null && this.years.includes(year)) {
+      const amount = +value;
 
-  onChartClick(event: { event?: ChartEvent, active?: any[] }) {
-    if (!event.event) return;
+      // 🔍 On vérifie si l’année existe déjà
+      const declaredIndex = this.annualLossesDeclared.findIndex(l => l.lossYear == year);
+      const detectedIndex = this.annualLossesDetected.findIndex(l => l.lossYear == year);
 
-    const canvasPosition = event.event;
-    const chart = this.chartComponent.chart; // Instance Chart.js (à récupérer selon votre setup)
-
-    if (!chart) return;
-    // La position du clic relative au canvas
-    const clickX = canvasPosition.x;
-    const clickY = canvasPosition.y;
-
-    if (!clickX || !clickY) return;
-
-    // Position de l'axe X (exemple, à ajuster selon le graphique)
-    // Normalement, axe X est proche du bas, on peut récupérer la position via chart.chartArea
-    const chartArea = chart.chartArea;
-
-    // Largeur de la zone graphique
-    const width = chartArea.right - chartArea.left;
-
-    // Position relative sur l'axe X (entre 0 et 1)
-    const relativeX = (clickX - chartArea.left) / width;
-
-    const index = Math.floor(relativeX * (this.years.length));
-    if (index >= 0 && index < this.years.length) {
-      const selectedYear = this.years[index];
-      if (this.annualLossesDeclared[selectedYear] !== undefined && this.annualLossesDeclared[selectedYear] !== null) {
-        alert(`Une valeur existe déjà pour l'année ${selectedYear}: ${this.annualLossesDeclared[selectedYear]}`);
-        return;
+      if (declaredIndex !== -1) {
+        // 🔄 Met à jour la valeur existante
+        this.annualLossesDeclared[declaredIndex].amount = amount;
+      } else {
+        // ➕ Ajoute une nouvelle entrée
+        this.annualLossesDeclared.push({ lossYear: year, amount });
       }
-      const value = prompt(`Nouvelle valeur pour l'année ${selectedYear}`);
 
-      if (value !== null) {
-        this.annualLossesDeclared[selectedYear] = +value
-        this.annualLossesDetected[selectedYear] = +value
+      if (detectedIndex !== -1) {
+        this.annualLossesDetected[detectedIndex].amount = amount * 1.5; // ou amount selon ton besoin
+      } else {
+        this.annualLossesDetected.push({ lossYear: year, amount: amount * 1.5 });
       }
-    } else {
-      console.warn('Index hors limites :', index);
+
+      // 🧮 Mise à jour du graphique
+      this.updateChart();
     }
   }
 
-  addLoss() {
-
-  }
 
   exportExcel() {
     alert('Export Excel non implémenté');
