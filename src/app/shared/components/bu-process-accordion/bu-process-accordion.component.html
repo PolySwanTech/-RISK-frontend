@@ -68,12 +68,14 @@
       </div>
 
       <mat-list class="custom-list">
+          <button mat-raised-button style="width: 30%;" class="btn-primary" *ngIf="view === 'risks'" (click)="createNewEvent()">Nouvelle evenement</button>
         @for(node of currentNodes; track node.id){
-        <mat-list-item [matTooltip]="getTooltip(view)" (click)="view === 'risks' ? selectRisk(node) : viewNextLevel(node)">
+        <mat-list-item [matTooltip]="getTooltip(view)"
+          (click)="view === 'risks' ? selectRisk(node) : viewNextLevel(node)">
           <div class="node-content">
             <div class="node-content-wrapper">
               <h3 class="node-title">{{ node.name }}</h3>
-              <mat-chip *ngIf="node.lm" selected class="lm-chip">LM</mat-chip>
+              <span *ngIf="node.lm" class="badge type">LM</span>
             </div>
           </div>
 
@@ -92,7 +94,8 @@
 
             <button *ngIf="view === 'risks'" mat-stroked-button color="accent"
               (click)="consultationMode == 'admin' ? navToRisk(node.id) : selectRisk(node); $event.stopPropagation()">
-              <mat-icon>{{ consultationMode == 'admin' ? 'visibility' : 'check'}}</mat-icon> {{ consultationMode == 'admin' ? 'Consulter le risque' : 'Sélectionner le risque' }}
+              <mat-icon>{{ consultationMode == 'admin' ? 'visibility' : 'check'}}</mat-icon> {{ consultationMode ==
+              'admin' ? 'Consulter le risque' : 'Sélectionner le risque' }}
             </button>
 
             @if(consultationMode === 'admin' && view && view !== 'risks'){

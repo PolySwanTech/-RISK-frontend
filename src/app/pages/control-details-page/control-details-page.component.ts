@@ -137,12 +137,12 @@ export class ControlDetailsPageComponent implements OnInit {
 
   // === Helpers affichage ===
   getStatusClass(status?: Status): string {
-    if (!status) return 'status-default';
-    switch (status) {
-      case Status.ACHIEVED: return 'status-realise';
-      case Status.IN_PROGRESS: return 'status-en-cours';
-      case Status.NOT_ACHIEVED: return 'status-non-realise';
-      default: return 'status-default';
+    if (!status) return '';
+      switch (status) {
+      case Status.ACHIEVED: return 'achieved';
+      case Status.IN_PROGRESS: return 'in_progress';
+      case Status.NOT_ACHIEVED: return 'not_achieved';
+      default: return '';
     }
   }
   

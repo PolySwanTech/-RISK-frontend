@@ -53,7 +53,7 @@
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Statut</label>
-                            <span class="badge status" [ngClass]="actionPlan.status.toLowerCase()">
+                            <span class="badge" [ngClass]="actionPlan.status.toLowerCase()">
                                 {{ getReadableStatut(actionPlan.status) }}
                             </span>
                         </div>
@@ -64,7 +64,7 @@
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Risk</label>
-                            <span class="badge status" [ngClass]="actionPlan.riskName.toLowerCase()">
+                            <span class="badge type">
                                 {{ actionPlan.riskName }}
                             </span>
                         </div>

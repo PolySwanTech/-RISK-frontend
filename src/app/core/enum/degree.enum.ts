@@ -1,6 +1,6 @@
 export enum Degree {
-  LEVEL_1 = 'LEVEL_1',
-  LEVEL_2 = 'LEVEL_2',
+    LEVEL_1 = 'LEVEL_1',
+    LEVEL_2 = 'LEVEL_2',
 }
 
 export const DegreeLabels: Record<Degree, string> = {
