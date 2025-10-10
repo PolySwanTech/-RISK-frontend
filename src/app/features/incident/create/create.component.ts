@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatStepperModule } from '@angular/material/stepper';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
@@ -31,6 +31,8 @@ import { BuProcessAccordionComponent } from "../../../shared/components/bu-proce
 import { MatDialog } from '@angular/material/dialog';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
 import { SelectRiskEventComponent } from '../../../shared/components/select-risk-event/select-risk-event.component';
+import { RiskSelectionMode } from '../../../core/enum/riskSelection.enum';
+
 
 
 @Component({
@@ -125,13 +127,15 @@ export class CreateComponent implements OnInit {
 
   listCauses: Cause[] = [];
 
-  incidentService = inject(IncidentService);
-  riskService = inject(RiskService);
+  private incidentService = inject(IncidentService);
+  private riskService = inject(RiskService);
   riskCategoryService = inject(RiskCategoryService);
-  equipeService = inject(EquipeService);
-  causeService = inject(CauseService);
+  private equipeService = inject(EquipeService);
+  private causeService = inject(CauseService);
   consequenceService = inject(ConsequenceService);
-  processService = inject(ProcessService);
+  private processService = inject(ProcessService);
+
+  @ViewChild('stepper') stepper!: MatStepper;
 
 
   async ngOnInit(): Promise<void> {
@@ -145,6 +149,13 @@ export class CreateComponent implements OnInit {
       this.incidentForm2.patchValue(data.incidentForm2);
       this.incidentForm3.patchValue(data.incidentForm3);
       this.selectedBP = data.selectedBP;
+
+      setTimeout(() => {
+        if (data.stepIndex != null && this.stepper) {
+          this.stepper.selectedIndex = data.stepIndex;
+        }
+      });
+
       sessionStorage.removeItem('incident_draft');
     }
 
@@ -153,6 +164,11 @@ export class CreateComponent implements OnInit {
       this.loadIncident(this.incidentId);
     } else {
       this.loadTrees().subscribe();
+    }
+
+    const createdEventId = this.route.snapshot.queryParams['createdEventId'];
+    if (createdEventId) {
+      this.selectCreatedRisk(createdEventId);
     }
   }
 
@@ -206,15 +222,18 @@ export class CreateComponent implements OnInit {
         });
       });
 
+      if (incident.risk) {
+      this.riskService.getById(incident.risk).subscribe({
+        next: (risk) => {
+          this.risk = risk;
+          this.incidentForm3.get('riskId')?.setValue(risk.id);
+        },
+        error: (err) => console.error("Erreur lors du chargement du risque :", err)
+      });
+    }
+
       if (incident.riskName) {
-        this.selectedBP = {
-          bu: {
-            name: incident.teamName
-          },
-          process: {
-            name: incident.processName
-          }
-        }
+        this.selectedBP = { bu: { name: incident.teamName }, process: { name: incident.processName } }
       }
 
       this.incident = incident;
@@ -401,21 +420,25 @@ export class CreateComponent implements OnInit {
     });
   }
 
-  openRiskEventDialog() {
+  openRiskEventDialog(stepper: MatStepper) {
     const processId = this.incidentForm3.get('processId')?.value;
 
     const draftIncident = {
       incidentForm1: this.incidentForm1.value,
       incidentForm2: this.incidentForm2.value,
       incidentForm3: this.incidentForm3.value,
-      selectedBP: this.selectedBP
+      selectedBP: this.selectedBP,
+      stepIndex: stepper.selectedIndex
     };
     sessionStorage.setItem('incident_draft', JSON.stringify(draftIncident));
 
     const dialogRef = this.dialog.open(SelectRiskEventComponent, {
-      minWidth: '650px',
+      minWidth: '700px',
       height: '550px',
-      data: processId ? { processId } : null
+      data: {
+        mode: RiskSelectionMode.Event,
+        processId: processId ? processId : null,
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -426,5 +449,19 @@ export class CreateComponent implements OnInit {
     });
   }
 
+  private selectCreatedRisk(eventId: string): void {
+    this.riskService.getById(eventId).subscribe({
+      next: (risk) => {
+        this.risk = risk;
+        this.incidentForm3.get('riskId')?.setValue(risk.id);
+        this.router.navigate([], {
+          queryParams: { createdEventId: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+      },
+      error: (err) => console.error('❌ Erreur lors du chargement du risque créé :', err)
+    });
+  }
 
 }

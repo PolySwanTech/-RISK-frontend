@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,23 +11,36 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
-import { RiskService } from '../../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
 
 import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
 import { Process } from '../../../../core/models/Process';
-import { RiskCategoryService } from '../../../../core/services/risk/risk-category.service';
-import { SelectArborescenceComponent } from '../../../../shared/components/select-arborescence/select-arborescence.component';
-import { BaloiseCategoryDto, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
+import { BaloiseCategoryDto, baloisFormatLabel, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
 import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
+import { RiskSelectionMode } from '../../../../core/enum/riskSelection.enum';
+import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MatChipsModule, MatChipListbox } from '@angular/material/chips';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-create-risks-referentiel',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatStepperModule, MatButtonModule, GoBackComponent],
+    MatStepperModule, MatButtonModule, GoBackComponent,
+    MatRadioModule,
+    GoBackComponent,
+    NgIf,
+    MatIconModule,
+    MatTooltipModule,
+    MatDatepickerModule,
+    MatChipsModule,
+    MatChipListbox],
   templateUrl: './create-risks-referentiel.component.html',
   styleUrl: './create-risks-referentiel.component.scss'
 })
@@ -36,18 +49,18 @@ export class CreateRisksReferentielComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private dialog = inject(MatDialog)
 
-  private readonly riskSrv = inject(RiskService);
+
   private riskReferentielSrv = inject(RiskReferentielService)
   private readonly confirm = inject(ConfirmService);
-  private readonly riskCategoryService = inject(RiskCategoryService);
   private readonly procSrv = inject(ProcessService);
+
 
   /* ---------------- données ----------------- */
   listProcess: Process[] = [];
 
-  bal1: BaloiseCategoryDto[] = [];
-  bal2: BaloiseCategoryDto[] = [];
+  balois: BaloiseCategoryDto | null = null;
 
   pageTitle = 'Création d\'un risque référentiel';
   dialogLabel = { title: 'Création', message: 'création' };
@@ -64,13 +77,11 @@ export class CreateRisksReferentielComponent {
   /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
     libellePerso: this.fb.nonNullable.control<string>(''),
-    balois1: this.fb.nonNullable.control<BaloiseCategoryDto | null>(null, Validators.required),
-    balois2: this.fb.control<BaloiseCategoryDto | null>(null),
+    balois: this.fb.nonNullable.control<BaloiseCategoryDto | null>(null, Validators.required),
     description: this.fb.nonNullable.control<string>(''),
   });
 
   ngOnInit(): void {
-    this.riskCategoryService.getAll().subscribe(data => this.bal1 = data);
     const buId = this.route.snapshot.queryParams["buId"];
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -90,21 +101,31 @@ export class CreateRisksReferentielComponent {
       this.dialogLabel = { title: 'Mise à jour', message: 'mise à jour' };
 
       this.infoForm.patchValue({
-        balois1: this.risk.category ?? null,
-        balois2: this.risk.category ?? null,
+        balois: this.risk.category ?? null,
         description: this.risk.description,
       });
     });
   }
 
-  onCategoryChange(baloise: BaloiseCategoryDto, level: number): void {
-    if (level === 1 && baloise?.libelle) {
-      this.riskCategoryService.getByParent(baloise.libelle).subscribe(children => {
-        this.bal2 = children;                         // options du niveau 2
-        this.infoForm.patchValue({ balois2: null });  // reset du select niveau 2
-      });
-    }
+  openSubCategorySelector(): void {
+    const dialogRef = this.dialog.open(SelectRiskEventComponent, {
+      minWidth: '700px',
+      height: '550px',
+      data: { mode: RiskSelectionMode.CategoryLevel2 }
+    });
+
+    dialogRef.afterClosed().subscribe(subcategory => {
+      if (subcategory) {
+        this.balois = subcategory;
+        this.infoForm.get('balois')?.setValue(subcategory.libelle);
+      }
+    });
   }
+
+  format(label?: string): string {
+      return baloisFormatLabel(label ?? '');
+    }
+
 
 
   submit(): void {
@@ -113,9 +134,8 @@ export class CreateRisksReferentielComponent {
       return;
     }
 
-    const cat1 = this.infoForm.get('balois1')?.value;
-    const cat2 = this.infoForm.get('balois2')?.value;
-    const category = cat2 ?? cat1;
+    const category = this.infoForm.get('balois')?.value;
+
 
     if (!category) {
       console.error('Catégorie obligatoire !');

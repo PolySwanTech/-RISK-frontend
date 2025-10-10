@@ -1,68 +1,124 @@
 <div class="bp-wrapper">
 
+  <!-- ====== BARRE DE RECHERCHE ====== -->
   <div class="search-section">
     <div class="search-input-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
+
       <input
         type="text"
-        [placeholder]="searchText"
+        class="search-input"
+        [placeholder]="searchPlaceholder"
         [(ngModel)]="searchQuery"
         (input)="onSearchInput($event)"
-        class="search-input"
       />
+
       <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
         <mat-icon>clear</mat-icon>
       </button>
     </div>
 
+    <!-- Résultats de recherche -->
     <div *ngIf="showSearchResults" class="search-results">
+      <!-- Loading -->
       <div *ngIf="isSearching" class="search-loading">
         <mat-spinner diameter="24"></mat-spinner>
         <div class="search-loading-text">Recherche en cours...</div>
       </div>
 
+      <!-- Aucun résultat -->
       <div *ngIf="!isSearching && searchResults.length === 0" class="search-empty">
-        Aucun événement trouvé pour "<strong>{{ searchQuery }}</strong>"
-        <div class="create-btn-wrapper">
-          <button mat-flat-button color="primary" (click)="createNewEvent()">
-            <mat-icon>add</mat-icon> Créer un nouvel événement de risque
-          </button>
-        </div>
+        Aucun {{ searchTypeLabel.toLowerCase() }} trouvé pour
+        "<strong>{{ searchQuery }}</strong>"
+        <button mat-flat-button color="primary" (click)="createNewEvent()">
+          <mat-icon>add</mat-icon> Créer un nouvel événement
+        </button>
       </div>
 
-      <div *ngFor="let result of searchResults" class="search-result-item" (click)="selectEvent(result)">
+      <!-- Liste des résultats -->
+      <div *ngFor="let result of searchResults" class="search-result-item" (click)="selectSearchResult(result)">
         <div class="search-result-header">
-          <strong class="search-result-name">{{ result.libelle }}</strong>
-          <span class="search-result-type type-risque">Événement</span>
+          <strong class="search-result-name">{{ format(result.libelle) }}</strong>
+          <span class="search-result-type type-risque">{{ searchTypeLabel }}</span>
         </div>
-        <div class="search-result-path">{{ result.description }}</div>
+        <div class="search-result-path" *ngIf="result.description">{{ result.description }}</div>
       </div>
     </div>
   </div>
 
+  <!-- ====== NAVIGATION HIÉRARCHIQUE ====== -->
   <div *ngIf="!showSearchResults" class="list-panel">
-    <div class="panel-title">Liste des événements de risque</div>
+    <!-- En-tête -->
+    <div class="panel-title">
+      <div class="panel-title-left">
+        <button *ngIf="currentLevel !== 'categories'" mat-icon-button (click)="back()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h2>{{ viewTitle }}</h2>
+      </div>
 
-    <mat-list class="custom-list">
-      <mat-list-item *ngFor="let event of allEvents" (click)="selectEvent(event)">
-        <div class="node-content">
-          <div class="node-content-wrapper">
-            <h3 class="node-title">{{ event.libelle }}</h3>
-            <p class="node-subtitle">{{ event.description }}</p>
+      <div class="breadcrumb">
+        <span *ngFor="let step of breadcrumb; let last = last">
+          {{ step }} <span *ngIf="!last">›</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Contenu -->
+    <div *ngIf="isLoading" class="empty">
+      <mat-spinner></mat-spinner>
+      <p>Chargement...</p>
+    </div>
+
+    <mat-list *ngIf="!isLoading">
+
+      <!-- NIVEAU 1 : Catégories -->
+      <ng-container *ngIf="currentLevel === 'categories'">
+        <mat-list-item *ngFor="let cat of currentItems" (click)="selectCategory(cat)">
+          <mat-icon matListIcon>folder</mat-icon>
+          <h3 matLine>{{ format(cat.libelle) }}</h3>
+          <mat-icon matSuffix>chevron_right</mat-icon>
+        </mat-list-item>
+      </ng-container>
+
+      <!-- NIVEAU 2 : Sous-catégories -->
+      <ng-container *ngIf="currentLevel === 'subcategories'">
+        <mat-list-item *ngFor="let sub of currentItems" (click)="selectSubCategory(sub)">
+          <mat-icon matListIcon>subdirectory_arrow_right</mat-icon>
+          <h3 matLine>{{ format(sub.libelle) }}</h3>
+          <mat-icon matSuffix>chevron_right</mat-icon>
+        </mat-list-item>
+      </ng-container>
+
+      <!-- NIVEAU 3 : Référentiels -->
+      <ng-container *ngIf="currentLevel === 'referentiels'">
+        <mat-list-item *ngFor="let ref of currentItems" (click)="selectReferentiel(ref)">
+          <mat-icon matListIcon>account_tree</mat-icon>
+          <h3 matLine>{{ ref.libelle }}</h3>
+          <mat-icon matSuffix>chevron_right</mat-icon>
+        </mat-list-item>
+      </ng-container>
+
+      <!-- NIVEAU 4 : Événements -->
+      <ng-container *ngIf="currentLevel === 'events'">
+        <button mat-flat-button color="primary" (click)="createNewEvent()">
+          <mat-icon>add</mat-icon> Créer un nouvel événement
+        </button>
+        <mat-list-item *ngFor="let event of currentItems" (click)="selectEvent(event)">
+          <mat-icon matListIcon>warning</mat-icon>
+          <div class="node-content">
+            <h3 matLine>{{ event.libelle }}</h3>
           </div>
-        </div>
-
-        <div class="node-actions">
           <button mat-stroked-button color="primary" (click)="selectEvent(event); $event.stopPropagation()">
             <mat-icon>check</mat-icon> Sélectionner
           </button>
-        </div>
-      </mat-list-item>
+        </mat-list-item>
+      </ng-container>
     </mat-list>
-  </div>
-</div>
 
-<div *ngIf="isSearching && !allEvents.length" class="empty">
-  <mat-spinner></mat-spinner>
-  Chargement des événements...
+    <!-- Aucun élément -->
+    <div *ngIf="!isLoading && currentItems.length === 0" class="empty">
+      <p>Aucun élément trouvé.</p>
+    </div>
+  </div>
 </div>
