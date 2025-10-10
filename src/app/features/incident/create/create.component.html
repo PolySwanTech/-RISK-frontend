@@ -94,21 +94,19 @@
           <form [formGroup]="incidentForm3">
             <button style="margin-bottom: 20px;" mat-stroked-button (click)="create()">
               <mat-icon>add</mat-icon>
-              Associer BU / Processus *
+              Associer BU / Processus / évenement redouté *
             </button>
             <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBP">
               <mat-chip> Equipe : {{ selectedBP.bu.name }}</mat-chip>
               <mat-chip> Processus : {{ selectedBP.process.name }}</mat-chip>
+              <mat-chip *ngIf="selectedBP?.risk" [matTooltip]="selectedBP.risk.isInfo ? 'Cet évenement de risque n\'a pas encore été validé' : null">
+                Evenement redouté : {{ selectedBP.risk.name }}
+                <mat-icon *ngIf="selectedBP.risk.isInfo"
+                  style="margin-left: 4px; vertical-align: middle; margin-bottom: -4px; font-size: 18px; color: rgb(255, 187, 0);">
+                  warning
+                </mat-icon>
+              </mat-chip>
             </mat-chip-listbox>
-
-            <button style="margin-bottom: 20px;" mat-stroked-button (click)="openRiskEventDialog(stepper)">
-              <mat-icon>add</mat-icon>
-              Associer Risque *
-            </button>
-            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="risk">
-              <mat-chip> Risk : {{ risk.libelle }}</mat-chip>
-            </mat-chip-listbox>
-
             <mat-form-field>
               <mat-label>Cause</mat-label>
               <mat-select formControlName="cause" [compareWith]="compareById">

@@ -20,6 +20,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreateProcessComponent } from '../../../features/process/create-process/create-process.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CreateRisksComponent } from '../../../features/reglages/risks/create-risks/create-risks.component';
 
 export interface ProcessNode {
   id: string;
@@ -584,7 +585,7 @@ export class BuProcessAccordionComponent {
     switch (this.view) {
       case 'bu': return 'Unités Métiers';
       case 'process': return 'Processus';
-      case 'risks': return 'Risques';
+      case 'risks': return 'Evenements de Risques';
       default: return '';
     }
   }
@@ -835,4 +836,59 @@ export class BuProcessAccordionComponent {
           : 'Voir les détails de l\'élément';
     }
   }
+
+  createNewEvent(): void {
+  const buId = this.breadcrumb.find(b => b.type === 'process')?.id;
+  const processId = this.breadcrumb.find(b => b.type === 'risks')?.id;
+  const redirect = this.router.url;
+
+  const dialogRef = this.dialog.open(CreateRisksComponent, {
+    width: '700px',
+    maxHeight: '90vh',
+    data: { processId, buId, redirect },
+    disableClose: true,
+    autoFocus: false
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      const node = {
+        id : result.createdEventId, name : result.libelle, isInfo : true
+      }
+      this.selectRisk(node)
+      this.refreshCurrentRisks(processId || '');
+      // Recharger le cache pour la recherche
+      this.loadAllRisks();
+    }
+  });
+}
+
+private refreshCurrentRisks(processId: string): void {
+  if (!processId || this.view !== 'risks') return;
+
+  this.riskService.getRisksTreeByProcessId(processId).subscribe({
+    next: (risks) => {
+      const riskNodes = risks.map(r => ({
+        id: r.id,
+        name: r.libelle,
+        enfants: r.enfants,
+        type: 'risk' as const
+      }));
+
+      // Mettre à jour les nœuds actuels
+      this.currentNodes = riskNodes;
+      
+      // Mettre à jour le breadcrumb
+      if (this.breadcrumb.length > 0) {
+        this.breadcrumb[this.breadcrumb.length - 1].nodes = riskNodes;
+      }
+
+      this.snackBarService.info('Liste des risques actualisée');
+    },
+    error: (error) => {
+      console.error('Erreur lors du rechargement des risques:', error);
+      this.snackBarService.error('Erreur lors du rechargement');
+    }
+  });
+}
 }

@@ -7,12 +7,21 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { Router } from '@angular/router';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { RiskReferentielService } from '../../../core/services/risk/risk-referentiel.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { BaloiseCategoryDto, baloisFormatLabel } from '../../../core/models/RiskReferentiel';
 import { Level, RiskSelectionMode } from '../../../core/enum/riskSelection.enum';
+
+export enum NavigationMode {
+  Hierarchical = 'hierarchical',
+  Direct = 'direct'
+}
 
 @Component({
   selector: 'app-select-risk-event',
@@ -24,7 +33,11 @@ import { Level, RiskSelectionMode } from '../../../core/enum/riskSelection.enum'
     MatButtonModule,
     MatListModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatChipsModule,
+    MatButtonToggleModule,
+    MatSelectModule,
+    MatFormFieldModule
   ],
   templateUrl: './select-risk-event.component.html',
   styleUrls: ['./select-risk-event.component.scss']
@@ -34,6 +47,10 @@ export class SelectRiskEventComponent implements OnInit {
   @Input() mode: RiskSelectionMode = RiskSelectionMode.Event;
   @Output() selected = new EventEmitter<any>();
 
+  // --- Navigation Mode ---
+  navigationMode: NavigationMode = NavigationMode.Hierarchical;
+  NavigationMode = NavigationMode;
+
   // --- UI ---
   searchQuery = '';
   isSearching = false;
@@ -42,12 +59,20 @@ export class SelectRiskEventComponent implements OnInit {
   viewTitle = 'Catégories Baloise';
   currentLevel: Level = Level.Categories;
 
+  // --- Filtres mode direct ---
+  selectedCategoryLevel1: string | null = null;
+  selectedCategoryLevel2: string | null = null;
+  categoriesLevel1: BaloiseCategoryDto[] = [];
+  categoriesLevel2: BaloiseCategoryDto[] = [];
+
   // --- Données ---
   breadcrumb: string[] = [];
   currentItems: any[] = [];
   searchResults: any[] = [];
   allSearchItems: any[] = [];
   processId?: string;
+  allCategories: BaloiseCategoryDto[] = [];
+  allReferentiels: any[] = [];
 
   selections: {
     category?: BaloiseCategoryDto;
@@ -66,9 +91,100 @@ export class SelectRiskEventComponent implements OnInit {
   ngOnInit(): void {
     this.mode = this.data?.mode ?? this.mode;
     this.processId = this.data?.processId;
-    this.loadRootCategories();
-    this.loadSearchData();
+    
+    // Charger toutes les catégories d'abord
+    this.categoryService.getAll().subscribe({
+      next: (categories) => {
+        this.allCategories = categories;
+        this.categoriesLevel1 = categories.filter(c => !c.parent);
+        
+        // Puis charger les référentiels
+        this.referentielService.getAll().subscribe({
+          next: (refs) => {
+            this.allReferentiels = refs;
+            
+            // Initialiser la vue selon le mode
+            if (this.navigationMode === NavigationMode.Direct) {
+              this.initDirectMode();
+            } else {
+              this.loadRootCategories();
+            }
+            
+            this.loadSearchData();
+          }
+        });
+      }
+    });
+  }
 
+  // ---------- GESTION DES MODES ----------
+  onNavigationModeChange(mode: NavigationMode): void {
+    this.navigationMode = mode;
+    this.clearFilters();
+    this.clearSearch();
+    
+    if (mode === NavigationMode.Direct) {
+      this.initDirectMode();
+    } else {
+      this.loadRootCategories();
+    }
+  }
+
+  private initDirectMode(): void {
+    this.currentLevel = Level.Referentiels;
+    this.viewTitle = 'Taxonomies';
+    this.breadcrumb = [];
+    this.currentItems = [...this.allReferentiels];
+  }
+
+  // ---------- FILTRES MODE DIRECT ----------
+  onCategoryLevel1Change(): void {
+    this.selectedCategoryLevel2 = null;
+    
+    if (this.selectedCategoryLevel1) {
+      const parent = this.allCategories.find(c => c.libelle === this.selectedCategoryLevel1);
+      if (parent) {
+        this.categoriesLevel2 = this.allCategories.filter(c => c.parent === parent.libelle);
+      }
+    } else {
+      this.categoriesLevel2 = [];
+    }
+    
+    this.applyFilters();
+  }
+
+  onCategoryLevel2Change(): void {
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    let filtered = [...this.allReferentiels];
+    
+    if (this.selectedCategoryLevel2) {
+      // Filtrer par catégorie niveau 2
+      const cat2 = this.allCategories.find(c => c.libelle === this.selectedCategoryLevel2);
+      if (cat2) {
+        filtered = filtered.filter(ref => ref.category?.label === cat2.label);
+      }
+    } else if (this.selectedCategoryLevel1) {
+      // Filtrer par catégorie niveau 1
+      const cat1 = this.allCategories.find(c => c.libelle === this.selectedCategoryLevel1);
+      if (cat1) {
+        // Trouver toutes les sous-catégories
+        const subCategories = this.allCategories.filter(c => c.parent === cat1.libelle);
+        const subCategoryLabels = subCategories.map(c => c.label);
+        
+        filtered = filtered.filter(ref => subCategoryLabels.includes(ref.category?.label));
+      }
+    }
+    
+    this.currentItems = filtered;
+  }
+
+  private clearFilters(): void {
+    this.selectedCategoryLevel1 = null;
+    this.selectedCategoryLevel2 = null;
+    this.categoriesLevel2 = [];
   }
 
   // ---------- RECHERCHE ----------
@@ -142,11 +258,9 @@ export class SelectRiskEventComponent implements OnInit {
 
   // ---------- HIÉRARCHIE ----------
   loadRootCategories(): void {
-    this.handleLoading(this.categoryService.getAll(), (categories: BaloiseCategoryDto[]) => {
-      const roots = categories.filter(c => !c.parent);
-      this.updateView(Level.Categories, roots, 'Catégories Baloise (Niveau 1)', []);
-      this.resetSelections();
-    });
+    const roots = this.allCategories.filter(c => !c.parent);
+    this.updateView(Level.Categories, roots, 'Catégories Baloise (Niveau 1)', []);
+    this.resetSelections();
   }
 
   selectCategory(category: BaloiseCategoryDto): void {
@@ -169,15 +283,13 @@ export class SelectRiskEventComponent implements OnInit {
       return this.closeAndEmit(sub);
 
     this.selections.subcategory = sub;
-    this.handleLoading(this.referentielService.getAll(), (refs: any[]) => {
-      const filtered = refs.filter(r => r.category.label === sub.label);
-      this.updateView(
-        Level.Referentiels,
-        filtered,
-        `Taxonomie : ${this.format(sub.libelle)}`,
-        [this.format(this.selections.category?.libelle), this.format(sub.libelle)]
-      );
-    });
+    const filtered = this.allReferentiels.filter(r => r.category.label === sub.label);
+    this.updateView(
+      Level.Referentiels,
+      filtered,
+      `Taxonomie : ${this.format(sub.libelle)}`,
+      [this.format(this.selections.category?.libelle), this.format(sub.libelle)]
+    );
   }
 
   selectReferentiel(ref: any): void {
@@ -204,8 +316,36 @@ export class SelectRiskEventComponent implements OnInit {
     this.closeAndEmit(event);
   }
 
+  // ---------- MÉTHODE POUR RÉCUPÉRER LES CATÉGORIES BALOISE ----------
+  getBaloiseCategories(ref: any): string[] {
+    if (!ref?.category) return [];
+    
+    const categories: string[] = [];
+    
+    // Ajouter la catégorie actuelle
+    if (ref.category.label) {
+      categories.push(this.format(ref.category.label));
+    }
+    
+    // Retrouver le parent de la catégorie actuelle
+    const currentCategory = this.allCategories.find(
+      c => c.label === ref.category.label
+    );
+    
+    if (currentCategory?.parent) {
+      categories.unshift(this.format(currentCategory.parent));
+    }
+    
+    return categories;
+  }
+
   // ---------- NAVIGATION ----------
   back(): void {
+    if (this.navigationMode === NavigationMode.Direct) {
+      // En mode direct, on reste sur la liste des référentiels
+      return;
+    }
+
     switch (this.currentLevel) {
       case Level.Events:
         this.selections.referentiel = undefined;
@@ -255,7 +395,7 @@ export class SelectRiskEventComponent implements OnInit {
     }
   }
 
-  // ---------- CRÉATION D’ÉVÉNEMENT ----------
+  // ---------- CRÉATION D'ÉVÉNEMENT ----------
   createNewEvent(): void {
     const queryParams: any = {
       redirect: this.router.url,
@@ -268,16 +408,18 @@ export class SelectRiskEventComponent implements OnInit {
     this.router.navigate(['reglages', 'risks', 'create'], { queryParams });
   }
 
-  /** Affiche le bouton de création si :
-   *  - on est en mode Event
-   *  - ET soit aucun résultat de recherche
-   *  - soit on a sélectionné un référentiel sans événement
-   */
   get shouldShowCreateButton(): boolean {
     return this.mode === RiskSelectionMode.Event &&
       (
         (!this.isSearching && this.showSearchResults && this.searchResults.length === 0)
         || (this.currentLevel === Level.Events)
       );
+  }
+
+  get canGoBack(): boolean {
+    if (this.navigationMode === NavigationMode.Direct) {
+      return false;
+    }
+    return this.currentLevel !== Level.Categories;
   }
 }
