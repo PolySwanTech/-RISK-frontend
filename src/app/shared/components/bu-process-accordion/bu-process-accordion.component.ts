@@ -414,7 +414,7 @@ export class BuProcessAccordionComponent {
       this.viewProcesses(node);
     } else if (this.view === 'process') {
       // si on veut s'arrêter au processus, on émet et on s'arrête
-      if (this.stopAtProcess || this.consultationMode === 'selection') {
+      if (this.stopAtProcess && this.consultationMode === 'selection') {
         const result = {
         bu: this.breadcrumb.find(b => b.type === 'process' || b.type === 'bu'),
         process: node

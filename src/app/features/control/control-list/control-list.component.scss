@@ -24,52 +24,6 @@ mat-form-field {
   width: 100%;
 }
 
-.badge {
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: white;
-  display: inline-block;
-  text-transform: capitalize;
-}
-
-.badge-type {
-  background-color: #5c6bc0; 
-}
-
-.badge-risque-faible {
-  background-color: #81c784; 
-}
-
-.badge-risque-moyen {
-  background-color: #ffb74d; 
-}
-
-.badge-risque-eleve {
-  background-color: #e57373; 
-}
-
-.badge-controle-faible {
-  background-color: #ef5350;
-}
-
-.badge-controle-moyen {
-  background-color: #ffca28;
-}
-
-.badge-controle-eleve {
-  background-color: #66bb6a;
-}
-
-.badge-statut-ouvert {
-  background-color: #42a5f5;
-}
-
-.badge-statut-ferme {
-  background-color: #ff3f3f;
-}
-
 .filters-section {
   width: 100%;
 }
