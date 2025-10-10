@@ -162,7 +162,7 @@ export class CreateRisksComponent implements OnInit {
       this.router.navigate(['reglages', 'risks']);
     }
   }
-
+  
   submit(): void {
     if (this.infoForm.invalid) {
       console.error('Formulaire invalide:', this.infoForm.errors);

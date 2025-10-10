@@ -458,18 +458,18 @@ export class BuProcessAccordionComponent {
           type: 'risk' as const
         }));
 
-        if (riskNodes.length) {
-          this.view = 'risks'; // CHANGEMENT DE VUE : de process vers risks
-          this.currentNodes = riskNodes;
-          this.breadcrumb.push({
-            id: process.id,
-            name: process.name,
-            nodes: riskNodes,
-            type: 'risks' // On passe en vue risks
-          });
-        } else {
-          this.snackBarService.info('Aucun risque associé à ce processus.');
-        }
+        this.view = 'risks'; // CHANGEMENT DE VUE : de process vers risks
+        this.currentNodes = riskNodes;
+        this.breadcrumb.push({
+          id: process.id,
+          name: process.name,
+          nodes: riskNodes,
+          type: 'risks' // On passe en vue risks
+        });
+        // if (riskNodes.length) {
+        // } else {
+        //   this.snackBarService.info('Aucun risque associé à ce processus.');
+        // }
       },
       error: (error) => {
         console.error('Erreur lors du chargement des risques:', error);
@@ -811,57 +811,57 @@ export class BuProcessAccordionComponent {
   }
 
   createNewEvent(): void {
-  const buId = this.breadcrumb.find(b => b.type === 'process')?.id;
-  const processId = this.breadcrumb.find(b => b.type === 'risks')?.id;
-  const redirect = this.router.url;
+    const buId = this.breadcrumb.find(b => b.type === 'process')?.id;
+    const processId = this.breadcrumb.find(b => b.type === 'risks')?.id;
+    const redirect = this.router.url;
 
-  const dialogRef = this.dialog.open(CreateRisksComponent, {
-    width: '700px',
-    maxHeight: '90vh',
-    data: { processId, buId, redirect },
-    disableClose: true,
-    autoFocus: false
-  });
+    const dialogRef = this.dialog.open(CreateRisksComponent, {
+      width: '700px',
+      maxHeight: '90vh',
+      data: { processId, buId, redirect },
+      disableClose: true,
+      autoFocus: false
+    });
 
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      const node = {
-        id : result.createdEventId, name : result.libelle, isInfo : true
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const node = {
+          id: result.createdEventId, name: result.libelle, isInfo: true
+        }
+        this.selectRisk(node)
+        this.refreshCurrentRisks(processId || '');
+        // Recharger le cache pour la recherche
+        this.loadAllRisks();
       }
-      this.selectRisk(node)
-      this.refreshCurrentRisks(processId || '');
-      // Recharger le cache pour la recherche
-      this.loadAllRisks();
-    }
-  });
-}
+    });
+  }
 
-private refreshCurrentRisks(processId: string): void {
-  if (!processId || this.view !== 'risks') return;
+  private refreshCurrentRisks(processId: string): void {
+    if (!processId || this.view !== 'risks') return;
 
-  this.riskService.getRisksTreeByProcessId(processId).subscribe({
-    next: (risks) => {
-      const riskNodes = risks.map(r => ({
-        id: r.id,
-        name: r.libelle,
-        enfants: r.enfants,
-        type: 'risk' as const
-      }));
+    this.riskService.getRisksTreeByProcessId(processId).subscribe({
+      next: (risks) => {
+        const riskNodes = risks.map(r => ({
+          id: r.id,
+          name: r.libelle,
+          enfants: r.enfants,
+          type: 'risk' as const
+        }));
 
-      // Mettre à jour les nœuds actuels
-      this.currentNodes = riskNodes;
-      
-      // Mettre à jour le breadcrumb
-      if (this.breadcrumb.length > 0) {
-        this.breadcrumb[this.breadcrumb.length - 1].nodes = riskNodes;
+        // Mettre à jour les nœuds actuels
+        this.currentNodes = riskNodes;
+
+        // Mettre à jour le breadcrumb
+        if (this.breadcrumb.length > 0) {
+          this.breadcrumb[this.breadcrumb.length - 1].nodes = riskNodes;
+        }
+
+        this.snackBarService.info('Liste des risques actualisée');
+      },
+      error: (error) => {
+        console.error('Erreur lors du rechargement des risques:', error);
+        this.snackBarService.error('Erreur lors du rechargement');
       }
-
-      this.snackBarService.info('Liste des risques actualisée');
-    },
-    error: (error) => {
-      console.error('Erreur lors du rechargement des risques:', error);
-      this.snackBarService.error('Erreur lors du rechargement');
-    }
-  });
-}
+    });
+  }
 }
