@@ -26,7 +26,7 @@ export class ProcessService {
     return this.http.get<Process>(`${this.baseUrl}/${id}`);
   }
 
-  createProcess(process: { name: string; bu: { id: string; name: string }; parentId?: string }) {
+  createProcess(process: { name: string; bu: string, parentId?: string }) {
     return this.http.post<Process>(this.baseUrl, process)
   }
 
@@ -50,7 +50,7 @@ export class ProcessService {
     return this.http.get<Process[]>(this.baseUrl + '/by-dmr', { params: params });
   }
 
-  delete(id : string) {
+  delete(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

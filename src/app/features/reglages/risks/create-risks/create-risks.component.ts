@@ -71,7 +71,7 @@ export class CreateRisksComponent implements OnInit {
   bal1: BaloiseCategoryDto[] = [];
   bal2: BaloiseCategoryDto[] = [];
 
-  pageTitle = 'Création d\'un évènement de risque';
+  pageTitle = 'Création d\'un évènement de risque redouté';
   dialogLabel = { title: 'Création', message: 'création' };
 
   riskLevels = Object.values(RiskLevelEnum);
@@ -211,7 +211,7 @@ export class CreateRisksComponent implements OnInit {
       if (result) {
         this.risk = result;
         this.infoForm.get('parentRisk')?.setValue(this.risk.id);
-        console.log(this.risk)
+        console.log(this.infoForm)
       }
     });
   }

@@ -68,7 +68,7 @@
       </div>
 
       <mat-list class="custom-list">
-          <button mat-raised-button style="width: 30%;" class="btn-primary" *ngIf="view === 'risks'" (click)="createNewEvent()">Nouvelle evenement</button>
+          <button mat-raised-button style="width: 30%;" class="btn-primary" *ngIf="view === 'risks'" (click)="createNewEvent()">Nouvel evenement</button>
         @for(node of currentNodes; track node.id){
         <mat-list-item [matTooltip]="getTooltip(view)"
           (click)="view === 'risks' ? selectRisk(node) : viewNextLevel(node)">
