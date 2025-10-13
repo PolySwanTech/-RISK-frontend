@@ -42,9 +42,7 @@ export class ReglagesComponent {
         width: '800px'
       }
     ).afterClosed().subscribe(bu => {
-      console.log(bu)
       this.entitiesService.save(bu).subscribe(resp => {
-        console.log(resp)
       })
     })
   }
@@ -55,9 +53,7 @@ export class ReglagesComponent {
         width: '800px'
       }
     ).afterClosed().subscribe(p => {
-      console.log(p)
       this.processService.createProcess(p).subscribe(resp => {
-        console.log(resp)
       })
     })
   }

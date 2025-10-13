@@ -34,7 +34,7 @@
 
             <div class="actions">
 
-              <button mat-raised-button class="btn-red" matStepperPrevious *ngIf="risk.id">
+              <button mat-raised-button class="btn-red" (click)="cancel()" *ngIf="risk.id">
                 Annuler
               </button>
 

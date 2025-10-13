@@ -36,6 +36,8 @@ import { MatChipListbox, MatChip } from "@angular/material/chips";
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    FormsModule, MatButtonModule, ReactiveFormsModule, 
+    MatIconModule, PopupHeaderComponent,
     FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, PopupHeaderComponent,
     MatChipListbox,
     MatChip

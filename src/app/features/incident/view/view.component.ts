@@ -381,7 +381,9 @@ export class ViewComponent implements OnInit {
     const diffTime = Math.abs(date2.getTime() - date1.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 30) {
+    if(diffDays < 0){
+      return 'black';
+    }else if (diffDays < 30) {
       return 'green';
     } else if (diffDays < 60) {
       return 'orange';
@@ -391,6 +393,8 @@ export class ViewComponent implements OnInit {
   }
 
   getDaysDiff(from: Date | string, to: Date | string): number {
+    if(from == null || to == null)
+        return -1;
     const date1 = new Date(from);
     const date2 = new Date(to);
     const diffTime = Math.abs(date2.getTime() - date1.getTime());

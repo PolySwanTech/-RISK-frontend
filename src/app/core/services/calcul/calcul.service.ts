@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { SmaInput, SmaInputCreateDto, SmaLoss, SmaLossUpsert, SmaPayload } from '../../models/Sma';
-import { SmaResult } from '../../models/SmaResult';
 
 @Injectable({
   providedIn: 'root'
@@ -12,24 +10,20 @@ export class CalculService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl + '/sma/inputs';
 
-  createInput(dto: SmaInputCreateDto) {
-    return this.http.post<SmaInput>(`${this.baseUrl}`, dto);
+  getValues() {
+    return this.http.get<any>(this.baseUrl)
   }
 
-  upsertLosses(inputId: string, losses: SmaLossUpsert[]) {
-    return this.http.post<SmaLoss[]>(`${this.baseUrl}/${inputId}/losses`, losses);
+  getLosses() {
+    return this.http.get<any[]>(this.baseUrl + '/losses')
   }
 
-  getPayload(inputId: string) {
-    return this.http.get<SmaPayload>(`${this.baseUrl}/${inputId}`);
+  saveLosses(losses: { lossYear: number, amount: number }[]) {
+    return this.http.post<any[]>(this.baseUrl, losses);
   }
 
-  getLatestPayload() {
-    return this.http.get<SmaPayload>(`${this.baseUrl}/latest/payload`);
-  }
-
-  getResult(inputId: string) {
-    return this.http.get<SmaResult>(`${this.baseUrl}/${inputId}/result`);
+  getResult() {
+    return this.http.get<any[]>(this.baseUrl + '/result')
   }
 
 }

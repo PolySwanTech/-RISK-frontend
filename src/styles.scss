@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+@use "sass:color";
 @import '@angular/material/prebuilt-themes/azure-blue.css';
+
+$purple-color : #7E57C2;
 
 :root {
     --mat-sys-background: #f8f9fc;
@@ -328,41 +331,6 @@ tr:last-child {
     }
 }
 
-
-// .badge {
-//     display: inline-block;
-//     padding: 4px 8px;
-//     border-radius: 12px;
-//     font-size: 12px;
-//     font-weight: bold;
-//     color: white;
-//     text-align: center;
-//     min-width: 50px;
-
-//     background-color: #adb5bd; // gris doux (default)
-
-//     &.new {
-//         background-color: #8dd6c0; // turquoise adouci
-//     }
-
-//     &.moyen,
-//     &.draft,
-//     &.in_progress, &.medium {
-//         background-color: #e6c678; // jaune doux
-//     }
-
-//     &.closed,
-//     &.faible,
-//     &.achieved, &.conforme, &.minimal {
-//         background-color: #9fcf9f; // vert doux
-//     }
-
-//     &.fort,
-//     &.not_achieved, &.non_conforme, &.maximum {
-//         background-color: #d87c7c; // rouge doux
-//     }
-// }
-
 .priority-bar {
     width: 60px;
     height: 10px;
@@ -612,10 +580,10 @@ mat-paginator {
 
 button[mat-icon-button] {
     &.btn-red {
-        color: lighten(#dc3545, 5%);
+        color: color.adjust(#dc3545, $lightness: 5%);
 
         * &:hover {
-            color: lighten(#dc3545, 10%);
+            color: color.adjust(#dc3545, $lightness: 10%);
         }
     }
 }
@@ -640,7 +608,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: lighten(#004aad, 5%);
+            background-color: color.adjust(#004aad, $lightness : 5%);
         }
     }
 
@@ -649,7 +617,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: lighten(#29850b, 5%);
+            background-color: color.adjust(#29850b, $lightness: 5%);
         }
     }
 
@@ -658,7 +626,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: lighten(#7E57C2, 5%);
+            background-color: color.adjust($purple-color, $lightness: 5%);
         }
     }
 
@@ -667,7 +635,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: lighten(#dc3545, 5%);
+            background-color: color.adjust(#dc3545, $lightness: 5%);
         }
     }
 

@@ -418,7 +418,6 @@ export class CreateOperationalImpactComponent implements OnInit {
         .subscribe(amountDtos => {
           this.existingAmounts[operatingLossId] = amountDtos.map(a => Amount.fromDto(a));
         });
-        console.log(this.existingAmounts);
     }
     
       deactivateAmount(id: string, operatingLossId: string) {
