@@ -18,7 +18,6 @@ import { CreateEvaluationComponent } from './features/cartographie/create-evalua
 import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
 import { CreateCartoComponent } from './features/cartographie/create-carto/create-carto/create-carto.component';
 import { TodoComponent } from './pages/todo/todo.component';
-import { ProcessManagerComponent } from './shared/components/param-process/param-process.component';
 import { AttenuationMetricsListComponent } from './features/control/attenuation-metrics-list/attenuation-metrics-list.component';
 
 export const routes: Routes = [
