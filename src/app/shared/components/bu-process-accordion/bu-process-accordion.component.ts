@@ -452,7 +452,6 @@ export class BuProcessAccordionComponent {
   }
 
   private viewRisks(process: ProcessNode) {
-
     this.riskService.getRisksTreeByProcessId(process.id).subscribe({
       next: (risks) => {
         const riskNodes = risks.map(r => ({
@@ -470,10 +469,6 @@ export class BuProcessAccordionComponent {
           nodes: riskNodes,
           type: 'risks' // On passe en vue risks
         });
-        // if (riskNodes.length) {
-        // } else {
-        //   this.snackBarService.info('Aucun risque associé à ce processus.');
-        // }
       },
       error: (error) => {
         console.error('Erreur lors du chargement des risques:', error);

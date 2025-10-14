@@ -10,6 +10,27 @@ import { ControlService } from '../../../core/services/control/control.service';
 import { ControlTemplate } from '../../../core/models/ControlTemplate';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Status, StatusLabels } from '../../../core/enum/status.enum';
+import { Plugin } from 'chart.js';
+
+const noDataPlugin: Plugin<'pie'> = {
+  id: 'noDataPlugin',
+  beforeDraw: (chart) => {
+    const data = chart.data.datasets[0].data;
+    const total = 0;
+
+    if (total === 0) {
+      const { ctx, width, height } = chart;
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 16px Arial';
+      ctx.fillStyle = '#999';
+      ctx.fillText('Aucune donnée disponible', width / 2, height / 2);
+      ctx.restore();
+    }
+  }
+};
 
 @Component({
   selector: 'app-control-chart',
@@ -30,6 +51,8 @@ export class ControlChartComponent implements OnInit {
   statusLabels = StatusLabels;
   degreeLabels = DegreeLabels;
 
+  noDataPlugin = noDataPlugin;
+
   pieChartData = {
     labels: [] as string[],
     datasets: [{
@@ -42,24 +65,24 @@ export class ControlChartComponent implements OnInit {
 
   pieChartOptions: ChartOptions<'pie'> = {
     responsive: true,
-    maintainAspectRatio: false, // permet d'adapter la taille à son conteneur
+    maintainAspectRatio: false,
     layout: { padding: 20 },
     plugins: {
       legend: {
         position: 'left',
         labels: {
-          color: '#333',                 // couleur du texte
+          color: '#333',
           font: {
-            size: 14,                    // taille du texte
-            weight: 'bold',              // épaisseur (normal, bold, etc.)
-            family: 'Arial, sans-serif' // police de caractères
+            size: 14,
+            weight: 'bold',
+            family: 'Arial, sans-serif'
           },
-          boxWidth: 20,                  // taille du carré de couleur
-          boxHeight: 15,                 // hauteur du carré de couleur (Chart.js 4+)
-          padding: 20,                   // espacement autour du texte dans la légende
-          usePointStyle: true,          // affiche un rond au lieu d'un carré
-          pointStyle: 'circle',         // 'circle', 'rect', 'star', etc.
-          textAlign: 'left'             // alignement du texte (start, center, end)
+          boxWidth: 20,
+          boxHeight: 15,
+          padding: 20,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          textAlign: 'left'
         }
       },
       tooltip: {
@@ -71,23 +94,36 @@ export class ControlChartComponent implements OnInit {
           }
         }
       }
-    }
+    },
   };
 
   ngOnInit() {
     this.controlService.getAllTemplates().subscribe(data => {
-      this.controls = data
+      this.controls = data;
+
+      let remaining = this.controls.length;
+
+      if (remaining === 0) {
+        this.updateChart(); // aucune donnée
+        return;
+      }
+
       this.controls.forEach(c => {
-        this.controlService.getLastExecution(c.id).subscribe(data => {
-          c.execution = data;
-          this.updateChart();
+        this.controlService.getLastExecution(c.id).subscribe(exec => {
+          c.execution = exec;
+          remaining--;
+
+          // Mettre à jour uniquement une fois que toutes les exécutions sont récupérées
+          if (remaining === 0) {
+            this.updateChart();
+          }
         });
-      })
+      });
     });
   }
 
-  updateChart() {
 
+  updateChart() {
     if (this.groupByLevel) {
       const counts: Record<Degree, number> = {
         [Degree.LEVEL_1]: 0,
@@ -97,13 +133,12 @@ export class ControlChartComponent implements OnInit {
       this.controls.forEach(control => {
         counts[control.controlLevel] = (counts[control.controlLevel] || 0) + 1;
       });
+
       this.pieChartData.labels = Object.keys(counts).map(
         degree => this.formatDegree(degree as Degree)
       );
       this.pieChartData.datasets[0].data = Object.values(counts);
-      this.chart?.update();
-    }
-    else {
+    } else {
       const counts: Record<Status, number> = {
         [Status.ACHIEVED]: 0,
         [Status.IN_PROGRESS]: 0,
@@ -116,14 +151,15 @@ export class ControlChartComponent implements OnInit {
         if (control.execution)
           counts[control.execution.status] = (counts[control.execution.status] || 0) + 1;
       });
+
       this.pieChartData.labels = Object.keys(counts).map(
         statusKey => this.formatStatus(statusKey as Status)
       );
       this.pieChartData.datasets[0].data = Object.values(counts);
-      this.chart?.update();
     }
-  }
 
+    this.chart?.update();
+  }
 
   formatStatus(status: Status) {
     return this.statusLabels[status] || 'Inconnu'

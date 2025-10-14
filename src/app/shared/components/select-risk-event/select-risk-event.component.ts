@@ -11,7 +11,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { RiskReferentielService } from '../../../core/services/risk/risk-referentiel.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
@@ -85,6 +85,7 @@ export class SelectRiskEventComponent implements OnInit {
   // --- Injections ---
   private dialogRef = inject(MatDialogRef<SelectRiskEventComponent>, { optional: true });
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private categoryService = inject(RiskCategoryService);
   private referentielService = inject(RiskReferentielService);
   private riskService = inject(RiskService);
@@ -94,13 +95,14 @@ export class SelectRiskEventComponent implements OnInit {
     this.mode = this.data?.mode ?? this.mode;
     this.processId = this.data?.processId;
 
-    // Charger toutes les catégories d'abord
+    const cat1 = this.route.snapshot.queryParams["cat1"];
+    const cat2 = this.route.snapshot.queryParams["cat2"];
+
     this.categoryService.getAll().subscribe({
       next: (categories) => {
         this.allCategories = categories;
         this.categoriesLevel1 = categories.filter(c => !c.parent);
 
-        // Puis charger les référentiels
         this.referentielService.getAll().subscribe({
           next: (refs) => {
             this.allReferentiels = refs;
@@ -113,14 +115,37 @@ export class SelectRiskEventComponent implements OnInit {
             }
 
             this.loadSearchData();
+
+            // 👉 Maintenant que tout est prêt, on peut auto-sélectionner
+            if (cat1 && cat2) {
+              this.autoSelectCategories(cat1, cat2);
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: {
+                  label: null,
+                  cat1: null,
+                  cat2: null
+                },
+                queryParamsHandling: 'merge',
+                replaceUrl: true
+              });
+
+            }
           }
         });
       }
     });
 
-    this.isDialog = this.dialogRef != undefined
-    console.log(this.isDialog)
+    this.isDialog = this.dialogRef != undefined;
   }
+
+  autoSelectCategories(cat1: string, cat2: string) {
+    const category = this.allCategories.find(c => c.libelle === cat1);
+    if (category) {
+      this.selectCategory(category, cat2);
+    }
+  }
+
 
   // ---------- GESTION DES MODES ----------
   onNavigationModeChange(mode: NavigationMode): void {
@@ -268,20 +293,33 @@ export class SelectRiskEventComponent implements OnInit {
     this.resetSelections();
   }
 
-  selectCategory(category: BaloiseCategoryDto): void {
+  selectCategory(category: BaloiseCategoryDto, autoSelectSub?: string): void {
     if (this.mode === RiskSelectionMode.CategoryLevel1)
       return this.closeAndEmit(category);
 
     this.selections.category = category;
-    this.handleLoading(this.categoryService.getByParent(category.libelle), (subs: BaloiseCategoryDto[]) => {
-      this.updateView(
-        Level.Subcategories,
-        subs,
-        `Sous-catégories de ${this.format(category.libelle)}`,
-        [this.format(category.libelle)]
-      );
-    });
+
+    this.handleLoading(
+      this.categoryService.getByParent(category.libelle),
+      (subs: BaloiseCategoryDto[]) => {
+        this.updateView(
+          Level.Subcategories,
+          subs,
+          `Sous-catégories de ${this.format(category.libelle)}`,
+          [this.format(category.libelle)]
+        );
+
+        // 👉 Auto-sélection de la sous-catégorie si précisé
+        if (autoSelectSub) {
+          const sub = subs.find(s => s.libelle === autoSelectSub);
+          if (sub) {
+            setTimeout(() => this.selectSubCategory(sub), 0);
+          }
+        }
+      }
+    );
   }
+
 
   selectSubCategory(sub: BaloiseCategoryDto): void {
     if (this.mode === RiskSelectionMode.CategoryLevel2)
@@ -315,6 +353,16 @@ export class SelectRiskEventComponent implements OnInit {
         ].filter(Boolean)
       );
     });
+  }
+
+  addReferentiel() {
+    this.router.navigate(['reglages', 'risks', 'create-referentiel'],
+      {
+        queryParams: {
+          bal: this.selections.subcategory?.libelle,
+          next: `reglages?label=Taxonmie&cat1=${this.selections.category?.libelle}&cat2=${this.selections.subcategory?.libelle}`
+        }
+      })
   }
 
   selectEvent(event: any): void {

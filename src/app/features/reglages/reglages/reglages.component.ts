@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -6,6 +6,7 @@ import { SelectRiskEventComponent } from "../../../shared/components/select-risk
 import { MatDialog } from '@angular/material/dialog';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-reglages',
@@ -13,10 +14,15 @@ import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog
   templateUrl: './reglages.component.html',
   styleUrl: './reglages.component.scss'
 })
-export class ReglagesComponent {
+export class ReglagesComponent implements OnInit {
+
 
   private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  
   private entitiesService = inject(EntitiesService)
+
+  selectedTabIndex = 0;
 
   goBackButtons: GoBackButton[] = [
     {
@@ -24,9 +30,17 @@ export class ReglagesComponent {
       icon: 'add',
       class: 'btn-primary',
       show: true,
-      action: () => {}
+      action: () => { }
     }
   ]
+
+  ngOnInit(): void {
+    const label = this.route.snapshot.queryParams['label'];
+
+    if (label === 'Taxonmie') {
+      this.selectedTabIndex = 1; // Index de l'onglet "Taxonomie"
+    }
+  }
 
   addBu() {
     this.dialog.open(AddEntityDialogComponent,

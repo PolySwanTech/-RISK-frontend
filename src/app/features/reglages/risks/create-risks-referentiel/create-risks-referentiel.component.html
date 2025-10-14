@@ -15,7 +15,7 @@
             </mat-form-field>
 
             <!-- Catégorie L1 -------------------------------------------------- -->
-            <button style="margin-bottom: 20px;" mat-stroked-button (click)="openSubCategorySelector()">
+            <button *ngIf="!isBaloisPreselected" style="margin-bottom: 20px;" mat-stroked-button (click)="openSubCategorySelector()">
               <mat-icon>add</mat-icon>
               Associer un Risque Bâlois*
             </button>

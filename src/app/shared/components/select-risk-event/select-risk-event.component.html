@@ -2,9 +2,7 @@
 
   <!-- ====== TOGGLE MODE NAVIGATION ====== -->
   <div class="navigation-mode-toggle">
-    <mat-button-toggle-group 
-      [value]="navigationMode" 
-      (change)="onNavigationModeChange($event.value)">
+    <mat-button-toggle-group [value]="navigationMode" (change)="onNavigationModeChange($event.value)">
       <mat-button-toggle [value]="NavigationMode.Hierarchical">
         <mat-icon>account_tree</mat-icon>
         Navigation hiérarchique
@@ -46,13 +44,8 @@
     <div class="search-input-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
 
-      <input
-        type="text"
-        class="search-input"
-        [placeholder]="searchPlaceholder"
-        [(ngModel)]="searchQuery"
-        (input)="onSearchInput($event)"
-      />
+      <input type="text" class="search-input" [placeholder]="searchPlaceholder" [(ngModel)]="searchQuery"
+        (input)="onSearchInput($event)" />
 
       <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
         <mat-icon>clear</mat-icon>
@@ -137,6 +130,8 @@
 
       <!-- NIVEAU 3 : Référentiels avec badges Baloise -->
       <ng-container *ngIf="currentLevel === 'referentiels'">
+        <button mat-raised-button class="btn btn-secondary" (click)="addReferentiel()">Ajouter une nouvelle
+          taxonomie</button>
         <mat-list-item *ngFor="let ref of currentItems" (click)="selectReferentiel(ref)">
           <mat-icon matListIcon>account_tree</mat-icon>
           <div matLine class="referentiel-content">
@@ -161,7 +156,8 @@
           <div class="node-content">
             <h3 matLine>{{ event.libelle }}</h3>
           </div>
-          <button *ngIf="isDialog" mat-stroked-button color="primary" (click)="selectEvent(event); $event.stopPropagation()">
+          <button *ngIf="isDialog" mat-stroked-button color="primary"
+            (click)="selectEvent(event); $event.stopPropagation()">
             <mat-icon>check</mat-icon> Sélectionner
           </button>
         </mat-list-item>
