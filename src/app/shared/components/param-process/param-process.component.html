@@ -1,0 +1,134 @@
+<app-go-back [title]="'Gestion des processus'" [buttons]="goBackButtons"></app-go-back>
+
+<div class="container">
+
+  <!-- <div class="header">
+    <h1>Gestion de l'Organigramme - Risque Opérationnel</h1>
+  </div> -->
+
+  <div class="content">
+    <!-- Arbre des processus -->
+    <div class="tree-section">
+      <h2>Structure des Processus</h2>
+      <div class="tree">
+        <div *ngFor="let process of processes" class="tree-node">
+          <div class="process-item" [class.selected]="selectedProcess?.id === process.id"
+            (click)="selectProcess(process)">
+            <span class="toggle" (click)="toggleExpand(process, $event)">
+              {{ process.enfants && process.enfants.length > 0 ? (process.expanded ? '▼' : '▶') : '•' }}
+            </span>
+            <span class="process-name">{{ process.name }}</span>
+            <span class="badge" [class]="'badge-' + process.niveau">{{ getLevelLabel(process.niveau) }}</span>
+            <span class="risk-count" *ngIf="process.risks && process.risks.length > 0">
+              {{ process.risks.length }} risque(s)
+            </span>
+          </div>
+          <div *ngIf="process.expanded" class="children">
+            <ng-container *ngTemplateOutlet="processTree; context: {$implicit: process.enfants}"></ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Détails et actions -->
+    <div class="details-section">
+      <div *ngIf="!selectedProcess" class="placeholder">
+        <p>Sélectionnez un processus dans l'arbre pour voir les détails</p>
+      </div>
+
+      <div *ngIf="selectedProcess && !showDispatchModal" class="process-details">
+        <h2>{{ selectedProcess.name }}</h2>
+        <p class="level-info">Niveau : {{ getLevelLabel(selectedProcess.niveau) }}</p>
+
+        <div class="actions">
+          <button *ngIf="selectedProcess && selectedProcess.niveau && selectedProcess.niveau < 3"
+            class="btn btn-primary" (click)="initiateAddChild()">
+            + Ajouter un sous-processus
+          </button>
+        </div>
+
+        <div class="risk-events-section">
+          <h3 *ngIf="selectedProcess">Événements de risque redouté ({{ viewedRisks ? viewedRisks.length : 0 }})</h3>
+          <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button style="margin-bottom : 10px;"
+            class="btn btn-primary" (click)="createNewEvent()">+ Ajouter évènement redouté</button>
+          <div *ngIf="viewedRisks.length > 0; else noRisk" class="risk-list">
+            <div *ngFor="let risk of viewedRisks" class="risk-item">
+              <strong>{{ risk.libelle }}</strong>
+              <p>{{ risk.description }}</p>
+            </div>
+          </div>
+          <ng-template #noRisk>
+            <p class="empty-state">Aucun événement de risque associé</p>
+          </ng-template>
+        </div>
+      </div>
+      <div *ngIf="showDispatchModal" class="dispatch-modal">
+        <h2>Dispatcher les événements de risque redouté</h2>
+        <p *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0" class="warning">
+          ⚠️ Le processus "{{ selectedProcess.name }}" possède {{ selectedProcess.risks.length }} événement(s)
+          de risque.
+          Vous devez créer au moins 2 sous-processus et dispatcher les risques redoutés entre eux.
+        </p>
+
+        <div class="subprocess-creation">
+          <h3>Création des sous-processus</h3>
+          <div *ngFor="let sp of newSubprocesses; let i = index" class="subprocess-form">
+            <div class="form-row">
+              <label>Sous-processus {{ i + 1 }}</label>
+              <input type="text" [(ngModel)]="sp.name" placeholder="Nom du sous-processus" class="form-control">
+              <button *ngIf="newSubprocesses.length > 2" class="btn-icon btn-danger" (click)="removeSubprocess(i)">
+                ✕
+              </button>
+            </div>
+          </div>
+          <button class="btn btn-secondary" (click)="addSubprocess()">
+            + Ajouter un autre sous-processus
+          </button>
+        </div>
+
+        <div class="risk-dispatch" *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0">
+          <h3>Dispatcher les risques</h3>
+          <div *ngFor="let risk of selectedProcess?.risks" class="risk-dispatch-item">
+            <div class="risk-info">
+              <strong>{{ risk.libelle }}</strong>
+              <p>{{ risk.description }}</p>
+            </div>
+            <select [(ngModel)]="riskDispatch[risk.id]" class="form-control" [class.invalid]="!riskDispatch[risk.id]">
+              <!-- <option value="">-- Assigner à un sous-processus --</option> -->
+              <option *ngFor="let sp of newSubprocesses; let i = index" [value]="i">
+                {{ sp.name || 'Sous-processus ' + (i + 1) }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="cancelDispatch()">
+            Annuler
+          </button>
+          <button class="btn btn-primary" [disabled]="!canConfirmDispatch()" (click)="confirmDispatch()">
+            Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #processTree let-enfants>
+  <div *ngFor="let child of enfants" class="tree-node">
+    <div class="process-item child" [class.selected]="selectedProcess?.id === child.id" (click)="selectProcess(child)">
+      <span class="toggle" (click)="toggleExpand(child, $event)">
+        {{ child.enfants.length > 0 ? (child.expanded ? '▼' : '▶') : '•' }}
+      </span>
+      <span class="process-name">{{ child.name }}</span>
+      <span class="badge" [class]="'badge-' + child.niveau">{{ getLevelLabel(child.niveau) }}</span>
+      <span class="risk-count" *ngIf="child.risks && child.risks.length > 0">
+        {{ child.risks.length }} risque(s)
+      </span>
+    </div>
+    <div *ngIf="child.expanded" class="enfants">
+      <ng-container *ngTemplateOutlet="processTree; context: {$implicit: child.enfants}"></ng-container>
+    </div>
+  </div>
+</ng-template>

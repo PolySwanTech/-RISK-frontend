@@ -122,7 +122,6 @@ export class BuProcessAccordionComponent {
     this.route.queryParams.subscribe(params => {
       const buId = params['buId'] || this.buId;
       if (buId) {
-        console.log('➡️ BU ID trouvé dans les query params:', buId);
         this.navigateToBuFromQueryParam(buId);
       }
     });
@@ -130,21 +129,10 @@ export class BuProcessAccordionComponent {
 
   // Naviguer vers les processus d'une BU depuis les query params
   private navigateToBuFromQueryParam(buId: string): void {
-    // Chercher la BU dans la hiérarchie
     const bu = this.findBuById(buId);
 
     if (bu) {
-      console.log('➡️ BU trouvée:', bu);
-
-      // Naviguer directement vers les processus de cette BU
       this.viewProcesses(bu);
-
-      // Optionellement, nettoyer le query param après navigation
-      // this.router.navigate([], { 
-      //   relativeTo: this.route, 
-      //   queryParams: { buId: null }, 
-      //   queryParamsHandling: 'merge' 
-      // });
     } else {
       console.warn('➡️ BU non trouvée avec l\'ID:', buId);
       this.snackBarService.error('Unité métier non trouvée');
@@ -424,6 +412,10 @@ export class BuProcessAccordionComponent {
 
   private viewProcesses(bu: ProcessNode) {
 
+    if (!this.dialogRef) {
+      this.router.navigate(['reglages', 'process'], { queryParams: { buId: bu.id } })
+    }
+
     // Vérifier d'abord dans `children` (processus construits via buildBUChildren)
     let processes = bu.children;
 
@@ -448,7 +440,6 @@ export class BuProcessAccordionComponent {
   }
 
   private viewRisks(process: ProcessNode) {
-
     this.riskService.getRisksTreeByProcessId(process.id).subscribe({
       next: (risks) => {
         const riskNodes = risks.map(r => ({
@@ -466,10 +457,6 @@ export class BuProcessAccordionComponent {
           nodes: riskNodes,
           type: 'risks' // On passe en vue risks
         });
-        // if (riskNodes.length) {
-        // } else {
-        //   this.snackBarService.info('Aucun risque associé à ce processus.');
-        // }
       },
       error: (error) => {
         console.error('Erreur lors du chargement des risques:', error);
@@ -626,7 +613,6 @@ export class BuProcessAccordionComponent {
 
     this.searchResults = processResults.slice(0, 10); // Limiter à 10 résultats
     this.isSearching = false;
-    console.log('➡️ Résultats de recherche de processus:', this.searchResults);
   }
 
 
@@ -657,8 +643,6 @@ export class BuProcessAccordionComponent {
   }
 
   selectSearchResult(result: any): void {
-    console.log('➡️ Sélection depuis la recherche:', result);
-
     if (result.type === 'risk') {
       const obj = {
         bu: { id: result.buId, name: result.buName },
@@ -681,7 +665,6 @@ export class BuProcessAccordionComponent {
 
     this.clearSearch();
   }
-
 
   deleteBu(id: string) {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")
@@ -772,19 +755,7 @@ export class BuProcessAccordionComponent {
   }
 
   addProcess(buId: string) {
-    this.dialog.open(CreateProcessComponent,
-      {
-        width: '800px',
-        data: { buId: buId }
-      }
-    ).afterClosed().subscribe(p => {
-      this.processService.createProcess(p).subscribe(resp => {
-        this.ngOnInit();
-      },
-        error => {
-          this.ngOnInit();
-        });
-    });
+    this.router.navigate(['reglages', 'process'], { queryParams: { buId, create: true } })
   }
 
   getTooltip(view: string): string {

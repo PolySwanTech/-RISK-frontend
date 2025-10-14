@@ -14,6 +14,8 @@ export class Process {
     niveau?: number;
     sum = 0;
 
+    expanded : boolean = false
+
     constructor(
         name: string,
         bu: BusinessUnit,

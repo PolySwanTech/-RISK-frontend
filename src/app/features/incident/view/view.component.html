@@ -23,7 +23,8 @@
 
                             <div class="timeline-segment">
                                 <div class="days-diff">
-                                    {{ getDaysDiff(incident.survenueAt, incident.detectedAt) }} jours
+                                    {{ getDaysDiff(incident.survenueAt, incident.detectedAt) == -1 ? 'N/R' :
+                                    getDaysDiff(incident.survenueAt, incident.detectedAt) + ' jours' }}
                                 </div>
 
                                 <div class="line-gradient" [ngStyle]="{
@@ -42,7 +43,8 @@
 
                             <div class="timeline-segment">
                                 <div class="days-diff">
-                                    {{ getDaysDiff(incident.detectedAt, incident.declaredAt) }} jours
+                                    {{ getDaysDiff(incident.detectedAt, incident.declaredAt) == -1 ? 'N/R' :
+                                    getDaysDiff(incident.declaredAt, incident.detectedAt) + ' jours'}}
                                 </div>
 
                                 <div class="line-gradient" [ngStyle]="{
@@ -175,12 +177,12 @@
                             <mat-icon>visibility</mat-icon>
                         </button>
                         }
-                    }
-                    @else {
+                        }
+                        @else {
                         <div class="empty" style="margin: 20px 0;">
                             <span>Aucun impact n'est disponible pour un incident en brouillon.</span>
                         </div>
-                    }
+                        }
                     </div>
                 </mat-card-content>
             </mat-card>

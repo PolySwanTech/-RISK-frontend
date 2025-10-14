@@ -37,7 +37,7 @@ export class CreateProcessComponent {
   ope = 'Créer'
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { process: Process , buId?: string} | null
+    @Inject(MAT_DIALOG_DATA) public data: { process: Process, buId?: string } | null
   ) {
 
     if (data && data.process) {
@@ -61,7 +61,24 @@ export class CreateProcessComponent {
     this.equipeService.getAllEquipes().subscribe(data => {
       this.businessUnits = data;
 
+      if (this.businessUnits.length === 1) {
+        const onlyUnit = this.businessUnits[0];
+
+        // Set value in the form
+        this.processForm.get('buId')?.setValue(onlyUnit.id);
+
+        // Disable the field
+        this.processForm.get('buId')?.disable();
+
+        // Appeler le handler manuellement si nécessaire
+        this.onBuChange(onlyUnit.id);
+      } else {
+        // Assurez-vous que le champ est activé dans le cas général
+        this.processForm.get('buId')?.enable();
+      }
+
       const buId = this.processForm.get('buId')!.value;
+      
       if (buId) {
         this.onBuChange(buId);
       }
@@ -88,7 +105,7 @@ export class CreateProcessComponent {
         this.processService.updateProcess(this.data.process.id, dto).subscribe(resp => {
           this.snackBarService.success("Le processus a bien été modifié")
           this.dialogRef.close(true);
-          this.router.navigate(['reglages']);
+          // this.router.navigate(['reglages']);
         });
       }
       else {
@@ -97,7 +114,7 @@ export class CreateProcessComponent {
         this.processService.createProcess(dto).subscribe(resp => {
           this.snackBarService.success("Le processus a bien été créé")
           this.dialogRef.close(true);
-          this.router.navigate(['reglages']);
+          // this.router.navigate(['reglages']);
         });
       }
     }

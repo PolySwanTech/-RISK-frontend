@@ -1,8 +1,8 @@
-<div class="body-container">
-  <app-go-back [title]="'Création d\'un évenement de risque'" />
+<div [ngClass]="!data ? 'body-container' : ''">
+  <app-go-back *ngIf="!data" [title]="'Création d\'un évenement de risque'" />
 
   <section>
-    <div class="form-container">
+    <div class="form-container" [ngStyle]="data ? { width: 'auto' } : {}">
       <h2>{{ pageTitle }}</h2>
 
       <!-- le stepper n’est affiché que lorsque l’objet risk est prêt -->
@@ -14,17 +14,13 @@
               <input matInput formControlName="libellePerso" placeholder="Entrez le titre du risque" />
             </mat-form-field>
 
-            <!-- Parent ----------------------------------------------------- -->
-            <mat-form-field class="full-width">
-              <mat-label>Risque parent</mat-label>
-              <mat-select formControlName="parentRisk">
-                <mat-option [value]="undefined">Aucun</mat-option>
-                <!-- on utilise risk.id pour lier le risque parent -->
-                <mat-option *ngFor="let r of risks" [value]="r.id">
-                  {{ r.libelle }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+            <button style="margin-bottom: 20px;" mat-stroked-button (click)="openRiskEventDialog()">
+              <mat-icon>add</mat-icon>
+              Associer Risque *
+            </button>
+            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="risk && risk.libelle">
+              <mat-chip> Taxonomie : {{ risk.libelle }}</mat-chip>
+            </mat-chip-listbox>
 
             <app-select-arborescence tooltip="Sélectionnez le processus associé" *ngIf="listProcess.length > 0"
               [id]="infoForm.get('processId')!.value" (changeValue)="onProcessSelected($event)"
@@ -32,13 +28,13 @@
             </app-select-arborescence>
 
             <mat-form-field class="full-width">
-              <mat-label>Description *</mat-label>
+              <mat-label>Description</mat-label>
               <input matInput formControlName="description" placeholder="Saisir une description"/>
             </mat-form-field>
 
             <div class="actions">
 
-              <button mat-raised-button class="btn-red" matStepperPrevious *ngIf="risk.id">
+              <button mat-raised-button class="btn-red" (click)="cancel()" *ngIf="risk.id">
                 Annuler
               </button>
 

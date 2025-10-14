@@ -167,9 +167,9 @@ export class EvaluationCardComponent {
   }
   get evalClass(): string {
     const v = (this.evaluationView?.evaluation || '').toUpperCase();
-    if (v.includes('PARTIEL')) return 'pill-warning';
-    if (v.includes('NON')) return 'pill-danger';
-    if (v.includes('CONF')) return 'pill-success';
+    if (v.includes('PARTIEL')) return 'partiel';
+    if (v.includes('NON')) return 'non_conforme';
+    if (v.includes('CONF')) return 'conforme';
     return 'pill-default';
   }
   get hasValidation(): boolean {
@@ -180,11 +180,11 @@ export class EvaluationCardComponent {
   }
   get reviewBadgeClass(): string {
     const s = this.evaluationView?.reviewStatus;
-    if (s === ReviewStatus.APPROVED) return 'pill-success';
-    if (s === ReviewStatus.REEXAM_REQUESTED) return 'pill-warning';
-    if (s === ReviewStatus.PENDING) return 'pill-default';
-    if (s === ReviewStatus.REJECTED) return 'pill-danger';
-    return 'pill-default';
+    if (s === ReviewStatus.APPROVED) return 'validé';
+    if (s === ReviewStatus.REEXAM_REQUESTED) return 'pending';
+    if (s === ReviewStatus.PENDING) return 'in_progress';
+    if (s === ReviewStatus.REJECTED) return 'annulé';
+    return '';
   }
   get reviewBadgeLabel(): string {
     const s = this.evaluationView?.reviewStatus;

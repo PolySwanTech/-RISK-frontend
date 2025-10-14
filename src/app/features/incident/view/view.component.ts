@@ -152,7 +152,6 @@ export class ViewComponent implements OnInit {
       const actionPlan = await firstValueFrom(this.actionPlanService.getActionPlanByIncident(id));
       this.planActionId = actionPlan?.id ?? '';
     } catch (error) {
-      console.log('Erreur lors de la récupération du plan d’action :', error);
       this.planActionId = null;
     }
     this.goBackButtons = [
@@ -249,7 +248,6 @@ export class ViewComponent implements OnInit {
 
  async extractTokenInfo() {
     this.permissions = await this.authService.getPermissionsByTeam(this.incident?.teamId ?? '');
-    console.log('Permissions de la team:', this.permissions);
   }
 
   canClose() {
@@ -349,7 +347,6 @@ export class ViewComponent implements OnInit {
     this.actionPlanService.getActionPlanByIncident(incidentId).subscribe(
       {
         next: actionPlan => {
-          console.log(actionPlan)
           this.planActionId = actionPlan.id;
         }
       });
@@ -381,7 +378,9 @@ export class ViewComponent implements OnInit {
     const diffTime = Math.abs(date2.getTime() - date1.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 30) {
+    if(diffDays < 0){
+      return 'black';
+    }else if (diffDays < 30) {
       return 'green';
     } else if (diffDays < 60) {
       return 'orange';
@@ -391,6 +390,8 @@ export class ViewComponent implements OnInit {
   }
 
   getDaysDiff(from: Date | string, to: Date | string): number {
+    if(from == null || to == null)
+        return -1;
     const date1 = new Date(from);
     const date2 = new Date(to);
     const diffTime = Math.abs(date2.getTime() - date1.getTime());

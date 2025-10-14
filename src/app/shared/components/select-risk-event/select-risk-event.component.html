@@ -1,17 +1,51 @@
-<div class="bp-wrapper">
+<div class="wrapper">
+
+  <!-- ====== TOGGLE MODE NAVIGATION ====== -->
+  <div class="navigation-mode-toggle">
+    <mat-button-toggle-group [value]="navigationMode" (change)="onNavigationModeChange($event.value)">
+      <mat-button-toggle [value]="NavigationMode.Hierarchical">
+        <mat-icon>account_tree</mat-icon>
+        Navigation hiérarchique
+      </mat-button-toggle>
+      <mat-button-toggle [value]="NavigationMode.Direct">
+        <mat-icon>filter_list</mat-icon>
+        Accès direct
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <!-- ====== FILTRES MODE DIRECT ====== -->
+  <div *ngIf="navigationMode === NavigationMode.Direct && !showSearchResults" class="filters-section">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Catégorie Baloise Niveau 1</mat-label>
+      <mat-select [(value)]="selectedCategoryLevel1" (selectionChange)="onCategoryLevel1Change()">
+        <mat-option [value]="null">Toutes les catégories</mat-option>
+        <mat-option *ngFor="let cat of categoriesLevel1" [value]="cat.libelle">
+          {{ format(cat.libelle) }}
+        </mat-option>
+      </mat-select>
+      <mat-icon matPrefix>folder</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field" *ngIf="selectedCategoryLevel1">
+      <mat-label>Catégorie Baloise Niveau 2</mat-label>
+      <mat-select [(value)]="selectedCategoryLevel2" (selectionChange)="onCategoryLevel2Change()">
+        <mat-option [value]="null">Toutes les sous-catégories</mat-option>
+        <mat-option *ngFor="let cat of categoriesLevel2" [value]="cat.libelle">
+          {{ format(cat.libelle) }}
+        </mat-option>
+      </mat-select>
+      <mat-icon matPrefix>subdirectory_arrow_right</mat-icon>
+    </mat-form-field>
+  </div>
 
   <!-- ====== BARRE DE RECHERCHE ====== -->
   <div class="search-section">
     <div class="search-input-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
 
-      <input
-        type="text"
-        class="search-input"
-        [placeholder]="searchPlaceholder"
-        [(ngModel)]="searchQuery"
-        (input)="onSearchInput($event)"
-      />
+      <input type="text" class="search-input" [placeholder]="searchPlaceholder" [(ngModel)]="searchQuery"
+        (input)="onSearchInput($event)" />
 
       <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
         <mat-icon>clear</mat-icon>
@@ -30,7 +64,7 @@
       <div *ngIf="!isSearching && searchResults.length === 0" class="search-empty">
         Aucun {{ searchTypeLabel.toLowerCase() }} trouvé pour
         "<strong>{{ searchQuery }}</strong>"
-        <button mat-flat-button color="primary" (click)="createNewEvent()">
+        <button *ngIf="isDialog" mat-flat-button color="primary" (click)="createNewEvent()">
           <mat-icon>add</mat-icon> Créer un nouvel événement
         </button>
       </div>
@@ -51,16 +85,20 @@
     <!-- En-tête -->
     <div class="panel-title">
       <div class="panel-title-left">
-        <button *ngIf="currentLevel !== 'categories'" mat-icon-button (click)="back()">
+        <button *ngIf="canGoBack" mat-icon-button (click)="back()">
           <mat-icon>arrow_back</mat-icon>
         </button>
         <h2>{{ viewTitle }}</h2>
       </div>
 
-      <div class="breadcrumb">
+      <div class="breadcrumb" *ngIf="navigationMode === NavigationMode.Hierarchical">
         <span *ngFor="let step of breadcrumb; let last = last">
           {{ step }} <span *ngIf="!last">›</span>
         </span>
+      </div>
+
+      <div class="results-count" *ngIf="navigationMode === NavigationMode.Direct && currentLevel === 'referentiels'">
+        {{ currentItems.length }} taxonomie(s)
       </div>
     </div>
 
@@ -72,8 +110,8 @@
 
     <mat-list *ngIf="!isLoading">
 
-      <!-- NIVEAU 1 : Catégories -->
-      <ng-container *ngIf="currentLevel === 'categories'">
+      <!-- NIVEAU 1 : Catégories (mode hiérarchique uniquement) -->
+      <ng-container *ngIf="currentLevel === 'categories' && navigationMode === NavigationMode.Hierarchical">
         <mat-list-item *ngFor="let cat of currentItems" (click)="selectCategory(cat)">
           <mat-icon matListIcon>folder</mat-icon>
           <h3 matLine>{{ format(cat.libelle) }}</h3>
@@ -81,8 +119,8 @@
         </mat-list-item>
       </ng-container>
 
-      <!-- NIVEAU 2 : Sous-catégories -->
-      <ng-container *ngIf="currentLevel === 'subcategories'">
+      <!-- NIVEAU 2 : Sous-catégories (mode hiérarchique uniquement) -->
+      <ng-container *ngIf="currentLevel === 'subcategories' && navigationMode === NavigationMode.Hierarchical">
         <mat-list-item *ngFor="let sub of currentItems" (click)="selectSubCategory(sub)">
           <mat-icon matListIcon>subdirectory_arrow_right</mat-icon>
           <h3 matLine>{{ format(sub.libelle) }}</h3>
@@ -90,18 +128,27 @@
         </mat-list-item>
       </ng-container>
 
-      <!-- NIVEAU 3 : Référentiels -->
+      <!-- NIVEAU 3 : Référentiels avec badges Baloise -->
       <ng-container *ngIf="currentLevel === 'referentiels'">
+        <button mat-raised-button class="btn btn-secondary" (click)="addReferentiel()">Ajouter une nouvelle
+          taxonomie</button>
         <mat-list-item *ngFor="let ref of currentItems" (click)="selectReferentiel(ref)">
           <mat-icon matListIcon>account_tree</mat-icon>
-          <h3 matLine>{{ ref.libelle }}</h3>
+          <div matLine class="referentiel-content">
+            <h3 class="referentiel-title">{{ ref.libelle }}</h3>
+            <mat-chip-set class="baloise-badges">
+              <mat-chip *ngFor="let category of getBaloiseCategories(ref)" class="baloise-chip">
+                {{ category }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
           <mat-icon matSuffix>chevron_right</mat-icon>
         </mat-list-item>
       </ng-container>
 
       <!-- NIVEAU 4 : Événements -->
       <ng-container *ngIf="currentLevel === 'events'">
-        <button mat-flat-button color="primary" (click)="createNewEvent()">
+        <button *ngIf="isDialog" mat-flat-button color="primary" (click)="createNewEvent()">
           <mat-icon>add</mat-icon> Créer un nouvel événement
         </button>
         <mat-list-item *ngFor="let event of currentItems" (click)="selectEvent(event)">
@@ -109,7 +156,8 @@
           <div class="node-content">
             <h3 matLine>{{ event.libelle }}</h3>
           </div>
-          <button mat-stroked-button color="primary" (click)="selectEvent(event); $event.stopPropagation()">
+          <button *ngIf="isDialog" mat-stroked-button color="primary"
+            (click)="selectEvent(event); $event.stopPropagation()">
             <mat-icon>check</mat-icon> Sélectionner
           </button>
         </mat-list-item>

@@ -21,6 +21,10 @@ export class RiskService {
     return this.http.post<RiskTemplate>(this.baseUrl, dto);
   }
 
+  reasign(riskId: string, processId: string) {
+    return this.http.patch(this.baseUrl + '/reassign', { riskId, processId })
+  }
+
   getAll(buId?: string): Observable<RiskTemplate[]> {
     let params = new HttpParams();
     if (buId) {

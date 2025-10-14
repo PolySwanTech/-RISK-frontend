@@ -70,6 +70,7 @@ export class CreateRisksReferentielComponent {
   riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
 
+  isBaloisPreselected = false;
 
   /** instance courante (vide ou chargée) */
   risk: RiskReferentiel = new RiskReferentiel();
@@ -84,6 +85,21 @@ export class CreateRisksReferentielComponent {
   ngOnInit(): void {
     const buId = this.route.snapshot.queryParams["buId"];
     const id = this.route.snapshot.paramMap.get('id');
+
+    const balois = this.route.snapshot.queryParams['bal']
+
+    if (balois) {
+
+      this.balois = {
+        libelle: balois,
+        label: balois,
+        definition: null,
+        parent: null
+      }
+
+      this.infoForm.get('balois')?.setValue(balois);
+      this.isBaloisPreselected = true
+    }
 
     this.procSrv.getProcessTree(buId).subscribe(list => {
       this.listProcess = list
@@ -123,8 +139,8 @@ export class CreateRisksReferentielComponent {
   }
 
   format(label?: string): string {
-      return baloisFormatLabel(label ?? '');
-    }
+    return baloisFormatLabel(label ?? '');
+  }
 
 
 
@@ -136,13 +152,10 @@ export class CreateRisksReferentielComponent {
 
     const category = this.infoForm.get('balois')?.value;
 
-
     if (!category) {
       console.error('Catégorie obligatoire !');
       return;
     }
-
-
 
     const payload: RiskReferentielCreateDto = {
       libelle: this.infoForm.get('libellePerso')!.value!,
@@ -150,13 +163,16 @@ export class CreateRisksReferentielComponent {
       description: this.infoForm.get('description')!.value!,
     };
 
-    this.riskReferentielSrv.create(payload).subscribe(riskId => {
+    this.riskReferentielSrv.create(payload).subscribe(risk => {
       this.confirm.openConfirmDialog(
         this.dialogLabel.title,
         `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
         false
       );
-      this.router.navigate(['reglages', 'risks', riskId]);
+      const next = this.route.snapshot.queryParams['next']
+      if(next){
+        this.router.navigateByUrl(next);
+      }
     });
   }
 }

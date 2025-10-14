@@ -195,19 +195,14 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   getBadgeClass(type: string, value: any) {
     switch (type) {
       case 'type':
-        return 'badge-type';
-      case 'risk':
-        if (value.toLowerCase().includes('faible')) return 'badge-risque-faible';
-        if (value.toLowerCase().includes('moyen')) return 'badge-risque-moyen';
-        if (value.toLowerCase().includes('élevé') || value.toLowerCase().includes('very_high')) return 'badge-risque-élevé';
-        return '';
+        return 'type';
       case 'control':
-        if (value === 'Niveau 1') return 'badge-controle-faible';
-        if (value === 'Niveau 2') return 'badge-controle-moyen';
+        if (value === 'Niveau 1') return 'faible';
+        if (value === 'Niveau 2') return 'moyen';
         return '';
       case 'statut':
-        if (value.toLowerCase().includes('actif')) return 'badge-statut-ouvert';
-        if (value.toLowerCase().includes('suspendu')) return 'badge-statut-ferme';
+        if (value.toLowerCase().includes('actif')) return 'ouvert';
+        if (value.toLowerCase().includes('suspendu')) return 'ferme';
         return '';
       default:
         return '';

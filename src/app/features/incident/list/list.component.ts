@@ -84,7 +84,11 @@ export class ListComponent implements OnInit {
     {
       columnDef: 'state',
       header: 'Statut',
-      cell: (incident: Incident) => this.getStateLabel(incident.state), // ← label lisible
+      cell: (incident: Incident) => `
+          <span class="badge ${incident.state.toLowerCase()}">
+            ${this.getStateLabel(incident.state)}
+          </span>
+        `, // ← label lisible
       isBadge: 'state',                                                // ← si ton template gère les badges
       filterType: 'select',
       options: Object.values(State).map(s => ({                        // ← options = enum + label
@@ -96,7 +100,7 @@ export class ListComponent implements OnInit {
   ];
 
 
-  goBackButtons : GoBackButton[] = []
+  goBackButtons: GoBackButton[] = []
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
@@ -122,7 +126,7 @@ export class ListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-     this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe(params => {
       const riskId = params['riskId'];
       const processId = params['processId'];
 
@@ -200,7 +204,7 @@ export class ListComponent implements OnInit {
       ['incident', 'create']
     );
   }
-  
+
   toggleIncidentSelection(incidentId: string) {
     if (this.selectedIncidents.has(incidentId)) {
       this.selectedIncidents.delete(incidentId);

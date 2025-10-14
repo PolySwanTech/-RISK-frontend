@@ -5,8 +5,10 @@ import { NgChartsModule, BaseChartDirective } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateActionPlanDialogComponent } from '../../create-action-plan-dialog/create-action-plan-dialog.component';
+import { CreateActionPlanDialogComponent } from '../../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
 import { MatButtonModule } from '@angular/material/button';
+import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
+import { Status, StatusLabels } from '../../../core/enum/status.enum';
 
 @Component({
   selector: 'app-action-plan-chart',
@@ -21,7 +23,9 @@ export class ActionPlanChartComponent implements OnInit {
 
   @Input() createPlan = false;
 
-  constructor(private http: HttpClient) {}
+  private actionPlanService = inject(ActionPlanService);
+
+  statusLabels = StatusLabels;
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective<any>;
 
@@ -41,7 +45,7 @@ export class ActionPlanChartComponent implements OnInit {
     layout: {
       padding: {
         top: 30,
-        bottom: 30 
+        bottom: 30
       }
     },
     plugins: {
@@ -70,21 +74,29 @@ export class ActionPlanChartComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.http.get<any[]>('data-example/action-plans-fake-data.json').subscribe(data => {
-      const statusCounts: Record<string, number> = {};
+    this.actionPlanService.getActionsPlan().subscribe(data => {
+
+      const statusCounts: Record<Status, number> = { NOT_ACHIEVED: 0, NOT_STARTED: 0, ACHIEVED: 0, CANCELLED: 0, IN_PROGRESS: 0 };
+
       data.forEach(plan => {
-        const status = plan.status?.toString().trim();
+        const status = plan.status;
         if (!status) return;
         statusCounts[status] = (statusCounts[status] || 0) + 1;
       });
 
-      this.doughnutChartDataFull.labels = Object.keys(statusCounts);
+      this.doughnutChartDataFull.labels = Object.keys(statusCounts).map(
+        statusKey => this.formatStatus(statusKey as Status)
+      );
       this.doughnutChartDataFull.datasets[0].data = Object.values(statusCounts);
       this.chart?.update();
     });
   }
 
-  create(){
+  formatStatus(status: Status) {
+    return this.statusLabels[status] || 'Inconnu'
+  }
+
+  create() {
     const dialogRef = this.dialog.open(CreateActionPlanDialogComponent, {
       width: '600px !important',
       height: '600px',
