@@ -71,7 +71,7 @@
       <div *ngIf="!isSearching && searchResults.length === 0" class="search-empty">
         Aucun {{ searchTypeLabel.toLowerCase() }} trouvé pour
         "<strong>{{ searchQuery }}</strong>"
-        <button mat-flat-button color="primary" (click)="createNewEvent()">
+        <button *ngIf="isDialog" mat-flat-button color="primary" (click)="createNewEvent()">
           <mat-icon>add</mat-icon> Créer un nouvel événement
         </button>
       </div>
@@ -153,7 +153,7 @@
 
       <!-- NIVEAU 4 : Événements -->
       <ng-container *ngIf="currentLevel === 'events'">
-        <button mat-flat-button color="primary" (click)="createNewEvent()">
+        <button *ngIf="isDialog" mat-flat-button color="primary" (click)="createNewEvent()">
           <mat-icon>add</mat-icon> Créer un nouvel événement
         </button>
         <mat-list-item *ngFor="let event of currentItems" (click)="selectEvent(event)">
@@ -161,7 +161,7 @@
           <div class="node-content">
             <h3 matLine>{{ event.libelle }}</h3>
           </div>
-          <button mat-stroked-button color="primary" (click)="selectEvent(event); $event.stopPropagation()">
+          <button *ngIf="isDialog" mat-stroked-button color="primary" (click)="selectEvent(event); $event.stopPropagation()">
             <mat-icon>check</mat-icon> Sélectionner
           </button>
         </mat-list-item>

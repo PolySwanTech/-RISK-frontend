@@ -38,5 +38,4 @@ export const routes: Routes = [
   { path: 'action-plan', children: actionPlanRoutes, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_ACTION_PLAN } },
   { path: 'control', children: controlRoutes, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CONTROLES } },
   { path: 'todo', component: TodoComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_TODO } },
-  { path: 'test', component: ProcessManagerComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_TODO } },
 ];

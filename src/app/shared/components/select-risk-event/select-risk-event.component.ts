@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, inject, Input, OnInit, Output, EventEmitter, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -80,8 +80,10 @@ export class SelectRiskEventComponent implements OnInit {
     referentiel?: any;
   } = {};
 
+  isDialog = false;
+
   // --- Injections ---
-  private dialogRef = inject(MatDialogRef<SelectRiskEventComponent>);
+  private dialogRef = inject(MatDialogRef<SelectRiskEventComponent>, { optional: true });
   private router = inject(Router);
   private categoryService = inject(RiskCategoryService);
   private referentielService = inject(RiskReferentielService);
@@ -91,30 +93,33 @@ export class SelectRiskEventComponent implements OnInit {
   ngOnInit(): void {
     this.mode = this.data?.mode ?? this.mode;
     this.processId = this.data?.processId;
-    
+
     // Charger toutes les catégories d'abord
     this.categoryService.getAll().subscribe({
       next: (categories) => {
         this.allCategories = categories;
         this.categoriesLevel1 = categories.filter(c => !c.parent);
-        
+
         // Puis charger les référentiels
         this.referentielService.getAll().subscribe({
           next: (refs) => {
             this.allReferentiels = refs;
-            
+
             // Initialiser la vue selon le mode
             if (this.navigationMode === NavigationMode.Direct) {
               this.initDirectMode();
             } else {
               this.loadRootCategories();
             }
-            
+
             this.loadSearchData();
           }
         });
       }
     });
+
+    this.isDialog = this.dialogRef != undefined
+    console.log(this.isDialog)
   }
 
   // ---------- GESTION DES MODES ----------
@@ -122,7 +127,7 @@ export class SelectRiskEventComponent implements OnInit {
     this.navigationMode = mode;
     this.clearFilters();
     this.clearSearch();
-    
+
     if (mode === NavigationMode.Direct) {
       this.initDirectMode();
     } else {
@@ -140,7 +145,7 @@ export class SelectRiskEventComponent implements OnInit {
   // ---------- FILTRES MODE DIRECT ----------
   onCategoryLevel1Change(): void {
     this.selectedCategoryLevel2 = null;
-    
+
     if (this.selectedCategoryLevel1) {
       const parent = this.allCategories.find(c => c.libelle === this.selectedCategoryLevel1);
       if (parent) {
@@ -149,7 +154,7 @@ export class SelectRiskEventComponent implements OnInit {
     } else {
       this.categoriesLevel2 = [];
     }
-    
+
     this.applyFilters();
   }
 
@@ -159,7 +164,7 @@ export class SelectRiskEventComponent implements OnInit {
 
   private applyFilters(): void {
     let filtered = [...this.allReferentiels];
-    
+
     if (this.selectedCategoryLevel2) {
       // Filtrer par catégorie niveau 2
       const cat2 = this.allCategories.find(c => c.libelle === this.selectedCategoryLevel2);
@@ -173,11 +178,11 @@ export class SelectRiskEventComponent implements OnInit {
         // Trouver toutes les sous-catégories
         const subCategories = this.allCategories.filter(c => c.parent === cat1.libelle);
         const subCategoryLabels = subCategories.map(c => c.label);
-        
+
         filtered = filtered.filter(ref => subCategoryLabels.includes(ref.category?.label));
       }
     }
-    
+
     this.currentItems = filtered;
   }
 
@@ -319,23 +324,23 @@ export class SelectRiskEventComponent implements OnInit {
   // ---------- MÉTHODE POUR RÉCUPÉRER LES CATÉGORIES BALOISE ----------
   getBaloiseCategories(ref: any): string[] {
     if (!ref?.category) return [];
-    
+
     const categories: string[] = [];
-    
+
     // Ajouter la catégorie actuelle
     if (ref.category.label) {
       categories.push(this.format(ref.category.label));
     }
-    
+
     // Retrouver le parent de la catégorie actuelle
     const currentCategory = this.allCategories.find(
       c => c.label === ref.category.label
     );
-    
+
     if (currentCategory?.parent) {
       categories.unshift(this.format(currentCategory.parent));
     }
-    
+
     return categories;
   }
 
@@ -364,7 +369,8 @@ export class SelectRiskEventComponent implements OnInit {
   // ---------- OUTILS ----------
   private closeAndEmit(item: any): void {
     this.selected.emit(item);
-    this.dialogRef.close(item);
+    if (this.dialogRef)
+      this.dialogRef.close(item);
   }
 
   private resetSelections(): void {
@@ -404,7 +410,8 @@ export class SelectRiskEventComponent implements OnInit {
     if (this.processId) queryParams.processId = this.processId;
     if (this.searchQuery?.trim()) queryParams.libelle = this.searchQuery.trim();
 
-    this.dialogRef.close();
+    if (this.dialogRef)
+      this.dialogRef.close();
     this.router.navigate(['reglages', 'risks', 'create'], { queryParams });
   }
 

@@ -105,7 +105,7 @@ export class CreateProcessComponent {
         this.processService.updateProcess(this.data.process.id, dto).subscribe(resp => {
           this.snackBarService.success("Le processus a bien été modifié")
           this.dialogRef.close(true);
-          this.router.navigate(['reglages']);
+          // this.router.navigate(['reglages']);
         });
       }
       else {
@@ -114,7 +114,7 @@ export class CreateProcessComponent {
         this.processService.createProcess(dto).subscribe(resp => {
           this.snackBarService.success("Le processus a bien été créé")
           this.dialogRef.close(true);
-          this.router.navigate(['reglages']);
+          // this.router.navigate(['reglages']);
         });
       }
     }

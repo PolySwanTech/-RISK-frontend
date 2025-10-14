@@ -424,6 +424,10 @@ export class BuProcessAccordionComponent {
 
   private viewProcesses(bu: ProcessNode) {
 
+    if (!this.dialogRef) {
+      this.router.navigate(['reglages', 'process'], { queryParams: { buId: bu.id } })
+    }
+
     // Vérifier d'abord dans `children` (processus construits via buildBUChildren)
     let processes = bu.children;
 
@@ -772,19 +776,7 @@ export class BuProcessAccordionComponent {
   }
 
   addProcess(buId: string) {
-    this.dialog.open(CreateProcessComponent,
-      {
-        width: '800px',
-        data: { buId: buId }
-      }
-    ).afterClosed().subscribe(p => {
-      this.processService.createProcess(p).subscribe(resp => {
-        this.ngOnInit();
-      },
-        error => {
-          this.ngOnInit();
-        });
-    });
+    this.router.navigate(['reglages', 'process'], { queryParams: { buId, create: true } })
   }
 
   getTooltip(view: string): string {

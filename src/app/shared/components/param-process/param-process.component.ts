@@ -12,17 +12,7 @@ import { forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { PermissionName } from '../../../core/enum/permission.enum';
 import { CreateProcessComponent } from '../../../features/process/create-process/create-process.component';
-
-
-interface ProcessClass {
-  id: string;
-  name: string;
-  level: 'macro' | 'process' | 'subprocess';
-  parentId: string | null;
-  children: ProcessClass[];
-  riskEvents: RiskTemplate[];
-  expanded?: boolean;
-}
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-process-manager',
@@ -41,8 +31,12 @@ export class ProcessManagerComponent implements OnInit {
 
   viewedRisks: RiskTemplate[] = []
 
+  buId: string = ''
+
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   private processService = inject(ProcessService);
   private riskService = inject(RiskService);
@@ -58,21 +52,35 @@ export class ProcessManagerComponent implements OnInit {
   ]
 
   ngOnInit() {
-    this.processService.getProcessTree().subscribe(list => {
+    this.buId = this.route.snapshot.queryParams["buId"] || ""
+    this.processService.getProcessTree(this.buId).subscribe(list => {
       this.processes = list
     });
+    if (this.route.snapshot.queryParams["create"]) {
+      this.addProcess();
+    }
   }
 
   addProcess() {
-    this.dialog.open(CreateProcessComponent,
-      {
-        width: '800px'
-      }
-    ).afterClosed().subscribe(p => {
-      this.processService.createProcess(p).subscribe(resp => {
-      })
-    })
+    const dialogRef = this.dialog.open(CreateProcessComponent, {
+      width: '800px',
+      data: { buId: this.buId }
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      // Recharger les données
+      this.ngOnInit();
+
+      // Supprimer le queryParam `create`
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { create: null }, // 👈 Supprime 'create'
+        queryParamsHandling: 'merge',  // 👈 Garde les autres queryParams (comme buId)
+        replaceUrl: true               // 👈 Évite d’ajouter une nouvelle entrée dans l’historique du navigateur
+      });
+    });
   }
+
 
   selectProcess(process: Process) {
     this.selectedProcess = process;
@@ -185,7 +193,7 @@ export class ProcessManagerComponent implements OnInit {
     const createRequests = newChildren.map((child, index) => {
       return this.processService.createProcess({
         name: child.name,
-        bu: 'aa6331bc-8fcf-44d8-9f82-91bb29d292ae',
+        bu: this.buId,
         parentId: child.parentId
       }).pipe(
         switchMap(createdProcess => {
