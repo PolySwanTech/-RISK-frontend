@@ -113,7 +113,6 @@ export class PlanifierExecutionPopupComponent {
       plannedAt: safe.toISOString(),
       priority
     });
-    console.log(evaluator)
   }
 
 

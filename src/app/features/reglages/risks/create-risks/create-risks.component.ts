@@ -211,7 +211,6 @@ export class CreateRisksComponent implements OnInit {
       if (result) {
         this.risk = result;
         this.infoForm.get('parentRisk')?.setValue(this.risk.id);
-        console.log(this.infoForm)
       }
     });
   }

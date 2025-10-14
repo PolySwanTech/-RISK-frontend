@@ -30,7 +30,7 @@ export class ReglagesComponent implements OnInit {
       icon: 'add',
       class: 'btn-primary',
       show: true,
-      action: () => { }
+      action: () => this.addBu()
     }
   ]
 

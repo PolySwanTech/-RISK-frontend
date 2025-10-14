@@ -14,14 +14,14 @@ import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ConsequenceService } from '../../../core/services/consequence/consequence.service';
 import { Consequence } from '../../../core/models/Consequence';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
-import { firstValueFrom, forkJoin, map, tap } from 'rxjs';
+import { finalize, firstValueFrom, forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,6 +32,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
 import { SelectRiskEventComponent } from '../../../shared/components/select-risk-event/select-risk-event.component';
 import { RiskSelectionMode } from '../../../core/enum/riskSelection.enum';
+import { LoadingService } from '../../../core/services/loading/loading.service';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 
 
@@ -56,7 +58,7 @@ import { RiskSelectionMode } from '../../../core/enum/riskSelection.enum';
     MatDatepickerModule,
     MatChipsModule,
     MatChipListbox,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
@@ -175,13 +177,13 @@ export class CreateComponent implements OnInit {
 
   maxDateValidator(maxDate: Date) {
     return (control: any) => {
-      if (!control.value) return null; 
+      if (!control.value) return null;
       const inputDate = new Date(control.value);
       return inputDate <= maxDate ? null : { maxDate: true };
     };
   }
 
-  private loadTrees(processRootId?: string ) {
+  private loadTrees(processRootId?: string) {
     return forkJoin({
       processes: this.processService.getProcessTree(processRootId),
       risks: this.riskService.getRisksTree(processRootId),
@@ -223,17 +225,17 @@ export class CreateComponent implements OnInit {
       });
 
       if (incident.risk) {
-      this.riskService.getById(incident.risk).subscribe({
-        next: (risk) => {
-          this.risk = risk;
-          this.incidentForm3.get('riskId')?.setValue(risk.id);
-        },
-        error: (err) => console.error("Erreur lors du chargement du risque :", err)
-      });
-    }
+        this.riskService.getById(incident.risk).subscribe({
+          next: (risk) => {
+            this.risk = risk;
+            this.incidentForm3.get('riskId')?.setValue(risk.id);
+          },
+          error: (err) => console.error("Erreur lors du chargement du risque :", err)
+        });
+      }
 
       if (incident.riskName) {
-        this.selectedBP = { bu: { name: incident.teamName }, process: { name: incident.processName }, risk: {name: incident.riskName} }
+        this.selectedBP = { bu: { name: incident.teamName }, process: { name: incident.processName }, risk: { name: incident.riskName } }
       }
 
       this.incident = incident;
@@ -309,40 +311,29 @@ export class CreateComponent implements OnInit {
   }
 
   addIncident() {
-
     if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
       console.error("Formulaire invalide pour la soumission");
       return;
     }
 
     const incident = this.convertFormToIncident(false);
-    incident.state = State.SUBMIT
+    incident.state = State.SUBMIT;
 
-    if (this.incidentId) {
-      this.incidentService.updateIncident(this.incidentId, incident).subscribe(
-        {
-          next: resp => {
-            this.afterCreation("Modification réussie", this.incidentId);
-          },
-          error: err => {
-            console.error("Erreur lors de la modification de l'incident", err);
-          }
-        },
-      );
-    }
-    else {
-      this.incidentService.saveIncident(incident).subscribe(
-        {
-          next: resp => {
-            this.afterCreation("Création réussie", resp);
-          },
-          error: err => {
-            console.error("Erreur lors de la création de l'incident", err);
-          }
-        },
-      );
-    }
+    const request$ = this.incidentId
+      ? this.incidentService.updateIncident(this.incidentId, incident)
+      : this.incidentService.saveIncident(incident);
+
+    request$.subscribe({
+      next: resp => {
+        const id = this.incidentId ? this.incidentId : resp;
+        this.afterCreation(this.incidentId ? "Modification réussie" : "Création réussie", id);
+      },
+      error: err => {
+        console.error("Erreur lors de la sauvegarde de l'incident", err);
+      }
+    });
   }
+
 
   addDraft() {
     const incident = this.convertFormToIncident(true);
@@ -407,11 +398,10 @@ export class CreateComponent implements OnInit {
       minWidth: '750px',
       height: '600px',
       maxHeight: '600px',
-      data:{
-        stopAtProcess : false
+      data: {
+        stopAtProcess: false
       }
     });
-
     dialogRef.afterClosed().subscribe(event => {
       this.selectBP(event);
     });
@@ -441,7 +431,7 @@ export class CreateComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.risk = result;
-        
+
         this.incidentForm3.get('riskId')?.setValue(result.id);
       }
     });
@@ -463,13 +453,6 @@ export class CreateComponent implements OnInit {
   }
 
   createNewEvent(): void {
-    // const queryParams: any = {
-    //   redirect: this.router.url,
-    //   riskReferentielId: this.selections.referentiel?.id,
-    // };
-    // if (this.processId) queryParams.processId = this.processId;
-    // if (this.searchQuery?.trim()) queryParams.libelle = this.searchQuery.trim();
-    
     this.router.navigate(['reglages', 'risks', 'create']);
   }
 

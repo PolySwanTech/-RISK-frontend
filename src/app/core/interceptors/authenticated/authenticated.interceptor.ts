@@ -5,8 +5,6 @@ import { inject } from '@angular/core';
 
 export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
 
-  var snackBarService = inject(SnackBarService);
-
   var token = sessionStorage.getItem('token');
   // Clone the request and add the Authorization header if the token exists
   const modifiedReq = token

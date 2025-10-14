@@ -122,7 +122,6 @@ export class BuProcessAccordionComponent {
     this.route.queryParams.subscribe(params => {
       const buId = params['buId'] || this.buId;
       if (buId) {
-        console.log('➡️ BU ID trouvé dans les query params:', buId);
         this.navigateToBuFromQueryParam(buId);
       }
     });
@@ -130,21 +129,10 @@ export class BuProcessAccordionComponent {
 
   // Naviguer vers les processus d'une BU depuis les query params
   private navigateToBuFromQueryParam(buId: string): void {
-    // Chercher la BU dans la hiérarchie
     const bu = this.findBuById(buId);
 
     if (bu) {
-      console.log('➡️ BU trouvée:', bu);
-
-      // Naviguer directement vers les processus de cette BU
       this.viewProcesses(bu);
-
-      // Optionellement, nettoyer le query param après navigation
-      // this.router.navigate([], { 
-      //   relativeTo: this.route, 
-      //   queryParams: { buId: null }, 
-      //   queryParamsHandling: 'merge' 
-      // });
     } else {
       console.warn('➡️ BU non trouvée avec l\'ID:', buId);
       this.snackBarService.error('Unité métier non trouvée');
@@ -625,7 +613,6 @@ export class BuProcessAccordionComponent {
 
     this.searchResults = processResults.slice(0, 10); // Limiter à 10 résultats
     this.isSearching = false;
-    console.log('➡️ Résultats de recherche de processus:', this.searchResults);
   }
 
 
@@ -656,8 +643,6 @@ export class BuProcessAccordionComponent {
   }
 
   selectSearchResult(result: any): void {
-    console.log('➡️ Sélection depuis la recherche:', result);
-
     if (result.type === 'risk') {
       const obj = {
         bu: { id: result.buId, name: result.buName },
@@ -680,7 +665,6 @@ export class BuProcessAccordionComponent {
 
     this.clearSearch();
   }
-
 
   deleteBu(id: string) {
     this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer ce processus ? Cette action est irréversible.")
