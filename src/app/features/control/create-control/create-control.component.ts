@@ -122,8 +122,6 @@ export class CreateControlComponent {
       riskId: this.form.value.riskId,
     };
 
-    console.log("Payload création contrôle : ", payload);
-
     this.controlService.createControl(payload).subscribe({
       next: () => {
         this.snackBarService.success("Le contrôle a bien été ajouté");

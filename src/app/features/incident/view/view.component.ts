@@ -152,7 +152,6 @@ export class ViewComponent implements OnInit {
       const actionPlan = await firstValueFrom(this.actionPlanService.getActionPlanByIncident(id));
       this.planActionId = actionPlan?.id ?? '';
     } catch (error) {
-      console.log('Erreur lors de la récupération du plan d’action :', error);
       this.planActionId = null;
     }
     this.goBackButtons = [
@@ -249,7 +248,6 @@ export class ViewComponent implements OnInit {
 
  async extractTokenInfo() {
     this.permissions = await this.authService.getPermissionsByTeam(this.incident?.teamId ?? '');
-    console.log('Permissions de la team:', this.permissions);
   }
 
   canClose() {
@@ -349,7 +347,6 @@ export class ViewComponent implements OnInit {
     this.actionPlanService.getActionPlanByIncident(incidentId).subscribe(
       {
         next: actionPlan => {
-          console.log(actionPlan)
           this.planActionId = actionPlan.id;
         }
       });

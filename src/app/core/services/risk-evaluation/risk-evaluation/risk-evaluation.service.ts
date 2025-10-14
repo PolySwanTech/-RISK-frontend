@@ -11,10 +11,7 @@ export class RiskEvaluationService {
   private readonly http     = inject(HttpClient);
   private readonly baseUrl  = environment.apiUrl + '/evaluations';
 
-
-
   saveEvaluation(riskId: string, evaluation: RiskLevelEnum, indicators: any[], brut: boolean) {
-    console.log({ riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
     return this.http.post(this.baseUrl, { riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
   }
 
