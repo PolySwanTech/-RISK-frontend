@@ -49,8 +49,8 @@
 
         <div class="risk-events-section">
           <h3 *ngIf="selectedProcess">Événements de risque redouté ({{ viewedRisks ? viewedRisks.length : 0 }})</h3>
-          <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button style="width: 30%;"
-            class="btn-primary" (click)="createNewEvent()">Nouvel evenement</button>
+          <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button style="margin-bottom : 10px;"
+            class="btn btn-primary" (click)="createNewEvent()">+ Ajouter évènement redouté</button>
           <div *ngIf="viewedRisks.length > 0; else noRisk" class="risk-list">
             <div *ngFor="let risk of viewedRisks" class="risk-item">
               <strong>{{ risk.libelle }}</strong>
