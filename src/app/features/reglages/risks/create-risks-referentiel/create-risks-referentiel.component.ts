@@ -26,7 +26,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RiskSelectionMode } from '../../../../core/enum/risk-';
+import { RiskSelectionMode } from '../../../../core/enum/risk-enum';
 @Component({
   selector: 'app-create-risks-referentiel',
   standalone: true,

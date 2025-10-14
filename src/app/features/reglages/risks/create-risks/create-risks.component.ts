@@ -24,10 +24,10 @@ import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/risk
 import { Process } from '../../../../core/models/Process';
 import { BaloiseCategoryDto, RiskReferentiel } from '../../../../core/models/RiskReferentiel';
 import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
-import { RiskSelectionMode } from '../../../../core/enum/riskSelection.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { CdkStepper, CdkStepperModule } from '@angular/cdk/stepper';
+import { CdkStepper } from '@angular/cdk/stepper';
+import { RiskSelectionMode } from '../../../../core/enum/risk-enum';
 
 @Component({
   selector: 'app-create-risks',

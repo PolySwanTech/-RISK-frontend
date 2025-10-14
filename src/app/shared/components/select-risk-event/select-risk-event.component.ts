@@ -16,7 +16,7 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { RiskReferentielService } from '../../../core/services/risk/risk-referentiel.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { BaloiseCategoryDto, baloisFormatLabel } from '../../../core/models/RiskReferentiel';
-import { RiskSelectionMode, Level } from '../../../core/enum/risk-';
+import { RiskSelectionMode, Level } from '../../../core/enum/risk-enum';
 
 export enum NavigationMode {
   Hierarchical = 'hierarchical',
