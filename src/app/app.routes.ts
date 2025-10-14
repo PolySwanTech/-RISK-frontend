@@ -19,6 +19,7 @@ import { CreateEvaluationComponent } from './features/cartographie/create-evalua
 import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
 import { CreateCartoComponent } from './features/cartographie/create-carto/create-carto/create-carto.component';
 import { TodoComponent } from './pages/todo/todo.component';
+import { AttenuationMetricsListComponent } from './features/control/attenuation-metrics-list/attenuation-metrics-list.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
@@ -39,5 +40,6 @@ export const routes: Routes = [
   { path: 'organigramme', children: organigrammeRoutes, canActivate: [AuthGuard] },
   { path: 'action-plan', children: actionPlanRoutes, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_ACTION_PLAN } },
   { path: 'control', children: controlRoutes, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CONTROLES } },
+  { path: 'attenuationMetrics', component : AttenuationMetricsListComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CONTROLES } },
   { path: 'todo', component: TodoComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_TODO } },
 ];

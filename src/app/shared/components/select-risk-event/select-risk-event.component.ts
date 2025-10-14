@@ -12,7 +12,7 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { RiskReferentielService } from '../../../core/services/risk/risk-referentiel.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { BaloiseCategoryDto, baloisFormatLabel } from '../../../core/models/RiskReferentiel';
-import { Level, RiskSelectionMode } from '../../../core/enum/riskSelection.enum';
+import { RiskSelectionMode, Level } from '../../../core/enum/risk-';
 
 @Component({
   selector: 'app-select-risk-event',

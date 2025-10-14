@@ -19,7 +19,6 @@ import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/risk
 import { Process } from '../../../../core/models/Process';
 import { BaloiseCategoryDto, baloisFormatLabel, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
 import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
-import { RiskSelectionMode } from '../../../../core/enum/riskSelection.enum';
 import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatChipsModule, MatChipListbox } from '@angular/material/chips';
@@ -27,6 +26,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RiskSelectionMode } from '../../../../core/enum/risk-';
 @Component({
   selector: 'app-create-risks-referentiel',
   standalone: true,

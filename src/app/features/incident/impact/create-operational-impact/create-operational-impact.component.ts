@@ -732,18 +732,18 @@ export class CreateOperationalImpactComponent implements OnInit {
   }
 
   openFilesDialog(impactId: string) {
-  const ref = this.fileService.openFiles([], TargetType.IMPACT, impactId, /* closed: */ false);
+    const ref = this.fileService.openFiles([], TargetType.IMPACT, impactId, /* closed: */ false);
 
-  // rafraîchit le compteur quand on revient du dialog
-  ref.afterClosed()
-    .pipe(
-      switchMap(() => this.fileService.getFiles(TargetType.IMPACT, impactId)),
-      catchError(() => of([]))
-    )
-    .subscribe(files => {
-      this.attachedCounts[impactId] = files.length;
-    });
-}
+    // rafraîchit le compteur quand on revient du dialog
+    ref.afterClosed()
+      .pipe(
+        switchMap(() => this.fileService.getFiles(TargetType.IMPACT, impactId)),
+        catchError(() => of([]))
+      )
+      .subscribe(files => {
+        this.attachedCounts[impactId] = files.length;
+      });
+  }
 
   private loadAttachedCountsForAllImpacts(losses: OperatingLoss[]) {
   if (!losses?.length) {
