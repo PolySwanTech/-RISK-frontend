@@ -13,11 +13,12 @@ import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.serv
 import { PermissionName } from '../../../core/enum/permission.enum';
 import { CreateProcessComponent } from '../../../features/process/create-process/create-process.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-process-manager',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoBackComponent],
+  imports: [CommonModule, FormsModule, GoBackComponent, MatIconModule],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
 })
@@ -61,7 +62,7 @@ export class ProcessManagerComponent implements OnInit {
     if (this.route.snapshot.queryParams["create"]) {
       this.addProcess();
     }
-    this.cartoMode = this.route.snapshot.queryParams['carto']
+    this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
   }
 
   addProcess() {

@@ -100,6 +100,7 @@ export class CreateEvaluationComponent implements OnInit {
         this.selectedProcess = obj.process
         this.selectedRisk = obj.risk
         if (this.selectedBU && this.selectedProcess && this.selectedRisk) {
+          
           this.getMatrix(this.selectedBU.id);
           this.getFrequenciesByBu(this.selectedBU.id);
           this.getSeveritiesByBu(this.selectedBU.id);
@@ -142,7 +143,7 @@ export class CreateEvaluationComponent implements OnInit {
         .subscribe(
           {
             next: _ => {
-              this.snackBarService.info("Evaluation sauvegarder");
+              this.snackBarService.info("Evaluation sauvegardée");
               event.next();
             },
             error : err => {

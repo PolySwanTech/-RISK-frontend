@@ -50,9 +50,16 @@
             redouté</button>
           <div *ngIf="viewedRisks.length > 0; else noRisk" class="risk-list">
             <div *ngFor="let risk of viewedRisks" class="risk-item">
-              <strong>{{ risk.libelle }}</strong>
-              <p>{{ risk.description }}</p>
-              <button *ngIf="cartoMode" (click)="chooseRiskForCarto(risk)">Sélectionner</button>
+              <div class="risk-label">
+                <strong>{{ risk.libelle }}</strong>
+                <p>{{ risk.description }}</p>
+              </div>
+              <div class="risk-selection">
+                <button *ngIf="cartoMode" mat-raised-button class="btn btn-secondary" (click)="chooseRiskForCarto(risk)">
+                  Sélectionner
+                  <mat-icon>arrow_forward</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
           <ng-template #noRisk>
