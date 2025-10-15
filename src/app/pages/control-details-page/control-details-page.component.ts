@@ -31,7 +31,7 @@ import { AuthService } from '../../core/services/auth/auth.service';
     RouterModule,
     MethodologyCardComponent,
     HasPermissionDirective
-],
+  ],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
 })
@@ -55,7 +55,7 @@ export class ControlDetailsPageComponent implements OnInit {
   evaluationCache: Record<string, ControlEvaluationView | null> = {};
 
   // Boutons GoBack (seulement Planifier + Historique)
-  goBackButtons : GoBackButton[] = [
+  goBackButtons: GoBackButton[] = [
   ];
 
   // === Carrousel (4 dernières exécutions) ===
@@ -81,29 +81,29 @@ export class ControlDetailsPageComponent implements OnInit {
     this.controlService.getControl(id).subscribe(control => {
       this.control = control;
       this.goBackButtons = [{
-      label: 'Planifier exécution',
-      icon: 'calendar_today',
-      class: 'btn-purple',
-      show: this.sameCreator() ,
-      permission: 'CREATE_CONTROLE',
-      action: () => this.scheduleExecution()
-    },
-    {
-      label: 'Voir tout l’historique',
-      icon: 'history',
-      class: 'btn-primary',
-      show: true,
-      action: () => this.viewFullHistory()
-    }];
+        label: 'Planifier exécution',
+        icon: 'calendar_today',
+        class: 'btn-purple',
+        show: this.sameCreator(),
+        permission: 'CREATE_CONTROLE',
+        action: () => this.scheduleExecution()
+      },
+      {
+        label: 'Voir tout l’historique',
+        icon: 'history',
+        class: 'btn-primary',
+        show: true,
+        action: () => this.viewFullHistory()
+      }];
     });
   }
 
- sameCreator(){
-   return this.authService.sameUserName(this.control?.creator || '');
+  sameCreator() {
+    return this.authService.sameUserName(this.control?.creator || '');
   }
 
-  sameEvaluator(s : string){
-   return this.authService.sameUserName(s);
+  sameEvaluator(s: string) {
+    return this.authService.sameUserName(s);
   }
 
   loadControlExecutions(id: string): void {
@@ -115,7 +115,7 @@ export class ControlDetailsPageComponent implements OnInit {
       const calls = executions.map(e =>
         this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
       );
-      
+
 
       forkJoin(calls).subscribe(views => {
         this.evaluationCache = {};
@@ -138,14 +138,14 @@ export class ControlDetailsPageComponent implements OnInit {
   // === Helpers affichage ===
   getStatusClass(status?: Status): string {
     if (!status) return '';
-      switch (status) {
+    switch (status) {
       case Status.ACHIEVED: return 'achieved';
       case Status.IN_PROGRESS: return 'in_progress';
       case Status.NOT_ACHIEVED: return 'not_achieved';
       default: return '';
     }
   }
-  
+
   formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
 
 
@@ -166,7 +166,7 @@ export class ControlDetailsPageComponent implements OnInit {
     this.dialog.open(PopupEvaluationControleComponent, {
       data: {
         action: action,
-        controlId : this.control?.id,
+        controlId: this.control?.id,
         executionId: executionId,
         mode: 'FORM',
         canValidate: true

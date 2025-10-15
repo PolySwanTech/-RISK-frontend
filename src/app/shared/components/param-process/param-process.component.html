@@ -1,11 +1,7 @@
 <app-go-back [title]="'Gestion des processus'" [buttons]="goBackButtons"></app-go-back>
 
 <div class="container">
-
-  <!-- <div class="header">
-    <h1>Gestion de l'Organigramme - Risque Opérationnel</h1>
-  </div> -->
-
+  
   <div class="content">
     <!-- Arbre des processus -->
     <div class="tree-section">
@@ -49,12 +45,14 @@
 
         <div class="risk-events-section">
           <h3 *ngIf="selectedProcess">Événements de risque redouté ({{ viewedRisks ? viewedRisks.length : 0 }})</h3>
-          <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button style="margin-bottom : 10px;"
-            class="btn btn-primary" (click)="createNewEvent()">+ Ajouter évènement redouté</button>
+          <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button
+            style="margin-bottom : 10px;" class="btn btn-primary" (click)="createNewEvent()">+ Ajouter évènement
+            redouté</button>
           <div *ngIf="viewedRisks.length > 0; else noRisk" class="risk-list">
             <div *ngFor="let risk of viewedRisks" class="risk-item">
               <strong>{{ risk.libelle }}</strong>
               <p>{{ risk.description }}</p>
+              <button *ngIf="cartoMode" (click)="chooseRiskForCarto(risk)">Sélectionner</button>
             </div>
           </div>
           <ng-template #noRisk>

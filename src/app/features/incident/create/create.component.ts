@@ -31,7 +31,7 @@ import { BuProcessAccordionComponent } from "../../../shared/components/bu-proce
 import { MatDialog } from '@angular/material/dialog';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
 import { SelectRiskEventComponent } from '../../../shared/components/select-risk-event/select-risk-event.component';
-import { RiskSelectionMode } from '../../../core/enum/risk-';
+import { RiskSelectionMode } from '../../../core/enum/risk-enum';
 
 
 

@@ -1,20 +1,15 @@
-import { ControlEvaluation } from './../../../core/models/ControlEvaluation';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
-import { ProcessService } from '../../../core/services/process/process.service';
 import { Process, ProcessNode } from '../../../core/models/Process';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
-import { BusinessUnit } from '../../../core/models/BusinessUnit';
-import { EntitiesService } from '../../../core/services/entities/entities.service';
-import { EvalRiskProcessComponent } from '../create-carto/eval-risk-process/eval-risk-process.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
 import { MatrixComponent } from "../matrix/matrix.component";
-import { RiskLevelColor, RiskLevelEnum, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelColor, RiskLevelEnum, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -26,17 +21,29 @@ import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
+import { Range } from '../matrix-settings/matrix-settings.component';
+import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 
 
-interface Indicator{
-  frequenceId : number;
-  severiteId : number;
+interface Indicator {
+  frequenceId: number;
+  severiteId: number;
+  riskLevel: RiskLevel
 }
+
+interface MatrixCell {
+  severite: { id: number };
+  frequence: { id: number };
+  riskLevel: RiskLevel;
+}
+
 
 @Component({
   selector: 'app-create-evaluation',
   imports: [FormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatCardModule, MatChipsModule, FormsModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule, GoBackComponent,
     MatStepperModule,
     MatButtonModule, BuProcessAccordionComponent, MatrixComponent],
   templateUrl: './create-evaluation.component.html',
@@ -44,41 +51,20 @@ interface Indicator{
 })
 export class CreateEvaluationComponent implements OnInit {
 
-  private riskService = inject(RiskService);
-  private processService = inject(ProcessService);
   private evaluationSrv = inject(RiskEvaluationService);
-  private entityService = inject(EntitiesService);
+  private riskService = inject(RiskService);
   private matrixService = inject(MatrixService);
   private controlService = inject(ControlService);
   private snackBarService = inject(SnackBarService);
-
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   @Output() changeToEvaluationStep = new EventEmitter<void>();
 
-  risks: any[] = [];
-
-  selectedYear = new Date().getFullYear();
-
-  selectedRisk: any | null = null;
-  selectedProcess: ProcessNode | null = null;
-
-  processes: Process[] = [];
-
-  hierarchicalProcesses: ProcessNode[] = [];
-  filteredProcesses: ProcessNode[] = [];
-
-  evaluations = [];
-
   currentStep: number = 1;
-  selectedBU: ProcessNode | null = null;
-  financialImpact: number = 0;
-  imageSeverity: number = 3;
-  imageFrequency: number = 2;
-  judicialSeverity: number = 1;
-  judicialFrequency: number = 1;
 
-  frequencyList: any[] = [];
-  severityList: any[] = [];
+  frequencyList: Range[] = [];
+  severityList: Range[] = [];
   matrixData: any = [];
 
   financierIndirect: RiskLevelEnum | null = null;
@@ -88,16 +74,45 @@ export class CreateEvaluationComponent implements OnInit {
   highestRiskLevelNet: RiskLevelEnum | null = null;
   riskLevels = Object.values(RiskLevelEnum);
 
-  indicators : Indicator[] = [];
+  indicators: Indicator[] = [];
 
   controls: ControlTemplate[] = [];
 
-  selectedBPR : any = null;
+  selectedRisk: RiskTemplate | null = null;
+  selectedBU: BusinessUnit | null = null;
+  selectedProcess: Process | null = null;
+
+  severitiesMap: Map<number, number> = new Map();
 
   ngOnInit(): void {
-    this.entityService.loadEntities().subscribe((entities: BusinessUnit[]) => {
-      this.fetchProcesses(entities);
-    });
+    const dataIsInSessionStorage = this.route.snapshot.queryParams['data'] || false;
+    const sessionStorageKey = this.route.snapshot.queryParams['key'] || false;
+
+    if (dataIsInSessionStorage && sessionStorageKey) {
+      const obj = JSON.parse(sessionStorage.getItem(sessionStorageKey) || "");
+      sessionStorage.removeItem(sessionStorageKey);
+      this.router.navigate([], {
+        queryParams: {},
+        replaceUrl: true
+      });
+      if (obj) {
+        this.selectedBU = obj.bu
+        this.selectedProcess = obj.process
+        this.selectedRisk = obj.risk
+        if (this.selectedBU && this.selectedProcess && this.selectedRisk) {
+          this.getMatrix(this.selectedBU.id);
+          this.getFrequenciesByBu(this.selectedBU.id);
+          this.getSeveritiesByBu(this.selectedBU.id);
+          this.controlService.getAllTemplates(this.selectedProcess.id, this.selectedRisk.id).subscribe(
+            controls => this.controls = controls
+          )
+        }
+      }
+    }
+  }
+
+  getRiskLevelFromSeverityFrequencySelected(sev: Range) {
+    return this.indicators.find(i => i.severiteId == sev.id)!.riskLevel.name || RiskLevelEnum.HIGH
   }
 
   getRiskLevelEnum(riskLevel: RiskLevelEnum) {
@@ -122,90 +137,21 @@ export class CreateEvaluationComponent implements OnInit {
 
   gotoSteppe3(event: any) {
     this.highestRiskLevelNet = this.highestRiskLevel;
-    if (this.highestRiskLevel && this.selectedBU) {
-      this.evaluationSrv.saveEvaluation(this.selectedRisk.id, this.highestRiskLevel, this.indicators, true).subscribe(
-        _ => {
-          this.snackBarService.info("Evaluation sauvegarder");
-          event.next();
-        }
-      )
+    if (this.highestRiskLevel && this.selectedRisk) {
+      this.evaluationSrv.saveEvaluation(this.selectedRisk.id, this.highestRiskLevel, this.indicators, true)
+        .subscribe(
+          {
+            next: _ => {
+              this.snackBarService.info("Evaluation sauvegarder");
+              event.next();
+            },
+            error : err => {
+              this.snackBarService.info("Une évaluation de cet évènement de risque redouté, existe déjà");
+              window.location.reload();
+            }
+          }
+        )
     }
-  }
-
-  fetchProcesses(allEntities: BusinessUnit[]): void {
-    this.processService.getAll().subscribe((data: any[]) => {
-      this.processes = data;
-      this.buildHierarchy(allEntities);
-      this.filteredProcesses = [...this.hierarchicalProcesses];
-    });
-  }
-
-  buildHierarchy(allEntities: BusinessUnit[]): void {
-    const buMap = new Map<string, Process[]>();
-
-    this.processes.forEach(process => {
-      const buName = process.buName;
-      if (!buMap.has(buName)) {
-        buMap.set(buName, []);
-      }
-      buMap.get(buName)!.push(process);
-    });
-
-    this.hierarchicalProcesses = allEntities
-      .map(entity => {
-        const processes = buMap.get(entity.name) || [];
-        return {
-          id: `${entity.id}`,
-          lm: entity.lm,
-          name: entity.name,
-          niveau: 0,
-          type: 'bu' as const,
-          children: this.buildBUChildren(processes)
-        };
-      });
-  }
-
-  private buildBUChildren(processes: any[]): ProcessNode[] {
-    // Séparer les parents (pas de parentName) des enfants
-    const parents = processes.filter(p => !p.parentName);
-    const children = processes.filter(p => p.parentName);
-
-    return parents.map(parent => ({
-      id: parent.id,
-      lm: parent.lm,
-      name: parent.name,
-      niveau: parent.niveau,
-      type: this.determineNodeType(parent),
-      buName: parent.buName,
-      parentName: parent.parentName,
-      children: this.findChildren(parent.name, children)
-    }));
-  }
-
-  private findChildren(parentName: string, allChildren: any[]): ProcessNode[] {
-    const directChildren = allChildren.filter(child => child.parentName === parentName);
-
-    return directChildren.map(child => ({
-      id: child.id,
-      lm: child.lm,
-      name: child.name,
-      niveau: child.niveau,
-      type: this.determineNodeType(child),
-      buName: child.buName,
-      parentName: child.parentName,
-      children: this.findChildren(child.name, allChildren.filter(c => c.id !== child.id))
-    }));
-  }
-
-  private determineNodeType(process: any): 'parent' | 'child' {
-    return process.parentName ? 'child' : 'parent';
-  }
-
-  getProcessByRisks(risk: RiskTemplate) {
-    this.selectedRisk = risk;
-    this.processService.getAllByRisks(risk.id).subscribe(processes => {
-      this.processes = processes;
-    });
   }
 
   getMatrix(id: string) {
@@ -232,6 +178,7 @@ export class CreateEvaluationComponent implements OnInit {
     this.matrixService.getSeveritiesByBu(buId).subscribe({
       next: resp => {
         this.severityList = resp;
+        this.severityList.forEach(s => this.severitiesMap.set(s.id, 0))
 
       },
       error: err => console.error(err)
@@ -249,44 +196,50 @@ export class CreateEvaluationComponent implements OnInit {
     return classes[index] || '';
   }
 
-  updateRisk(severity: any) {
+  getSeverityValue(id: number): number {
+    return this.severitiesMap.get(id) ?? 0;
+  }
 
-    let frequency = severity.selectedFrequency;
+  setSeverityValue(id: number, value: number): void {
+    this.severitiesMap.set(id, value);
+  }
 
-    this.indicators.push({severiteId: severity.id, frequenceId : frequency.id});
-    
-    interface MatrixCell {
-      severite: { id: number };
-      frequence: { id: number };
-      riskLevel: RiskLevelEnum;
-    }
+  updateRisk(severity: Range) {
 
-    const cell: MatrixCell | undefined = this.matrixData.cells.find(
-      (c: MatrixCell) => c.severite.id == severity.id && c.frequence.id == Number(frequency.id)
-    );
+    let frequency = this.severitiesMap.get(severity.id) || -1;
 
-    if (cell) {
-      // retrouver la sévérité concernée et lui attacher le niveau de risque
-      const sev = this.severityList.find(s => s.id == severity.id);
-      if (sev) {
-        sev.riskLevel = cell.riskLevel; // ⚡ maintenant une string (ex: "LOW")
+    if (frequency != -1) {
+
+      const cell: MatrixCell | undefined = this.matrixData.cells.find(
+        (c: MatrixCell) => c.severite.id == severity.id && c.frequence.id == frequency);
+
+      if (cell) {
+        const existingIndex = this.indicators.findIndex(ind => ind.severiteId === severity.id);
+
+        const updatedIndicator: Indicator = {
+          severiteId: severity.id,
+          frequenceId: frequency,
+          riskLevel: cell.riskLevel
+        };
+
+        if (existingIndex !== -1) {
+          // 🔁 Replace the existing indicator
+          this.indicators[existingIndex] = updatedIndicator;
+        } else {
+          // ➕ Add a new indicator
+          this.indicators.push(updatedIndicator);
+        }
       }
-    }
 
-    // toujours recalculer après chaque changement
-    this.updateHighestRisk();
+      // toujours recalculer après chaque changement
+      this.updateHighestRisk();
+    }
   }
 
   updateHighestRisk() {
     const selectedRisks: RiskLevelEnum[] = [];
 
-    // risques venant de la matrice
-    this.severityList.forEach(s => {
-      if (s.riskLevel) {
-        selectedRisks.push(s.riskLevel.name); // ✅ plus de .name
-      }
-    });
-
+    this.indicators.map(s => s.riskLevel.name).forEach(r => selectedRisks.push(r))
     // risques venant des selects "Financier Indirect" et "Non Financier"
     if (this.financierIndirect) {
       selectedRisks.push(this.financierIndirect);
@@ -306,36 +259,6 @@ export class CreateEvaluationComponent implements OnInit {
     );
   }
 
-  trackByProcessId = (_: number, p: ProcessNode) => p.id;
-
-  onSelectProcess(p: ProcessNode) {
-    this.selectedProcess = p;
-    this.changeToEvaluationStep.emit();
-  }
-
-  onSaveEvaluation() {
-    this.selectedProcess = null;
-    this.selectedRisk = null;
-  }
-
-  onRiskChange(event: any): void {
-    this.currentStep = 2;
-    this.selectedBPR = event;
-    this.selectedBU = event.bu
-    if (this.selectedBU) {
-      this.getMatrix(this.selectedBU.id);
-      this.getFrequenciesByBu(this.selectedBU.id);
-      this.getSeveritiesByBu(this.selectedBU.id);
-    }
-
-    this.selectedProcess = event.process
-    this.selectedRisk = event.risk
-
-    this.controlService.getAllTemplatesByProcessAndRisk(this.selectedProcess, this.selectedRisk!).subscribe(controls => {
-      this.controls = controls;
-    });
-  }
-
   getContrastColor(hexColor: string): string {
     if (!hexColor) return '#000';
     const c = hexColor.substring(1); // supprime #
@@ -347,41 +270,12 @@ export class CreateEvaluationComponent implements OnInit {
     return yiq >= 128 ? '#000' : '#fff';
   }
 
-  selectBusinessUnit(bu: ProcessNode): void {
-    this.selectedBU = bu;
-    this.getMatrix(bu.id);
-    this.getFrequenciesByBu(bu.id);
-    this.getSeveritiesByBu(bu.id);
-    this.selectedProcess = null;
-  }
-
-  selectProcess(process: ProcessNode): void {
-    this.selectedProcess = process;
-    this.riskService.getAllByProcess(this.selectedProcess?.id).subscribe(risks => {
-      this.risks = risks;
-    });
-
-    if (this.selectedRisk && this.selectedProcess) {
-      this.currentStep = 2;
-    }
-  }
-
   saveEvaluation(stepper: any): void {
-    // Préparer les données pour l'enregistrement
-    const evaluationData = {
-      riskId: this.selectedRisk?.id.id,
-      processId: this.selectedProcess?.id,
-      frequencyList: this.frequencyList,
-      financierIndirect: this.financierIndirect,
-      financierNonFinancier: this.financierNonFinancier,
-      highestRiskLevel: this.highestRiskLevel,
-      highestRiskLevelNet: this.highestRiskLevelNet
-    };
 
-    if (this.highestRiskLevelNet) {
+    if (this.highestRiskLevelNet && this.selectedRisk) {
       this.evaluationSrv.saveEvaluation(this.selectedRisk.id, this.highestRiskLevelNet, [], false).subscribe(
         _ => {
-          this.snackBarService.info("Evaluation sauvegarder");
+          this.snackBarService.info("Evaluation sauvegardée");
           stepper.next();
         }
       )
@@ -389,15 +283,6 @@ export class CreateEvaluationComponent implements OnInit {
   }
 
   newEvaluation(): void {
-    this.currentStep = 1;
-    this.selectedRisk = null;
-    this.selectedBU = null;
-    this.selectedProcess = null;
-    this.financialImpact = 0;
-    this.imageSeverity = 3;
-    this.imageFrequency = 2;
-    this.judicialSeverity = 1;
-    this.judicialFrequency = 1;
-    this.highestRiskLevel = null;
+    window.location.reload();
   }
 }

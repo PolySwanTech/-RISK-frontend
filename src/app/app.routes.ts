@@ -16,7 +16,6 @@ import { CartographieComponent } from './pages/cartographie/cartographie.compone
 import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
 import { CreateEvaluationComponent } from './features/cartographie/create-evaluation/create-evaluation.component';
 import { SelectCartoComponent } from './shared/components/select-carto/select-carto/select-carto.component';
-import { CreateCartoComponent } from './features/cartographie/create-carto/create-carto/create-carto.component';
 import { TodoComponent } from './pages/todo/todo.component';
 import { AttenuationMetricsListComponent } from './features/control/attenuation-metrics-list/attenuation-metrics-list.component';
 
@@ -25,9 +24,8 @@ export const routes: Routes = [
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
   { path: 'risk/:id', component : RiskPageComponent, canActivate : [AuthGuard] },
   { path: 'cartographie', component: CartographieComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CARTOGRAPHIE } },
-  { path: 'cartographie/create', component: CreateCartoComponent, canActivate: [AuthGuard] },
+  { path: 'cartographie/create', component: CreateEvaluationComponent, canActivate: [AuthGuard] },
   { path: 'cartographie/consulter', component: SelectCartoComponent, canActivate: [AuthGuard] },
-  { path: 'cartographie/evaluation', component: CreateEvaluationComponent, canActivate: [AuthGuard] },
   { path: 'calcul/view', component : CalculViewComponent, canActivate : [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CALCUL_FONDS_PROPRE } },
   { path: 'auth', children: authRoutes },
   { path: 'user', children: userRoutes, canActivate: [AuthGuard] },

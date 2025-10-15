@@ -26,8 +26,8 @@ import { BaloiseCategoryDto, RiskReferentiel } from '../../../../core/models/Ris
 import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { CdkStepper, CdkStepperModule } from '@angular/cdk/stepper';
-import { RiskSelectionMode } from '../../../../core/enum/risk-';
+import { CdkStepper } from '@angular/cdk/stepper';
+import { RiskSelectionMode } from '../../../../core/enum/risk-enum';
 
 @Component({
   selector: 'app-create-risks',
