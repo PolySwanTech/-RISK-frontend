@@ -390,9 +390,14 @@ $radius-lg: 10px;
         // Header du panneau - Grille
         ::ng-deep .mat-expansion-panel-header {
           background: linear-gradient(to bottom, $bg-white 0%, $bg-light 100%);
-          padding: 14px 16px;
+          padding: 12px 14px;
           min-height: auto;
           transition: all 0.3s ease;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 100%;
+          min-width: 0;
 
           &:hover {
             background: linear-gradient(to bottom, $bg-light 0%, lighten($bg-light, 1%) 100%);
@@ -406,15 +411,17 @@ $radius-lg: 10px;
           .mat-panel-title {
             flex: 1;
             margin: 0;
+
           }
         }
 
         .panel-title-grid {
           display: grid;
-          grid-template-columns: 140px 1fr 360px 180px 120px;
+          grid-template-columns: 140px 1fr 180px 180px 120px;
           gap: 16px;
           align-items: center;
           width: 100%;
+
 
           .grid-cell {
             display: flex;
@@ -458,38 +465,57 @@ $radius-lg: 10px;
         .type-badge {
           display: inline-flex;
           align-items: center;
-          gap: 5px;
-          padding: 4px 10px;
+          gap: 4px;
+          padding: 3px 8px;
           background: $bg-light;
           border: 1px solid $border-light;
           border-radius: $radius-sm;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
           color: $text-secondary;
+          max-width: 100%;
+          min-width: 0;
 
           mat-icon {
-            font-size: 14px;
-            width: 14px;
-            height: 14px;
+            font-size: 13px;
+            width: 13px;
+            height: 13px;
             color: lighten($primary, 15%);
+            flex-shrink: 0;
+          }
+
+          > *:not(mat-icon) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
           }
         }
 
         .evaluation-badge-compact {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 4px 10px;
+          gap: 4px;
+          padding: 3px 8px;
           border-radius: $radius-sm;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 600;
           border: 1.5px solid transparent;
-          white-space: nowrap;
+          max-width: 100%;
+          min-width: 0;
 
           .status-icon {
-            font-size: 16px;
-            width: 16px;
-            height: 16px;
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+          }
+
+          > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
           }
 
           &[data-status="CONFORME"] {
@@ -531,17 +557,27 @@ $radius-lg: 10px;
         .status-badge {
           display: inline-flex;
           align-items: center;
-          gap: 5px;
-          padding: 4px 10px;
+          gap: 4px;
+          padding: 3px 8px;
           border-radius: $radius-sm;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 600;
           border: 1.5px solid transparent;
+          max-width: 100%;
+          min-width: 0;
 
           mat-icon {
-            font-size: 16px;
-            width: 16px;
-            height: 16px;
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+          }
+
+          > *:not(mat-icon) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
           }
 
           &.active {
@@ -843,9 +879,156 @@ $radius-lg: 10px;
 }
 
 // ==================== RESPONSIVE ====================
+@media (max-width: 1800px) {
+  .attenuation-container {
+    .table-section .table-container .metric-panel {
+      .panel-title-grid {
+        grid-template-columns: 95px 170px auto auto 95px;
+        gap: 10px;
+
+        .grid-cell {
+          gap: 2px;
+
+          .cell-label {
+            font-size: 8px;
+            letter-spacing: 0.2px;
+          }
+          
+          .cell-value {
+            font-size: 11px;
+          }
+        }
+      }
+
+      .type-badge,
+      .evaluation-badge-compact,
+      .status-badge {
+        padding: 2px 6px;
+        font-size: 10px;
+        gap: 3px;
+
+        mat-icon {
+          font-size: 12px;
+          width: 12px;
+          height: 12px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1600px) {
+  .attenuation-container {
+    .table-section .table-container .metric-panel {
+      .panel-title-grid {
+        grid-template-columns: 90px 160px auto auto 90px;
+        gap: 8px;
+      }
+    }
+  }
+}
+
 @media (max-width: 1400px) {
-  .attenuation-container .categories-grid .category-card {
-    max-width: calc(25% - 10px);
+  .attenuation-container {
+    .categories-grid .category-card {
+      max-width: calc(25% - 10px);
+    }
+
+    .table-section .table-container .metric-panel {
+      .panel-title-grid {
+        grid-template-columns: 85px 150px auto auto 85px;
+        gap: 8px;
+
+        .grid-cell {
+          .cell-label {
+            font-size: 8px;
+          }
+          
+          .cell-value {
+            font-size: 11px;
+          }
+        }
+      }
+
+      .type-badge,
+      .evaluation-badge-compact,
+      .status-badge {
+        padding: 2px 6px;
+        font-size: 10px;
+        gap: 3px;
+
+        mat-icon {
+          font-size: 11px;
+          width: 11px;
+          height: 11px;
+        }
+      }
+    }
+  }
+}
+
+// Nouveau breakpoint pour écran scindé
+@media (max-width: 1100px) {
+  .attenuation-container {
+    .table-section .table-container .metric-panel {
+      ::ng-deep .mat-expansion-panel-header {
+        padding: 10px 12px;
+      }
+
+      .panel-title-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px 8px;
+        row-gap: 5px;
+
+        .grid-cell {
+          &.libelle-cell {
+            grid-column: 1 / -1;
+            order: -1;
+            padding-bottom: 5px;
+            border-bottom: 1px solid $border-light;
+            margin-bottom: 2px;
+          }
+
+          &.reference-cell {
+            order: 1;
+          }
+
+          &.type-cell {
+            order: 2;
+          }
+
+          &.evaluation-cell {
+            order: 3;
+          }
+
+          &.status-cell {
+            order: 4;
+          }
+
+          .cell-label {
+            font-size: 8px;
+          }
+          
+          .cell-value {
+            font-size: 11px;
+          }
+        }
+      }
+
+      .type-badge,
+      .evaluation-badge-compact,
+      .status-badge {
+        padding: 2px 6px;
+        font-size: 10px;
+        gap: 3px;
+
+        mat-icon {
+          font-size: 11px;
+          width: 11px;
+          height: 11px;
+        }
+      }
+    }
   }
 }
 
@@ -868,20 +1051,36 @@ $radius-lg: 10px;
           }
         }
       }
+    }
+  }
+}
 
-      .table-container .metric-panel {
-        .panel-title-grid {
-          grid-template-columns: 1fr;
-          gap: 8px;
+@media (max-width: 900px) {
+  .attenuation-container {
+    .table-section .table-container .metric-panel {
+      ::ng-deep .mat-expansion-panel-header {
+        padding: 10px 12px;
+      }
 
-          .grid-cell {
-            .cell-label {
-              font-size: 9px;
-            }
-            
-            .cell-value {
-              font-size: 12px;
-            }
+      .panel-title-grid {
+        grid-template-columns: 1fr;
+        gap: 5px;
+
+        .grid-cell {
+          order: initial !important;
+
+          .cell-label {
+            font-size: 8px;
+          }
+          
+          .cell-value {
+            font-size: 11px;
+          }
+
+          &.libelle-cell {
+            padding-bottom: 4px;
+            border-bottom: 1px solid $border-light;
+            margin-bottom: 2px;
           }
         }
       }
@@ -980,13 +1179,13 @@ $radius-lg: 10px;
       .evaluation-badge-compact,
       .status-badge,
       .type-badge {
-        padding: 3px 8px;
-        font-size: 11px;
+        padding: 2px 5px;
+        font-size: 9px;
 
         mat-icon {
-          font-size: 14px;
-          width: 14px;
-          height: 14px;
+          font-size: 10px;
+          width: 10px;
+          height: 10px;
         }
       }
     }
