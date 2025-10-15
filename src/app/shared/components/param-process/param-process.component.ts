@@ -33,6 +33,8 @@ export class ProcessManagerComponent implements OnInit {
 
   buId: string = ''
 
+  cartoMode: boolean = false
+
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService);
   private route = inject(ActivatedRoute);
@@ -59,6 +61,7 @@ export class ProcessManagerComponent implements OnInit {
     if (this.route.snapshot.queryParams["create"]) {
       this.addProcess();
     }
+    this.cartoMode = this.route.snapshot.queryParams['carto']
   }
 
   addProcess() {
@@ -88,6 +91,25 @@ export class ProcessManagerComponent implements OnInit {
     this.newSubprocesses = [];
     this.riskDispatch = {};
     this.viewedRisks = this.getAllRisksRecursive(process);
+  }
+
+  chooseRiskForCarto(risk: RiskTemplate) {
+    const sessionStorageKey = "object_for_carto"
+    const obj =
+    {
+      bu: {
+        id: this.buId,
+        name: this.selectedProcess?.buName
+      },
+      process: this.selectedProcess,
+      risk: risk
+    }
+
+    sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
+
+    if (this.cartoMode) {
+      this.router.navigate(['cartographie', 'create'], { queryParams: { data: true, key: sessionStorageKey } })
+    }
   }
 
   // Méthode récursive pour collecter tous les risques

@@ -84,6 +84,8 @@ export class BuProcessAccordionComponent {
   searchText: string = "Rechercher un risque";
 
 
+  isCartoMode: boolean = false;
+
   // Recherche globale
   searchQuery: string = '';
   searchResults: any[] = [];
@@ -92,14 +94,37 @@ export class BuProcessAccordionComponent {
   allRisks: any[] = []; // Cache de tous les risques pour la recherche
 
   ngOnInit() {
-    this.entityService.loadEntitiesTree().subscribe((entitiesTree: any) => {
-      this.entities = entitiesTree;
-      this.fetchProcesses(entitiesTree);
-    });
+    if (this.route.snapshot.queryParams['buId'] && this.route.snapshot.queryParams['riskId']) {
+      const risk = {
+        bu: {
+          id: this.route.snapshot.queryParams['buId'],
+          name: ""
+        },
+        process: {
+          id: "",
+          name: ""
+        },
+        risk: {
+          id: this.route.snapshot.queryParams['riskId'],
+          name: ""
+        }
+      }
+      this.riskSelected.emit(risk)
+    }
+    else {
+      this.entityService.loadEntitiesTree().subscribe((entitiesTree: any) => {
+        this.entities = entitiesTree;
+        this.fetchProcesses(entitiesTree);
+      });
+    }
     if (this.data?.stopAtProcess) {
       this.stopAtProcess = this.data.stopAtProcess
       this.searchText = "Rechercher un processus"
     }
+
+    this.isCartoMode = this.router.url.includes("cartographie");
+
+
   }
 
   fetchProcesses(allEntities: BusinessUnit[]): void {
@@ -413,7 +438,7 @@ export class BuProcessAccordionComponent {
   private viewProcesses(bu: ProcessNode) {
 
     if (!this.dialogRef) {
-      this.router.navigate(['reglages', 'process'], { queryParams: { buId: bu.id } })
+      this.router.navigate(['reglages', 'process'], { queryParams: { buId: bu.id, carto: this.isCartoMode } })
     }
 
     // Vérifier d'abord dans `children` (processus construits via buildBUChildren)
@@ -615,7 +640,6 @@ export class BuProcessAccordionComponent {
     this.isSearching = false;
   }
 
-
   private performSearch(): void {
     this.isSearching = true;
     this.showSearchResults = true;
@@ -748,7 +772,6 @@ export class BuProcessAccordionComponent {
   addRiskReferentiel(id: string): void {
     this.router.navigate(['reglages', 'risks', 'create-referentiel'], { queryParams: { processId: id } });
   }
-
 
   navToRisk(id: string) {
     this.router.navigate(['reglages', 'risks', id]);

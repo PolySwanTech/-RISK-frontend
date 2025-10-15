@@ -21,11 +21,5 @@ export const reglagesRoute: Routes = [
   },
   {
     path: 'process', component : ProcessManagerComponent
-  }, 
-  {
-    path: 'evaluation',
-    children: [
-      { path: 'create', component: CreateEvaluationComponent }
-    ]
   }
 ];
