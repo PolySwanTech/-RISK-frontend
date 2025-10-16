@@ -1,4 +1,6 @@
 // Variables professionnelles pour secteur bancaire
+@use "sass:color";
+
 $primary: #1976d2;
 $primary-light: #e3f2fd;
 $success: #2e7d32;
@@ -318,7 +320,7 @@ $radius-lg: 10px;
             transition: all 0.3s ease;
 
             &:hover {
-              border-color: lighten($primary, 35%);
+              border-color: color.adjust($primary, $lightness : 35%);
               box-shadow: $shadow-sm;
               transform: translateY(-1px);
             }

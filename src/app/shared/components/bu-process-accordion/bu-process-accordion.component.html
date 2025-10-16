@@ -3,7 +3,7 @@
   <div class="search-section">
     <div class="search-input-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
-      <input type="text" placeholder= {{searchText}} [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
+      <input type="text" placeholder={{searchText}} [(ngModel)]="searchQuery" (input)="onSearchInput($event)"
         class="search-input">
       <button *ngIf="searchQuery" mat-icon-button (click)="clearSearch()" class="search-clear-btn">
         <mat-icon>clear</mat-icon>
@@ -68,7 +68,8 @@
       </div>
 
       <mat-list class="custom-list">
-          <button mat-raised-button style="width: 30%;" class="btn-primary" *ngIf="view === 'risks'" (click)="createNewEvent()">Nouvel evenement</button>
+        <button mat-raised-button style="width: 30%;" class="btn-primary" *ngIf="view === 'risks'"
+          (click)="createNewEvent()">Nouvel evenement</button>
         @for(node of currentNodes; track node.id){
         <mat-list-item [matTooltip]="getTooltip(view)"
           (click)="view === 'risks' ? selectRisk(node) : viewNextLevel(node)">
@@ -80,24 +81,6 @@
           </div>
 
           <div class="node-actions">
-            <button *ngIf="hasChildren(node)" mat-stroked-button class="btn-hierarchy"
-              (click)="enterNode(node); $event.stopPropagation()">
-              <mat-icon>account_tree</mat-icon>
-              Voir la hiérarchie
-            </button>
-
-            <button *ngIf="canViewNextLevel(node)" mat-stroked-button color="primary"
-              (click)="viewNextLevel(node); $event.stopPropagation()">
-              <mat-icon>visibility</mat-icon>
-              {{ getNextLevelButtonText(node) }}
-            </button>
-
-            <button *ngIf="view === 'risks'" mat-stroked-button color="accent"
-              (click)="consultationMode == 'admin' ? navToRisk(node.id) : selectRisk(node); $event.stopPropagation()">
-              <mat-icon>{{ consultationMode == 'admin' ? 'visibility' : 'check'}}</mat-icon> {{ consultationMode ==
-              'admin' ? 'Consulter le risque' : 'Sélectionner le risque' }}
-            </button>
-
             @if(consultationMode === 'admin' && view && view !== 'risks'){
             <button mat-icon-button (click)="$event.stopPropagation()" [matMenuTriggerFor]="menu">
               <mat-icon>more_vert</mat-icon>
@@ -105,7 +88,6 @@
 
             <mat-menu #menu="matMenu">
               <ng-container *ngIf="view && view === 'bu'">
-
                 <button mat-menu-item (click)="goToMatrixPage(node.id)">
                   <mat-icon>grid_on</mat-icon>
                   <span>Voir la matrice</span>
@@ -125,31 +107,6 @@
                   <mat-icon>delete</mat-icon>
                   <span>Supprimer</span>
                 </button>
-
-              </ng-container>
-
-              <ng-container *ngIf="view === 'process'">
-
-                <button mat-menu-item (click)="addRisk(node.id)">
-                  <mat-icon>add</mat-icon>
-                  <span>Nouvel événement de risque</span>
-                </button>
-
-                <button mat-menu-item (click)="addRiskReferentiel(node.id)">
-                  <mat-icon>add</mat-icon>
-                  <span>Nouveau référentiel de risque</span>
-                </button>
-
-                <button mat-menu-item (click)="openProcessDialog(node, $event)">
-                  <mat-icon>edit</mat-icon>
-                  <span>Modifier</span>
-                </button>
-
-                <button mat-menu-item (click)="deleteProcess(node.id)">
-                  <mat-icon>delete</mat-icon>
-                  <span>Supprimer</span>
-                </button>
-
               </ng-container>
             </mat-menu>
             }
