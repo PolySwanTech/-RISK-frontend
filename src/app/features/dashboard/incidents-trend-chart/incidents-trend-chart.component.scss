@@ -1,0 +1,41 @@
+.trend-card {
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+mat-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+mat-card-subtitle {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.chart-container {
+  height: 300px;
+}
+
+.trend-info {
+  margin-top: 10px;
+  font-weight: 500;
+  color: #444;
+  text-align: left;
+
+  span {
+    font-weight: 600;
+  }
+
+  .positive {
+    color: #16a34a;
+  }
+
+  .negative {
+    color: #dc2626;
+  }
+}

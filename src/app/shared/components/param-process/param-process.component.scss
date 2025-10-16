@@ -1,0 +1,338 @@
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 30px;
+    min-height: 600px;
+}
+
+.tree-section,
+.details-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tree-section h2,
+.details-section h2 {
+    margin-top: 0;
+    color: #2d3748;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.tree-node {
+    margin-left: 0;
+}
+
+.process-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.process-item:hover {
+    background: #f7fafc;
+}
+
+.process-item.selected {
+    background: #ebf4ff;
+    border-left: 3px solid #4299e1;
+}
+
+.process-item.child {
+    margin-left: 24px;
+}
+
+.toggle {
+    width: 20px;
+    color: #718096;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.process-name {
+    flex: 1;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-1 {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.badge-2 {
+    background: #bee3f8;
+    color: #2c5282;
+}
+
+.badge-3 {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.risk-count {
+    font-size: 12px;
+    color: #e53e3e;
+    font-weight: 600;
+}
+
+.children {
+    margin-left: 0;
+}
+
+.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #a0aec0;
+    text-align: center;
+}
+
+.process-details h2 {
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.level-info {
+    color: #718096;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.risk-events-section {
+    margin-bottom: 30px;
+}
+
+.risk-events-section h3 {
+    font-size: 16px;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.risk-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.risk-item {
+    padding: 15px;
+    background: #fef5e7;
+    border-left: 4px solid #f39c12;
+    border-radius: 6px;
+    display : flex;
+    justify-content: space-between;
+    
+}
+
+.risk-item strong {
+    display: block;
+    color: #2d3748;
+    margin-bottom: 5px;
+}
+
+.risk-item p {
+    margin: 0;
+    color: #718096;
+    font-size: 14px;
+}
+
+.empty-state {
+    color: #a0aec0;
+    font-style: italic;
+}
+
+.actions {
+    margin-top: 25px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #4299e1;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #3182ce;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
+}
+
+.btn-primary:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+}
+
+.btn-icon {
+    padding: 4px 8px;
+    font-size: 16px;
+}
+
+.btn-danger {
+    background: #fc8181;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #f56565;
+}
+
+.dispatch-modal {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.warning {
+    background: #fff5f5;
+    border-left: 4px solid #fc8181;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 6px;
+    color: #742a2a;
+}
+
+.subprocess-creation,
+.risk-dispatch {
+    margin: 25px 0;
+}
+
+.subprocess-creation h3,
+.risk-dispatch h3 {
+    font-size: 16px;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.subprocess-form {
+    margin-bottom: 12px;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-row label {
+    width: 120px;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.form-control {
+    flex: 1;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4299e1;
+}
+
+.form-control.invalid {
+    border-color: #fc8181;
+}
+
+.risk-dispatch-item {
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 15px;
+    align-items: start;
+    padding: 15px;
+    background: #f7fafc;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.risk-info strong {
+    display: block;
+    color: #2d3748;
+    margin-bottom: 5px;
+}
+
+.risk-info p {
+    margin: 0;
+    color: #718096;
+    font-size: 13px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #e2e8f0;
+}

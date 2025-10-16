@@ -48,7 +48,7 @@ export class ActionPlan {
     riskName : string = "";
     taxonomie: RiskTemplate | null;
     incidentId: string;
-    echeance: Date;
+    echeance: Date = new Date();
 
     createdAt: Date = new Date();
 

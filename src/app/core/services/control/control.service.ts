@@ -4,7 +4,6 @@ import { environment } from '../../../environments/environment';
 import { ControlTemplate, ControlTemplateCreateDto } from '../../models/ControlTemplate';
 import { ControlExecution } from '../../models/ControlExecution';
 import { RiskTemplate } from '../../models/RiskTemplate';
-import { Process } from '../../models/Process';
 import { ControlEvaluation } from '../../models/ControlEvaluation';
 import { Observable } from 'rxjs';
 import { ControlMethodology, ControlMethodologyCreateDto } from '../../models/ControlMethodology';
@@ -103,5 +102,10 @@ export class ControlService {
 
   activateControl(controlId: string) {
     return this.http.patch(`${this.baseUrlTemp}/${controlId}/activate`, {});
+  }
+
+  getLastExecution(controlId: string) {
+    const params = new HttpParams().set("controlId", controlId);
+    return this.http.get<ControlExecution>(this.baseUrlExec + '/last', { params: params })
   }
 }

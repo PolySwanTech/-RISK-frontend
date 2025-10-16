@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Inject, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
-import { Evaluation } from '../../../core/enum/evaluation.enum';
+import { Evaluation, EvaluationLabels } from '../../../core/enum/evaluation.enum';
 import { ControlEvaluationView, ControlEvaluation } from '../../../core/models/ControlEvaluation';
 import { ControlExecution } from '../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
@@ -38,7 +38,6 @@ export class EvaluationCardComponent {
 
   @Output() close = new EventEmitter<void>();
 
-  @Output() evaluateRequested = new EventEmitter<void>();
   @Output() openDetailsRequested = new EventEmitter<string>();
 
   @Input() showNoEvalText = false;
@@ -55,15 +54,10 @@ export class EvaluationCardComponent {
     resume: '',
     comments: ''
   };
-  evaluationOptions = Object.values(EvaluationControl);
-  labels = EvaluationControlLabels;
-
-  constructor() { }
 
   private controlService = inject(ControlService);
   private fileService = inject(FileService);
   private confirmService = inject(ConfirmService);
-  private dialog = inject(MatDialog);
   private authService = inject(AuthService);
 
   actionTaken: 'valid' | 'reexam' | null = null;
@@ -105,8 +99,8 @@ export class EvaluationCardComponent {
     });
   }
 
-  sameCreator(){
-   return this.authService.sameUserName(this.evaluationView?.performedBy || '');
+  sameCreator() {
+    return this.authService.sameUserName(this.evaluationView?.performedBy || '');
   }
 
   openDetails(executionId: string): void {
@@ -123,16 +117,6 @@ export class EvaluationCardComponent {
     });
   }
 
-  startEvaluationFor(executionId: string): void {
-    this.evaluationData = {
-      executionId,
-      evaluation: Evaluation.MEDIUM,
-      resume: '',
-      comments: ''
-    };
-    this.mode = 'FORM';
-  }
-
   handleAction(action: string) {
     this.openDetailsRequested.emit(action);
   }
@@ -145,47 +129,44 @@ export class EvaluationCardComponent {
     let files = await firstValueFrom(this.fileService.getFiles(target, this.executionId))
 
     this.fileService.openFiles(files, target, this.executionId)
-      .afterClosed().subscribe(_ => {
-        if (!closed) {
-          // this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
-          //   result => {
-          //     if (result) {
-          //       this.validateAction(actionId);
-          //     }
-          //   }
-          // )
-        }
-      });
+      .afterClosed().subscribe();
   }
 
   get evalLabel(): string {
-    const v = (this.evaluationView?.evaluation || '').toUpperCase();
-    if (v.includes('PARTIEL')) return 'Partiellement conforme';
-    if (v.includes('NON')) return 'Non conforme';
-    if (v.includes('CONF')) return 'Conforme';
-    return '—';
+    if (this.evaluationView) {
+      return EvaluationControlLabels[this.evaluationView.evaluation]
+    }
+    else {
+      return '—';
+    }
   }
+
   get evalClass(): string {
-    const v = (this.evaluationView?.evaluation || '').toUpperCase();
-    if (v.includes('PARTIEL')) return 'partiel';
-    if (v.includes('NON')) return 'non_conforme';
-    if (v.includes('CONF')) return 'conforme';
-    return 'pill-default';
+    if (this.evaluationView) {
+      switch (this.evaluationView.evaluation) {
+        case EvaluationControl.CONFORME: return 'conforme';
+        case EvaluationControl.NON_CONFORME: return 'non_conforme';
+        case EvaluationControl.PARTIELLEMENT_CONFORME: return 'partiel';
+        default: return 'pill_default';
+      }
+    }
+    return 'pill_default';
   }
-  get hasValidation(): boolean {
-    const v = this.evaluationView;
-    if (!v) return false;
-    return (v.reviewStatus === 'APPROVED' || v.reviewStatus === 'REEXAM_REQUESTED'
-      || !!v.reviewedAt || !!v.reviewedBy || !!v.reviewComment);
-  }
+  
   get reviewBadgeClass(): string {
     const s = this.evaluationView?.reviewStatus;
-    if (s === ReviewStatus.APPROVED) return 'validé';
-    if (s === ReviewStatus.REEXAM_REQUESTED) return 'pending';
-    if (s === ReviewStatus.PENDING) return 'in_progress';
-    if (s === ReviewStatus.REJECTED) return 'annulé';
+    if (s) {
+      switch (s) {
+        case ReviewStatus.APPROVED: return 'validé';
+        case ReviewStatus.REEXAM_REQUESTED: return 'pending';
+        case ReviewStatus.PENDING: return 'in_progress';
+        case ReviewStatus.REJECTED: return 'annulé';
+        default: return '';
+      }
+    }
     return '';
   }
+  
   get reviewBadgeLabel(): string {
     const s = this.evaluationView?.reviewStatus;
     return s ? ReviewStatusLabels[s] : '—';

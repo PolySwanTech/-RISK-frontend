@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { RiskId, RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
+import { RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -19,6 +19,10 @@ export class RiskService {
 
   save(dto: RiskTemplateCreateDto) {
     return this.http.post<RiskTemplate>(this.baseUrl, dto);
+  }
+
+  reasign(riskId: string, processId: string) {
+    return this.http.patch(this.baseUrl + '/reassign', { riskId, processId })
   }
 
   getAll(buId?: string): Observable<RiskTemplate[]> {
@@ -47,7 +51,7 @@ export class RiskService {
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params })
   }
 
-  getByParent(parentId: RiskId) {
+  getByParent(parentId: string) {
     let params = new HttpParams();
     params = params.append('parentId', parentId.toString());
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params: params });

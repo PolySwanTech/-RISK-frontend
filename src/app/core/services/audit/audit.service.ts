@@ -4,7 +4,6 @@ import { TargetType } from '../../enum/targettype.enum';
 import { environment } from '../../../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { AuditComponent } from '../../../shared/components/audit/audit.component';
-import { SnackBarService } from '../snack-bar/snack-bar.service';
 
 @Injectable({
   providedIn: 'root'

@@ -14,16 +14,6 @@ export class MatrixService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl + '/matrix';
 
-  /** Récupère toutes les matrices */
-  getMatrices(): Observable<Matrix[]> {
-    return this.http.get<Matrix[]>(this.baseUrl);
-  }
-
-  /** Récupère une matrice par son id */
-  getMatriceById(id: string): Observable<Matrix> {
-    return this.http.get<Matrix>(`${this.baseUrl}/${id}`);
-  }
-
   getDefaultMatrix(buId: string): Observable<any> {
     const params = new HttpParams().set("buId", buId);
     return this.http.get<Matrix>(this.baseUrl, { params: params });
@@ -53,7 +43,7 @@ export class MatrixService {
   /** 🔹 Récupère les sévérités par BU */
   getSeveritiesByBu(buId: string): Observable<any[]> {
     const params = new HttpParams().set("buId", buId);
-    return this.http.get<any[]>(`${this.baseUrl}/severity`, { params });
+    return this.http.get<Range[]>(`${this.baseUrl}/severity`, { params });
   }
 
 }

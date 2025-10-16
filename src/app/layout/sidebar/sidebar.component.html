@@ -39,10 +39,20 @@
 
         <!-- ✅ Contrôles -->
         <ng-container *appHasPermission="'VIEW_CONTROLES'">
-          <a mat-list-item routerLink="/control/chart">
-            <mat-icon>bar_chart</mat-icon>
-            <span>Contrôles</span>
+          <a mat-list-item [matMenuTriggerFor]="menu">
+            <mat-icon>shield</mat-icon>
+            <span>DMR</span>
           </a>
+          <mat-menu #menu="matMenu">
+            <button routerLink="/control/chart" *appHasPermission="'VIEW_CONTROLES'" mat-menu-item>
+              <mat-icon>rule</mat-icon>
+              <span>Contrôles</span>
+            </button>
+            <button mat-menu-item *appHasPermission="'VIEW_CONTROLES'" routerLink="/attenuationMetrics">
+              <mat-icon>bar_chart</mat-icon>
+              <span>Mesures d'atténuations</span>
+            </button>
+          </mat-menu>
         </ng-container>
 
         <!-- ✅ Incidents -->

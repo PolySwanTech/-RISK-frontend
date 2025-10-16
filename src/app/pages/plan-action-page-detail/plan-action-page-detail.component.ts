@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +18,6 @@ import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
 import { firstValueFrom } from 'rxjs';
 import { TargetType } from '../../core/enum/targettype.enum';
-import { FichiersComponent } from '../../shared/components/fichiers/fichiers.component';
 import { FileService } from '../../core/services/file/file.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
@@ -26,23 +25,25 @@ import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service
 import { AddActionDialogComponent } from '../../features/action-plan/add-action-dialog/add-action-dialog.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { AuditService } from '../../core/services/audit/audit.service';
-import { AuditPanelComponent } from '../../shared/components/audit/audit-panel/audit-panel.component';
-import { MatDrawer, MatDrawerContainer } from '@angular/material/sidenav';
+import { MatDrawer } from '@angular/material/sidenav';
 import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
 import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
+import { TimelineActionPlanComponent } from '../../shared/components/timeline-action-plan/timeline-action-plan.component';
 
 @Component({
   selector: 'app-plan-action-page-detail',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe, TimelineActionPlanComponent,
     MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, AuditButtonComponent,
     MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule, HasPermissionDirective],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
-export class PlanActionPageDetailComponent {
+export class PlanActionPageDetailComponent implements OnInit {
 
   @ViewChild('auditDrawer') auditDrawer!: MatDrawer;
 
+  today: Date = new Date();
+  intervalId?: any;
 
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
@@ -82,7 +83,6 @@ export class PlanActionPageDetailComponent {
   getActionPlan(id: string) {
     this.actionPlanService.getActionPlan(id).subscribe(resp => {
       this.actionPlan = resp;
-      console.log(this.actionPlan);
 
       // Todo: métriques doivent être calculées côté backend
       if (this.actionPlan?.actions?.length) {
@@ -119,7 +119,7 @@ export class PlanActionPageDetailComponent {
           icon: 'play_arrow',
           class: 'btn-purple',
           show: !!canStart,
-          permission: {teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']},
+          permission: { teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN'] },
           action: () => this.startActionPlan()
         },
         {
@@ -127,7 +127,7 @@ export class PlanActionPageDetailComponent {
           icon: 'check',
           class: 'btn-primary',
           show: !!canEnd,
-          permission: {teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']},
+          permission: { teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN'] },
           action: () => this.endActionPlan()
         }
       ];
@@ -154,28 +154,40 @@ export class PlanActionPageDetailComponent {
   }
 
   validateAction(actionId: string) {
-
-    this.actionPlanService.finishAction(actionId).subscribe(
-      _ => this.ngOnInit()
-    )
+    if (this.actionPlan) {
+      this.auditService.openAuditDialog(this.actionPlan.id, TargetType.ACTION_PLAN)
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.actionPlanService.finishAction(actionId).subscribe(
+              _ => this.ngOnInit()
+            )
+          }
+          else {
+            this.snackBarService.info("Action non-abandonnée.")
+          }
+        })
+    }
   }
 
   abandon(action: Action) {
-    this.auditService.openAuditDialog(action.id, TargetType.ACTION_PLAN)
-      .afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.actionPlanService.abandonAction(action.id).subscribe(
-            _ => {
-              this.snackBarService.info("Action abandonnée avec succès.")
-              this.ngOnInit();
-            }
-          )
-        }
-        else {
-          this.snackBarService.info("Action non-abandonnée.")
-        }
-      })
+    if (this.actionPlan) {
+      this.auditService.openAuditDialog(this.actionPlan.id, TargetType.ACTION_PLAN)
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.actionPlanService.abandonAction(action.id).subscribe(
+              _ => {
+                this.snackBarService.info("Action abandonnée avec succès.")
+                this.ngOnInit();
+              }
+            )
+          }
+          else {
+            this.snackBarService.info("Action non-abandonnée.")
+          }
+        })
+    }
   }
 
   getCompletedCount(actions: Action[]): number {
@@ -286,7 +298,7 @@ export class PlanActionPageDetailComponent {
     if (this.auditDrawer.opened) {
       this.auditDrawer.close();
     }
-    else{
+    else {
       this.auditDrawer.open();
     }
   }

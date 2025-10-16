@@ -36,6 +36,8 @@ import { MatChipListbox, MatChip } from "@angular/material/chips";
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    FormsModule, MatButtonModule, ReactiveFormsModule, 
+    MatIconModule, PopupHeaderComponent,
     FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, PopupHeaderComponent,
     MatChipListbox,
     MatChip
@@ -119,8 +121,6 @@ export class CreateControlComponent {
       priority: this.form.value.priority,
       riskId: this.form.value.riskId,
     };
-
-    console.log("Payload création contrôle : ", payload);
 
     this.controlService.createControl(payload).subscribe({
       next: () => {

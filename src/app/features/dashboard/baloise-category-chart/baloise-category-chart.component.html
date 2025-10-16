@@ -1,0 +1,22 @@
+<mat-card class="chart-container mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>📊 Catégories Bâloises</mat-card-title>
+    <mat-card-subtitle>
+      <i *ngIf="drillLevel === 'parent'">Niveau 1</i>
+      <i *ngIf="drillLevel === 'child'">Sous-catégories de {{ selectedParent?.label }}</i>
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div *ngIf="drillLevel === 'child'">
+      <button mat-stroked-button color="primary" (click)="goBack()">⬅ Retour</button>
+    </div>
+
+    <canvas baseChart
+            [data]="data"
+            [options]="options"
+            type="bar"
+            (chartClick)="onChartClick($event)">
+    </canvas>
+  </mat-card-content>
+</mat-card>

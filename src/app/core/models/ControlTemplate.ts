@@ -6,15 +6,9 @@ import { RiskLevel } from "../enum/riskLevel.enum";
 import { ControlExecution } from "./ControlExecution";
 import { RiskTemplate } from "./RiskTemplate";
 
-export interface ControlId {
-    /** UUID généré côté back */
-    id: string;
-    /** Instant ISO 8601 retourné par le back */
-    version: Date;
-}
 export class ControlTemplate {
 
-    id: ControlId;
+    id: string;
     reference: string;
     libelle: string;
     description: string;
@@ -35,7 +29,6 @@ export class ControlTemplate {
     constructor
         (
             id: string,
-            version: Date,
             reference: string,
             libelle: string,
             description: string,
@@ -53,7 +46,7 @@ export class ControlTemplate {
             creator: string,
             riskName: string
         ) {
-        this.id = { id, version };
+        this.id = id;
         this.reference = reference;
         this.libelle = libelle;
         this.description = description;

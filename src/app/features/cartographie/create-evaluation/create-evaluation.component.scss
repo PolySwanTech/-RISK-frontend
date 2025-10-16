@@ -373,8 +373,8 @@ mat-chip.very_high {
 
 .controls-grid {
   display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .control-card {
@@ -398,4 +398,18 @@ mat-chip.very_high {
     font-weight: bold;
     margin-top: 8px;
   }
+}
+
+::ng-deep .mat-step-header {
+  pointer-events: none;
+}
+
+.attenuation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.attenuation-card {
+  border-left: 5px solid #2196f3;
 }

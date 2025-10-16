@@ -14,12 +14,12 @@
     <!-- Business Unit -->
     <mat-form-field class="full-width">
       <mat-label>Business Unit</mat-label>
-      <mat-select formControlName="buId" (selectionChange)="onBuChange($event.value)">
+      <mat-select formControlName="bu" [disabled]="businessUnits.length === 1" (selectionChange)="onBuChange($event.value)">
         <mat-option *ngFor="let bu of businessUnits" [value]="bu.id">
           {{ bu.name }}
         </mat-option>
       </mat-select>
-      <mat-error *ngIf="processForm.get('buId')?.invalid && processForm.get('buId')?.touched">
+      <mat-error *ngIf="processForm.get('bu')?.invalid && processForm.get('bu')?.touched">
         La BU est requise.
       </mat-error>
     </mat-form-field>

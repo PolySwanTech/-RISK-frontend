@@ -258,7 +258,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   }
 
   onRowClick(control: ControlTemplate) {
-    this.router.navigate(['control', 'details', control.id.id]);
+    this.router.navigate(['control', 'details', control.id]);
   }
 
   create() {
@@ -323,12 +323,12 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   activeOrSuspendControl(control: ControlTemplate) {
     if (control.actif) {
       // suspend
-      this.controlService.suspendControl(control.id.id).subscribe(_ => this.snackBarService.info('Le contrôle a été suspendu avec succès.'));
+      this.controlService.suspendControl(control.id).subscribe(_ => this.snackBarService.info('Le contrôle a été suspendu avec succès.'));
       this.getUsersAndControls();
     }
     else {
       // activate
-      this.controlService.activateControl(control.id.id).subscribe(_ => this.snackBarService.info('Le contrôle a été activé avec succès.'));
+      this.controlService.activateControl(control.id).subscribe(_ => this.snackBarService.info('Le contrôle a été activé avec succès.'));
       this.getUsersAndControls();
     }
   }

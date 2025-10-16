@@ -1,7 +1,7 @@
 import { State } from "../enum/state.enum";
 import { Cause } from "./Cause";
 import { OperatingLoss } from "./OperatingLoss";
-import { BaloiseCategoryDto } from "./RiskTemplate";
+import { BaloiseCategoryDto } from "./RiskReferentiel";
 
 
 export class Incident {

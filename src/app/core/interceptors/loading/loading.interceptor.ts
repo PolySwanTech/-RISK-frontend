@@ -6,11 +6,16 @@ import { finalize } from 'rxjs/operators';
 
 export const LoadingInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
   const loadingService = inject(LoadingService);  
-  loadingService.show();
 
-  return next(req).pipe( 
+  const shouldShowLoader = req.headers.get('X-Show-Loader') === 'true';
+
+  if (shouldShowLoader) {
+    loadingService.show("🕐 Génération du PDF en cours, merci de patienter...");
+  }
+
+  return next(req).pipe(
     finalize(() => {
-      loadingService.hide();
+      if (shouldShowLoader) loadingService.hide();
     })
   );
 };
