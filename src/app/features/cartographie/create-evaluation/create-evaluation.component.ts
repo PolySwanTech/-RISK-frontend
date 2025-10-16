@@ -25,7 +25,9 @@ import { Range } from '../matrix-settings/matrix-settings.component';
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
-
+import { AttenuationMetricsService } from '../../../core/services/attenuationMetrics/attenuation-metrics.service';
+import { AttenuationMetrics } from '../../../core/models/AttenuationMetrics';
+import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 
 interface Indicator {
   frequenceId: number;
@@ -52,7 +54,8 @@ interface MatrixCell {
 export class CreateEvaluationComponent implements OnInit {
 
   private evaluationSrv = inject(RiskEvaluationService);
-  private riskService = inject(RiskService);
+  private attenuationSrv = inject(AttenuationMetricsService);
+
   private matrixService = inject(MatrixService);
   private controlService = inject(ControlService);
   private snackBarService = inject(SnackBarService);
@@ -82,6 +85,9 @@ export class CreateEvaluationComponent implements OnInit {
   selectedBU: BusinessUnit | null = null;
   selectedProcess: Process | null = null;
 
+  attenuationMetrics: AttenuationMetrics[] = [];
+
+
   severitiesMap: Map<number, number> = new Map();
 
   ngOnInit(): void {
@@ -107,6 +113,10 @@ export class CreateEvaluationComponent implements OnInit {
           this.controlService.getAllTemplates(this.selectedProcess.id, this.selectedRisk.id).subscribe(
             controls => this.controls = controls
           )
+          this.attenuationSrv.getByRisk(this.selectedRisk.id).subscribe({
+            next: metrics => this.attenuationMetrics = metrics,
+            error: err => console.error('Erreur chargement atténuations', err)
+          });
         }
       }
     }
@@ -281,6 +291,11 @@ export class CreateEvaluationComponent implements OnInit {
         }
       )
     }
+  }
+
+  getAttenuationMetricsEvaluationLabel(evaluation: EvaluationControl | undefined): string {
+    if (!evaluation) return 'Aucune évaluation'; 
+    return EvaluationControlLabels[evaluation];
   }
 
   newEvaluation(): void {

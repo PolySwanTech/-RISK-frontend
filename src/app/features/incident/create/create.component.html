@@ -118,10 +118,9 @@
               </button>
             </mat-form-field>
 
-            @if(incident || listCauses.length > 0){
             <app-select-users [selectedUserId]="selectedUser" (userSelected)="changeUser($event)"
               placeholder="Collaborateur pouvant vous aider"></app-select-users>
-            }
+            
 
           </form>
 

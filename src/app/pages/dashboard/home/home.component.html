@@ -1,43 +1,39 @@
 <app-go-back [title]="'Tableau de bord'" [buttons]="goBackButtons"></app-go-back>
+
 <section class="dashboard-container">
-  <!-- Section des filtres -->
-  <mat-card class="filters-card">
-    <mat-card-content class="filters-section">
-      <div class="filters-header">
-        <div>
-          <mat-icon>filter_alt</mat-icon>
-          <span class="filters-title">Filtres</span>
-        </div>
+
+  <!-- Section des onglets -->
+  <mat-tab-group animationDuration="300ms" color="primary" mat-align-tabs="center">
+
+    <!-- Onglet Incidents -->
+    <mat-tab label="Incidents">
+      <div class="graphs-container">
+
+        @if(incidents && incidents.length > 0) {
+          <app-incidents-trend-chart [incidents]="incidents"></app-incidents-trend-chart>
+          <app-bar-chart [incidents]="incidents"></app-bar-chart>
+          <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
+          <app-baloise-category-chart [incidents]="incidents"></app-baloise-category-chart>
+        } @else {
+          <p class="no-incidents">Aucun incident à afficher.</p>
+        }
       </div>
-      <app-filter-table [availableFilters]="filtersConfig"
-                    (filtersChanged)="handleFiltersChanged($event)">
-                </app-filter-table>
-    </mat-card-content>
-  </mat-card>
+    </mat-tab>
 
-  <!-- Vos graphiques existants -->
-  <div class="graphs-container">
-    <app-action-plan-chart></app-action-plan-chart>
-    <app-control-chart></app-control-chart>
-  </div>
+    <!-- Onglet Contrôles -->
+    <mat-tab label="Contrôles">
+      <div class="graphs-container">
+        <app-control-chart></app-control-chart>
+      </div>
+    </mat-tab>
 
-  <!-- Graphiques incidents -->
-  <div class="graphs-container">
-    @if(incidents && incidents.length > 0) {
-      <app-bar-chart [incidents]="incidents"></app-bar-chart>
-      <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
+    <!-- Onglet Plans d’action -->
+    <mat-tab label="Plans d’action">
+      <div class="graphs-container">
+        <app-action-plan-chart></app-action-plan-chart>
+      </div>
+    </mat-tab>
 
-    } @else {
-      <p class="no-incidents">Aucun incident à afficher.</p>
-    }
-  </div>
-
-  <div class="graphs-container">
-    @if(incidents && incidents.length > 0) {
-      <app-baloise-category-chart [incidents]="incidents"></app-baloise-category-chart>
-    } @else {
-      <p class="no-incidents">Aucun incident à afficher.</p>
-    }
-  </div>
+  </mat-tab-group>
 
 </section>
