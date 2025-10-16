@@ -15,6 +15,10 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TargetType } from '../../../core/enum/targettype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { PopupHeaderComponent } from '../popup-header/popup-header.component';
+import { forkJoin, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+import { MatDividerModule } from '@angular/material/divider';
+
 
 export interface UploadedFile {
   id: string;
@@ -25,13 +29,25 @@ export interface UploadedFile {
   etag: string;
   uploadedAt: Date;
   uploadedBy: string;
+  description?: string;
+  isNew?: boolean;
+}
+
+// Fichier "en attente" uniquement côté UI
+interface PendingFile {
+  tempId: string;       // pour trackBy/suppression
+  file: File;           // l'objet File pour l'upload
+  filename: string;
+  size: number;
+  contentType: string;
+  description?: string;
 }
 
 @Component({
   selector: 'app-fichiers',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
     MatGridListModule, MatButtonModule, MatFormFieldModule, PopupHeaderComponent,
-    MatInputModule, MatTooltipModule, CommonModule],
+    MatInputModule, MatTooltipModule, CommonModule, MatDividerModule],
   templateUrl: './fichiers.component.html',
   styleUrl: './fichiers.component.scss'
 })
@@ -55,6 +71,8 @@ export class FichiersComponent {
   filteredFiles: UploadedFile[] = [];
 
   isDragOver = false;
+  pendingFiles: PendingFile[] = [];
+  isSaving = false;
 
   constructor(@Optional() public dialogRef: MatDialogRef<FichiersComponent>, @Optional() @Inject(MAT_DIALOG_DATA) public data?: {
     files?: UploadedFile[];
@@ -105,11 +123,12 @@ export class FichiersComponent {
   }
 
   onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.handleFiles(Array.from(input.files));
-    }
+  const input = event.target as HTMLInputElement;
+  if (input.files) {
+    this.addPending(Array.from(input.files));
+    input.value = ''; // pour autoriser redépôt des mêmes noms
   }
+}
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -124,59 +143,108 @@ export class FichiersComponent {
   }
 
   onDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
-
-    if (event.dataTransfer?.files) {
-      this.handleFiles(Array.from(event.dataTransfer.files));
-    }
+  event.preventDefault();
+  event.stopPropagation();
+  this.isDragOver = false;
+  if (event.dataTransfer?.files) {
+    this.addPending(Array.from(event.dataTransfer.files));
   }
+}
 
-  private async handleFiles(files: File[]) {
-    const validFiles: File[] = [];
+private addPending(files: File[]) {
+  for (const file of files) {
+    if (!this.isValidFile(file)) {
+      this.confirmService.openConfirmDialog(
+        "Fichier non supporté",
+        `Le fichier ${file.name} n'est pas dans un format supporté.`,
+        false
+      );
+      continue;
+    }
+    this.pendingFiles.push({
+      tempId: crypto.randomUUID(),
+      file,
+      filename: file.name,
+      size: file.size,
+      contentType: file.type,
+      description: ''
+    });
+  }
+}
 
-    // On prépare toutes les promesses d'upload
-    const uploadPromises: Promise<void>[] = [];
+  // private async handleFiles(files: File[]) {
+  //   const validFiles: File[] = [];
 
-    for (const file of files) {
-      if (this.isValidFile(file)) {
-        validFiles.push(file);
-        uploadPromises.push(this.uploadFile(file)); // on stocke la promesse
-      } else {
-        this.confirmService.openConfirmDialog(
-          "Fichier non supporté",
-          `Le fichier ${file.name} n'est pas dans un format supporté.`,
-          false
-        );
-      }
+  //   // On prépare toutes les promesses d'upload
+  //   const uploadPromises: Promise<void>[] = [];
+
+  //   for (const file of files) {
+  //     if (this.isValidFile(file)) {
+  //       validFiles.push(file);
+  //       uploadPromises.push(this.uploadFile(file)); // on stocke la promesse
+  //     } else {
+  //       this.confirmService.openConfirmDialog(
+  //         "Fichier non supporté",
+  //         `Le fichier ${file.name} n'est pas dans un format supporté.`,
+  //         false
+  //       );
+  //     }
+  //   }
+
+  //   if (validFiles.length > 0) {
+  //     try {
+  //       // attendre que TOUS les fichiers soient uploadés
+  //       await Promise.all(uploadPromises);
+
+  //       const fileNames = validFiles.map(f => f.name).join(", ");
+  //       const message =
+  //         validFiles.length === 1
+  //           ? `Le fichier ${fileNames} a été ajouté avec succès.`
+  //           : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
+
+  //       this.snackbarService.success("Fichier(s) ajouté(s) " + message);
+  //       this.ngOnInit();
+  //     } catch (error) {
+  //       this.confirmService.openConfirmDialog(
+  //         "Erreur",
+  //         "Une erreur est survenue lors de l'upload d'un ou plusieurs fichiers.",
+  //         false
+  //       );
+  //     }
+  //   }
+
+  // }
+
+  private async uploadFile(file: File): Promise<void> {
+
+    if (!this.targetId) {
+      this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
+      return;
     }
 
-    if (validFiles.length > 0) {
-      try {
-        // attendre que TOUS les fichiers soient uploadés
-        await Promise.all(uploadPromises);
-
-        const fileNames = validFiles.map(f => f.name).join(", ");
-        const message =
-          validFiles.length === 1
-            ? `Le fichier ${fileNames} a été ajouté avec succès.`
-            : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
-
-        this.snackbarService.success("Fichier(s) ajouté(s) " + message);
-        this.ngOnInit();
-      } catch (error) {
+    this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
+      next: _ => {
+        // Refresh la liste
+        this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+        this.attachedFiles = files.map(f => ({
+          ...f,
+          isNew: f.filename === file.name
+        }));
+        this.filteredFiles = this.attachedFiles;
+        this.filteredFilesCount = this.filteredFiles.length;
+        });
+      },
+      error: _ => {
         this.confirmService.openConfirmDialog(
           "Erreur",
-          "Une erreur est survenue lors de l'upload d'un ou plusieurs fichiers.",
+          `Erreur lors de l'ajout du fichier ${file.name}.`,
           false
         );
       }
-    }
-
+    });
   }
 
-  private isValidFile(file: File): boolean {
+   private isValidFile(file: File): boolean {
     const validTypes = [
       'application/pdf',
       'application/msword',
@@ -191,32 +259,6 @@ export class FichiersComponent {
     ];
 
     return validTypes.includes(file.type);
-  }
-
-  private async uploadFile(file: File): Promise<void> {
-
-    if (!this.targetId) {
-      this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
-      return;
-    }
-
-    this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
-      next: _ => {
-        // Refresh la liste
-        this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
-          this.attachedFiles = files;
-          this.filteredFiles = files;
-          this.filteredFilesCount = files.length;
-        });
-      },
-      error: _ => {
-        this.confirmService.openConfirmDialog(
-          "Erreur",
-          `Erreur lors de l'ajout du fichier ${file.name}.`,
-          false
-        );
-      }
-    });
   }
 
   downloadFile(file: UploadedFile, openInBrowser: boolean = false): void {
@@ -248,24 +290,54 @@ export class FichiersComponent {
     });
   }
 
-  //   // TODO: Implémenter la "suppression", mais il faut juste cacher le file ne plus le rendre apparant-> pour la traçabilité
-  // deleteFile(fileId: string): void {
-  //   this.fileService.deleteFile(fileId).subscribe({
-  //     next: () => {
-  //       this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-  //       this.confirmService.openConfirmDialog("Fichier supprimé", "Le fichier a été supprimé avec succès.", false);
-  //     },
-  //     error: (error) => {
-  //       this.confirmService.openConfirmDialog("Erreur", "Erreur lors de la suppression du fichier.", false);
-  //     }
-  //   });
+ removePending(tempId: string) {
+  this.pendingFiles = this.pendingFiles.filter(p => p.tempId !== tempId);
+}
 
-  //   // Simulation pour la démo
-  //   const file = this.attachedFiles.find(f => f.id === fileId);
-  //   this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-  //   this.filteredFiles = this.attachedFiles;
-  //   this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.filename} a été supprimé avec succès.`, false);
-  // }
+clearPending() {
+  this.pendingFiles = [];
+}
+
+savePending() {
+  if (!this.targetId) {
+    this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
+    return;
+  }
+  if (this.pendingFiles.length === 0) {
+    this.snackbarService.info("Aucun fichier à enregistrer.");
+    return;
+  }
+
+  this.isSaving = true;
+
+  const requests = this.pendingFiles.map(p =>
+    this.fileService.uploadFile(p.file, this.targetType, this.targetId, p.description ?? '').pipe(
+      catchError(err => {
+        this.snackbarService.error(`Échec upload: ${p.filename}`);
+        return of(null); // continue le lot
+      })
+    )
+  );
+
+  forkJoin(requests).pipe(finalize(() => (this.isSaving = false))).subscribe({
+    next: _ => {
+      // rafraîchit la liste des fichiers persistés
+      this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+        this.attachedFiles = files;
+        this.filteredFiles = files;
+        this.filteredFilesCount = files.length;
+        this.pendingFiles = []; // panier vidé
+        this.snackbarService.success("Fichiers enregistrés.");
+        this.dialogRef?.close({ updated: true });
+      });
+    },
+    error: _ => {
+      this.confirmService.openConfirmDialog("Erreur", "Erreur lors de l'enregistrement.", false);
+    }
+  });
+}
+
+
 
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 B';
@@ -329,5 +401,7 @@ export class FichiersComponent {
   preview(file: UploadedFile) {
     this.downloadFile(file, true);
   }
+
+  trackByTempId = (_: number, p: PendingFile) => p.tempId;
 
 }

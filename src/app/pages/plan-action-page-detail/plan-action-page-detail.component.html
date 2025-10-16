@@ -1,11 +1,3 @@
-<!-- <mat-drawer-container class="audit-drawer-container">
-    <mat-drawer #auditDrawer mode="over" position="end" class="audit-drawer">
-        @if(actionPlan != null){
-        <app-audit-panel [contextId]="actionPlan.id" contextType="ACTION_PLAN"></app-audit-panel>
-        }
-    </mat-drawer>
-
-</mat-drawer-container> -->
 <div class="body-container">
     @if(actionPlan){
     <app-go-back [title]="`Détails d'un plan d'action`" [subtitle]="actionPlan.reference"
@@ -22,14 +14,22 @@
                     </span>
                 </mat-card-title>
             </mat-card-header>
+            <app-timeline-action-plan [actionPlan]="actionPlan"></app-timeline-action-plan>
             <mat-card-content class="plan-info-content">
-
                 <div class="info-grid">
                     <div class="info-block">
                         <mat-icon>person</mat-icon>
                         <div class="info-text">
                             <label>Equipe responsable</label>
                             <div class="value">{{ actionPlan.userInCharge }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <mat-icon>event</mat-icon>
+                        <div class="info-text">
+                            <label>Date de création</label>
+                            <div class="value">{{ actionPlan.createdAt | date: 'dd/MM/yyyy' }}</div>
                         </div>
                     </div>
 
@@ -53,7 +53,7 @@
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Statut</label>
-                            <span class="badge status" [ngClass]="actionPlan.status.toLowerCase()">
+                            <span class="badge" [ngClass]="actionPlan.status.toLowerCase()">
                                 {{ getReadableStatut(actionPlan.status) }}
                             </span>
                         </div>
@@ -64,7 +64,7 @@
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Risk</label>
-                            <span class="badge status" [ngClass]="actionPlan.riskName.toLowerCase()">
+                            <span class="badge type">
                                 {{ actionPlan.riskName }}
                             </span>
                         </div>
@@ -102,11 +102,16 @@
                 <mat-tab label="Actions à réaliser">
                     <mat-card-header>
                         <mat-card-title>
+                            @if(actionPlan.status == statusEnum.NOT_STARTED){
                             <button mat-raised-button class="btn-primary"
-                                *ngIf="actionPlan.status == statusEnum.NOT_STARTED" (click)="openAddActionDialog()">
+                                *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                (click)="openAddActionDialog()">
                                 <mat-icon>add</mat-icon>
                                 <span>Ajouter</span>
                             </button>
+                            }
+
+                            <div *ngIf="actionPlan.status != statusEnum.NOT_STARTED"></div>
                             <div class="progression-section">
                                 <label>Progression globale</label>
                                 <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
@@ -128,18 +133,24 @@
                                             <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy'
                                                 }})</span>
                                         </p>
-                                        <button *ngIf="canAbandonAction(action)" mat-icon-button class="btn-red"
-                                            matTooltip="Abandonner" (click)="abandon(action)">
+                                        @if(canAbandonAction(action)){
+                                        <button
+                                            *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                            mat-icon-button class="btn-red" matTooltip="Abandonner"
+                                            (click)="abandon(action)">
                                             <mat-icon>delete</mat-icon>
                                         </button>
+                                        }
                                     </div>
-                                    <ng-container
-                                        *ngIf="!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED">
-                                        <button mat-raised-button class="btn-primary" (click)="viewFiles(action.id)">
-                                            <mat-icon>upload</mat-icon>
-                                            Déposer un justificatif
-                                        </button>
-                                    </ng-container>
+                                    @if(!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED){
+                                    <button mat-raised-button
+                                        *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                        class="btn-primary" (click)="viewFiles(action.id)">
+                                        <mat-icon>upload</mat-icon>
+                                        Déposer un justificatif
+                                    </button>
+                                    }
+
                                     <ng-container *ngIf="action.performedAt">
                                         <p class="validated">
                                             ✔ Terminé par <strong>{{ action.performedBy }}</strong>
@@ -187,9 +198,6 @@
     </div>
     }
 </div>
-
-<!-- <button mat-fab class="audit-button" (click)="openAuditPanel()"> <mat-icon> {{ auditDrawer.opened ? 'close' :
-        'history'}}</mat-icon> </button> -->
 
 @if(actionPlan){
 <app-audit-button [contextId]="actionPlan.id" [contextTarget]="targetTypeEnum.ACTION_PLAN"></app-audit-button>

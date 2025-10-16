@@ -1,7 +1,7 @@
 import { State } from "../enum/state.enum";
 import { Cause } from "./Cause";
 import { OperatingLoss } from "./OperatingLoss";
-import { BaloiseCategoryDto } from "./RiskTemplate";
+import { BaloiseCategoryDto } from "./RiskReferentiel";
 
 
 export class Incident {
@@ -30,7 +30,12 @@ export class Incident {
 
     state: State;
     consequences: string[];
-    intervenant?: string | null;
+    intervenantId?: string | null;
+    intervenantName?: string | null;
+    creatorId?: string | null;
+    creatorName?: string | null;
+
+
 
     constructor(
         id: string,
@@ -49,7 +54,10 @@ export class Incident {
         impacts: OperatingLoss[] = [],
         state: State = State.DRAFT,
         consequences: string[] = [],
-        intervenant?: string | null,
+        intervenantId?: string | null,
+        intervenantName?: string,
+        creatorId?: string | null,
+        creatorName?: string,
     ){
         this.id = id;
         this.title = title;
@@ -67,7 +75,10 @@ export class Incident {
         this.impacts = impacts;
         this.state = state;
         this.consequences = consequences;
-        this.intervenant = intervenant || null;
+        this.intervenantId = intervenantId || null;
+        this.intervenantName = intervenantName || null;
+        this.creatorId = creatorId || null;
+        this.creatorName = creatorName || null;
     }
 
 

@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $gray-50: #f9fafb;
 $gray-100: #f3f4f6;
 $gray-200: #e5e7eb;
@@ -56,8 +58,6 @@ $gray-600: #475569;
 
 
   .main-content {
-    max-width: 1280px;
-    margin: 3rem auto 0;
     padding: 2rem 1rem;
   }
 
@@ -114,7 +114,7 @@ $gray-600: #475569;
     &.is-active,
     &.is-selected {
       background: #f5f9ff;
-      border-color: lighten($brand, 25%);
+      border-color: color.adjust($brand, $lightness: 25%);
       box-shadow: 0 0 0 2px rgba(37, 99, 235, .25);
     }
 
@@ -213,31 +213,7 @@ $gray-600: #475569;
     }
   }
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: .25rem;
-    padding: .2rem .6rem;
-    border-radius: 999px;
-    font-size: .75rem;
-    font-weight: 700;
 
-    &.small {
-      font-size: .75rem;
-    }
-  }
-
-  .status-realise {
-    @include chip(#d1fae5, #065f46, #a7f3d0);
-  }
-
-  .status-en-cours {
-    @include chip(#fef3c7, #92400e, #fcd34d);
-  }
-
-  .status-non-realise {
-    @include chip(#fee2e2, #991b1b, #fecaca);
-  }
 
   .rv-chip {
     display: inline-flex;

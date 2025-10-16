@@ -10,6 +10,7 @@ import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/ActionPlan
 export class ActionPlanService {
 
   base = environment.apiUrl + '/action-plans';
+  baseAction = environment.apiUrl + '/actions';
   http = inject(HttpClient);
 
   createActionPlan(actionPlan: ActionPlanCreateDto) {
@@ -33,23 +34,23 @@ export class ActionPlanService {
   }
 
   addActions(actions: Action[], id: string) {
-    return this.http.post(`${this.base}/${id}/actions`, actions);
+    return this.http.post(`${this.baseAction}`, actions, { params: { actionPlanId: id } });
   }
 
   getActionPlanByIncident(incidentId: string) {
     const params = new HttpParams().set("incidentId", incidentId);
-    return this.http.get<ActionPlan>(`${this.base + '/incident'}`, { params : params});
+    return this.http.get<ActionPlan>(`${this.base + '/incident'}`, { params: params });
   }
 
-  finishAction(actionId : string){
-    return this.http.put(this.base + '/actions/finish/' + actionId, null);
+  finishAction(actionId: string) {
+    return this.http.put(this.baseAction + '/finish/' + actionId, {});
   }
 
-  delete(id : string){
-    return this.http.put(this.base + '/' + id + '/deactivate', {})
+  abandonAction(id: string) {
+    return this.http.put(`${this.baseAction}/deactivate/${id}`, {})
   }
 
-  abandonAction(id : string){
-    return this.http.put(this.base + '/action/' + id + '/deactivate', {})
+  delete(id: string) {
+    return this.http.put(`${this.base}/${id}/deactivate`, {})
   }
 }

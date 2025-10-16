@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { BusinessUnit } from '../../core/models/BusinessUnit';
 import { EntitiesService } from '../../core/services/entities/entities.service';
@@ -16,6 +16,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ListProcessComponent } from '../../features/process/list-process/list-process.component';
+import { Permission } from '../../core/models/permission';
 
 @Component({
   selector: 'app-cartographie',
@@ -40,11 +41,12 @@ export class CartographieComponent implements OnInit {
   businessUnits: BusinessUnit[] = [];
   years: number[] = [];
 
-  goBackButtons = [
+  goBackButtons : GoBackButton[] = [
     {
       label: 'Créer une cartographie',
       icon: 'add',
       class: 'btn-primary',
+      permission: 'CREATE_CARTOGRAPHIE',
       show: true,
       action: () => this.addCarto()
     }
@@ -76,7 +78,6 @@ export class CartographieComponent implements OnInit {
     // if(this.selectedBuId){
     //   this.riskService.getEvaluationsByBu(this.selectedBuId).subscribe(
     //     resp => {
-    //       console.log(resp)
     //     }
     //   )
     // }

@@ -164,27 +164,8 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
     let target = TargetType.CONTROL
     let files = await firstValueFrom(this.fileService.getFiles(target, this.executionId))
-
-    this.dialog.open(FichiersComponent,
-      {
-        width: '400px',
-        data: {
-          files: files,
-          targetType: target,
-          targetId: this.executionId,
-          closed: closed
-        }
-      }
-    )
-      .afterClosed().subscribe(_ => {
+    this.fileService.openFiles(files, target, this.executionId).afterClosed().subscribe(_ => {
         if (!closed) {
-          // this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
-          //   result => {
-          //     if (result) {
-          //       this.validateAction(actionId);
-          //     }
-          //   }
-          // )
         }
       });
   }

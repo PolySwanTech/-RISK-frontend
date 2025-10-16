@@ -1,26 +1,10 @@
 {
   "/api": {
-    "target": "http://incident:8080",
+    "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
       "^/api": ""
-    }
-  },
-  "/minio": {
-    "target": "http://minio:9000",
-    "secure": false,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/minio": ""
-    }
-  },
-  "/api/rwa": {
-    "target": "http://rwa:8000",
-    "secure": false,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/api/rwa": ""
     }
   }
 }

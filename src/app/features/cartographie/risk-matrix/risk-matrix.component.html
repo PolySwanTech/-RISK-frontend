@@ -16,12 +16,12 @@
 
     <div class="info-row">
       <span class="label">Libellé :</span>
-      <span class="value">{{ riskData.libellePerso }}</span>
+      <span class="value">{{ riskData.libelle }}</span>
     </div>
 
     <div class="info-row">
       <span class="label">Catégorie Bâloise :</span>
-      <span class="value">{{ riskData.category.parent ? riskData.category.parent + ' > ' + riskData.category.label : riskData.category.label }}</span>
+      <span class="value">{{ riskData.riskReferentiel.category.parent ? riskData.riskReferentiel.category.parent + ' > ' + riskData.riskReferentiel.category.label : riskData.riskReferentiel.category.label }}</span>
     </div>
 
     <div class="info-row">
@@ -55,7 +55,7 @@
   <!-- ===================== Description ===================== -->
   <h4>Description :</h4>
   <p class="description-text">
-    {{ riskData.description }}
+    {{ riskData.riskReferentiel.description }}
   </p>
 
   <!-- ===================== Contrôles ===================== -->

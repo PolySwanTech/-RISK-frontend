@@ -15,25 +15,21 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-add-action-dialog',
   imports: [FormsModule, CommonModule, MatFormFieldModule, PopupHeaderComponent,
-     MatIconModule, MatInputModule, MatCardModule, MatButtonModule],
+    MatIconModule, MatInputModule, MatCardModule, MatButtonModule],
   templateUrl: './add-action-dialog.component.html',
   styleUrl: './add-action-dialog.component.scss'
 })
-export class AddActionDialogComponent implements OnInit{
+export class AddActionDialogComponent {
 
   private actionPlanService = inject(ActionPlanService);
   private snackBarService = inject(SnackBarService);
   private dialogRef = inject(MatDialogRef<AddActionDialogComponent>);
 
-  actions : Action[] = [];
+  actions: Action[] = [];
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {actionPlanId: string}){}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { actionPlanId: string }) { }
 
-  ngOnInit(): void {
-    throw new Error('Method not implemented.');
-  }
-
-  save(){
+  save() {
     this.actionPlanService.addActions(this.actions, this.data.actionPlanId).subscribe({
       next: (action) => {
         this.snackBarService.info("Action(s) ajoutée(s) avec succès");
@@ -45,16 +41,16 @@ export class AddActionDialogComponent implements OnInit{
       }
     });
   }
-  
-  closePopup(){
+
+  closePopup() {
     this.dialogRef.close();
   }
 
-  addAction(){
+  addAction() {
     this.actions.push(new Action('', '', new Date(), '', '', ''));
   }
 
-  removeAction(index : number){
+  removeAction(index: number) {
     this.actions.splice(index, 1);
   }
 }

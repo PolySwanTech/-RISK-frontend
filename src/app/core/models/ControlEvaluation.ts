@@ -1,3 +1,4 @@
+import { EvaluationControl } from "../enum/evaluation-controle.enum";
 import { Evaluation } from "../enum/evaluation.enum";
 import { ReviewStatus } from "../enum/reviewStatus.enum";
 
@@ -10,7 +11,7 @@ export class ControlEvaluation {
 
 export interface ControlEvaluationView {
   id: string;
-  evaluation: string;
+  evaluation: EvaluationControl;
   resume: string;
   comments: string;
   evaluatedAt: string;

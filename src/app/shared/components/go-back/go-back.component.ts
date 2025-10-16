@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,8 @@ export class GoBackComponent {
   @Input() title!: string;
   @Input() subtitle?: string;
   @Input() buttons: GoBackButton[] = [];
+  @ViewChild('header') header!: ElementRef<HTMLDivElement>;
+  headerHeight = 0;
 
   @Input() onBack?: () => void;
 
@@ -25,13 +27,30 @@ export class GoBackComponent {
   }
   isStickyClosed = false;
 
-  constructor(private sidebarService: SidebarService) {}
+  constructor(private sidebarService: SidebarService) { }
 
   ngOnInit() {
     this.sidebarService.isClosed$.subscribe(state => {
       this.isStickyClosed = state;
     });
+  }
+
+  ngAfterViewInit() {
+  setTimeout(() => {
+    this.updateHeaderHeight();
+  });
 }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.updateHeaderHeight();
+  }
+
+  updateHeaderHeight() {
+    if (this.header) {
+      this.headerHeight = this.header.nativeElement.offsetHeight;
+    }
+  }
 }
 
 export interface GoBackButton {
@@ -39,6 +58,6 @@ export interface GoBackButton {
   icon?: string;
   class?: string;
   show?: boolean; // condition d’affichage
-  permission?: PermissionNameType | PermissionNameType[];
+  permission?: PermissionNameType | PermissionNameType[] | { teamId?: string, permissions: PermissionNameType | PermissionNameType[] };
   action: () => void;
 }

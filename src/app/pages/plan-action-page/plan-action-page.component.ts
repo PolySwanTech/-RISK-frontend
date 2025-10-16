@@ -247,6 +247,7 @@ export class PlanActionPageComponent implements OnInit {
         icon: 'add',
         show: true,
         class: 'btn-primary',
+        permission: 'CREATE_ACTION_PLAN',
         action: () => this.add()
       },
       {
@@ -254,7 +255,7 @@ export class PlanActionPageComponent implements OnInit {
         icon: 'file_download',
         show: true,
         class: 'btn-green',
-        action: () => console.log('Export action plans')
+        action: () => this.export()
       },
 
     ]
@@ -351,6 +352,10 @@ export class PlanActionPageComponent implements OnInit {
 
   getReadableStatut(status: Status): string {
     return StatusLabels[status] || status;
+  }
+
+  export(){
+    console.error("Fonctionnalité non-implémentée")
   }
 
 

@@ -1,38 +1,39 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatStepperModule } from '@angular/material/stepper';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatRadioModule } from '@angular/material/radio';
 import { SelectUsersComponent } from "../../../shared/components/select-users/select-users.component";
-import { ButtonAddFileComponent } from "../../../shared/components/button-add-file/button-add-file.component";
 import { MatSelectModule } from '@angular/material/select';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ConsequenceService } from '../../../core/services/consequence/consequence.service';
 import { Consequence } from '../../../core/models/Consequence';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
-import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
-import { firstValueFrom, forkJoin, map, tap } from 'rxjs';
+import { finalize, firstValueFrom, forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
-import { Dialog } from '@angular/cdk/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
+import { SelectRiskEventComponent } from '../../../shared/components/select-risk-event/select-risk-event.component';
+import { RiskSelectionMode } from '../../../core/enum/risk-enum';
+
+
 
 
 @Component({
@@ -55,7 +56,8 @@ import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
     MatTooltipModule,
     MatDatepickerModule,
     MatChipsModule,
-    MatChipListbox
+    MatChipListbox,
+    MatTooltipModule,
   ],
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
@@ -75,7 +77,9 @@ export class CreateComponent implements OnInit {
 
   today = new Date();
 
-  selectedBPR: any = null
+  selectedBP: any = null
+  risk: any = null;
+
 
 
   incidentForm1 = this._formBuilder.group({
@@ -125,42 +129,60 @@ export class CreateComponent implements OnInit {
 
   listCauses: Cause[] = [];
 
-  incidentService = inject(IncidentService);
-  riskService = inject(RiskService);
+  private incidentService = inject(IncidentService);
+  private riskService = inject(RiskService);
   riskCategoryService = inject(RiskCategoryService);
-  equipeService = inject(EquipeService);
-  causeService = inject(CauseService);
+  private equipeService = inject(EquipeService);
+  private causeService = inject(CauseService);
   consequenceService = inject(ConsequenceService);
-  processService = inject(ProcessService);
+  private processService = inject(ProcessService);
+
+  @ViewChild('stepper') stepper!: MatStepper;
 
 
   async ngOnInit(): Promise<void> {
     this.hasTeam = false;
-
-
-    // D'abord charger les équipes
     await this.fetchTeams();
 
-    // Ensuite charger l'incident ou l'arbre
+    const draft = sessionStorage.getItem('incident_draft');
+    if (draft) {
+      const data = JSON.parse(draft);
+      this.incidentForm1.patchValue(data.incidentForm1);
+      this.incidentForm2.patchValue(data.incidentForm2);
+      this.incidentForm3.patchValue(data.incidentForm3);
+      this.selectedBP = data.selectedBP;
+
+      setTimeout(() => {
+        if (data.stepIndex != null && this.stepper) {
+          this.stepper.selectedIndex = data.stepIndex;
+        }
+      });
+
+      sessionStorage.removeItem('incident_draft');
+    }
+
     if (this.incidentId) {
       this.title = "Modification d'un incident";
       this.loadIncident(this.incidentId);
     } else {
       this.loadTrees().subscribe();
     }
+
+    const createdEventId = this.route.snapshot.queryParams['createdEventId'];
+    if (createdEventId) {
+      this.selectCreatedRisk(createdEventId);
+    }
   }
 
-  // Validator personnalisé pour les dates
   maxDateValidator(maxDate: Date) {
     return (control: any) => {
-      if (!control.value) return null; // Ne pas valider si vide
+      if (!control.value) return null;
       const inputDate = new Date(control.value);
       return inputDate <= maxDate ? null : { maxDate: true };
     };
   }
 
-  private loadTrees(processRootId?: string /** optionnel */) {
-    /* on renvoie un Observable<void> qui émet quand tout est chargé */
+  private loadTrees(processRootId?: string) {
     return forkJoin({
       processes: this.processService.getProcessTree(processRootId),
       risks: this.riskService.getRisksTree(processRootId),
@@ -171,14 +193,12 @@ export class CreateComponent implements OnInit {
         this.listRisks = risks;
         this.listCauses = causes;
       }),
-      /* on ne renvoie plus de valeur (juste la fin du chargement) */
       map(() => void 0)
     );
   }
 
   loadIncident(id: string): void {
     this.incidentService.getIncidentById(id).subscribe((incident) => {
-      console.log(incident)
       this.incidentForm1.patchValue({
         reference: incident.reference,
         titre: incident.title,
@@ -199,26 +219,26 @@ export class CreateComponent implements OnInit {
           processId: incident.process,
           riskId: incident.risk,
           cause: incident.cause,
-          intervenant: incident.intervenant,
+          intervenant: incident.intervenantId,
         });
       });
 
+      if (incident.risk) {
+        this.riskService.getById(incident.risk).subscribe({
+          next: (risk) => {
+            this.risk = risk;
+            this.incidentForm3.get('riskId')?.setValue(risk.id);
+          },
+          error: (err) => console.error("Erreur lors du chargement du risque :", err)
+        });
+      }
+
       if (incident.riskName) {
-        this.selectedBPR = {
-          bu: {
-            name: incident.teamName
-          },
-          process: {
-            name: incident.processName
-          },
-          risk: {
-            name: incident.riskName
-          }
-        }
+        this.selectedBP = { bu: { name: incident.teamName }, process: { name: incident.processName }, risk: { name: incident.riskName } }
       }
 
       this.incident = incident;
-      this.selectedUser = incident.intervenant || null;
+      this.selectedUser = incident.intervenantId || null;
     });
   }
 
@@ -290,44 +310,29 @@ export class CreateComponent implements OnInit {
   }
 
   addIncident() {
-
     if (this.incidentForm1.invalid || this.incidentForm2.invalid || this.incidentForm3.invalid) {
       console.error("Formulaire invalide pour la soumission");
       return;
     }
 
-
-
     const incident = this.convertFormToIncident(false);
-    incident.state = State.SUBMIT
+    incident.state = State.SUBMIT;
 
-    console.log(incident)
+    const request$ = this.incidentId
+      ? this.incidentService.updateIncident(this.incidentId, incident)
+      : this.incidentService.saveIncident(incident);
 
-    if (this.incidentId) {
-      this.incidentService.updateIncident(this.incidentId, incident).subscribe(
-        {
-          next: resp => {
-            this.afterCreation("Modification réussie", this.incidentId);
-          },
-          error: err => {
-            console.error("Erreur lors de la modification de l'incident", err);
-          }
-        },
-      );
-    }
-    else {
-      this.incidentService.saveIncident(incident).subscribe(
-        {
-          next: resp => {
-            this.afterCreation("Création réussie", resp);
-          },
-          error: err => {
-            console.error("Erreur lors de la création de l'incident", err);
-          }
-        },
-      );
-    }
+    request$.subscribe({
+      next: resp => {
+        const id = this.incidentId ? this.incidentId : resp;
+        this.afterCreation(this.incidentId ? "Modification réussie" : "Création réussie", id);
+      },
+      error: err => {
+        console.error("Erreur lors de la sauvegarde de l'incident", err);
+      }
+    });
   }
+
 
   addDraft() {
     const incident = this.convertFormToIncident(true);
@@ -380,12 +385,8 @@ export class CreateComponent implements OnInit {
     a && b ? a.id === b.id : a === b;
 
 
-  private _iso(v: any) {
-    return v?.toISOString ? v.toISOString() : v;
-  }
-
-  selectBPR(event: any) {
-    this.selectedBPR = event;
+  selectBP(event: any) {
+    this.selectedBP = event;
     this.incidentForm3.get('teamId')?.setValue(event.bu.id)
     this.incidentForm3.get('processId')?.setValue(event.process.id)
     this.incidentForm3.get('riskId')?.setValue(event.risk.id)
@@ -396,12 +397,62 @@ export class CreateComponent implements OnInit {
       minWidth: '750px',
       height: '600px',
       maxHeight: '600px',
+      data: {
+        stopAtProcess: false
+      }
     });
-
     dialogRef.afterClosed().subscribe(event => {
-      this.selectBPR(event);
+      this.selectBP(event);
     });
   }
 
+  openRiskEventDialog(stepper: MatStepper) {
+    const processId = this.incidentForm3.get('processId')?.value;
+
+    const draftIncident = {
+      incidentForm1: this.incidentForm1.value,
+      incidentForm2: this.incidentForm2.value,
+      incidentForm3: this.incidentForm3.value,
+      selectedBP: this.selectedBP,
+      stepIndex: stepper.selectedIndex
+    };
+    sessionStorage.setItem('incident_draft', JSON.stringify(draftIncident));
+
+    const dialogRef = this.dialog.open(SelectRiskEventComponent, {
+      minWidth: '700px',
+      height: '550px',
+      data: {
+        mode: RiskSelectionMode.Event,
+        processId: processId ? processId : null,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.risk = result;
+
+        this.incidentForm3.get('riskId')?.setValue(result.id);
+      }
+    });
+  }
+
+  private selectCreatedRisk(eventId: string): void {
+    this.riskService.getById(eventId).subscribe({
+      next: (risk) => {
+        this.risk = risk;
+        this.incidentForm3.get('riskId')?.setValue(risk.id);
+        this.router.navigate([], {
+          queryParams: { createdEventId: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+      },
+      error: (err) => console.error('❌ Erreur lors du chargement du risque créé :', err)
+    });
+  }
+
+  createNewEvent(): void {
+    this.router.navigate(['reglages', 'risks', 'create']);
+  }
 
 }

@@ -1,4 +1,4 @@
-<div class="header sticky" [class.sticky-close]="isStickyClosed">
+<div #header class="header sticky" [class.sticky-close]="isStickyClosed">
   <div class="header-content">
     <div class="header-left">
       <button class="back-button" (click)="goBack()">
@@ -23,7 +23,7 @@
         </button>
       </ng-container>
       }
-      @else if(btn.permission){
+      @else if(btn.show && btn.permission){
       <ng-container *appHasPermission="btn.permission">
         <button mat-raised-button [ngClass]="btn.class" (click)="btn.action()">
           @if(btn.icon){
@@ -37,4 +37,4 @@
     </div>
   </div>
 </div>
-<div style="margin-top: 40px;"></div>
+<div [style.height.px]="headerHeight"></div>

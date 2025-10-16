@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
@@ -18,6 +18,10 @@ export class IncidentService {
     return this.http.get<Incident[]>(this.baseUrl);
   }
 
+  loadIncidentsFull(): Observable<Incident[]> {
+    return this.http.get<Incident[]>(`${this.baseUrl}?completeDto=true`);
+  }
+
   deleteIncident(id: string) {
     return this.http.delete(this.baseUrl + `/${id}`)
   }
@@ -31,11 +35,15 @@ export class IncidentService {
   }
 
   saveIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl, incident);
+    return this.http.post(this.baseUrl, incident,
+      { headers: new HttpHeaders({ 'X-Show-Loader': 'true' }) }
+    );
   }
 
   updateIncident(id: string, incidentDto: any) {
-    return this.http.put<void>(`${this.baseUrl}/${id}`, incidentDto);
+    return this.http.put<void>(`${this.baseUrl}/${id}`, incidentDto,
+      { headers: new HttpHeaders({ 'X-Show-Loader': 'true' }) }
+    );
   }
 
   draftIncident(incident: any): Observable<any> {

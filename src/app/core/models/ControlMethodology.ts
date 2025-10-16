@@ -4,7 +4,6 @@ import { ExecutionMode } from "../enum/exceutionmode.enum";
 export interface ControlMethodology {
   id: string;
   controlTemplateId: string;
-  controlTemplateVersion: string;
   controlNature: ControlNature;
   executionMode: ExecutionMode;
   scope?: string | null;
@@ -14,7 +13,6 @@ export interface ControlMethodology {
 
 export interface ControlMethodologyCreateDto {
   controlTemplateId: string;
-  controlTemplateVersion: string;
   controlNature: ControlNature;
   executionMode: ExecutionMode;
   scope?: string;

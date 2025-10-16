@@ -1,0 +1,39 @@
+<app-go-back [title]="'Tableau de bord'" [buttons]="goBackButtons"></app-go-back>
+
+<section class="dashboard-container">
+
+  <!-- Section des onglets -->
+  <mat-tab-group animationDuration="300ms" color="primary" mat-align-tabs="center">
+
+    <!-- Onglet Incidents -->
+    <mat-tab label="Incidents">
+      <div class="graphs-container">
+
+        @if(incidents && incidents.length > 0) {
+          <app-incidents-trend-chart [incidents]="incidents"></app-incidents-trend-chart>
+          <app-bar-chart [incidents]="incidents"></app-bar-chart>
+          <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
+          <app-baloise-category-chart [incidents]="incidents"></app-baloise-category-chart>
+        } @else {
+          <p class="no-incidents">Aucun incident à afficher.</p>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Contrôles -->
+    <mat-tab label="Contrôles">
+      <div class="graphs-container">
+        <app-control-chart></app-control-chart>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet Plans d’action -->
+    <mat-tab label="Plans d’action">
+      <div class="graphs-container">
+        <app-action-plan-chart></app-action-plan-chart>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+</section>

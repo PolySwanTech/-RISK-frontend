@@ -94,14 +94,20 @@
           <form [formGroup]="incidentForm3">
             <button style="margin-bottom: 20px;" mat-stroked-button (click)="create()">
               <mat-icon>add</mat-icon>
-              Associer BU / Processus / Risque *
+              Associer BU / Processus / évenement redouté *
             </button>
-            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
-              <mat-chip> Equipe : {{ selectedBPR.bu.name }}</mat-chip>
-              <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
-              <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
+            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBP">
+              <mat-chip> Equipe : {{ selectedBP.bu.name }}</mat-chip>
+              <mat-chip> Processus : {{ selectedBP.process.name }}</mat-chip>
+              <mat-chip *ngIf="selectedBP?.risk"
+                [matTooltip]="selectedBP.risk.isInfo ? 'Cet évenement de risque n\'a pas encore été validé' : null">
+                Evenement redouté : {{ selectedBP.risk.name }}
+                <mat-icon *ngIf="selectedBP.risk.isInfo"
+                  style="margin-left: 4px; vertical-align: middle; margin-bottom: -4px; font-size: 18px; color: rgb(255, 187, 0);">
+                  warning
+                </mat-icon>
+              </mat-chip>
             </mat-chip-listbox>
-
             <mat-form-field>
               <mat-label>Cause</mat-label>
               <mat-select formControlName="cause" [compareWith]="compareById">
@@ -112,10 +118,9 @@
               </button>
             </mat-form-field>
 
-            @if(incident || listCauses.length > 0){
             <app-select-users [selectedUserId]="selectedUser" (userSelected)="changeUser($event)"
               placeholder="Collaborateur pouvant vous aider"></app-select-users>
-            }
+            
 
           </form>
 

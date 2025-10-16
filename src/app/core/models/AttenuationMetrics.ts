@@ -1,3 +1,4 @@
+import { EvaluationControl } from "../enum/evaluation-controle.enum";
 import { RiskTemplate } from "./RiskTemplate";
 
 export class AttenuationMetrics {
@@ -13,6 +14,13 @@ export class AttenuationMetrics {
 
   /** UUID du créateur */
   creatorId!: string;
+  creatorName!: string
+
+  createdAt!: Date;
+
+  type!: AttenuationMetricsTypeDto;
+
+  evaluation?: EvaluationControl;
 
   /** Relation vers Risk (clé composite côté back, simplifiée côté front) */
   riskId?: string;
@@ -28,5 +36,13 @@ export class AttenuationMetrics {
 export interface AttenuationMetricsCreateDto {
   libelle: string;
   description: string;
-  riskId: string;     // UUID du risk
+  riskId: string;
+  type: string;
+}
+
+export interface AttenuationMetricsTypeDto {
+  code: string;
+  definition: string | null;
+  parentCode: string | null;
+  label: string;
 }

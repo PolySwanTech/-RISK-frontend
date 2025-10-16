@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $success-color: #4caf50;
 $accent-color: #2196f3;
 $danger-color: #f44336;
@@ -148,7 +150,7 @@ $light-gray: #f5f7fa;
           }
 
           &:hover {
-            background-color: lighten($accent-color, 40%);
+            background-color: color.adjust($accent-color, $lightness : 40%);
           }
 
         }
@@ -253,10 +255,10 @@ strong {
 }
 
 ::ng-deep .mat-stepper-vertical-line::before {
-    top: calc(8px - calc((var(--mat-stepper-header-height, 150px) - 24px) / 2)) !important;
-    bottom: calc(8px - calc((var(--mat-stepper-header-height, 150px) - 24px) / 2)) !important;
+  top: calc(8px - calc((var(--mat-stepper-header-height, 150px) - 24px) / 2)) !important;
+  bottom: calc(8px - calc((var(--mat-stepper-header-height, 150px) - 24px) / 2)) !important;
 }
 
 ::ng-deep .mat-vertical-content {
-    padding: 0 !important;
+  padding: 0 !important;
 }

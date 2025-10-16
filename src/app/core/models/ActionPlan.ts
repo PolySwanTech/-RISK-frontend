@@ -42,11 +42,13 @@ export class ActionPlan {
     status: Status;
     priority: Priority;
     creator: string;
+    
+    teamId : string;
     userInCharge: string;
     riskName : string = "";
     taxonomie: RiskTemplate | null;
     incidentId: string;
-    echeance: Date;
+    echeance: Date = new Date();
 
     createdAt: Date = new Date();
 
@@ -63,6 +65,7 @@ export class ActionPlan {
         status: Status,
         priority: Priority,
         creator: string,
+        teamId : string,
         userInCharge: string,
         taxonomie: RiskTemplate | null,
         incidentId: string,
@@ -76,6 +79,7 @@ export class ActionPlan {
         this.status = status;
         this.priority = priority;
         this.creator = creator;
+        this.teamId = teamId;
         this.userInCharge = userInCharge;
         this.taxonomie = taxonomie;
         this.incidentId = incidentId;
