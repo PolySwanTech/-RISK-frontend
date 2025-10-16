@@ -41,9 +41,8 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
     MatAccordion,
     MatExpansionPanelTitle,
     MatExpansionPanelHeader,
-    MatExpansionPanel,
-    MatExpansionPanelDescription
-  ],
+    MatExpansionPanel
+],
   templateUrl: './attenuation-metrics-list.component.html',
   styleUrls: ['./attenuation-metrics-list.component.scss']
 })
