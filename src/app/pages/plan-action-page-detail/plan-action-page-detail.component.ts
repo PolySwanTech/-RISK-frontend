@@ -38,10 +38,9 @@ import { TimelineActionPlanComponent } from '../../shared/components/timeline-ac
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
-export class PlanActionPageDetailComponent implements OnInit, OnDestroy {
+export class PlanActionPageDetailComponent implements OnInit {
 
   @ViewChild('auditDrawer') auditDrawer!: MatDrawer;
-
 
   today: Date = new Date();
   intervalId?: any;
@@ -75,15 +74,6 @@ export class PlanActionPageDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
-    this.intervalId = setInterval(() => {
-      this.today = new Date();
-    }, 60 * 1000);
-  }
-
-  ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
   }
 
   isNotStarted() {
@@ -164,28 +154,40 @@ export class PlanActionPageDetailComponent implements OnInit, OnDestroy {
   }
 
   validateAction(actionId: string) {
-
-    this.actionPlanService.finishAction(actionId).subscribe(
-      _ => this.ngOnInit()
-    )
+    if (this.actionPlan) {
+      this.auditService.openAuditDialog(this.actionPlan.id, TargetType.ACTION_PLAN)
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.actionPlanService.finishAction(actionId).subscribe(
+              _ => this.ngOnInit()
+            )
+          }
+          else {
+            this.snackBarService.info("Action non-abandonnée.")
+          }
+        })
+    }
   }
 
   abandon(action: Action) {
-    this.auditService.openAuditDialog(action.id, TargetType.ACTION_PLAN)
-      .afterClosed()
-      .subscribe(result => {
-        if (result) {
-          this.actionPlanService.abandonAction(action.id).subscribe(
-            _ => {
-              this.snackBarService.info("Action abandonnée avec succès.")
-              this.ngOnInit();
-            }
-          )
-        }
-        else {
-          this.snackBarService.info("Action non-abandonnée.")
-        }
-      })
+    if (this.actionPlan) {
+      this.auditService.openAuditDialog(this.actionPlan.id, TargetType.ACTION_PLAN)
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.actionPlanService.abandonAction(action.id).subscribe(
+              _ => {
+                this.snackBarService.info("Action abandonnée avec succès.")
+                this.ngOnInit();
+              }
+            )
+          }
+          else {
+            this.snackBarService.info("Action non-abandonnée.")
+          }
+        })
+    }
   }
 
   getCompletedCount(actions: Action[]): number {

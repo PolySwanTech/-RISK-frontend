@@ -13,7 +13,6 @@ import { IncidentService } from "../../../core/services/incident/incident.servic
 import { BaloiseCategoryChartComponent } from "../../../features/dashboard/baloise-category-chart/baloise-category-chart.component";
 import { BarChartComponent } from "../../../features/dashboard/bar-chart/bar-chart.component";
 import { DoughnutChartComponent } from "../../../features/dashboard/doughnut-chart/doughnut-chart.component";
-import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { ActionPlanChartComponent } from "../action-plan-chart/action-plan-chart.component";
 import { ControlChartComponent } from "../control-chart/control-chart.component";
@@ -24,7 +23,7 @@ import { IncidentsTrendChartComponent } from "../../../features/dashboard/incide
   selector: 'app-home',
   imports: [MatCardModule, MatTabsModule, ActionPlanChartComponent, ControlChartComponent,
     BarChartComponent, DoughnutChartComponent, MatIconModule, GoBackComponent,
-    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent, BaloiseCategoryChartComponent, IncidentsTrendChartComponent],
+    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, BaloiseCategoryChartComponent, IncidentsTrendChartComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

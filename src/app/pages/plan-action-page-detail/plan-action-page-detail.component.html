@@ -1,11 +1,3 @@
-<!-- <mat-drawer-container class="audit-drawer-container">
-    <mat-drawer #auditDrawer mode="over" position="end" class="audit-drawer">
-        @if(actionPlan != null){
-        <app-audit-panel [contextId]="actionPlan.id" contextType="ACTION_PLAN"></app-audit-panel>
-        }
-    </mat-drawer>
-
-</mat-drawer-container> -->
 <div class="body-container">
     @if(actionPlan){
     <app-go-back [title]="`Détails d'un plan d'action`" [subtitle]="actionPlan.reference"
@@ -206,9 +198,6 @@
     </div>
     }
 </div>
-
-<!-- <button mat-fab class="audit-button" (click)="openAuditPanel()"> <mat-icon> {{ auditDrawer.opened ? 'close' :
-        'history'}}</mat-icon> </button> -->
 
 @if(actionPlan){
 <app-audit-button [contextId]="actionPlan.id" [contextTarget]="targetTypeEnum.ACTION_PLAN"></app-audit-button>

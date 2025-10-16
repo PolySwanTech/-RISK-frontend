@@ -86,9 +86,9 @@
   margin-bottom: 30px;
 }
 
-mat-card-content{
+mat-card-content {
   padding-bottom: 16px;
-  height : 425px;
+  height: 425px;
 }
 
 .main-result-card {
@@ -119,12 +119,16 @@ mat-card-content{
   }
 
   .chart-placeholder {
-    height: 90%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    margin-top: 50px;
+    height: 350px; // tu peux ajuster selon la taille souhaitée
+    width: 100%;
+    position: relative;
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      display: block;
+    }
   }
 }
 
