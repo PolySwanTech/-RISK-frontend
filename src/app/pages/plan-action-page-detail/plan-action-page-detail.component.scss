@@ -4,7 +4,91 @@
 
 }
 
+/* Timeline des dates */
+.timeline-horizontal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
 
+  .timeline-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .timeline-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 150px;
+
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .dot.red {
+      background: #dc3545;
+    }
+
+    .dot.orange {
+      background: #fd7e14;
+    }
+
+    .dot.green {
+      background: #28a745;
+    }
+
+    .date {
+      font-weight: bold;
+      color: #212529;
+      margin-bottom: 5px;
+    }
+
+    .label {
+      font-size: 14px;
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+
+  .line-gradient {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    width: 150px;
+    transition: background 0.3s ease;
+  }
+
+  .days-diff {
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom: 5px;
+    color: #555;
+  }
+}
 
 .plan-detail-container {
   display: flex;
@@ -218,16 +302,16 @@ mat-card-content {
 }
 
 .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 150vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 150vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 app-audit-button {

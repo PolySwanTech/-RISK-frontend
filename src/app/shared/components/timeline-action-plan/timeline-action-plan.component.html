@@ -1,0 +1,23 @@
+<div class="timeline-container">
+    <h2>Plan d'Action - Timeline</h2>
+
+    <div class="timeline-wrapper">
+        <div class="timeline-line">
+            <!-- Segments de ligne avec couleurs -->
+            <div *ngFor="let segment of segments" class="timeline-segment" [style.left.%]="segment.start"
+                [style.width.%]="segment.end - segment.start" [style.backgroundColor]="segment.color">
+                <span class="segment-label">{{ segment.label }}</span>
+            </div>
+
+            <!-- Points sur la timeline -->
+            <div *ngFor="let point of points" class="timeline-point" [class.current]="point.label === 'Aujourd\'hui'"
+                [style.left.%]="point.position">
+                <div class="point-marker"></div>
+                <div class="point-label">
+                    <strong>{{ point.label }}</strong>
+                    <span>{{ point.date | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
