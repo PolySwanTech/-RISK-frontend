@@ -50,7 +50,7 @@ export class CreateProcessComponent {
     else {
       this.processForm = this.fb.group({
         name: ['', Validators.required],
-        buId: [this.data ? this.data.buId : null, Validators.required],
+        bu: [this.data ? this.data.buId : null, Validators.required],
         parentId: [null]
       });
     }
@@ -65,19 +65,13 @@ export class CreateProcessComponent {
         const onlyUnit = this.businessUnits[0];
 
         // Set value in the form
-        this.processForm.get('buId')?.setValue(onlyUnit.id);
-
-        // Disable the field
-        this.processForm.get('buId')?.disable();
+        this.processForm.get('bu')?.setValue(onlyUnit.id);
 
         // Appeler le handler manuellement si nécessaire
         this.onBuChange(onlyUnit.id);
-      } else {
-        // Assurez-vous que le champ est activé dans le cas général
-        this.processForm.get('buId')?.enable();
       }
 
-      const buId = this.processForm.get('buId')!.value;
+      const buId = this.processForm.get('bu')!.value;
       
       if (buId) {
         this.onBuChange(buId);
@@ -109,8 +103,10 @@ export class CreateProcessComponent {
         });
       }
       else {
-        const { name, buId, parentId } = this.processForm.value;
-        const dto = { name, bu: buId, parentId: parentId || null };
+        const { name, bu, parentId } = this.processForm.value;
+        console.log(bu)
+        const dto = { name, bu, parentId: parentId || null };
+        console.log(dto)
         this.processService.createProcess(dto).subscribe(resp => {
           this.snackBarService.success("Le processus a bien été créé")
           this.dialogRef.close(true);
