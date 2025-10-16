@@ -1,10 +1,26 @@
-.graphs-container {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    justify-content: center;
+mat-tab-group {
+  margin-top: 20px;
+}
 
-    >* {
-        flex: 1;
-    }
+::ng-deep .mat-mdc-tab-labels {
+  justify-content: center;
+}
+
+.graphs-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+
+  > * {
+    flex: 1 1 45%;
+  }
+}
+
+.no-incidents {
+  text-align: center;
+  font-style: italic;
+  color: #777;
+  margin-top: 20px;
 }

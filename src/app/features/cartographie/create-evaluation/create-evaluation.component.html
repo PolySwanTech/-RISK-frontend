@@ -119,6 +119,32 @@
             </mat-card-content>
           </mat-card>
         </div>
+
+        <h3>🛡️ Mesures d'atténuation</h3>
+
+        <div class="attenuation-grid" *ngIf="attenuationMetrics.length > 0; else noMetrics">
+          <mat-card *ngFor="let metric of attenuationMetrics" class="attenuation-card">
+            <mat-card-header>
+              <mat-card-title>{{ metric.libelle }}</mat-card-title>
+              <mat-card-subtitle>{{ metric.type.label || 'Type inconnu' }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p>{{ metric.description || 'Aucune description.' }}</p>
+              <p><strong>Créée par :</strong> {{ metric.creatorName }}</p>
+              <p><strong>Date de création :</strong> {{ metric.createdAt | date:'dd/MM/yyyy' }}</p>
+              <p><strong>Evaluation :</strong> {{ getAttenuationMetricsEvaluationLabel(metric.evaluation) }}</p>
+              <mat-chip [color]="metric.actif ? 'primary' : 'warn'">
+                {{ metric.actif ? 'Active' : 'Inactif' }}
+              </mat-chip>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <ng-template #noMetrics>
+          <p>Aucune mesure d'atténuation n'est associée à ce risque.</p>
+        </ng-template>
+
+
         <mat-form-field *ngIf="highestRiskLevelNet" appearance="fill">
           <mat-label>Niveau de Risque proposé</mat-label>
           <mat-select [(ngModel)]="highestRiskLevelNet">

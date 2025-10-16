@@ -403,3 +403,13 @@ mat-chip.very_high {
 ::ng-deep .mat-step-header {
   pointer-events: none;
 }
+
+.attenuation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.attenuation-card {
+  border-left: 5px solid #2196f3;
+}

@@ -17,12 +17,14 @@ import { FilterTableComponent } from "../../../shared/components/filter-table/fi
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { ActionPlanChartComponent } from "../action-plan-chart/action-plan-chart.component";
 import { ControlChartComponent } from "../control-chart/control-chart.component";
+import { MatTabsModule } from '@angular/material/tabs';
+import { IncidentsTrendChartComponent } from "../../../features/dashboard/incidents-trend-chart/incidents-trend-chart.component";
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, ActionPlanChartComponent, ControlChartComponent,
+  imports: [MatCardModule, MatTabsModule, ActionPlanChartComponent, ControlChartComponent,
     BarChartComponent, DoughnutChartComponent, MatIconModule, GoBackComponent,
-    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent, BaloiseCategoryChartComponent],
+    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent, BaloiseCategoryChartComponent, IncidentsTrendChartComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -69,9 +71,9 @@ export class HomeComponent implements OnInit {
 
   private incidentService = inject(IncidentService)
 
-
   ngOnInit() {
     this.loadIncidents();
+
   }
 
   clearFilters(): void {
