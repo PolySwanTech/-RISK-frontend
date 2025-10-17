@@ -7,18 +7,69 @@
 
     <!-- Onglet Incidents -->
     <mat-tab label="Incidents">
-      <div class="graphs-container">
 
-        @if(incidents && incidents.length > 0) {
-          <app-incidents-trend-chart [incidents]="incidents"></app-incidents-trend-chart>
-          <app-bar-chart [incidents]="incidents"></app-bar-chart>
-          <app-doughnut-chart [incidents]="incidents"></app-doughnut-chart>
-          <app-baloise-category-chart [incidents]="incidents"></app-baloise-category-chart>
-        } @else {
-          <p class="no-incidents">Aucun incident à afficher.</p>
-        }
-      </div>
-    </mat-tab>
+  <!-- 1️⃣ Graphe de tendances -->
+  <div class="trend-container">
+    <app-incidents-trend-chart [incidents]="filteredIncidents"></app-incidents-trend-chart>
+  </div>
+
+  <!-- 2️⃣ Filtre par période personnalisée -->
+  <div class="filter-container">
+    <mat-form-field appearance="outline">
+      <mat-label>Date de début</mat-label>
+      <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" placeholder="Choisir une date" />
+      <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+      <mat-datepicker #pickerStart></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date de fin</mat-label>
+      <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" placeholder="Choisir une date" />
+      <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+      <mat-datepicker #pickerEnd></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="applyDateFilter()">Appliquer</button>
+    <button mat-stroked-button color="warn" (click)="clearDateFilter()">Réinitialiser</button>
+  </div>
+
+
+<!-- 🔺 Pyramide des incidents -->
+<div class="incident-pyramid">
+
+  <!-- Sommet : Total -->
+  <div class="pyramid-top">
+    <mat-card class="total">
+      <mat-card-title>Total d’incidents</mat-card-title>
+      <mat-card-content>{{ totalIncidents }}</mat-card-content>
+      <p class="resolution-rate">Durée moyenne de résolution {{ resolutionRate }} j</p>
+    </mat-card>
+  </div>
+
+  <!-- Niveau intermédiaire : En cours / Résolus -->
+  <div class="pyramid-middle">
+    <mat-card class="in-progress">
+      <mat-card-title>En cours</mat-card-title>
+      <mat-card-content>{{ inProgressIncidents }}</mat-card-content>
+      <p class="resolution-rate">{{ draftIncidents }} en brouillon</p>
+    </mat-card>
+
+    <mat-card class="resolved">
+      <mat-card-title>Résolus</mat-card-title>
+      <mat-card-content>{{ resolvedIncidents }}</mat-card-content>
+      <p class="resolution-rate"><strong>{{ resolutionRate }}%</strong> taux de résolution</p>
+    </mat-card>
+  </div>
+</div>
+
+
+  <!-- 4️⃣ Autres graphiques -->
+  <div class="graphs-container">
+    <app-baloise-category-chart [incidents]="filteredIncidents"></app-baloise-category-chart>
+  </div>
+
+</mat-tab>
+
 
     <!-- Onglet Contrôles -->
     <mat-tab label="Contrôles">

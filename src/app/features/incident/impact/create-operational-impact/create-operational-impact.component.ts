@@ -457,7 +457,6 @@ export class CreateOperationalImpactComponent implements OnInit {
       catchError((e) => { console.error('Erreur chargement incident', e); return of(null); })
     ).subscribe(incident => {
       if (!incident) return;
-
       this.currentBusinessUnitId = incident.teamId ?? undefined;
       this.currentBusinessUnitName = incident.teamName ?? undefined;
 
@@ -618,7 +617,6 @@ export class CreateOperationalImpactComponent implements OnInit {
     this.operatingLossService.create(dto, 'Création impact financier').pipe(
       switchMap((operatingLossId: string) => {
         if (!operatingLossId) return of(null);
-
         const amountCalls = impact.details.map((d) => {
           const amountDto: CreateAmountDto = {
             amountType: d.amountType!,
