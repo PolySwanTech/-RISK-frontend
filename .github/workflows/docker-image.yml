@@ -31,3 +31,16 @@ jobs:
       - name: Push Docker image to GHCR
         run: |
           docker push ghcr.io/polyswantech/frontend:latest
+
+      - name: Deploy to sever via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 51.38.48.197
+          username: debian
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          port: 49152
+          script: |
+            cd /home/debian/Documents/appli
+            docker rm -f frontend || true
+            docker rmi ghcr.io/polyswantech/frontend:latest || true
+            docker compose up frontend -d 
