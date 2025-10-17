@@ -1,23 +1,49 @@
 <mat-card class="trend-card">
-  <mat-card-title>
-    📈 Tendance des incidents
-  </mat-card-title>
-  <mat-card-subtitle>
-    Évolution trimestrielle
-  </mat-card-subtitle>
+  <mat-card-header>
+    <mat-card-title>📈 Évolution des incidents</mat-card-title>
+    <mat-card-subtitle>
+      Cliquez sur un point pour zoomer sur la période
+    </mat-card-subtitle>
 
-  <div class="chart-container">
-    <canvas baseChart
-            [data]="lineChartData"
-            [options]="lineChartOptions"
-            [type]="'line'">
-    </canvas>
-  </div>
+    <!-- Sélecteur de granularité -->
+    <div class="granularity-selector">
+      <span>Granularité :</span>
+      <button
+        *ngFor="let g of granularities"
+        mat-button
+        [color]="granularity === g.value ? 'primary' : undefined"
+        (click)="changeGranularity(g.value)"
+      >
+        {{ g.label }}
+      </button>
+    </div>
 
-  <div class="trend-info">
-    Tendance: 
-    <span [class.positive]="trendValue > 0" [class.negative]="trendValue < 0">
-      {{ trendText }}
-    </span>
-  </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Indication de zoom -->
+    <div *ngIf="zoomLabel" class="zoom-info">
+      🔍 Zoom sur : {{ zoomLabel }}
+      <button mat-icon-button color="warn" (click)="resetZoom()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Graphique -->
+    <div class="chart-wrapper">
+      <canvas
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="'line'"
+        (chartClick)="onChartClick($event)"
+      ></canvas>
+    </div>
+
+    <div class="trend-info" *ngIf="trendText">
+        <span [ngClass]="{ 'positive': trendValue >= 0, 'negative': trendValue < 0 }">
+            {{ trendText }}
+        </span>
+    </div>
+  </mat-card-content>
 </mat-card>

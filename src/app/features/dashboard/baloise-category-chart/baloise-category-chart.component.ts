@@ -1,11 +1,13 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
-import { Incident } from '../../../core/models/Incident';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { Incident } from '../../../core/models/Incident';
 import { IncidentFilterService } from '../../../core/services/incident-filter/incident-filter.service';
+import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
+import { BaloiseCategoryDto } from '../../../core/models/RiskReferentiel';
 
 type DrillLevel = 'parent' | 'child';
 
@@ -21,82 +23,142 @@ interface SelectedParent {
   templateUrl: './baloise-category-chart.component.html',
   styleUrls: ['./baloise-category-chart.component.scss']
 })
-export class BaloiseCategoryChartComponent implements OnInit, OnDestroy {
+export class BaloiseCategoryChartComponent implements OnInit, OnDestroy, OnChanges {
   @Input() incidents: Incident[] = [];
 
   drillLevel: DrillLevel = 'parent';
   selectedParent: SelectedParent | null = null;
 
   data: ChartData<'bar'> = { labels: [], datasets: [] };
-  options: ChartOptions<'bar'> = { responsive: true, maintainAspectRatio: false };
+  options: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    scales: {
+      x: {
+        beginAtZero: true,
+        title: { display: true, text: 'Nombre d’incidents' }
+      },
+      y: {
+        title: { display: true, text: 'Catégories' }
+      }
+    }
+  };
+
   private sub!: Subscription;
+  private allParentCategories: BaloiseCategoryDto[] = [];
+  private allChildCategories: BaloiseCategoryDto[] = [];
 
-  constructor(private filterService: IncidentFilterService) {}
+  constructor(
+    private filterService: IncidentFilterService,
+    private riskCategoryService: RiskCategoryService
+  ) {}
 
+  // ✅ Charger les catégories de niveau 1 au démarrage
   ngOnInit() {
-    this.sub = this.filterService.filteredIncidents$.subscribe(filtered => {
-      this.buildChart(filtered || this.incidents);
+    this.riskCategoryService.getAll().subscribe(allCats => {
+      this.allParentCategories = allCats.filter(c => !c.parent);
+
+      // 🔹 Si on a déjà des incidents au moment du chargement, on affiche
+      if (this.incidents?.length) {
+        this.buildChart(this.incidents);
+      }
+
+      // 🔹 Écoute des filtres (pour mise à jour dynamique)
+      this.sub = this.filterService.filteredIncidents$.subscribe(filtered => {
+        this.buildChart(filtered && filtered.length > 0 ? filtered : this.incidents);
+      });
     });
+  }
+
+  // ✅ Réagit si les incidents changent (arrivent après coup)
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['incidents'] && this.incidents?.length && this.allParentCategories?.length) {
+      this.buildChart(this.incidents);
+    }
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    if (this.sub) this.sub.unsubscribe();
   }
 
+  // 🔧 Construction du graphique
   private buildChart(source: Incident[]) {
     const counts: Record<string, number> = {};
 
-    source.forEach(inc => {
-      const parent = inc.categoryBaloise?.parent || null;
-      const libelle = inc.categoryBaloise?.libelle || null;
-      const label = inc.categoryBaloise?.label || null;
+    if (this.drillLevel === 'parent') {
+      this.allParentCategories.forEach(cat => {
+        const total = source.filter(
+          inc => inc.categoryBaloise?.parent === cat.libelle
+        ).length;
+        counts[cat.label || 'Non catégorisé'] = total;
+      });
+    } else if (this.drillLevel === 'child' && this.selectedParent) {
+      this.allChildCategories.forEach(subCat => {
+        const total = source.filter(
+          inc => inc.categoryBaloise?.libelle === subCat.libelle
+        ).length;
+        counts[subCat.label || 'Non catégorisé'] = total;
+      });
+    }
 
-      let key = '';
+    const labels =
+      this.drillLevel === 'parent'
+        ? this.allParentCategories.map(c => c.label || 'Non catégorisé')
+        : this.allChildCategories.map(c => c.label || 'Non catégorisé');
 
-      if (this.drillLevel === 'parent') {
-        if (!parent && label) key = label;
-        if (!parent && !label) key = 'Non catégorisé';
-      } else if (this.drillLevel === 'child' && this.selectedParent) {
-        if (parent === this.selectedParent.libelle) key = label || 'Non catégorisé';
-      }
-
-      if (key) counts[key] = (counts[key] || 0) + 1;
-    });
+    const dataValues = labels.map(label => counts[label] || 0);
 
     this.data = {
-      labels: Object.keys(counts),
-      datasets: [{ label: 'Incidents', data: Object.values(counts), backgroundColor: '#42A5F5' }]
+      labels,
+      datasets: [
+        {
+          label: 'Incidents',
+          data: dataValues,
+          backgroundColor: labels.map(l => (counts[l] ? '#42A5F5' : '#E0E0E0'))
+        }
+      ]
     };
   }
 
+  // 🔍 Drilldown dynamique
   onChartClick(event: any) {
     if (!event.active?.length) return;
     const index = event.active[0].index;
     const clickedLabel = this.data.labels?.[index] as string;
 
-    const incident = this.incidents.find(
-      inc => !inc.categoryBaloise?.parent && inc.categoryBaloise?.label === clickedLabel
-    );
+    const parentCat = this.allParentCategories.find(c => c.label === clickedLabel);
+    if (!parentCat) return;
 
-    if (this.drillLevel === 'parent' && incident) {
-      this.selectedParent = {
-        libelle: incident.categoryBaloise!.libelle,
-        label: incident.categoryBaloise!.label
-      };
-      this.drillLevel = 'child';
+    this.selectedParent = {
+      libelle: parentCat.libelle,
+      label: parentCat.label
+    };
+
+    this.drillLevel = 'child';
+
+    this.riskCategoryService.getByParent(parentCat.libelle).subscribe(subCats => {
+      this.allChildCategories = subCats;
       this.buildChart(this.incidents);
-      this.filterService.setFilter('category', (inc: Incident) =>
-        inc.categoryBaloise?.parent === this.selectedParent!.libelle
-      );
-    }
+    });
+
+    this.filterService.setFilter('category', (inc: Incident) =>
+      inc.categoryBaloise?.parent === parentCat.libelle
+    );
   }
 
+  // ⏪ Retour au niveau parent
   goBack() {
     if (this.drillLevel === 'child') {
       this.drillLevel = 'parent';
       this.selectedParent = null;
-      this.buildChart(this.incidents);
+      this.allChildCategories = [];
       this.filterService.clearFilter('category');
+
+      this.riskCategoryService.getAll().subscribe(allCats => {
+        this.allParentCategories = allCats.filter(c => !c.parent);
+        this.buildChart(this.incidents);
+      });
     }
   }
 }
