@@ -2,8 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { firstValueFrom, forkJoin, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { firstValueFrom, forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 
 import { ActivatedRoute } from '@angular/router';
 
@@ -77,7 +77,6 @@ export class CreateOperationalImpactComponent implements OnInit {
   private snackBarService = inject(SnackBarService);
   private fileService = inject(FileService);
 
-  businessUnits: BusinessUnit[] = [];
   allBusinessUnits: BusinessUnit[] = [];
 
   goBackButtons: GoBackButton[] = [];
@@ -85,7 +84,7 @@ export class CreateOperationalImpactComponent implements OnInit {
   TargetType = TargetType;
 
   attachedCounts: Record<string, number> = {};
-  
+
 
   // ---------- Contexte Incident/BU ----------
   private currentBusinessUnitId?: string;
@@ -97,7 +96,7 @@ export class CreateOperationalImpactComponent implements OnInit {
   financialAmountTypes: AmountTypeDto[] = [];
   nonFinancialAmountTypes: AmountTypeDto[] = [];
   estimeAmountType: AmountTypeDto | null = null;
-  
+
   newAmounts: Record<string, { amountType: string | null; accountingReference: string; accountingDate: string; amount: string }> = {};
   showAddAmountForm: Record<string, boolean> = {};
 
@@ -113,9 +112,8 @@ export class CreateOperationalImpactComponent implements OnInit {
   existingFinancialLosses: OperatingLoss[] = [];
   existingNonFinancialLosses: OperatingLoss[] = [];
   existingAmounts: Record<string, Amount[]> = {};
-  isLoadingExisting = false;
   selectedImpacts: Record<string, boolean> = {};
-  selectedAmounts: Record<string, Record<string, boolean>> = {}; 
+  selectedAmounts: Record<string, Record<string, boolean>> = {};
   trackByIdString = (_: number, item: { id: string }) => item.id;
 
   // ---------- State ----------
@@ -133,14 +131,11 @@ export class CreateOperationalImpactComponent implements OnInit {
       }
     });
 
-    this.equipeService.loadEntities()
+    this.equipeService.loadEntities(true)
       .pipe(catchError(() => of([] as BusinessUnit[])))
       .subscribe(bus => {
-        this.businessUnits = bus.filter(b => b.lm === true);
         this.allBusinessUnits = bus;
       });
-
-    this.loadIncidentContext();
 
     this.operatingLossTypeService
       .findByOperatingLossFamily(OperatingLossFamily.FINANCIER)
@@ -166,29 +161,29 @@ export class CreateOperationalImpactComponent implements OnInit {
         this.estimeAmountType = found || amountTypes[0] || null;
       });
 
-      this.goBackButtons = [
-        {
-          label: 'Valider la sélection',
-          icon: 'check_circle',
-          class: 'btn-secondary',
-          show: true,
-          action: () => this.validateSelected(),
-        },
-        {
-          label: 'Rejeter la sélection',
-          icon: 'cancel',
-          class: 'btn-tertiary',
-          show: true,
-          action: () => this.rejectSelected(),
-        },
-        {
-          label: 'Désactiver',
-          icon: '',
-          class: 'btn-primary',
-          show: true,
-          action: () => this.deactivateSelected(),
-        }
-      ];
+    this.goBackButtons = [
+      {
+        label: 'Valider la sélection',
+        icon: 'check_circle',
+        class: 'btn-secondary',
+        show: true,
+        action: () => this.validateSelected(),
+      },
+      {
+        label: 'Rejeter la sélection',
+        icon: 'cancel',
+        class: 'btn-tertiary',
+        show: true,
+        action: () => this.rejectSelected(),
+      },
+      {
+        label: 'Désactiver',
+        icon: '',
+        class: 'btn-primary',
+        show: true,
+        action: () => this.deactivateSelected(),
+      }
+    ];
   }
 
   // ---------- Financier ----------
@@ -208,12 +203,12 @@ export class CreateOperationalImpactComponent implements OnInit {
       ],
     };
   }
-    addFinancialDetail(i: number) {
-      this.formData.financialImpacts[i].details.push({ amountType: null, accountingReference: '',accountingDate: '', amount: '' });
-    }
-    removeFinancialDetail(i: number, j: number) {
-      this.formData.financialImpacts[i].details.splice(j, 1);
-    }
+  addFinancialDetail(i: number) {
+    this.formData.financialImpacts[i].details.push({ amountType: null, accountingReference: '', accountingDate: '', amount: '' });
+  }
+  removeFinancialDetail(i: number, j: number) {
+    this.formData.financialImpacts[i].details.splice(j, 1);
+  }
 
   toggleImpactSelection(impactId: string, amounts: Amount[]) {
     const newState = !this.selectedImpacts[impactId];
@@ -225,6 +220,11 @@ export class CreateOperationalImpactComponent implements OnInit {
     // Appliquer la sélection à tous les montants de l’impact
     amounts.forEach(a => this.selectedAmounts[impactId][a.id] = newState);
   }
+
+  trackByAmountId(index: number, amount: Amount) {
+    return amount.id;
+  }
+
 
   toggleAmountSelection(impactId: string, amountId: string) {
     this.selectedAmounts[impactId] = this.selectedAmounts[impactId] || {};
@@ -310,28 +310,35 @@ export class CreateOperationalImpactComponent implements OnInit {
 
   refreshExistingOperatingLosses() {
     if (!this.incidentId) return;
-    this.isLoadingExisting = true;
-   
+
     this.operatingLossService
       .listByIncident(this.incidentId)
-      .pipe(catchError(() => of([] as OperatingLoss[])))
-      .subscribe((losses) => {
-        this.existingOperatingLosses = losses;
-        this.existingFinancialLosses = losses.filter(
-          (l) => l?.type?.family === OperatingLossFamily.FINANCIER
-        );
-        this.existingNonFinancialLosses = losses.filter(
-          (l) => l?.type?.family === OperatingLossFamily.NON_FINANCIER
-        );
-  
-        // Charger les montants pour chaque OperatingLoss
-        losses.forEach((l) => this.loadAmountsForOperatingLoss(l.id));
+      .pipe(
+        catchError(() => of([] as OperatingLoss[])),
+        switchMap(losses => {
+          this.existingOperatingLosses = losses;
+          this.existingFinancialLosses = losses.filter(l => l?.type?.family === OperatingLossFamily.FINANCIER);
+          this.existingNonFinancialLosses = losses.filter(l => l?.type?.family === OperatingLossFamily.NON_FINANCIER);
 
-        this.loadAttachedCountsForAllImpacts(losses);
-  
-        this.isLoadingExisting = false;
+          this.loadAttachedCountsForAllImpacts(losses);
+
+          const loaders = losses.map(l => this.loadAmountsForOperatingLoss(l.id));
+
+          // forkJoin attend que tous les Observables soient complétés
+          return forkJoin(loaders);
+        })
+      )
+      .subscribe({
+        next: () => {
+          // Ici, toutes les données (y compris les montants) sont chargées
+          // Tu peux déclencher une action, ou juste laisser l'UI s'afficher naturellement
+        },
+        error: () => {
+          // Gérer l'erreur ici si besoin
+        }
       });
   }
+
 
   deactivateSelected() {
     const impactIds = Object.keys(this.selectedImpacts).filter(id => this.selectedImpacts[id]);
@@ -393,50 +400,52 @@ export class CreateOperationalImpactComponent implements OnInit {
     });
   }
 
-  
-    deactivateOperatingLoss(id: string) {
-      if (!id) return;
-      if (!window.confirm('Désactiver cet impact ?')) return;
-  
-      this.operatingLossService.deactivate(id)
-        .pipe(
-          catchError((e) => {
-            console.error('Erreur désactivation', e);
-            this.snackBarService.error('Erreur lors de la désactivation de l’impact.');
-            return of(void 0);
-          })
-        )
-        .subscribe(() => {
-          this.snackBarService.success('Impact désactivé.');
-          this.refreshExistingOperatingLosses();
-        });
-    }
 
-    loadAmountsForOperatingLoss(operatingLossId: string) {
-      this.amountService.listByOperatingLoss(operatingLossId)
-        .pipe(catchError(() => of([] as AmountDto[])))
-        .subscribe(amountDtos => {
-          this.existingAmounts[operatingLossId] = amountDtos.map(a => Amount.fromDto(a));
-        });
-    }
-    
-      deactivateAmount(id: string, operatingLossId: string) {
-        if (!id) return;
-        if (!window.confirm('Désactiver ce montant ?')) return;
-    
-        this.amountService.deactivate(id)
-          .pipe(
-            catchError((e) => {
-              console.error('Erreur désactivation montant', e);
-              this.snackBarService.error('Erreur lors de la désactivation du montant.');
-              return of(void 0);
-            })
-          )
-          .subscribe(() => {
-            this.snackBarService.success('Montant désactivé.');
-            this.loadAmountsForOperatingLoss(operatingLossId);
-          });
-      }
+  deactivateOperatingLoss(id: string) {
+    if (!id) return;
+    if (!window.confirm('Désactiver cet impact ?')) return;
+
+    this.operatingLossService.deactivate(id)
+      .pipe(
+        catchError((e) => {
+          console.error('Erreur désactivation', e);
+          this.snackBarService.error('Erreur lors de la désactivation de l’impact.');
+          return of(void 0);
+        })
+      )
+      .subscribe(() => {
+        this.snackBarService.success('Impact désactivé.');
+        this.refreshExistingOperatingLosses();
+      });
+  }
+
+  loadAmountsForOperatingLoss(operatingLossId: string): Observable<Amount[]> {
+    return this.amountService.listByOperatingLoss(operatingLossId).pipe(
+      catchError(() => of([] as AmountDto[])),
+      map(amountDtos => amountDtos.map(a => Amount.fromDto(a))),
+      tap(amounts => {
+        this.existingAmounts[operatingLossId] = amounts;
+      })
+    );
+  }
+
+  deactivateAmount(id: string, operatingLossId: string) {
+    if (!id) return;
+    if (!window.confirm('Désactiver ce montant ?')) return;
+
+    this.amountService.deactivate(id)
+      .pipe(
+        catchError((e) => {
+          console.error('Erreur désactivation montant', e);
+          this.snackBarService.error('Erreur lors de la désactivation du montant.');
+          return of(void 0);
+        })
+      )
+      .subscribe(() => {
+        this.snackBarService.success('Montant désactivé.');
+        this.loadAmountsForOperatingLoss(operatingLossId);
+      });
+  }
 
   private loadIncidentContext() {
     if (!this.incidentId) return;
@@ -582,7 +591,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     // Vérifier s'il existe déjà un impact avec la même BU et le même type
     const duplicate = this.existingFinancialLosses.find(
-      existing => 
+      existing =>
         existing.entityId === impact.businessUnitId &&
         existing.type?.libelle === impact.type?.libelle
     );
@@ -638,7 +647,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     // Vérifier s'il existe déjà un impact avec la même BU et le même type
     const duplicate = this.existingNonFinancialLosses.find(
-      existing => 
+      existing =>
         existing.entityId === impact.businessUnitId &&
         existing.type?.libelle === impact.type?.libelle
     );
@@ -745,23 +754,23 @@ export class CreateOperationalImpactComponent implements OnInit {
   }
 
   private loadAttachedCountsForAllImpacts(losses: OperatingLoss[]) {
-  if (!losses?.length) {
-    this.attachedCounts = {};
-    return;
+    if (!losses?.length) {
+      this.attachedCounts = {};
+      return;
+    }
+
+    const calls = losses.map(l =>
+      this.fileService.getFiles(TargetType.IMPACT, l.id).pipe(
+        catchError(() => of([])),                     // si erreur: 0
+        map(files => ({ id: l.id, count: files.length }))
+      )
+    );
+
+    forkJoin(calls).subscribe(rows => {
+      const mapCounts: Record<string, number> = {};
+      rows.forEach(r => (mapCounts[r.id] = r.count));
+      this.attachedCounts = mapCounts;
+    });
   }
 
-  const calls = losses.map(l =>
-    this.fileService.getFiles(TargetType.IMPACT, l.id).pipe(
-      catchError(() => of([])),                     // si erreur: 0
-      map(files => ({ id: l.id, count: files.length }))
-    )
-  );
-
-  forkJoin(calls).subscribe(rows => {
-    const mapCounts: Record<string, number> = {};
-    rows.forEach(r => (mapCounts[r.id] = r.count));
-    this.attachedCounts = mapCounts;
-  });
-}
-  
 }
