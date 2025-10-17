@@ -1,157 +1,138 @@
-<div class="create-container">
-  <app-go-back previousPageName="Liste des incidents" currentPageName="Ajout d'un incident" />
+<div class="create-container body-container">
+  <app-go-back [title]="'Création de l\'incident'"></app-go-back>
   <section>
     <div class="form-container">
-      <h2>Ajout d'un incident</h2>
+      <h2>{{title}}</h2>
       <mat-stepper [linear]="false" #stepper>
+
+        <!-- Étape 1 : Informations de base -->
         <mat-step [stepControl]="incidentForm1" label="Informations de base">
           <form [formGroup]="incidentForm1">
             <mat-form-field>
               <mat-label>Titre</mat-label>
               <input matInput formControlName="titre" placeholder="Titre">
+              <button mat-icon-button matSuffix matTooltip="Saisissez le titre de l'incident.">
+                <mat-icon>info</mat-icon>
+              </button>
             </mat-form-field>
-
-            <ng-container *ngIf="hasTeam; else selectTeam">
-              <mat-form-field>
-                <mat-label>Équipe</mat-label>
-                <input matInput formControlName="equipeName" readonly>
-              </mat-form-field>
-            </ng-container>
-            <ng-template #selectTeam>
-              <mat-form-field>
-                <mat-label>Choisissez une équipe</mat-label>
-                <mat-select formControlName="equipeName">
-                  <mat-option *ngFor="let team of listTeams" [value]="team">{{ team }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </ng-template>
 
             <mat-form-field class="full-width">
               <mat-label>Description de l'incident</mat-label>
               <textarea matInput formControlName="commentaire" placeholder="Description de l'incident"></textarea>
+              <button mat-icon-button matSuffix matTooltip="Donnez une description détaillée de l'incident.">
+                <mat-icon>info</mat-icon>
+              </button>
             </mat-form-field>
 
             <mat-form-field>
               <mat-label>Localisation de l'incident</mat-label>
               <input matInput formControlName="location" placeholder="Location">
+              <button mat-icon-button matSuffix matTooltip="Indiquez le lieu où l'incident s'est produit.">
+                <mat-icon>info</mat-icon>
+              </button>
             </mat-form-field>
 
             <div class="actions">
-              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
+              <button mat-raised-button class="btn-green" (click)="addDraft()">Brouillon</button>
               <button mat-raised-button class="btn-primary" [disabled]="incidentForm1.invalid"
                 matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
 
+        <!-- Étape 2 : Dates -->
         <mat-step [stepControl]="incidentForm2" label="Dates">
           <form [formGroup]="incidentForm2">
             <mat-form-field>
               <mat-label>Date de déclaration</mat-label>
-              <input matInput type="date" formControlName="dateDeDeclaration" readonly>
+              <input matInput [matDatepicker]="picker1" formControlName="dateDeDeclaration" readonly>
+              <div matSuffix class="suffix-container">
+                <mat-datepicker-toggle [for]="picker1"></mat-datepicker-toggle>
+                <button mat-icon-button matTooltip="Ceci est la date à laquelle l'incident a été déclaré.">
+                  <mat-icon>info</mat-icon>
+                </button>
+              </div>
+              <mat-datepicker #picker1 disabled></mat-datepicker>
             </mat-form-field>
 
             <mat-form-field>
               <mat-label>Date de survenance</mat-label>
-              <input matInput type="date" formControlName="dateDeSurvenance">
+              <input matInput [max]="today" [matDatepicker]="picker2" formControlName="dateDeSurvenance">
+              <div matSuffix class="suffix-container">
+                <mat-datepicker-toggle [for]="picker2"></mat-datepicker-toggle>
+                <button mat-icon-button matTooltip="La date à laquelle l'incident s'est produit.">
+                  <mat-icon>info</mat-icon>
+                </button>
+              </div>
+              <mat-datepicker #picker2></mat-datepicker>
             </mat-form-field>
 
             <mat-form-field>
               <mat-label>Date de détection</mat-label>
-              <input matInput type="date" formControlName="dateDeDetection">
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Date de clôture (si clôturé)</mat-label>
-              <input matInput type="date" formControlName="dateDeCloture">
+              <input matInput [min]="incidentForm2.get('dateDeSurvenance')?.value" [max]="today"
+                [matDatepicker]="picker3" formControlName="dateDeDetection">
+              <div matSuffix class="suffix-container">
+                <mat-datepicker-toggle [for]="picker3"></mat-datepicker-toggle>
+                <button mat-icon-button matTooltip="Date à laquelle l'incident a été détecté.">
+                  <mat-icon>info</mat-icon>
+                </button>
+              </div>
+              <mat-datepicker #picker3></mat-datepicker>
             </mat-form-field>
 
             <div class="actions">
               <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
-              <button mat-raised-button class="btn-green" (click)="addIncident()">Brouillon</button>
+              <button mat-raised-button class="btn-green" (click)="addDraft()">Brouillon</button>
               <button mat-raised-button class="btn-primary" [disabled]="incidentForm2.invalid"
                 matStepperNext>Suivant</button>
             </div>
           </form>
         </mat-step>
 
+        <!-- Étape 3 : Autres informations -->
         <mat-step [stepControl]="incidentForm3" label="Autres info">
           <form [formGroup]="incidentForm3">
-
-            <app-button-add-file label="Télécharger des images" [accept]="'image/*'" [preview]="true"
-              property="newImages" (filesSelected)="onFilesChange($event)">
-            </app-button-add-file>
-
-            <mat-form-field>
-              <mat-label>Macro Processus (niveau 1)</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 1)">
-                <mat-option *ngFor="let p1 of listP1" [value]="p1">{{ p1.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listP2.length > 0">
-              <mat-label>Processus (niveau 2)</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 2)">
-                <mat-option *ngFor="let p2 of listP2" [value]="p2">{{ p2.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listP3.length > 0">
-              <mat-label>Micro-processus</mat-label>
-              <mat-select (selectionChange)="onProcessChange($event.value, 3)">
-                <mat-option *ngFor="let mp of listP3" [value]="mp">{{ mp.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Catégorie Niveau 1</mat-label>
-              <mat-select (selectionChange)="onBaloisChange($event.value, 1)">
-                <mat-option *ngFor="let c1 of listCatLvl1" [value]="c1">{{ formatCategoryName(c1) }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listCatLvl2.length > 0">
-              <mat-label>Catégorie Niveau 2</mat-label>
-              <mat-select (selectionChange)="onBaloisChange($event.value, 2)">
-                <mat-option *ngFor="let c2 of listCatLvl2" [value]="c2">{{ formatCategoryName(c2) }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field *ngIf="listCatLvl3.length > 0">
-              <mat-label>Catégorie Niveau 3</mat-label>
-              <mat-select (selectionChange)="onBaloisChange($event.value, 3)">
-                <mat-option *ngFor="let c3 of listCatLvl3" [value]="c3">{{ formatCategoryName(c3) }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
+            <button style="margin-bottom: 20px;" mat-stroked-button (click)="create()">
+              <mat-icon>add</mat-icon>
+              Associer BU / Processus / évenement redouté *
+            </button>
+            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBP">
+              <mat-chip> Equipe : {{ selectedBP.bu.name }}</mat-chip>
+              <mat-chip> Processus : {{ selectedBP.process.name }}</mat-chip>
+              <mat-chip *ngIf="selectedBP?.risk"
+                [matTooltip]="selectedBP.risk.isInfo ? 'Cet évenement de risque n\'a pas encore été validé' : null">
+                Evenement redouté : {{ selectedBP.risk.name }}
+                <mat-icon *ngIf="selectedBP.risk.isInfo"
+                  style="margin-left: 4px; vertical-align: middle; margin-bottom: -4px; font-size: 18px; color: rgb(255, 187, 0);">
+                  warning
+                </mat-icon>
+              </mat-chip>
+            </mat-chip-listbox>
             <mat-form-field>
               <mat-label>Cause</mat-label>
-              <mat-select formControlName="cause" (selectionChange)="onCauseChange($event.value)">
+              <mat-select formControlName="cause" [compareWith]="compareById">
                 <mat-option *ngFor="let cause of listCauses" [value]="cause">{{ cause.name }}</mat-option>
               </mat-select>
+              <button mat-icon-button matSuffix matTooltip="Sélectionnez la cause principale de l'incident.">
+                <mat-icon>info</mat-icon>
+              </button>
             </mat-form-field>
 
-            <mat-form-field>
-              <mat-label>Montant des pertes</mat-label>
-              <input matInput formControlName="lossAmount" type="number" placeholder="Ex: 25000">
-            </mat-form-field>
+            <app-select-users [selectedUserId]="selectedUser" (userSelected)="changeUser($event)"
+              placeholder="Collaborateur pouvant vous aider"></app-select-users>
+            
 
-            <mat-form-field>
-              <mat-label>Conséquence</mat-label>
-              <mat-select formControlName="consequenceId">
-                <mat-option *ngFor="let cons of listConsequence" [value]="cons.id">{{ cons.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <app-select-users (userSelected)="changeUser($event)" placeholder="Collaborateur pouvant vous aider" />
           </form>
 
           <div class="actions">
             <button mat-raised-button class="btn-red" matStepperPrevious>Retour</button>
+            <button mat-raised-button class="btn-green" (click)="addDraft()">Brouillon</button>
             <button mat-raised-button class="btn-primary"
               [disabled]="incidentForm1.invalid || incidentForm2.invalid || incidentForm3.invalid"
               (click)="addIncident()">Soumettre</button>
           </div>
         </mat-step>
+
       </mat-stepper>
     </div>
   </section>

@@ -1,4 +1,4 @@
-import { Component, inject, Input, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Incident } from '../../../core/models/Incident';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -7,175 +7,251 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateImpactPopUpComponent } from '../create-impact-pop-up/create-impact-pop-up.component';
 import { MatDialog } from '@angular/material/dialog';
-import { ImpactCardComponent } from '../impact-card/impact-card.component';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
-import { Impact, ImpactCreateDto } from '../../../core/models/Impact';
+import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
+import { CommonModule, DatePipe } from '@angular/common';
 import { SuiviIncident } from '../../../core/models/SuiviIncident';
-import { HttpClient } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { State } from '../../../core/enum/state.enum';
-import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
-import { ImpactService } from '../../../core/services/impact/impact.service';
+import { firstValueFrom } from 'rxjs';
+import { OperatingLossService } from '../../../core/services/operating-loss/operating-loss.service';
+import { saveAs } from 'file-saver';
+import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
+import { OperatingLoss } from '../../../core/models/OperatingLoss';
+import { AuditButtonComponent } from '../../../shared/components/audit/audit-button/audit-button.component';
+import { TargetType } from '../../../core/enum/targettype.enum';
 
-// Interface pour les fichiers attachés
-interface AttachedFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  uploadedAt: Date;
-  url?: string;
-}
+
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { AuthService } from '../../../core/services/auth/auth.service';
+
+
+type ImpactRow = {
+  bl: string;
+  brut: number;
+  net: number;
+  final: number;
+  nonFinancialLabels: string[];
+};
 
 @Component({
   selector: 'app-view',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, CurrencyPipe, DatePipe,
-    MatGridListModule, MatButtonModule, ImpactCardComponent, MatFormFieldModule,
-    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, FichiersComponent],
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
+    MatGridListModule, MatButtonModule, MatFormFieldModule,
+    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule,
+    FichiersComponent, AuditButtonComponent, MatTableModule],
   templateUrl: './view.component.html',
-  styleUrl: './view.component.scss',
-  providers: [
-    { provide: LOCALE_ID, useValue: 'fr' }
-  ]
+  styleUrl: './view.component.scss'
 })
+
 export class ViewComponent implements OnInit {
+
   private incidentService = inject(IncidentService);
-  private impactService = inject(ImpactService);
+  private actionPlanService = inject(ActionPlanService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
-  private suiviIncidentService = inject(SuiviIncidentService);
   private entitiesService = inject(EntitiesService);
-
+  private impactService = inject(OperatingLossService);
+  private authService = inject(AuthService);
 
 
   incident: Incident | undefined
-  totalAmount = 0;
-  userRole: string | undefined;
   userTeam: string | undefined;
-  username: string | undefined;
-  canClose: boolean = false;
   message: string = "";
   idIncident: string = "";
+
+  targetTypeEnum = TargetType
+
   suivi: SuiviIncident[] = []
 
-  // Propriétés pour la gestion des fichiers
-  attachedFiles: AttachedFile[] = [];
-  isDragOver = false;
+  businessUnits: BusinessUnit[] = [];
 
-  businessUnits: EntiteResponsable[] = [];
+  goBackButtons: GoBackButton[] = [];
+
+  operatingLosses: OperatingLoss[] = [];
+
+  impactRows: ImpactRow[] = [];
+  impactDataSource = new MatTableDataSource<ImpactRow>([]);
+  currentRisk: RiskTemplate | undefined;
+
+  planActionId: string | null = null;
+
+  permissions: string[] = [];
+
+  columns = [
+    {
+      columnDef: 'bl',
+      header: 'Business Line',
+      cell: (row: ImpactRow) => row.bl,
+      filterType: 'text',
+      icon: 'business'
+    },
+    {
+      columnDef: 'brut',
+      header: 'Montant brut',
+      cell: (row: ImpactRow) => row.brut,
+      type: 'currency',
+      icon: 'euro'
+    },
+    {
+      columnDef: 'net',
+      header: 'Montant net',
+      cell: (row: ImpactRow) => row.net,
+      type: 'currency',
+      icon: 'euro'
+    },
+    {
+      columnDef: 'final',
+      header: 'Montant final',
+      cell: (row: ImpactRow) => row.final,
+      type: 'currency',
+      icon: 'euro'
+    },
+    // {
+    //   columnDef: 'nonFinancial',
+    //   header: 'Impacts non financiers',
+    //   cell: (row: ImpactRow) => row.nonFinancialLabels.join(', ') || '—',
+    //   filterType: 'text',
+    //   icon: 'tips_and_updates'
+    // }
+  ];
+  displayedImpactColumns = this.columns.map(c => c.columnDef);
+
 
   ngOnInit(): void {
     this.entitiesService.loadEntities().subscribe(entities => {
       this.businessUnits = entities;
     });
     this.idIncident = this.route.snapshot.params['id'];
-    this.loadIncident(this.idIncident);
-    this.loadAttachedFiles(this.idIncident);
-    this.suiviIncidentService.getSuiviIncidentById(this.idIncident).subscribe(
-      (res) => {
-        this.suivi = res;
-      },
-      (err) => {
-        console.error("Erreur lors du chargement du suivi de l'incident :", err);
-      }
-    );
-    this.message = "";
+    this.loadIncident(this.idIncident)
+
+
+    if (this.idIncident) {
+      this.impactService.listByIncident(this.idIncident).subscribe(result => {
+        this.operatingLosses = result;
+        this.impactRows = this.buildImpactRows(this.operatingLosses);
+        this.impactDataSource.data = this.impactRows;
+      });
+    }
   }
 
-  loadIncident(id: string): void {
-    this.incidentService.getIncidentById(id).subscribe((incident) => {
-      this.incident = incident;
-      
-      this.extractTokenInfo();
-      this.checkCloseAuthorization();
-    });
-
-
-    this.impactService.sum(id).subscribe(
-      result => this.totalAmount = result
-    )
-  }
-
-  loadAttachedFiles(incidentId: string): void {
-    // TODO: Remplacer par votre service de fichiers
-    // this.fileService.getFilesByIncidentId(incidentId).subscribe(files => {
-    //   this.attachedFiles = files;
-    // });
-
-    // Données de test - à supprimer quand le service sera implémenté
-    this.attachedFiles = [
+  async loadIncident(id: string) {
+    this.incident = await firstValueFrom(this.incidentService.getIncidentById(id));
+    try {
+      const actionPlan = await firstValueFrom(this.actionPlanService.getActionPlanByIncident(id));
+      this.planActionId = actionPlan?.id ?? '';
+    } catch (error) {
+      this.planActionId = null;
+    }
+    this.goBackButtons = [
       {
-        id: '1',
-        name: 'rapport-incident.pdf',
-        size: 2458624, // 2.4 MB
-        type: 'application/pdf',
-        uploadedAt: new Date('2025-05-24')
+        label: "Consulter le plan d'action",
+        icon: 'playlist_add_check',
+        class: 'btn-primary',
+        show: this.canShowActions() && !this.isDraft() && this.planActionId != null && (this.sameCreator() || this.sameIntervenant()),
+        permission: {teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN']},
+        action: () => this.gotoActionPlan(this.planActionId as string)
       },
       {
-        id: '2',
-        name: 'capture-ecran-serveur.png',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-26')
+        label: "Créer un plan d'action",
+        icon: 'playlist_add_check',
+        class: 'btn-primary',
+        show: this.canShowActions() && !this.isDraft() && this.planActionId == null && (this.sameCreator() || this.sameIntervenant()),
+        permission: {teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN', 'CREATE_ACTION_PLAN']},
+        action: () => this.addActionPlan(this.incident)
       },
       {
-        id: '3',
-        name: 'capture-ecran-serveur.png',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
+        label: "Modifier",
+        icon: 'edit',
+        class: 'btn-green',
+        show: this.canShowActions() && !this.isDraft(),
+        permission: {teamId: this.incident?.teamId, permissions: ['UPDATE_INCIDENT']},
+        action: () => this.goToModification()
       },
       {
-        id: '4',
-        name: 'capture-ecran-serveur.png',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-30')
+        label: "Modifier",
+        icon: 'edit',
+        class: 'btn-green',
+        show: this.isDraft() && this.sameCreator(),
+        action: () => this.goToModification()
       },
       {
-        id: '5',
-        name: 'capture-ecran-serveur.png',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-18')
-      }
+        label: "Supprimer",
+        icon: 'delete',
+        class: 'btn-red',
+        show: this.isDraft() && this.sameCreator(),
+        action: () => this.delete()
+      },
+      {
+        label: 'Fiche Incident (PDF)',
+        icon: 'description',
+        class: 'btn-green',
+        show: !this.isDraft(),
+        action: () => this.downloadPDF()
+      },
+      {
+        label: 'Clôturer',
+        icon: 'lock',
+        class: 'btn-red',
+        show: this.canClose() && (this.sameCreator() || this.sameIntervenant()),
+        permission: {teamId: this.incident?.teamId, permissions: ['CLOSED_INCIDENT']},
+        action: () => this.closeIncident()
+      },
+
     ];
   }
 
-  extractTokenInfo(): void {
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      console.warn("Aucun token trouvé");
-      return;
-    }
-
-    const base64Payload = token.split('.')[1];
-    const jsonPayload = new TextDecoder().decode(
-      Uint8Array.from(atob(base64Payload), c => c.charCodeAt(0))
-    );
-    const payload = JSON.parse(jsonPayload);
-    this.userRole = payload.roles?.[0]?.role_name;
-    // this.userTeam = payload.roles?.[0]?.team_id;
-    this.username = payload.username;
-
+  sameCreator(){
+   return this.authService.sameUser(this.incident?.creatorId || '');
   }
 
-  checkCloseAuthorization(): void {
-    this.canClose = this.userRole === 'VALIDATEUR';
+  sameIntervenant(){
+   return this.authService.sameUser(this.incident?.intervenantId || '');
+  }
+
+
+
+  canShowActions(): boolean {
+    return this.incident?.state !== State.VALIDATE && this.incident?.state !== State.CLOSED;
+  }
+
+  isDraft(): boolean {
+    return this.incident?.state === State.DRAFT;
+  }
+
+  goToModification(): void {
+    if (this.incident) {
+      this.router.navigate(['incident', 'create'], { queryParams: { id: this.incident.id } });
+    }
+  }
+
+  delete() {
+    this.confirmService.openConfirmDialog("Confirmer la suppression", "Êtes-vous sûr de vouloir supprimer cet incident ? Cette action est irréversible.", true).subscribe(result => {
+      if (result) {
+        this.incidentService.deleteIncident(this.incident!.id).subscribe(() => {
+          this.router.navigate(['incident']);
+        });
+      }
+    });
+  }
+
+ async extractTokenInfo() {
+    this.permissions = await this.authService.getPermissionsByTeam(this.incident?.teamId ?? '');
+  }
+
+  canClose() {
+    return this.incident?.state != State.DRAFT && this.incident?.closedAt == null;
   }
 
   normalize(str?: string): string {
@@ -207,222 +283,55 @@ export class ViewComponent implements OnInit {
     }
   }
 
-addImpact() {
-  const dialogRef = this.dialog.open(CreateImpactPopUpComponent, {
-    width: '400px'
-  });
 
-  dialogRef.afterClosed().subscribe((result: Impact) => {
-    if (result && this.incident) {
-
-      /* ─── Construction explicite du DTO ─── */
-      const dto: ImpactCreateDto = {
-        montant:    result.montant,
-        entityId:   result.entityId,      // ou result.entiteResponsableId
-        incidentId: this.incident.id,     // ← lier à l’incident courant
-        type:       result.type,          // enum/chaine côté back
-        message:    result.message ?? ''  // commentaire optionnel
-      };
-
-
-      this.impactService.addImpact(dto).subscribe(() => {
-        this.confirmService.openConfirmDialog(
-          'Impact ajouté',
-          "L'impact a bien été ajouté à l'incident",
-          false
-        );
-        this.ngOnInit();     // rafraîchir la vue
-      });
-    }
-  });
-}
-
-  isNotClosed() {
-    if (this.incident) {
-      return this.incident.closedAt == null
-    }
-    return false
+  private toNumber(v: any): number {
+    const n = typeof v === 'number' ? v : (v == null ? 0 : Number(v));
+    return Number.isFinite(n) ? n : 0;
   }
 
-  accessSuivi() {
-    this.router.navigate(['incident', this.incident?.id, 'suivi'])
+  // “Financier” si au moins un montant est présent
+  private isFinancial(loss: OperatingLoss): boolean {
+    return !!(this.toNumber((loss as any).montantBrut) ||
+      this.toNumber((loss as any).montantNet) ||
+      this.toNumber((loss as any).montantFinal));
   }
 
-  sendMessage() {
-    if (this.incident && this.username) {
-      this.suiviIncidentService.addSuiviIncident(this.message, this.incident.id, this.username).subscribe(
-        () => {
-          this.confirmService.openConfirmDialog("Message envoyé", "Le message a bien été envoyé", false);
-          this.ngOnInit();
-        });
+  // Libellé d’un impact non financier
+  private impactLabel(loss: OperatingLoss): string {
+    return (loss as any).label || (loss as any).libelle || (loss as any).description || 'Impact';
+  }
+
+  private buildImpactRows(losses: OperatingLoss[]): ImpactRow[] {
+    const byBL = new Map<string, ImpactRow>();
+
+    for (const loss of losses ?? []) {
+      const bl = (loss as any).entityName || (loss as any).businessLine || 'Non assigné';
+      if (!byBL.has(bl)) {
+        byBL.set(bl, { bl, brut: 0, net: 0, final: 0, nonFinancialLabels: [] });
+      }
+      const row = byBL.get(bl)!;
+
+      if (this.isFinancial(loss)) {
+        row.brut += this.toNumber((loss as any).montantBrut);
+        row.net += this.toNumber((loss as any).montantNet);
+        row.final += this.toNumber((loss as any).montantFinal);
+      } else {
+        row.nonFinancialLabels.push(this.impactLabel(loss));
+      }
     }
+
+    return Array.from(byBL.values()).sort((a, b) => a.bl.localeCompare(b.bl));
+  }
+
+
+
+  isClosed() {
+    return this.incident!.closedAt !== null || false;
   }
 
   downloadExport(): void {
     if (!this.incident?.id) return;
     this.incidentService.downloadExport(this.incident.id);
-  }
-
-  // Méthodes pour la gestion des fichiers
-
-  openFileUpload(): void {
-    // Déclencher le clic sur l'input file caché
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    fileInput?.click();
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.handleFiles(Array.from(input.files));
-    }
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = true;
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
-
-    if (event.dataTransfer?.files) {
-      this.handleFiles(Array.from(event.dataTransfer.files));
-    }
-  }
-
-  private handleFiles(files: File[]): void {
-    files.forEach(file => {
-      if (this.isValidFile(file)) {
-        this.uploadFile(file);
-      } else {
-        this.confirmService.openConfirmDialog(
-          "Fichier non supporté",
-          `Le fichier ${file.name} n'est pas dans un format supporté.`,
-          false
-        );
-      }
-    });
-  }
-
-  private isValidFile(file: File): boolean {
-    const validTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'image/png',
-      'image/jpeg',
-      'image/jpg',
-      'text/plain',
-      'text/csv',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ];
-
-    return validTypes.includes(file.type);
-  }
-
-  private uploadFile(file: File): void {
-    if (!this.incident?.id) return;
-
-    // TODO: Implémenter l'upload vers votre API
-    // const formData = new FormData();
-    // formData.append('file', file);
-    // formData.append('incidentId', this.incident.id);
-
-    // this.fileService.uploadFile(formData).subscribe({
-    //   next: (response) => {
-    //     this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
-    //     this.loadAttachedFiles(this.incident!.id);
-    //   },
-    //   error: (error) => {
-    //     this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'upload de ${file.name}.`, false);
-    //   }
-    // });
-
-    // Simulation d'upload pour la démo
-    const newFile: AttachedFile = {
-      id: Date.now().toString(),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      uploadedAt: new Date()
-    };
-
-    this.attachedFiles.push(newFile);
-    this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
-  }
-
-  downloadFile(file: AttachedFile): void {
-    // TODO: Implémenter le téléchargement depuis votre API
-    // this.fileService.downloadFile(file.id).subscribe(blob => {
-    //   const url = window.URL.createObjectURL(blob);
-    //   const link = document.createElement('a');
-    //   link.href = url;
-    //   link.download = file.name;
-    //   link.click();
-    //   window.URL.revokeObjectURL(url);
-    // });
-
-    // Simulation pour la démo
-    this.confirmService.openConfirmDialog("Téléchargement", `Téléchargement de ${file.name} en cours...`, false);
-  }
-
-  deleteFile(fileId: string): void {
-    // TODO: Implémenter la suppression via votre API
-    // this.fileService.deleteFile(fileId).subscribe({
-    //   next: () => {
-    //     this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-    //     this.confirmService.openConfirmDialog("Fichier supprimé", "Le fichier a été supprimé avec succès.", false);
-    //   },
-    //   error: (error) => {
-    //     this.confirmService.openConfirmDialog("Erreur", "Erreur lors de la suppression du fichier.", false);
-    //   }
-    // });
-
-    // Simulation pour la démo
-    const file = this.attachedFiles.find(f => f.id === fileId);
-    this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-    this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.name} a été supprimé avec succès.`, false);
-  }
-
-  formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-  }
-
-  getFileIcon(filename: string): string {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    const iconMap: { [key: string]: string } = {
-      'pdf': 'picture_as_pdf',
-      'doc': 'description',
-      'docx': 'description',
-      'png': 'image',
-      'jpg': 'image',
-      'jpeg': 'image',
-      'txt': 'text_snippet',
-      'csv': 'table_chart',
-      'xlsx': 'table_chart',
-      'xls': 'table_chart'
-    };
-    return iconMap[ext || ''] || 'insert_drive_file';
-  }
-
-  getFileIconClass(filename: string): string {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    return `file-icon-${ext}`;
   }
 
   closeIncident(): void {
@@ -434,24 +343,79 @@ addImpact() {
     });
   }
 
-  addActionPlan() {
-    if(this.incident == null) {
-      return;
-    }
-    
-    let choice = confirm("Créer un plan d'action ou consulter un plan d'action existant ?")
-    if(choice){
-      this.dialog.open(CreateActionPlanDialogComponent, {
-        width: '400px', 
-        data : {
-          incidentId : this.incident.id,
-          reference : this.incident.reference
+  getPlanActionId(incidentId: string) {
+    this.actionPlanService.getActionPlanByIncident(incidentId).subscribe(
+      {
+        next: actionPlan => {
+          this.planActionId = actionPlan.id;
         }
-      })
+      });
+  }
+
+  gotoActionPlan(planActionId: string) {
+    this.router.navigate(['action-plan', planActionId]);
+  }
+
+  addActionPlan(incident: any) {
+    this.dialog.open(CreateActionPlanDialogComponent, {
+      width: '800px !important',
+      height: '550px',
+      minWidth: '800px',
+      maxWidth: '800px',
+      data: {
+        incidentId: incident.id,
+        reference: incident.reference
+      }
+    })
+  }
+
+
+
+
+  getLineColor(from: Date | string, to: Date | string): string {
+    const date1 = new Date(from);
+    const date2 = new Date(to);
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if(diffDays < 0){
+      return 'black';
+    }else if (diffDays < 30) {
+      return 'green';
+    } else if (diffDays < 60) {
+      return 'orange';
+    } else {
+      return 'red';
     }
-    else{
-      this.router.navigate(['action-plan', 'create', this.incident.id]);
-    }
+  }
+
+  getDaysDiff(from: Date | string, to: Date | string): number {
+    if(from == null || to == null)
+        return -1;
+    const date1 = new Date(from);
+    const date2 = new Date(to);
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  addImpact() {
+    this.router.navigate(['incident', this.idIncident, 'impacts']);
+  }
+
+  downloadPDF(): void {
+    if (!this.incident?.id) return;
+    this.incidentService.downloadPDF(this.incident.id).subscribe({
+      next: (blob) => {
+        const ref = this.incident?.reference ?? this.incident?.id;
+        const pdf = new Blob([blob], { type: 'application/pdf' });
+        saveAs(pdf, `FICHE_INCIDENT_${ref}.pdf`);
+      },
+      error: (err) => console.error('Erreur export PDF :', err)
+    });
+  }
+
+  totalAmount(): number {
+    return this.operatingLosses.reduce((sum, loss) => sum + loss.montantFinal, 0);
   }
 
 }

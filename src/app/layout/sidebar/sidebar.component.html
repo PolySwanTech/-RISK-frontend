@@ -1,64 +1,109 @@
 <mat-drawer-container class="sidenav-container">
-  <mat-drawer mode="side" [opened]="true">
+  <mat-drawer #drawer mode="side" [opened]="true">
     <mat-toolbar color="primary">
+      <button mat-icon-button (click)="onToggle(drawer)" class="hamburger">
+        <mat-icon>menu</mat-icon>
+      </button>
       <span>Risk View</span>
     </mat-toolbar>
-   
+
     <mat-nav-list>
       @if(authService.isLogin$ | async){
-      <ng-container *appHasPermission="'VIEW_DASHBOARDS'">
-        <a mat-list-item href="/dashboard" routerLink="/dashboard">
-          <mat-icon>dashboard</mat-icon>
-          <span>{{ 'MENU.DASHBOARD' | translate }}</span>
-        </a>
-      </ng-container>
-      <ng-container *appHasPermission="'VIEW_INCIDENTS'">
-        <a mat-list-item routerLink="/incident">
-          <mat-icon>warning</mat-icon>
-          <span [matBadge]="unreadIncidents > 0 ? unreadIncidents : null" matBadgeColor="warn"
-            matBadgePosition="above after" mat-button>
-            {{ 'MENU.INCIDENTS' | translate }}
-          </span>
-        </a>
-      </ng-container>
-      <!-- <ng-container *appHasPermission="'VIEW_ACTION_PLANS'"> -->
-        <ng-container>
-        <a mat-list-item routerLink="/risk">
-          <mat-icon>analytics</mat-icon>
-          <span>Cartographie</span>
-        </a>
-      </ng-container>
       <ng-container>
-        <a mat-list-item routerLink="/action-plan/list">
-          <mat-icon>pie_chart</mat-icon>
-          <span>Plans d'action</span>
-        </a>
-      </ng-container>
-      <ng-container>
-        <a mat-list-item routerLink="/control/chart">
-          <mat-icon>bar_chart</mat-icon>
-          <span>Contrôles</span>
-        </a>
-      </ng-container>
-      <a mat-list-item [matMenuTriggerFor]="menu">
-        <mat-icon>settings</mat-icon>
-        <span>{{ 'MENU.ADMIN' | translate }}</span>
-      </a>
-      <mat-menu #menu="matMenu">
-        <button routerLink="/reglages" mat-menu-item>
+
+        <!-- ✅ Vue "A faire" -->
+        <ng-container *appHasPermission="'VIEW_TODO'">
+          <a mat-list-item routerLink="/todo">
+            <mat-icon>checklist</mat-icon>
+            <span [matBadge]="'!'" matBadgeColor="warn" matBadgePosition="above after" mat-button>
+              A faire
+            </span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Tableaux de bord -->
+        <ng-container *appHasPermission="'VIEW_DASHBOARDS'">
+          <a mat-list-item routerLink="/dashboard">
+            <mat-icon>dashboard</mat-icon>
+            <span>{{ 'MENU.DASHBOARD' | translate }}</span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Cartographie -->
+        <ng-container *appHasPermission="'VIEW_CARTOGRAPHIE'">
+          <a mat-list-item routerLink="/cartographie">
+            <mat-icon>analytics</mat-icon>
+            <span>Cartographie</span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Contrôles -->
+        <ng-container *appHasPermission="'VIEW_CONTROLES'">
+          <a mat-list-item [matMenuTriggerFor]="menu">
+            <mat-icon>shield</mat-icon>
+            <span>DMR</span>
+          </a>
+          <mat-menu #menu="matMenu">
+            <button routerLink="/control/chart" *appHasPermission="'VIEW_CONTROLES'" mat-menu-item>
+              <mat-icon>rule</mat-icon>
+              <span>Contrôles</span>
+            </button>
+            <button mat-menu-item *appHasPermission="'VIEW_CONTROLES'" routerLink="/attenuationMetrics">
+              <mat-icon>bar_chart</mat-icon>
+              <span>Mesures d'atténuations</span>
+            </button>
+          </mat-menu>
+        </ng-container>
+
+        <!-- ✅ Incidents -->
+        <ng-container *appHasPermission="'VIEW_INCIDENTS'">
+          <a mat-list-item routerLink="/incident">
+            <mat-icon>warning</mat-icon>
+            <span>{{ 'MENU.INCIDENTS' | translate }}</span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Plan d'action -->
+        <ng-container *appHasPermission="'VIEW_ACTION_PLAN'">
+          <a mat-list-item routerLink="/action-plan/list">
+            <mat-icon>pie_chart</mat-icon>
+            <span>Plans d'action</span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Calcul des fonds propres -->
+        <ng-container *appHasPermission="'VIEW_CALCUL_FONDS_PROPRE'">
+          <a mat-list-item routerLink="/calcul/view">
+            <mat-icon>calculate</mat-icon>
+            <span>Calcul fonds propres</span>
+          </a>
+        </ng-container>
+
+        <!-- ✅ Menu Admin -->
+        @if(isAdmin()){
+        <a mat-list-item [matMenuTriggerFor]="menu">
           <mat-icon>settings</mat-icon>
-          <span>{{ 'MENU.SETTINGS' | translate }}</span>
-        </button>
-        <button mat-menu-item routerLink="/user/list">
-          <mat-icon>group</mat-icon>
-          <span>{{ 'MENU.USERS' | translate }}</span>
-        </button>
-        <button mat-menu-item routerLink="/permissions">
-          <mat-icon>lock</mat-icon>
-          <span>{{ 'MENU.PERMISSIONS' | translate }}</span>
-        </button>
-      </mat-menu>
+          <span>{{ 'MENU.ADMIN' | translate }}</span>
+        </a>
+        <mat-menu #menu="matMenu">
+          <button routerLink="/reglages" *appHasPermission="'VIEW_PARAMETRAGE'" mat-menu-item>
+            <mat-icon>settings</mat-icon>
+            <span>{{ 'MENU.SETTINGS' | translate }}</span>
+          </button>
+          <button mat-menu-item *appHasPermission="'VIEW_GESTION_UTILISATEURS'" routerLink="/user/list">
+            <mat-icon>group</mat-icon>
+            <span>{{ 'MENU.USERS' | translate }}</span>
+          </button>
+          <button mat-menu-item *appHasPermission="'VIEW_GESTION_PERMISSIONS'" routerLink="/permissions">
+            <mat-icon>lock</mat-icon>
+            <span>{{ 'MENU.PERMISSIONS' | translate }}</span>
+          </button>
+        </mat-menu>
+        }
+      </ng-container>
       }
+
+      <!-- ✅ Sélecteur de langue -->
       <a mat-list-item [matMenuTriggerFor]="langMenu">
         <mat-icon>language</mat-icon>
         <span>{{ 'MENU.LANGUAGE' | translate }}</span>
@@ -67,6 +112,7 @@
         <button mat-menu-item (click)="changeLang('fr')"><span>🇫🇷 Français</span></button>
         <button mat-menu-item (click)="changeLang('en')"><span>🇬🇧 English</span></button>
       </mat-menu>
+
       @if(authService.isLogin$ | async){
       <button class="deco" mat-list-item (click)="onLogout()">
         <mat-icon>logout</mat-icon>
@@ -74,9 +120,16 @@
       </button>
       }
     </mat-nav-list>
-   
   </mat-drawer>
+
   <mat-drawer-content>
+    @if(!drawer.opened){
+    <mat-toolbar color="primary" class="top-toolbar">
+      <button mat-icon-button (click)="onToggle(drawer)" class="hamburger">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </mat-toolbar>
+    }
     <ng-content></ng-content>
   </mat-drawer-content>
 </mat-drawer-container>

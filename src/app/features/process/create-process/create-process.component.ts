@@ -1,10 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { IncidentService } from '../../../core/services/incident/incident.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -13,13 +11,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
-import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 
 @Component({
   selector: 'app-create-process',
   imports: [ReactiveFormsModule, ReactiveFormsModule, CommonModule, FormsModule, ReactiveFormsModule,
-      MatFormFieldModule, MatInputModule, MatSelectModule,
-      MatStepperModule, MatButtonModule],
+    MatFormFieldModule, MatInputModule, MatSelectModule,
+    MatStepperModule, MatButtonModule, SelectArborescenceComponent],
   templateUrl: './create-process.component.html',
   styleUrl: './create-process.component.scss'
 })
@@ -33,36 +32,87 @@ export class CreateProcessComponent {
   router = inject(Router);
   fb = inject(FormBuilder);
   dialogRef = inject(MatDialogRef<CreateProcessComponent>);
+  snackBarService = inject(SnackBarService);
+
+  ope = 'Créer'
 
   constructor(
+    @Inject(MAT_DIALOG_DATA) public data: { process: Process, buId?: string } | null
   ) {
-    this.processForm = this.fb.group({
-      name: ['', Validators.required],
-      bu_id: ['', Validators.required],
-      parent: [null]
-    });
+
+    if (data && data.process) {
+      this.ope = 'Modifier';
+      this.processForm = this.fb.group({
+        name: [data.process.name, Validators.required],
+        parentId: [data.process.parentId, Validators.required]
+      });
+    }
+    else {
+      this.processForm = this.fb.group({
+        name: ['', Validators.required],
+        bu: [this.data ? this.data.buId : null, Validators.required],
+        parentId: [null]
+      });
+    }
+
   }
 
   ngOnInit() {
     this.equipeService.getAllEquipes().subscribe(data => {
       this.businessUnits = data;
-    });
 
-    this.processService.getAll().subscribe(data => {
-      this.processes = data;
+      if (this.businessUnits.length === 1) {
+        const onlyUnit = this.businessUnits[0];
+
+        // Set value in the form
+        this.processForm.get('bu')?.setValue(onlyUnit.id);
+
+        // Appeler le handler manuellement si nécessaire
+        this.onBuChange(onlyUnit.id);
+      }
+
+      const buId = this.processForm.get('bu')!.value;
+      
+      if (buId) {
+        this.onBuChange(buId);
+      }
     });
+  }
+
+  onBuChange(buId: string) {
+    this.processForm.patchValue({ parentId: null });
+    this.processes = [];
+    this.processService.getProcessLeaf(buId).subscribe(list => {
+      this.processes = [...list];
+    });
+  }
+
+  onSelectionProcess(value: any) {
+    this.processForm.get('parentId')?.setValue(value.id);
   }
 
   onSubmit() {
     if (this.processForm.valid) {
-      const { name, bu_id, parent } = this.processForm.value;
-      const dto = { name, bu: bu_id, parentId: parent || null };
-      this.processService.createProcess(dto).subscribe(() => {
-        this.dialogRef.close(true);
-        this.router.navigate(['reglages', 'process']);
-      });
-
+      if (this.data && this.data.process) {
+        const { name, parentId } = this.processForm.value;
+        const dto = { name, parentId: parentId || null };
+        this.processService.updateProcess(this.data.process.id, dto).subscribe(resp => {
+          this.snackBarService.success("Le processus a bien été modifié")
+          this.dialogRef.close(true);
+          // this.router.navigate(['reglages']);
+        });
+      }
+      else {
+        const { name, bu, parentId } = this.processForm.value;
+        console.log(bu)
+        const dto = { name, bu, parentId: parentId || null };
+        console.log(dto)
+        this.processService.createProcess(dto).subscribe(resp => {
+          this.snackBarService.success("Le processus a bien été créé")
+          this.dialogRef.close(true);
+          // this.router.navigate(['reglages']);
+        });
+      }
     }
   }
-
 }

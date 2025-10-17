@@ -1,31 +1,35 @@
-<div style="margin: 15px;">
+<div class="body-container">
     @if(actionPlan){
-    <app-go-back previousPageName="Liste des plans d'action"
-        [currentPageName]="`Détails du plan d'action - ` + actionPlan.libelle"></app-go-back>
+    <app-go-back [title]="`Détails d'un plan d'action`" [subtitle]="actionPlan.reference"
+        [buttons]="goBackButtons"></app-go-back>
+
     <div class="plan-detail-container">
-
-
         <mat-card class="action-plan-card">
             <mat-card-header>
                 <mat-card-title>
                     <span>{{ actionPlan.reference }} - {{ actionPlan.libelle }}
-                        @if(actionPlan.incidentId){
-                        (Ref incident : {{ actionPlan.incidentId }} )
+                        @if(actionPlan.incidentRef){
+                        (Ref incident : {{ actionPlan.incidentRef }} )
                         }
                     </span>
-                    <button mat-raised-button class="btn-green">
-                        <mat-icon>file_download</mat-icon> Exporter
-                    </button>
                 </mat-card-title>
             </mat-card-header>
+            <app-timeline-action-plan [actionPlan]="actionPlan"></app-timeline-action-plan>
             <mat-card-content class="plan-info-content">
-
                 <div class="info-grid">
                     <div class="info-block">
                         <mat-icon>person</mat-icon>
                         <div class="info-text">
                             <label>Equipe responsable</label>
                             <div class="value">{{ actionPlan.userInCharge }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block">
+                        <mat-icon>event</mat-icon>
+                        <div class="info-text">
+                            <label>Date de création</label>
+                            <div class="value">{{ actionPlan.createdAt | date: 'dd/MM/yyyy' }}</div>
                         </div>
                     </div>
 
@@ -49,20 +53,37 @@
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Statut</label>
-                            <span class="badge status" [ngClass]="actionPlan.status.toLowerCase()">
+                            <span class="badge" [ngClass]="actionPlan.status.toLowerCase()">
                                 {{ getReadableStatut(actionPlan.status) }}
                             </span>
                         </div>
                     </div>
 
-                    @if(actionPlan.taxonomie){
+                    @if(actionPlan.riskName){
                     <div class="info-block">
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Risk</label>
-                            <span class="badge status" [ngClass]="actionPlan.taxonomie!.libelle.toLowerCase()">
-                                {{ actionPlan.taxonomie!.libelle }}
+                            <span class="badge type">
+                                {{ actionPlan.riskName }}
                             </span>
+                        </div>
+                    </div>
+                    }
+
+                    @if(actionPlan.incidentRef){
+                    <div class="info-block">
+                        <mat-icon>check_circle</mat-icon>
+                        <div class="info-text">
+                            <label>Incident</label>
+                            <div class="incident">
+                                <span class="badge status" [ngClass]="actionPlan.incidentRef.toLowerCase()">
+                                    {{ actionPlan.incidentRef }}
+                                </span>
+                                <button mat-raised-button class="btn-primary" (click)="goToIncident()">
+                                    Accéder
+                                </button>
+                            </div>
                         </div>
                     </div>
                     }
@@ -76,51 +97,108 @@
         </mat-card>
 
         <mat-card class="actions-card">
-            <mat-card-header>
-                <mat-card-title>
-                    <span>Actions à réaliser</span>
-                    <div class="progression-section">
-                        <label>Progression globale</label>
-                        <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
-                        <small>
-                            {{ completedActions }} sur {{ totalActions }} actions terminées
-                            ({{ progressionPercent | number: '1.0-0' }}%)
-                        </small>
-                    </div>
-                </mat-card-title>
-            </mat-card-header>
-            <mat-card-content class="actions-content">
-                @for(action of actionPlan.actions; track action.id) {
-                <div class="action-row">
-                    <div class="action-info">
-                        <p class="action-title">
-                            <strong>{{ action.name }}</strong>
-                            <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy' }})</span>
-                        </p>
-
-
-                        @if(!action.performedAt){
-                        <ng-container>
-                            <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
-                                <mat-icon>upload</mat-icon>
-                                Déposer un justificatif
+            <mat-tab-group>
+                <!-- Onglet "Actions à réaliser" -->
+                <mat-tab label="Actions à réaliser">
+                    <mat-card-header>
+                        <mat-card-title>
+                            @if(actionPlan.status == statusEnum.NOT_STARTED){
+                            <button mat-raised-button class="btn-primary"
+                                *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                (click)="openAddActionDialog()">
+                                <mat-icon>add</mat-icon>
+                                <span>Ajouter</span>
                             </button>
-                            <input style="display: none;" type="file" (change)="validateAction(action, $event)" />
-                        </ng-container>
+                            }
+
+                            <div *ngIf="actionPlan.status != statusEnum.NOT_STARTED"></div>
+                            <div class="progression-section">
+                                <label>Progression globale</label>
+                                <mat-progress-bar mode="determinate" [value]="progressionPercent"></mat-progress-bar>
+                                <small>
+                                    {{ completedActions }} sur {{ totalActions }} actions terminées
+                                    ({{ progressionPercent | number: '1.0-0' }}%)
+                                </small>
+                            </div>
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content class="actions-content">
+                        @for(action of actions; track action){
+                        <div>
+                            <div class="action-row">
+                                <div class="action-info">
+                                    <div class="action-header">
+                                        <p class="action-title">
+                                            <strong>{{ action.name }}</strong>
+                                            <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy'
+                                                }})</span>
+                                        </p>
+                                        @if(canAbandonAction(action)){
+                                        <button
+                                            *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                            mat-icon-button class="btn-red" matTooltip="Abandonner"
+                                            (click)="abandon(action)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                        }
+                                    </div>
+                                    @if(!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED){
+                                    <button mat-raised-button
+                                        *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                        class="btn-primary" (click)="viewFiles(action.id)">
+                                        <mat-icon>upload</mat-icon>
+                                        Déposer un justificatif
+                                    </button>
+                                    }
+
+                                    <ng-container *ngIf="action.performedAt">
+                                        <p class="validated">
+                                            ✔ Terminé par <strong>{{ action.performedBy }}</strong>
+                                            le {{ action.performedAt | date: 'dd/MM/yyyy' }}
+                                        </p>
+                                        <button mat-raised-button class="btn-primary"
+                                            (click)="viewFiles(action.id, true)">
+                                            <mat-icon>upload</mat-icon>
+                                            Voir les fichiers joints
+                                        </button>
+                                    </ng-container>
+                                    <ng-container
+                                        *ngIf="!action.performedAt && actionPlan.status == statusEnum.NOT_STARTED">
+                                        <p class="not-started">⏳ En attente de démarrage du plan d'action</p>
+                                    </ng-container>
+
+                                </div>
+                            </div>
+                        </div>
                         }
-                        @else {
-                        <ng-container>
-                            <p class="validated">
-                                ✔ Terminé par <strong>{{ action.performedBy }}</strong>
-                                le {{ action.performedAt | date: 'dd/MM/yyyy' }}
-                            </p>
-                        </ng-container>
+                    </mat-card-content>
+                </mat-tab>
+
+                <!-- Onglet "Actions annulées" -->
+                <mat-tab label="Actions abandonnées">
+                    <mat-card-content class="actions-content">
+                        @for(action of abandonedActions; track action){
+                        <div>
+                            <div class="action-row">
+                                <div class="action-info">
+                                    <p class="action-title">
+                                        <strong>{{ action.name }}</strong>
+                                        <span class="action-date"> ({{ action.createdAt | date: 'dd/MM/yyyy'
+                                            }})</span>
+                                    </p>
+                                    <p class="cancelled">❌ Action abandonnée</p>
+                                </div>
+                            </div>
+                        </div>
                         }
-                    </div>
-                </div>
-                }
-            </mat-card-content>
+                    </mat-card-content>
+                </mat-tab>
+            </mat-tab-group>
         </mat-card>
     </div>
     }
 </div>
+
+@if(actionPlan){
+<app-audit-button [contextId]="actionPlan.id" [contextTarget]="targetTypeEnum.ACTION_PLAN"></app-audit-button>
+}

@@ -1,53 +1,56 @@
-import { BaloiseCategoryEnum } from "../enum/baloisecategory.enum";
-import { RiskImpactType } from "../enum/riskImpactType.enum";
-import { RiskLevel } from "../enum/riskLevel.enum";
+import { OperatingLossState } from "../enum/operatingLossState.enum";
+import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
+import { RiskReferentiel } from "./RiskReferentiel";
 
 
 
-// -------------  TYPES COMPLÉMENTAIRES -------------
-export interface RiskId {
-  /** UUID généré côté back */
-  id: string;
-  /** Instant ISO 8601 retourné par le back */
-  version: string;
+export interface Dmr {
+  controls: ControlTemplate[];
+  attenuationMetrics: AttenuationMetrics[];
 }
-
 
 // -------------  MODÈLE PRINCIPAL -------------
 export class RiskTemplate {
 
-  /** Identifiant composite (UUID + version) */
-  id!: RiskId;
+  id!: string;
 
-  libelle = '';
-  description = '';
+  libelle!: string;
 
-  /** Enum à iso avec le back */
-  riskBrut: RiskLevel = RiskLevel.LOW;
+  reference!: string;
 
-  /** UUID du process concerné */
-  processId = '';
+  description?: string;
 
-  reference = '';
+  riskReferentiel!: RiskReferentiel;
 
-  category?: BaloiseCategoryEnum;
+  declaredAt!: Date;
 
-  /** Set côté back → tableau côté front  */
-  impactTypes: RiskImpactType[] = [];
+  attachmentState!: OperatingLossState;
 
   /** actif par défaut */
   active = true;
 
-  /* relations */
-  riskEvaluations?: RiskEvaluation[];
-  controlTemplates?: ControlTemplate[];
+  creatorName!: string;
+  creatorId!: string;
 
-  creator?: string; // UUID de l'utilisateur qui a créé le risque
-
-  buName : string = ''
+  buName: string = '';
   processName: string = '';
+  processId?: string;
+
+  riskNet?: RiskEvaluation[];
+  riskBrut?: RiskEvaluation[];
+
+  /** champ dérivé côté back (@Transient) */
+  dmr?: Dmr;
+
+  // Accès pratiques (si tu veux manipuler sans repasser par dmr?.)
+  get controls(): ControlTemplate[] {
+    return this.dmr?.controls ?? [];
+  }
+  get attenuationMetrics(): AttenuationMetrics[] {
+    return this.dmr?.attenuationMetrics ?? [];
+  }
 
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
@@ -57,10 +60,8 @@ export class RiskTemplate {
 
 // -------------  DTO -------------
 export interface RiskTemplateCreateDto {
-  libelle:        string;
-  description: string;
-  processId:   string;                 // UUID
-  riskBrut:    RiskLevel;
-  category:  BaloiseCategoryEnum;      // objet complet (cf. back)
-  impactTypes: RiskImpactType[];       // tableau → Set côté Java
+  libelle: string;
+  riskReferentielId: string;
+  processId:   string;
+  description: string | null;    
 }

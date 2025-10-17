@@ -1,0 +1,119 @@
+.timeline-container {
+    padding: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.timeline-wrapper {
+    background: #f5f5f5;
+    padding: 60px 40px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.timeline-line {
+    position: relative;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+.timeline-segment {
+    position: absolute;
+    height: 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.segment-label {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    white-space: nowrap;
+    background: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-point {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.point-marker {
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 3px solid #666;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.timeline-point.current .point-marker {
+    width: 20px;
+    height: 20px;
+    border-color: #2196F3;
+    background: #2196F3;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(33, 150, 243, 0.1);
+    }
+}
+
+.point-label {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.point-label strong {
+    display: block;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.point-label span {
+    color: #666;
+}
+
+.timeline-point.current .point-label {
+    background: #2196F3;
+}
+
+.timeline-point.current .point-label strong,
+.timeline-point.current .point-label span {
+    color: white;
+}

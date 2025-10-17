@@ -1,77 +1,178 @@
-<mat-card-content style="display: flex; flex-direction: column; height: 97%;">
+<mat-card class="files-card" style="height: 80vh;">
+  <mat-card-content style="display: flex; flex-direction: column; height: 97%;">
+    <app-popup-header
+      [title]="'Pièces jointes'"
+      [showClose]="data != null"
+      (close)="closePopup()"
+    ></app-popup-header>
+
     <!-- Zone de dépôt -->
-    @if(!isNotClosed()){
-    <div class="upload-zone" (click)="fileInput.click()" (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.dragover]="isDragOver">
+    @if (!closed) {
+      <div
+        class="upload-zone"
+        (click)="fileInput.click()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        [class.dragover]="isDragOver"
+      >
         <mat-icon class="upload-icon">cloud_upload</mat-icon>
         <div class="upload-text">Glissez vos fichiers ici ou cliquez pour parcourir</div>
         <div class="upload-subtext">Formats supportés: PDF, DOC, IMG, TXT, CSV, Excel</div>
-    </div>
-    <input #fileInput type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt,.csv,.xlsx"
-        (change)="onFileSelected($event)" style="display: none;">
+      </div>
+      <input
+        #fileInput
+        type="file"
+        multiple
+        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt,.csv,.xlsx"
+        (change)="onFileSelected($event)"
+        style="display: none;"
+      />
     }
 
+    <!-- Recherche -->
     <div class="files-search-container">
-        <mat-form-field class="files-search-field" appearance="outline">
-            <mat-label>Rechercher dans les fichiers</mat-label>
-            <div class="files-search-input-container">
-                <input matInput [(ngModel)]="searchQuery" (input)="onSearchFiles($event)"
-                    placeholder="Nom du fichier, extension...">
-                <div class="files-search-input-actions">
-                    <mat-icon matSuffix>search</mat-icon>
-                    @if(searchQuery && searchQuery.length > 0) {
-                    <button matSuffix mat-icon-button aria-label="Effacer" (click)="clearSearch()">
-                        <mat-icon>close</mat-icon>
-                    </button>
-
-                    }
-                </div>
-            </div>
-        </mat-form-field>
-
-        <!-- Compteur de résultats -->
-        @if(searchQuery && searchQuery.length > 0) {
-        <div class="search-results-count">
-            {{ filteredFilesCount }} résultat(s) trouvé(s)
+      <mat-form-field class="files-search-field" appearance="outline">
+        <mat-label>Rechercher dans les fichiers</mat-label>
+        <div class="files-search-input-container">
+          <input
+            matInput
+            [(ngModel)]="searchQuery"
+            (input)="onSearchFiles($event)"
+            placeholder="Nom du fichier, extension..."
+          />
+          <div class="files-search-input-actions">
+            <mat-icon matSuffix>search</mat-icon>
+            @if (searchQuery && searchQuery.length > 0) {
+              <button matSuffix mat-icon-button aria-label="Effacer" (click)="clearSearch()">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </div>
         </div>
-        }
+      </mat-form-field>
+
+      @if (searchQuery && searchQuery.length > 0) {
+        <div class="search-results-count">
+          {{ filteredFilesCount }} résultat(s) trouvé(s)
+        </div>
+      }
     </div>
 
-    <!-- Liste des fichiers -->
-    @if(filteredFiles.length > 0) {
-    <div class="files-list">
-        @for(file of filteredFiles; track file.id) {
-        <mat-card class="file-item">
-            <div class="file-content">
-                <div class="file-icon" [ngClass]="getFileIcon(file.name)">
-                    <mat-icon>{{ getFileIcon(file.name) }}</mat-icon>
-                </div>
-                <div class="file-info">
-                    <div class="file-name">{{ file.name }}</div>
-                    <div class="file-details">
-                        {{ formatFileSize(file.size) }} •
-                        Ajouté le {{ formatDate(file.uploadedAt) }}
-                    </div>
-                </div>
-                <div class="file-actions">
-                    <button mat-icon-button matTooltip="Télécharger" (click)="downloadFile(file)">
-                        <mat-icon>download</mat-icon>
-                    </button>
-                    @if(!isNotClosed()){
-                    <button mat-icon-button color="warn" matTooltip="Supprimer" (click)="deleteFile(file.id)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                    }
-                </div>
-            </div>
-        </mat-card>
-        }
+    <!-- Liste unifiée (pending + saved) -->
+@if ((pendingFiles.length > 0) || (filteredFiles.length > 0)) {
+  <div class="files-list">
+
+   <!-- PENDING en premier -->
+@for (p of pendingFiles; track p.tempId) {
+  <mat-card class="file-item file-item--pending">
+    <div class="file-content">
+
+      <!-- Ligne haute : icône + titre à gauche, infos à droite -->
+      <div class="file-row-top">
+        <div class="file-left" (click)="$event.stopPropagation()">
+          <div class="file-icon" [ngClass]="getFileIcon(p.filename)">
+            <mat-icon>{{ getFileIcon(p.filename) }}</mat-icon>
+          </div>
+          <div class="file-name" [matTooltip]="p.filename" >{{ p.filename }}</div>
+        </div>
+
+        <div class="file-right">
+          <div class="file-meta">
+            <span class="chip">En attente</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description sous l’icône + titre -->
+      <div class="file-row-desc">
+        <mat-form-field appearance="outline" class="description-field" (click)="$event.stopPropagation()">
+          <mat-label>Description</mat-label>
+          <input matInput [(ngModel)]="p.description" placeholder="Ajouter une description..." />
+        </mat-form-field>
+      </div>
+
+      <!-- Actions en bas à droite -->
+      <div class="file-actions-br">
+        <button mat-icon-button color="warn" matTooltip="Retirer du panier"
+                (click)="removePending(p.tempId)" [disabled]="isSaving">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+
     </div>
-    } @else {
-    <div class="empty-state">
-        <mat-icon class="upload-icon">folder_open</mat-icon>
-        <div class="empty-text">Aucun fichier attaché</div>
-        <div class="empty-subtext">Les fichiers de l'incident apparaîtront ici</div>
+  </mat-card>
+}
+
+@if (pendingFiles.length > 0 && filteredFiles.length > 0) {
+  <mat-divider class="files-separator" role="separator"></mat-divider>
+}
+
+<!-- FICHIERS ENREGISTRÉS ensuite -->
+@for (file of filteredFiles; track file.id) {
+  <mat-card class="file-item">
+    <div class="file-content">
+
+      <!-- Ligne haute : icône + titre à gauche, infos à droite -->
+      <div class="file-row-top" (click)="preview(file)">
+        <div class="file-left">
+          <div class="file-icon" [ngClass]="getFileIcon(file.filename)">
+            <mat-icon>{{ getFileIcon(file.filename) }}</mat-icon>
+          </div>
+          <div class="file-name" [matTooltip]="file.filename">{{ file.filename }}</div>
+        </div>
+
+        <div class="file-right">
+          <div class="file-meta">
+            Ajouté par {{ file.uploadedBy }} le {{ formatDate(file.uploadedAt) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Description sous le titre, plus petit -->
+      @if (file.description) {
+        <div class="file-desc">
+          {{ file.description }}
+        </div>
+      }
+
+      <!-- Action en bas à droite -->
+      <div class="file-actions-br">
+        <button mat-icon-button matTooltip="Télécharger {{formatFileSize(file.size)}}"
+                (click)="downloadFile(file); $event.stopPropagation()">
+          <mat-icon>download</mat-icon>
+        </button>
+      </div>
+
     </div>
-    }
-</mat-card-content>
+  </mat-card>
+}
+
+
+  </div>
+} @else {
+  <div class="empty-state">
+    <mat-icon class="upload-icon">folder_open</mat-icon>
+    <div class="empty-text">Aucun fichier attaché</div>
+    <div class="empty-subtext">Les fichiers de l'incident apparaîtront ici</div>
+  </div>
+}
+
+<!-- Bouton Sauvegarder flottant -->
+@if (!closed && pendingFiles.length > 0) {
+  <div class="floating-save">
+    <button
+      mat-fab
+      color="primary"
+      (click)="savePending()"
+      [disabled]="isSaving"
+      aria-label="Sauvegarder les fichiers en attente"
+    >
+      <mat-icon>save</mat-icon>
+    </button>
+  </div>
+}
+
+
+  </mat-card-content>
+</mat-card>

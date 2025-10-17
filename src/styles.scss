@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+@use "sass:color";
 @import '@angular/material/prebuilt-themes/azure-blue.css';
+
+$purple-color : #7E57C2;
 
 :root {
     --mat-sys-background: #f8f9fc;
@@ -137,7 +140,7 @@ section {
         margin-block: 20px;
     }
 
-    button {
+    button:not([mat-icon-button]) {
         width: 100%;
         margin-top: 20px;
         padding: 12px;
@@ -270,38 +273,162 @@ tr:last-child {
     border-bottom: 1px solid dimgrey;
 }
 
-
 .badge {
     display: inline-block;
-    padding: 4px 8px;
+    padding: .25rem .75rem;
     border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    min-width: 50px;
+    font-size: .75rem;
+    font-weight: 600;
+    background: #edf2f7;
+    color: #2d3748;
 
-    background-color: #adb5bd; // gris doux (default)
-
-    &.new {
-        background-color: #8dd6c0; // turquoise adouci
+    &.type, &.pending {
+        background: #e9d8fd;
+        color: #553c9a;
     }
 
+    &.freq,
+    &.not_started,
+    &.ferme,
+    &.en_cours,
+    &.ouvert,
+    &.submit { 
+        background: #bee3f8;
+        color: #2b6cb0;
+    }
+
+    &.eval,
     &.moyen,
     &.draft,
-    &.in_progress {
-        background-color: #e6c678; // jaune doux
+    &.in_progress,
+    &.medium,
+    &.brouillon, &.partiel { 
+        background: #faf089;
+        color: #b7791f;
     }
 
+    &.validé,
     &.closed,
     &.faible,
-    &.achieved {
-        background-color: #9fcf9f; // vert doux
+    &.achieved,
+    &.conforme,
+    &.minimal,
+    &.level,
+    &.new,
+    &.cloturé { 
+        background: #c6f6d5;
+        color: #2f855a;
     }
 
+    &.annulé,
     &.fort,
-    &.not_achieved {
-        background-color: #d87c7c; // rouge doux
+    &.not_achieved,
+    &.non_conforme,
+    &.maximum,
+    &.status {
+        background: #fed7d7;
+        color: #c53030;
+    }
+}
+
+.priority-bar {
+    width: 60px;
+    height: 10px;
+    border-radius: 6px;
+    background: var(--mat-sys-outline-variant);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        border-radius: 5px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    // Animation au hover de la ligne
+    tr:hover & {
+        transform: scaleY(1.2);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// Priorité Élevée (Rouge)
+.priority-bar.elevee {
+    &::after {
+        width: 100%;
+        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    }
+
+    tr:hover & {
+        background: rgba(244, 67, 54, 0.1);
+
+        &::after {
+            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+            box-shadow: 0 3px 8px rgba(244, 67, 54, 0.4);
+        }
+    }
+}
+
+// Priorité Moyenne (Orange)
+.priority-bar.moyen {
+    &::after {
+        width: 66%;
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    }
+
+    tr:hover & {
+        background: rgba(255, 152, 0, 0.1);
+
+        &::after {
+            background: linear-gradient(135deg, #ff9800 0%, #ef6c00 100%);
+            box-shadow: 0 3px 8px rgba(255, 152, 0, 0.4);
+        }
+    }
+}
+
+// Priorité Faible (Vert)
+.priority-bar.faible {
+    &::after {
+        width: 33%;
+        background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    }
+
+    tr:hover & {
+        background: rgba(76, 175, 80, 0.1);
+
+        &::after {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            box-shadow: 0 3px 8px rgba(76, 175, 80, 0.4);
+        }
+    }
+}
+
+// Labels de priorité (optionnel)
+.priority-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 50px;
+
+    &.elevee {
+        color: var(--mat-sys-error);
+    }
+
+    &.moyen {
+        color: #ef6c00;
+    }
+
+    &.faible {
+        color: var(--mat-sys-primary);
     }
 }
 
@@ -312,7 +439,7 @@ tr:last-child {
 
 .table-container {
     width: 100%;
-    min-width: 700px;
+    overflow-y: auto;
 }
 
 table {
@@ -325,7 +452,6 @@ table {
     th {
         background-color: var(--mat-sys-surface-tint) !important;
         color: var(--mat-sys-on-secondary) !important;
-        font-weight: bold !important;
         text-align: left !important;
     }
 
@@ -387,19 +513,13 @@ mat-paginator {
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
 }
 
-td mat-icon {
-    color: var(--mat-sys-error) !important;
-}
-
-
-
 .mat-mdc-dialog-component-host {
     h2 {
         text-align: center;
         font-weight: bold !important;
     }
 
-    button:not(.mdc-switch) {
+    button:not(.mdc-switch):not(.mdc-icon-button):not(div.node-actions > button):not(.breadcrumb > button):not(.mat-mdc-button-base):not(.mat-mdc-form-field-icon-suffix > button):not(.mat-button-toggle-button) {
         width: 100%;
         margin-top: 20px;
         padding: 12px;
@@ -458,6 +578,16 @@ td mat-icon {
     }
 }
 
+button[mat-icon-button] {
+    &.btn-red {
+        color: color.adjust(#dc3545, $lightness: 5%);
+
+        * &:hover {
+            color: color.adjust(#dc3545, $lightness: 10%);
+        }
+    }
+}
+
 button[mat-raised-button] {
     display: flex;
     align-items: center;
@@ -478,7 +608,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: lighten(#004aad, 5%);
+            background-color: color.adjust(#004aad, $lightness : 5%);
         }
     }
 
@@ -487,7 +617,16 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: lighten(#29850b, 5%);
+            background-color: color.adjust(#29850b, $lightness: 5%);
+        }
+    }
+
+    &.btn-purple {
+        background-color: #7E57C2;
+        color: var(--mat-sys-on-primary);
+
+        &:hover {
+            background-color: color.adjust($purple-color, $lightness: 5%);
         }
     }
 
@@ -496,7 +635,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: lighten(#dc3545, 5%);
+            background-color: color.adjust(#dc3545, $lightness: 5%);
         }
     }
 
@@ -518,9 +657,17 @@ button[mat-raised-button] {
     gap: 30px;
     flex-direction: column;
     align-items: normal;
-    padding: 20px;
+    // padding: 20px 100px;
+
     width: auto;
     height: auto;
+
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f8fafc;
+    min-height: 100vh;
+    justify-content: flex-start;
 }
 
 /* Nouveaux styles pour les mat-cards */
@@ -558,6 +705,10 @@ button[mat-raised-button] {
 
 .filters-section {
     padding: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .filters-header {
@@ -568,7 +719,7 @@ button[mat-raised-button] {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 20px;
+        margin-bottom: 17px;
 
         mat-icon {
             color: var(--mat-sys-primary);
@@ -670,7 +821,7 @@ button[mat-raised-button] {
     }
 }
 
-  .priority-bar {
+.priority-bar {
     width: 60px;
     height: 10px;
     border-radius: 6px;
@@ -681,92 +832,157 @@ button[mat-raised-button] {
     transition: all 0.3s ease;
 
     &::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      border-radius: 5px;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        border-radius: 5px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     // Animation au hover de la ligne
     tr:hover & {
-      transform: scaleY(1.2);
-      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+        transform: scaleY(1.2);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
     }
-  }
+}
 
-  // Priorité Élevée (Rouge)
-  .priority-bar.elevee {
+// Priorité Élevée (Rouge)
+.priority-bar.elevee {
     &::after {
-      width: 100%;
-      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        width: 100%;
+        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
     }
 
     tr:hover & {
-      background: rgba(244, 67, 54, 0.1);
-      
-      &::after {
-        background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
-        box-shadow: 0 3px 8px rgba(244, 67, 54, 0.4);
-      }
-    }
-  }
+        background: rgba(244, 67, 54, 0.1);
 
-  // Priorité Moyenne (Orange)
-  .priority-bar.moyen {
+        &::after {
+            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+            box-shadow: 0 3px 8px rgba(244, 67, 54, 0.4);
+        }
+    }
+}
+
+// Priorité Moyenne (Orange)
+.priority-bar.moyen {
     &::after {
-      width: 66%;
-      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        width: 66%;
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
     }
 
     tr:hover & {
-      background: rgba(255, 152, 0, 0.1);
-      
-      &::after {
-        background: linear-gradient(135deg, #ff9800 0%, #ef6c00 100%);
-        box-shadow: 0 3px 8px rgba(255, 152, 0, 0.4);
-      }
-    }
-  }
+        background: rgba(255, 152, 0, 0.1);
 
-  // Priorité Faible (Vert)
-  .priority-bar.faible {
+        &::after {
+            background: linear-gradient(135deg, #ff9800 0%, #ef6c00 100%);
+            box-shadow: 0 3px 8px rgba(255, 152, 0, 0.4);
+        }
+    }
+}
+
+// Priorité Faible (Vert)
+.priority-bar.faible {
     &::after {
-      width: 33%;
-      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        width: 33%;
+        background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
     }
 
     tr:hover & {
-      background: rgba(76, 175, 80, 0.1);
-      
-      &::after {
-        background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-        box-shadow: 0 3px 8px rgba(76, 175, 80, 0.4);
-      }
-    }
-  }
+        background: rgba(76, 175, 80, 0.1);
 
-  // Labels de priorité (optionnel)
-  .priority-label {
+        &::after {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            box-shadow: 0 3px 8px rgba(76, 175, 80, 0.4);
+        }
+    }
+}
+
+// Labels de priorité (optionnel)
+.priority-label {
     font-size: 0.75rem;
     font-weight: 500;
     color: var(--mat-sys-on-surface-variant);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     min-width: 50px;
-    
+
     &.elevee {
-      color: var(--mat-sys-error);
+        color: var(--mat-sys-error);
     }
-    
+
     &.moyen {
-      color: #ef6c00;
+        color: #ef6c00;
     }
-    
+
     &.faible {
-      color: var(--mat-sys-primary);
+        color: var(--mat-sys-primary);
     }
-  }
+}
+
+mat-calendar {
+    table th {
+        text-align: center !important;
+        padding: 2px !important;
+    }
+
+    .mat-calendar-content {
+        padding: 1px !important;
+    }
+}
+
+.body-container {
+    margin: 20px;
+}
+
+.container-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    color: #334155;
+    min-height: 100vh;
+}
+
+.mat-mdc-card {
+    background: var(--mat-sort-arrow-color) !important;
+}
+
+::ng-deep .audit-dialog-panel {
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    top: 0;
+    right: 0;
+    position: fixed;
+    animation: slideIn 0.3s ease-out;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.no-data-row {
+    td {
+        text-align: center;
+        padding: 24px;
+    }
+
+    .no-data {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-style: italic;
+    }
+}

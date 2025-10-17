@@ -1,18 +1,21 @@
 <!--  risk-selection-dialog.component.html  -->
 <h2 mat-dialog-title>Sélectionner un risque</h2>
-
+<button [hidden]="!dialogRef" mat-icon-button aria-label="Fermer" (click)="closePopup()" class="close-popup-btn">
+  <mat-icon>close</mat-icon>
+</button>
+<app-popup-header [title]="'Sélectionner un risque'" [showClose]="true" (close)="closePopup()"></app-popup-header>
 <mat-dialog-content>
   <mat-list>
 
     @for (risk of data.risks; let i = $index; track trackByRisk(i, risk)) {
-      <mat-chip (click)="selectRisk(risk)">
-        {{ risk.reference }} – {{ risk.libelle }}
-      </mat-chip>
+    <mat-chip (click)="selectRisk(risk)">
+      {{ risk.reference }} – {{ risk.libellePerso }}
+    </mat-chip>
     }
 
   </mat-list>
 </mat-dialog-content>
 
 <mat-dialog-actions [align]="'end'">
-  <button mat-raised-button color="warn" (click)="closeDialog()">Annuler</button>
+  <button mat-raised-button color="warn" (click)="closePopup()">Annuler</button>
 </mat-dialog-actions>

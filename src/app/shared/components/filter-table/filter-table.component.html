@@ -1,0 +1,72 @@
+<div class="filter-container">
+
+  <div style="display: flex; gap: 20px;">
+    <button mat-raised-button class="btn-green" (click)="toggleDropdown()"><mat-icon>add</mat-icon> Ajouter un
+      filtre</button>
+    <button *ngIf="activeFilterKeys.length > 0" (click)="removeAllFilters()" mat-raised-button class="btn-red">
+      <mat-icon>clear</mat-icon>
+      Réinitialiser
+    </button>
+  </div>
+  <div class="dropdown-menu" *ngIf="dropdownOpen">
+    <div *ngIf="availableOptions.length > 0; else noOptions">
+      <div *ngFor="let option of availableOptions" class="dropdown-item" (click)="addFilter(option.key)">
+         <mat-icon *ngIf="option.icon">{{option.icon ? option.icon : 'filter_alt'}}</mat-icon>
+        {{ option.label }}
+      </div>
+    </div>
+    <ng-template #noOptions>
+      <div class="dropdown-item disabled">
+        Aucun filtre disponible
+      </div>
+    </ng-template>
+  </div>
+
+  <div *ngIf="activeFilterKeys.length > 0" class="filters" [formGroup]="filtersForm">
+    <div class="filter-field" *ngFor="let key of activeFilterKeys">
+      <mat-form-field *ngIf="getFilterMeta(key)?.type !== 'date' && getFilterMeta(key)?.type !== 'numberRange'" appearance="outline" class="filter-form-field">
+        <mat-label>{{ getFilterLabel(key) }}</mat-label>
+
+        <!-- Text / Number -->
+        <input *ngIf="getFilterMeta(key)?.type === 'text' || getFilterMeta(key)?.type === 'number'" matInput
+          [type]="getFilterMeta(key)?.type || 'text'" [formControlName]="key" />
+
+        <!-- Select -->
+        <mat-select *ngIf="getFilterMeta(key)?.type === 'select'" [formControlName]="key">
+          <mat-option *ngFor="let opt of getFilterMeta(key)?.options" [value]="isOptionObject(opt) ? opt.value : opt">
+            {{ isOptionObject(opt) ? opt.label : opt }}
+          </mat-option>
+        </mat-select>
+
+        <!-- Remove -->
+        <button mat-icon-button matSuffix (click)="removeFilter(key)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <div *ngIf="getFilterMeta(key)?.type === 'numberRange'" class="number-range">
+          <mat-form-field *ngIf="getFilterMeta(key)?.type === 'numberRange'" appearance="outline" class="filter-form-field">
+            <mat-label>{{ getFilterLabel(key) }} min</mat-label>
+            <input matInput type="number" [value]="filtersForm.get(key)?.value?.min || ''"
+              (input)="onNumberRangeChange(key, 'min', getValueAsNumber($event))" />
+          </mat-form-field>
+
+          <mat-form-field *ngIf="getFilterMeta(key)?.type === 'numberRange'" appearance="outline" class="filter-form-field">
+            <mat-label>{{ getFilterLabel(key) }} max</mat-label>
+            <input matInput type="number" [value]="filtersForm.get(key)?.value?.max || ''"
+              (input)="onNumberRangeChange(key, 'max', getValueAsNumber($event))" />
+          </mat-form-field>
+       
+
+        <!-- Remove -->
+        <button mat-icon-button matSuffix (click)="removeFilter(key)">
+          <mat-icon>close</mat-icon>
+        </button>
+         </div>
+      
+      <app-date-range-picker [removeField]="true" (removeFieldClicked)="removeFilter(key)"
+        *ngIf="getFilterMeta(key)?.type === 'date'" [label]="getFilterLabel(key)"
+        (dateRangeSelected)="filtersForm.get(key)?.setValue($event)"></app-date-range-picker>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="audit-container">
+  <h2>🕓 Historique des modifications</h2>
+
+  <div class="audit-list" *ngIf="auditList?.length; else empty">
+    @for(audit of auditList; track audit) {
+      <mat-card class="audit-item mat-elevation-z2">
+        <div class="audit-header">
+          <span class="audit-author"><mat-icon>person</mat-icon>{{ audit.writeBy.username }}</span>
+          <span class="audit-date">{{ audit.writeAt | date : 'dd/MM/yyyy' }}</span>
+        </div>
+        <p class="audit-comment">{{ audit.comments }}</p>
+      </mat-card>
+    }
+  </div>
+
+  <ng-template #empty>
+    <p class="empty-msg">Aucun commentaire pour le moment.</p>
+  </ng-template>
+
+  <button
+    *appHasPermission="'CREATE_AUDIT_COMMENTAIRE'"
+    mat-raised-button
+    class="btn-primary"
+    (click)="addAudit()"
+  ><mat-icon>add</mat-icon>
+    <span>Ajouter un commentaire</span>
+  </button>
+</div>

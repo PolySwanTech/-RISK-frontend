@@ -1,0 +1,46 @@
+<div class="body-container">
+  <app-go-back [title]="'Création d\'un risque référentiel'" />
+
+  <section>
+    <div class="form-container">
+      <h2>{{ pageTitle }}</h2>
+
+      <!-- le stepper n’est affiché que lorsque l’objet risk est prêt -->
+      @if (risk) {
+      <form [formGroup]="infoForm">
+            <!-- Titre --------------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Titre du risque</mat-label>
+              <input matInput formControlName="libellePerso" placeholder="Entrez le titre du risque" />
+            </mat-form-field>
+
+            <!-- Catégorie L1 -------------------------------------------------- -->
+            <button *ngIf="!isBaloisPreselected" style="margin-bottom: 20px;" mat-stroked-button (click)="openSubCategorySelector()">
+              <mat-icon>add</mat-icon>
+              Associer un Risque Bâlois*
+            </button>
+            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="balois">
+              <mat-chip> Catégorie Bâloise : {{ format(balois.libelle) }}</mat-chip>
+            </mat-chip-listbox>
+
+            <!-- Description --------------------------------------------------- -->
+            <mat-form-field class="full-width">
+              <mat-label>Description du risque</mat-label>
+              <textarea matInput formControlName="description" placeholder="Entrez la description"></textarea>
+            </mat-form-field>
+
+            <div class="actions">
+
+              <button mat-raised-button class="btn-red" matStepperPrevious *ngIf="risk.id">
+                Annuler
+              </button>
+
+              <button mat-raised-button class="btn-primary" (click)="submit()" [disabled]="infoForm.invalid">
+                Soumettre
+              </button>
+            </div>
+          </form>
+      }
+    </div>
+  </section>
+</div>

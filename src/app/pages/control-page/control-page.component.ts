@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ControlChartComponent } from "../../features/control/control-chart/control-chart/control-chart.component";
 import { ControlListComponent } from '../../features/control/control-list/control-list.component';
 
 @Component({

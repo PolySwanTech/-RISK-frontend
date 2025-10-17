@@ -1,5 +1,5 @@
 import { RiskLevel } from "../enum/riskLevel.enum";
-import { RiskId } from './RiskTemplate';
+import { Utilisateur } from "./Utilisateur";
 /* ----------------------------------------- */
 /*  models/RiskEvaluation.ts                 */
 /* ----------------------------------------- */
@@ -8,16 +8,33 @@ import { RiskId } from './RiskTemplate';
 export interface RiskEvaluationCreateDto {
   riskNet      : RiskLevel;
   probability ?: number | null;           // facultatif
-  /** On n’envoie que l’identifiant composite */
-  taxonomie : string;
+  commentaire : string;
 }
 
 /** --- objet retourné par l’API --- */
 export interface RiskEvaluation {
   id           : string;      // UUID
-  riskNet      : RiskLevel;
-  evaluator    : string;      // UUID de l’évaluateur
+  evaluation      : RiskLevel;
+  evaluator    : Utilisateur;      // UUID de l’évaluateur
   probability ?: number;
   createdAt    : Date;      // ISO
-  taxonomie : { id: RiskId };
+  riskId : string; // UUID du risque
+}
+
+/** --- objet retourné par l’API --- */
+export interface RiskEvaluationDto {
+  id           : string;      
+  evaluation      : RiskLevel;
+  evaluatorId   : string;   
+  evaluatorName    : string;   
+  createdAt    : Date;
+  riskId : string;
+  commentaire : string;
+  exercicePeriod: ExercicePeriod;
+  brut: boolean;
+}
+
+export interface ExercicePeriod {
+  start: Date;
+  end: Date;
 }

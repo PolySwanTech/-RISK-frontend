@@ -1,5 +1,4 @@
-<h2>Formulaire de création d'un contrôle</h2>
-
+<app-popup-header [title]="'Créer un contrôle'" [showClose]="true" (close)="closePopup()"></app-popup-header>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
   <div class="row-add">
@@ -21,7 +20,7 @@
       <mat-label>Récurrence</mat-label>
       <mat-select formControlName="frequency">
         @for (rec of recurences; track rec) {
-        <mat-option [value]="rec">{{ rec }}</mat-option>
+        <mat-option [value]="rec">{{ getRecurrenceLabel(rec) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -30,16 +29,19 @@
       <mat-label>Degré du niveau</mat-label>
       <mat-select formControlName="level">
         @for (lev of levels; track lev) {
-        <mat-option [value]="lev">{{ lev }}</mat-option>
+        <mat-option [value]="lev">{{ getDegresLabel(lev) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
-    
+  </div>
+
+  <div class="row-add">
+
     <mat-form-field appearance="outline">
       <mat-label>Type de contrôle</mat-label>
       <mat-select formControlName="type">
         @for (t of types; track t) {
-        <mat-option [value]="t">{{ t }}</mat-option>
+        <mat-option [value]="t">{{ getTypeLabel(t) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -48,49 +50,20 @@
       <mat-label>Priorité</mat-label>
       <mat-select formControlName="priority">
         @for (t of priorities; track t) {
-        <mat-option [value]="t">{{ t }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    </div>
-
-
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Entité Responsable</mat-label>
-      <mat-select formControlName="buId" (selectionChange)="onEntiteResponsableChange()">
-        @for (bu of entitesResponsables; track bu.id) {
-        <mat-option [value]="bu.id">{{ bu.name }}</mat-option>
+        <mat-option [value]="t">{{ getPriorityLabel(t) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
   </div>
 
-  <div class="row-add">
-    @if (form.get('buId')?.value) {
-    <mat-form-field appearance="outline">
-      <mat-label>Process</mat-label>
-      <mat-select formControlName="processId" (selectionChange)="onProcessChange()">
-        @for (p of processes; track p.id) {
-        <mat-option [value]="p.id">{{ p.name }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    }
-  </div>
-
-  <div class="row-add">
-    @if (form.get('processId')?.value) {
-    <mat-form-field appearance="outline">
-      <mat-label>Risk</mat-label>
-      <mat-select formControlName="taxonomie">
-        @for (r of risks; track r.id) {
-        <mat-option [value]="r">{{ r.libelle }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    }
-  </div>
-
+  <button style="margin-bottom: 10px;" mat-stroked-button (click)="create()">
+    <mat-icon>add</mat-icon>
+    Associer BU / Processus / Risque *
+  </button>
+  <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
+    <mat-chip> Equipe : {{ selectedBPR.bu.name }}</mat-chip>
+    <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
+    <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
+  </mat-chip-listbox>
   <button mat-raised-button class="btn-primary" type="submit">Créer</button>
 </form>

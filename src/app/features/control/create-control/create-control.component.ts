@@ -1,3 +1,4 @@
+import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,34 +7,41 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
-import { Process } from '../../../core/models/Process';
-import { Utilisateur } from '../../../core/models/Utilisateur';
+import { CommonModule } from '@angular/common';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/control/control.service';
-import { RiskTemplate } from '../../../core/models/RiskTemplate';
-import { Degree } from '../../../core/enum/degree.enum';
-import { Priority } from '../../../core/enum/Priority';
-import { Recurence } from '../../../core/enum/recurence.enum';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
+import { Priority, PriorityLabels } from '../../../core/enum/Priority';
+import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { Type } from '../../../core/enum/controltype.enum';
+import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
+import { MatIconModule } from '@angular/material/icon';
+import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
+import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
+import { MatChipListbox, MatChip } from "@angular/material/chips";
 
 @Component({
   selector: 'app-create-control',
   imports: [
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule, MatButtonModule, ReactiveFormsModule
-  ],
+    FormsModule, MatButtonModule, ReactiveFormsModule, 
+    MatIconModule, PopupHeaderComponent,
+    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, PopupHeaderComponent,
+    MatChipListbox,
+    MatChip
+],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
 })
@@ -46,42 +54,58 @@ export class CreateControlComponent {
   controlService = inject(ControlService);
   dialogRef = inject(MatDialogRef<CreateControlComponent>);
   confirmService = inject(ConfirmService);
+  snackBarService = inject(SnackBarService)
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
 
   form: FormGroup = this.fb.group({
-    libelle      : ['', Validators.required],
-    description  : ['', Validators.required],
-    frequency    : [null, Validators.required],
-    level        : [null, Validators.required],
-    type  : [null, Validators.required],
-    priority     : [null, Validators.required],
-    processId    : ['',  Validators.required],
-    taxonomie    : [null, Validators.required],
-    buId : ['', Validators.required],
-
+    libelle: ['', Validators.required],
+    description: ['', Validators.required],
+    frequency: [null, Validators.required],
+    level: [null, Validators.required],
+    type: [null, Validators.required],
+    priority: [null, Validators.required],
+    processId: [null, Validators.required],
+    riskId: ['', Validators.required],
+    buId: ['', Validators.required],
   });
+
+
+  listProcess: any[] = [];
+  listRisks: any[] = [];
+  listEntities: any[] = [];
 
   priorities = Object.values(Priority);
   types = Object.values(Type);
   levels = Object.values(Degree);
-  entitesResponsables: EntiteResponsable[] = [/* à remplir */];
-  processes: Process[] = [/* à remplir */];
-  risks: RiskTemplate[] = [/* à remplir */];
-  responsables: Utilisateur[] = [/* à remplir */];
 
-  recurences = Object.values(Recurence);
-  entiteResponsableId = ""
-  processId = "";
+  selectedBPR: any;
 
+  get buIdValue() {
+    return this.form.get('buId')?.value;
+  }
 
-  ngOnInit(): void {
-    this.buService.loadEntities().subscribe(entites => {
-      this.entitesResponsables = entites;
-    });
+  responsables$ = this.userService.getUsers();
 
-    this.userService.getUsers().subscribe(responsables => {
-      this.responsables = responsables;
-    });
+  recurences = Object.values(Recurrence);
+
+  ngOnInit() {
+  }
+
+  getTypeLabel(type: Type): string {
+    return ControlTypeLabels[type];
+  }
+
+  getPriorityLabel(priority: Priority): string {
+    return PriorityLabels[priority];
+  }
+
+  getDegresLabel(d: Degree): string {
+    return DegreeLabels[d];
+  }
+
+  getRecurrenceLabel(recurrence: Recurrence): string {
+    return RecurrenceLabels[recurrence];
   }
 
   onSubmit() {
@@ -91,38 +115,47 @@ export class CreateControlComponent {
       libelle: this.form.value.libelle,
       description: this.form.value.description,
       frequency: this.form.value.frequency,
-      level: this.form.value.level,
       controlType: this.form.value.type,
+      processId: this.form.value.processId,
+      level: this.form.value.level,
       priority: this.form.value.priority,
-      taxonomieId: this.form.value.taxonomie.id.id,
-      taxonomieVersion: this.form.value.taxonomie.id.version,
-
+      riskId: this.form.value.riskId,
     };
 
     this.controlService.createControl(payload).subscribe({
-      next : ()  => {
-        this.confirmService.openConfirmDialog("Contrôle ajouté", "Le contrôle a été ajouté avec succès", false);
-        this.dialogRef.close();
+      next: () => {
+        this.snackBarService.success("Le contrôle a bien été ajouté");
+        this.closePopup();
       },
-      error: err => console.error('Erreur création', err)
+      error: err => {
+        this.snackBarService.error(err.message);
+      }
     });
   }
 
-  onEntiteResponsableChange() {
-    const entiteResponsableId = this.form.get('buId')?.value;
-    if (entiteResponsableId) {
-      this.processService.getAllByEntite(entiteResponsableId).subscribe(processes => {
-        this.processes = processes;
-      });
-    }
+  closePopup() {
+    this.dialogRef.close();
   }
 
-  onProcessChange() {
-    const processId = this.form.get('processId')?.value;
-    if (processId) {
-      this.riskService.getAllByProcess(processId).subscribe(risks => {
-        this.risks = risks;
-      });
-    }
+  trackById = (index: number, item: { id: string }) => item.id;
+
+  selectBPR(event: any) {
+    this.selectedBPR = event;
+    this.form.get('buId')?.setValue(event.bu.id)
+    this.form.get('processId')?.setValue(event.process.id)
+    this.form.get('riskId')?.setValue(event.risk.id)
   }
+
+  create() {
+    const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
+      minWidth: '750px',
+      height: '600px',
+      maxHeight: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe(event => {
+      this.selectBPR(event);
+    });
+  }
+
 }

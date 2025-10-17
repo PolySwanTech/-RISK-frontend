@@ -1,0 +1,159 @@
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>À faire</h1>
+    <p class="subtitle">Tous vos éléments en attente de traitement</p>
+
+    <div class="stats">
+      <div class="stat plans">
+        <span class="dot">●</span>
+        <span>{{ getItemCount(todoEnum.ACTION_PLAN) }} Plans d'action</span>
+      </div>
+      <div class="stat incidents">
+        <span class="dot">●</span>
+        <span>{{ getItemCount(todoEnum.INCIDENT) }} Incidents</span>
+      </div>
+      <div class="stat controls">
+        <span class="dot">●</span>
+        <span>{{ getItemCount(todoEnum.CONTROL) }} Contrôles</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-row">
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button class="view-btn" [class.active]="currentView === 'grouped'" (click)="setView('grouped')">
+          Vue groupée
+        </button>
+        <button class="view-btn" [class.active]="currentView === 'unified'" (click)="setView('unified')">
+          Vue unifiée
+        </button>
+      </div>
+
+      <!-- Type Filter -->
+      <div class="filter-group">
+        <span class="filter-label">Filtrer :</span>
+        <button *ngFor="let filter of typeFilters" class="filter-btn"
+          [class.active]="currentTypeFilter.value === filter.value" (click)="setTypeFilter(filter)">
+          {{ filter.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content" [class.unified-view]="currentView === 'unified'">
+
+    <!-- Grouped View -->
+    <div *ngIf="currentView === 'grouped'">
+      <!-- Plans d'action -->
+      <div class="group" *ngIf="shouldShowGroup(todoEnum.ACTION_PLAN)"
+        [style.display]="currentTypeFilter.value === null || currentTypeFilter.value === todoEnum.ACTION_PLAN ? 'block' : 'none'">
+        <div class="group-header" (click)="toggleGroup(todoEnum.ACTION_PLAN)">
+          <span>📋 Plans d'action</span>
+          <div class="group-header-right">
+            <span class="group-count">{{ getFilteredGroupCount(todoEnum.ACTION_PLAN) }}</span>
+            <span class="chevron" [class.collapsed]="collapsedGroups[todoEnum.ACTION_PLAN]">▼</span>
+          </div>
+        </div>
+        <div class="group-content" [class.collapsed]="collapsedGroups[todoEnum.ACTION_PLAN]">
+          @for(item of getFilteredItems(todoEnum.ACTION_PLAN); track item.id){
+          <div (click)="viewItem(item)" class="item" matTooltip="Voir le plan d'action" [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+            <div class="item-type type-plans">Plan</div>
+            <div class="item-content">
+              <div class="item-title">{{ item.libelle }}</div>
+              <div class="item-meta">
+                <span>Échéance: {{ item.date | date : "dd/MM/yyyy" }}</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button class="action-btn" (click)="viewItem(item)">Voir</button>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Incidents -->
+      <div class="group" *ngIf="shouldShowGroup(todoEnum.INCIDENT)"
+        [style.display]="currentTypeFilter.value === null || currentTypeFilter.value === todoEnum.INCIDENT ? 'block' : 'none'">
+        <div class="group-header" (click)="toggleGroup(todoEnum.INCIDENT)">
+          <span>🚨 Incidents</span>
+          <div class="group-header-right">
+            <span class="group-count">{{ getFilteredGroupCount(todoEnum.INCIDENT) }}</span>
+            <span class="chevron" [class.collapsed]="collapsedGroups[todoEnum.INCIDENT]">▼</span>
+          </div>
+        </div>
+        <div class="group-content" [class.collapsed]="collapsedGroups[todoEnum.INCIDENT]">
+          @for(item of getFilteredItems(todoEnum.INCIDENT); track item.id){
+          <div (click)="viewItem(item)" class="item" matTooltip="Traiter l'incident" [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+            <div class="item-type type-incidents">Incident</div>
+            <div class="item-content">
+              <div class="item-title">{{ item.libelle }}</div>
+              <div class="item-meta">
+                <span>Créé: {{ item.date | date : "dd/MM/yyyy" }}</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button class="action-btn" (click)="viewItem(item)">Traiter</button>
+            </div>
+          </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- Contrôles -->
+      <div class="group" *ngIf="shouldShowGroup(todoEnum.CONTROL)"
+        [style.display]="currentTypeFilter.value === null || currentTypeFilter.value === todoEnum.CONTROL ? 'block' : 'none'">
+        <div class="group-header" (click)="toggleGroup(todoEnum.CONTROL)">
+          <span>✓ Contrôles</span>
+          <div class="group-header-right">
+            <span class="group-count">{{ getFilteredGroupCount(todoEnum.CONTROL) }}</span>
+            <span class="chevron" [class.collapsed]="collapsedGroups[todoEnum.CONTROL]">▼</span>
+          </div>
+        </div>
+        @for(item of getFilteredItems(todoEnum.CONTROL); track item.id){
+        <div (click)="viewItem(item)" class="group-content" [class.collapsed]="collapsedGroups[todoEnum.CONTROL]">
+          <div class="item" matTooltip="Accéder au contrôle" [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+            <div class="item-type type-controls">Contrôle</div>
+            <div class="item-content">
+              <div class="item-title">{{ item.libelle }}</div>
+              <div class="item-meta">
+                <span>Planifié: {{ item.date | date : "dd/MM/yyyy" }}</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button class="action-btn" (click)="viewItem(item)">Accéder</button>
+            </div>
+          </div>
+        </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- Unified View -->
+    <div *ngIf="currentView === 'unified'" class="unified-content">
+      <div *ngFor="let item of getAllFilteredItems()" class="item">
+        <div class="item-type" [ngClass]="'type-' + getTypeLabel(item.type)">
+          {{ getTypeLabel(item.type) }}
+        </div>
+        <div class="item-content">
+          <div class="item-title">{{ item.libelle }}</div>
+          <div class="item-meta">
+            <span>{{ getDateLabel(item) }}: {{ item.date | date : "dd/MM/yyyy" }}</span>
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="action-btn" (click)="viewItem(item)">
+            Voir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

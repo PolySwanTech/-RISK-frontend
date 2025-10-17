@@ -1,20 +1,24 @@
-<h2 mat-dialog-title>{{titlePage}}</h2>
-<mat-dialog-content>
-  <form [formGroup]="formGroup">
-
-    <mat-form-field class="full-width">
-      <mat-label>Nom</mat-label>
-      <input matInput formControlName="name" placeholder="Nom" required>
-  </mat-form-field>
-
-    <div class="form-group">
-      <label>Ligne Métier ?</label>
-      <mat-slide-toggle formControlName="lm" />
+<mat-card>
+  <app-popup-header [title]="titlePage" [showClose]="dialogRef != null" (close)="goBack()"></app-popup-header>
+  <mat-dialog-content>
+    <form [formGroup]="formGroup">
+  
+      <mat-form-field class="full-width">
+        <mat-label>Nom</mat-label>
+        <input matInput formControlName="name" placeholder="Nom" required>
+      </mat-form-field>
+  
+      <div class="form-group">
+        <label>Ligne Métier ?</label>
+        <mat-slide-toggle formControlName="lm" [checked]="formGroup.get('lm')?.value" />
+      </div>
+    </form>
+    <app-select-entities [entiteEnfantId]=" data ? data.id : ''"
+      [selectId]="BusinessUnit.parentId ? BusinessUnit.parentId : ''"
+      (entitieSelected)="entiteChange($event)"></app-select-entities>
+    <div class="actions">
+      <button mat-raised-button class="btn-red" (click)="goBack()">Retour</button>
+      <button mat-raised-button class="btn-primary" [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
     </div>
-  </form>
-  <app-select-entities [entiteEnfantId]=" data ? data.id : ''" [selectId]="entiteResponsable.parentId ? entiteResponsable.parentId : ''" (entitieSelected)="entiteChange($event)"></app-select-entities>
-  <div class="actions">
-    <button mat-raised-button class="btn-red" (click)="goBack()">Retour</button>
-    <button mat-raised-button class="btn-primary" [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
-  </div>
-</mat-dialog-content>
+  </mat-dialog-content>
+</mat-card>

@@ -1,67 +1,79 @@
 import { Type } from "../enum/controltype.enum";
 import { Degree } from "../enum/degree.enum";
 import { Priority } from "../enum/Priority";
-import { Recurence } from "../enum/recurence.enum";
+import { Recurrence } from "../enum/recurrence.enum";
+import { RiskLevel } from "../enum/riskLevel.enum";
 import { ControlExecution } from "./ControlExecution";
 import { RiskTemplate } from "./RiskTemplate";
 
-export interface ControlId {
-  /** UUID généré côté back */
-  id: string;
-  /** Instant ISO 8601 retourné par le back */
-  version: Date;
-}
 export class ControlTemplate {
 
-    id : ControlId;
+    id: string;
     reference: string;
     libelle: string;
     description: string;
-    frequency: Recurence;
-    level: Degree;
+    frequency: Recurrence;
+    controlLevel: Degree;
     controlType: Type;
-    priority: Priority;
-    taxonomie: RiskTemplate;
-    
-    buName : string = "";
-    creator : string = ""; 
-    controlExecutions : ControlExecution[] = [];
-    lastExecutionDate : Date | null = null;
+    processName: string;
+    responsable: string;
+    planDate: Date;
+    realizeDate: Date;
+    execution: ControlExecution | null = null;
+    nextExecution : string;
+    actif : boolean = false;
+    riskLevel : RiskLevel;
+    creator: string;
+    riskName: string;
 
     constructor
-    (
-        id: string,
-        version : Date,
-        reference: string,
-        libelle: string,
-        description: string,
-        frequency: Recurence,
-        level: Degree,
-        controlType: Type,
-        priority: Priority,
-        taxonomie: RiskTemplate
-    ) {
-        this.id = { id, version };
+        (
+            id: string,
+            reference: string,
+            libelle: string,
+            description: string,
+            frequency: Recurrence,
+            controlLevel: Degree,
+            controlType: Type,
+            taxonomie: RiskTemplate,
+            responsable: string,
+            planDate: Date,
+            realizeDate: Date,
+            processName: string,
+            nextExecution: string,
+            actif: boolean,
+            riskLevel: RiskLevel,
+            creator: string,
+            riskName: string
+        ) {
+        this.id = id;
         this.reference = reference;
         this.libelle = libelle;
         this.description = description;
         this.frequency = frequency;
-        this.level = level;
+        this.controlLevel = controlLevel;
         this.controlType = controlType;
-        this.priority = priority;
-        this.taxonomie = taxonomie;
+        this.processName = processName;
+        this.responsable = responsable;
+        this.planDate = planDate;
+        this.realizeDate = realizeDate;
+        this.nextExecution = nextExecution;
+        this.actif = actif;
+        this.riskLevel = riskLevel;
+        this.creator = creator;
+        this.riskName = riskName;
     }
 
 }
 
 // control-template.create.dto.ts
 export interface ControlTemplateCreateDto {
-        libelle: string,
-        description: string,
-        frequency: Recurence,
-        level: Degree,
-        controlType: Type,
-        priority: Priority,
-        taxonomieId: string
-        taxonomieVersion: String
+    libelle: string,
+    description: string,
+    frequency: Recurrence,
+    level: Degree,
+    controlType: Type,
+    priority: Priority,
+    processId: string,
+    riskId: string,
 }

@@ -1,9 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Incident } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
-import { Impact, ImpactCreateDto } from '../../models/Impact';
 import { saveAs } from 'file-saver';
 
 @Injectable({
@@ -11,7 +10,7 @@ import { saveAs } from 'file-saver';
 })
 export class IncidentService {
 
-  baseUrl = environment.apiUrl + '/incidents/incident'
+  baseUrl = environment.apiUrl + '/incidents'
 
   http = inject(HttpClient);
 
@@ -19,21 +18,44 @@ export class IncidentService {
     return this.http.get<Incident[]>(this.baseUrl);
   }
 
+  loadIncidentsFull(): Observable<Incident[]> {
+    return this.http.get<Incident[]>(`${this.baseUrl}?completeDto=true`);
+  }
+
+  deleteIncident(id: string) {
+    return this.http.delete(this.baseUrl + `/${id}`)
+  }
+
   countIncidentsNonClotures(): Observable<number> {
     return this.http.get<number>(this.baseUrl + '/nb/cloture')
   }
 
   getIncidentById(id: string): Observable<Incident> {
-    return this.http.get<any>(this.baseUrl + '/' + id);
+    return this.http.get<Incident>(this.baseUrl + '/' + id);
   }
 
   saveIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl, incident);
+    return this.http.post(this.baseUrl, incident,
+      { headers: new HttpHeaders({ 'X-Show-Loader': 'true' }) }
+    );
   }
-  
+
+  updateIncident(id: string, incidentDto: any) {
+    return this.http.put<void>(`${this.baseUrl}/${id}`, incidentDto,
+      { headers: new HttpHeaders({ 'X-Show-Loader': 'true' }) }
+    );
+  }
+
   draftIncident(incident: any): Observable<any> {
     return this.http.post(this.baseUrl + '/draft', incident);
-  }  
+  }
+
+  getIncidentByProcessAndRisk(processId: string, riskId: string): Observable<Incident[]> {
+    const params = new HttpParams()
+      .set('processId', processId)
+      .set('riskId', riskId);
+    return this.http.get<Incident[]>(this.baseUrl + '/search', { params });
+  }
 
   close(id: string) {
     return this.http.put(this.baseUrl + `/${id}/close`, null)
@@ -51,6 +73,20 @@ export class IncidentService {
         console.error("Erreur lors du téléchargement de l’export :", error);
       }
     );
-  }  
-  
+  }
+
+  downloadPDF(incidentId: string) {
+    const url = `${this.baseUrl}/${incidentId}/pdf`;
+    return this.http.get(url, { responseType: 'blob' });
+  }
+
+  hasActionPlan(incidentId: string): Observable<string | null> {
+    return this.http.get<string | null>(`${this.baseUrl}/${incidentId}/action-plan`);
+  }
+
+  findAllByIds(ids: Set<string>): Observable<Incident[]> {
+    const params = new HttpParams().set('ids', Array.from(ids).join(','));
+    return this.http.get<Incident[]>(this.baseUrl + '/ids', { params });
+  }
+
 }

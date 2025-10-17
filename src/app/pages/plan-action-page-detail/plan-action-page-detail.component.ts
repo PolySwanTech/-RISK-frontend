@@ -1,38 +1,58 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActionPlanService } from '../../core/services/action-plan/action-plan.service';
-import { GoBackComponent } from '../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Action, ActionPlan } from '../../core/models/ActionPlan';
-import { AuthService } from '../../core/services/auth/auth.service';
-import { EquipeService } from '../../core/services/equipe/equipe.service';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
+import { firstValueFrom } from 'rxjs';
+import { TargetType } from '../../core/enum/targettype.enum';
+import { FileService } from '../../core/services/file/file.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmService } from '../../core/services/confirm/confirm.service';
+import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service';
+import { AddActionDialogComponent } from '../../features/action-plan/add-action-dialog/add-action-dialog.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { AuditService } from '../../core/services/audit/audit.service';
+import { MatDrawer } from '@angular/material/sidenav';
+import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
+import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
+import { TimelineActionPlanComponent } from '../../shared/components/timeline-action-plan/timeline-action-plan.component';
 
 @Component({
   selector: 'app-plan-action-page-detail',
-  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe,
-    MatGridListModule, MatButtonModule, MatFormFieldModule,
-    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule],
+  imports: [MatCardModule, MatListModule, MatIconModule, FormsModule, DatePipe, TimelineActionPlanComponent,
+    MatGridListModule, MatButtonModule, MatFormFieldModule, MatTabsModule, AuditButtonComponent,
+    MatInputModule, GoBackComponent, MatTooltipModule, CommonModule, MatProgressBarModule, HasPermissionDirective],
   templateUrl: './plan-action-page-detail.component.html',
   styleUrl: './plan-action-page-detail.component.scss'
 })
-export class PlanActionPageDetailComponent {
+export class PlanActionPageDetailComponent implements OnInit {
+
+  @ViewChild('auditDrawer') auditDrawer!: MatDrawer;
+
+  today: Date = new Date();
+  intervalId?: any;
 
   private actionPlanService = inject(ActionPlanService);
   private route = inject(ActivatedRoute);
-  private authService = inject(AuthService);
-  private equipeService = inject(EquipeService);
+  private confirmService = inject(ConfirmService);
+  private router = inject(Router);
+  private fileService = inject(FileService);
+  private dialog = inject(MatDialog);
+  private snackBarService = inject(SnackBarService)
+  private auditService = inject(AuditService);
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -43,45 +63,130 @@ export class PlanActionPageDetailComponent {
 
   validator: string = '';
 
+  goBackButtons: GoBackButton[] = []
+
+  statusEnum = Status;
+  targetTypeEnum = TargetType;
+
+  abandonedActions: Action[] = []
+  actions: Action[] = []
+
+
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
   }
 
-  getActionPlan(id: string) {
-    this.actionPlanService.getActionPlan(id).subscribe(
-      resp => {
-        this.equipeService.getById(resp.userInCharge).subscribe(
-          team => {
-            this.actionPlan = resp;
-            this.actionPlan.userInCharge = team.name;
-            if (this.actionPlan?.actions?.length) {
-              this.totalActions = this.actionPlan.actions.length;
-              this.completedActions = this.getCompletedCount(this.actionPlan.actions);
-              this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-              this.updateStatus();
-            }
-          }
-        );
-
-      }
-    )
+  isNotStarted() {
+    return this.actionPlan && this.actionPlan.status == Status.NOT_STARTED || false;
   }
 
-  validateAction(action: Action, event: Event) {
-    // TODO : envoyer le file au back + valide action
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      const file = input.files[0];
-      action.fileName = file.name;
-      action.performedBy = this.authService.decryptToken()?.sub || "";
-      action.performedAt = new Date().toISOString();
+  getActionPlan(id: string) {
+    this.actionPlanService.getActionPlan(id).subscribe(resp => {
+      this.actionPlan = resp;
 
-      // 🔁 Recalculer les valeurs après validation
-      if (this.actionPlan?.actions) {
+      // Todo: métriques doivent être calculées côté backend
+      if (this.actionPlan?.actions?.length) {
+        this.totalActions = this.actionPlan.actions.length;
         this.completedActions = this.getCompletedCount(this.actionPlan.actions);
         this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
-        this.updateStatus();
       }
+
+      this.actions = this.actionPlan.actions.filter(a => a.actif == true);
+
+      // TODO : récupérer les actions abandonnées
+      this.abandonedActions = this.actionPlan.actions.filter(a => a.actif == false);
+
+      // règles d’affichage
+      const st = this.actionPlan?.status;
+
+      const canStart = st === Status.NOT_STARTED;
+
+      const canEnd =
+        st !== Status.ACHIEVED &&
+        st !== Status.NOT_STARTED &&
+        st !== (Status as any).CANCELLED
+
+      this.goBackButtons = [
+        {
+          label: 'Exporter',
+          icon: 'file_download',
+          class: 'btn-green',
+          show: true,
+          action: () => this.export()
+        },
+        {
+          label: 'Démarrer',
+          icon: 'play_arrow',
+          class: 'btn-purple',
+          show: !!canStart,
+          permission: { teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN'] },
+          action: () => this.startActionPlan()
+        },
+        {
+          label: 'Terminer',
+          icon: 'check',
+          class: 'btn-primary',
+          show: !!canEnd,
+          permission: { teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN'] },
+          action: () => this.endActionPlan()
+        }
+      ];
+    });
+  }
+
+  openAddActionDialog() {
+    this.dialog.open(AddActionDialogComponent,
+      {
+        width: '400px',
+        data: {
+          actionPlanId: this.actionPlan?.id
+        }
+      }
+    ).afterClosed().subscribe(result => {
+      if (result) {
+        this.ngOnInit();
+      }
+    });
+  }
+
+  canAbandonAction(action: Action) {
+    return action.performedAt == null && this.actionPlan?.status != Status.ACHIEVED && this.actionPlan?.status != Status.CANCELLED
+  }
+
+  validateAction(actionId: string) {
+    if (this.actionPlan) {
+      this.auditService.openAuditDialog(this.actionPlan.id, TargetType.ACTION_PLAN)
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.actionPlanService.finishAction(actionId).subscribe(
+              _ => this.ngOnInit()
+            )
+          }
+          else {
+            this.snackBarService.info("Action non-abandonnée.")
+          }
+        })
+    }
+  }
+
+  abandon(action: Action) {
+    if (this.actionPlan) {
+      this.auditService.openAuditDialog(this.actionPlan.id, TargetType.ACTION_PLAN)
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.actionPlanService.abandonAction(action.id).subscribe(
+              _ => {
+                this.snackBarService.info("Action abandonnée avec succès.")
+                this.ngOnInit();
+              }
+            )
+          }
+          else {
+            this.snackBarService.info("Action non-abandonnée.")
+          }
+        })
     }
   }
 
@@ -91,21 +196,6 @@ export class PlanActionPageDetailComponent {
 
   getCompletionRate(actions: Action[]): number {
     return actions.length ? Math.round((this.getCompletedCount(actions) / actions.length) * 100) : 0;
-  }
-
-  updateStatus() {
-    const completed = this.completedActions;
-    const total = this.totalActions;
-
-    if (total === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === 0) {
-      this.actionPlan!.status = Status.NOT_ACHIEVED;
-    } else if (completed === total) {
-      this.actionPlan!.status = Status.ACHIEVED;
-    } else {
-      this.actionPlan!.status = Status.IN_PROGRESS;
-    }
   }
 
   getReadableStatut(status: Status): string {
@@ -125,10 +215,21 @@ export class PlanActionPageDetailComponent {
     }
   }
 
-  openFileUpload(): void {
-    // Déclencher le clic sur l'input file caché
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    fileInput?.click();
+  async viewFiles(actionId: string, closed: boolean = false) {
+    var targetType = this.actionPlan?.incidentId ? TargetType.ACTION_PLAN_FROM_INCIDENT : TargetType.ACTION_PLAN;
+    let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId))
+
+    this.fileService.openFiles(files, targetType, actionId).afterClosed().subscribe(result => {
+      if (!closed) {
+        this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
+          result => {
+            if (result) {
+              this.validateAction(actionId);
+            }
+          }
+        )
+      }
+    });
   }
 
   getPriorityBarHtml(priority: Priority): string {
@@ -162,6 +263,44 @@ export class PlanActionPageDetailComponent {
         <span class="priority-label ${config.class}">${config.label}</span>
       </div>
     `;
+  }
+
+  export() {
+  }
+
+  startActionPlan() {
+    if (this.actionPlan && this.actionPlan.status === Status.NOT_STARTED) {
+      this.actionPlanService.startActionPlan(this.actionPlan.id!).subscribe(
+        _ => {
+          this.snackBarService.success("Le plan d'action a bien été démarré, vous pouvez commencer à réaliser les actions.");
+          this.ngOnInit()
+        }
+      )
+    }
+  }
+
+  endActionPlan() {
+    if (this.actionPlan && this.actionPlan.status !== Status.ACHIEVED && this.actionPlan.status !== Status.NOT_STARTED) {
+      this.actionPlanService.endActionPlan(this.actionPlan.id!).subscribe(
+        _ => {
+          this.snackBarService.success("Le plan d'action a bien été cloturé.");
+          this.ngOnInit()
+        }
+      )
+    }
+  }
+
+  goToIncident() {
+    this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
+  }
+
+  openAuditPanel() {
+    if (this.auditDrawer.opened) {
+      this.auditDrawer.close();
+    }
+    else {
+      this.auditDrawer.open();
+    }
   }
 
 }

@@ -1,0 +1,548 @@
+<app-go-back [title]="'Associer des Impacts Opérationnels'" [buttons]="filteredGoBackButtons" />
+
+<section class="dashboard-container section-spaced">
+  <div class="op-page">
+    <div class="op-container">
+
+      <!-- IMPACTS FINANCIERS -->
+      <div class="op-card op-mb">
+        <div class="op-section-header">
+          <div class="op-section-title">
+            <h2 class="op-h2">Impacts Financiers</h2>
+          </div>
+          <button type="button" (click)="addFinancialImpact()" class="btn btn--primary">
+            Ajouter
+          </button>
+        </div>
+
+        <!-- Si rien du tout -->
+        <div *ngIf="existingFinancialLosses.length === 0 && formData.financialImpacts.length === 0" class="op-empty">
+          <span class="op-empty-icon" aria-hidden="true"></span>
+          <p>Aucun impact financier défini</p>
+          <p class="op-empty-sub">Cliquez sur « Ajouter » pour commencer</p>
+        </div>
+
+        <!-- ===== NOUVEAUX (éditables) ===== -->
+        <div class="op-subcard" *ngFor="let impact of formData.financialImpacts; let i = index; trackBy: trackById">
+          <div class="op-subcard-head">
+            <h3 class="op-h3">Impact Financier #{{ i + 1 }}</h3>
+            <button type="button" (click)="removeItem('financialImpacts', impact.id)"
+              class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
+          </div>
+
+          <div class="op-grid op-grid--2">
+            <div class="op-field">
+              <label class="op-label">Titre *</label>
+              <input type="text" [(ngModel)]="impact.title" class="op-input"
+                [ngClass]="{'op-input--error': errors['financial_'+i] || errors['financial_details_'+i]}" />
+            </div>
+            <div class="op-field">
+              <label class="op-label">Entité *</label>
+              <select [(ngModel)]="impact.businessUnitId" class="op-select">
+                <option value="">Sélectionnez</option>
+                <option *ngFor="let bu of businessUnits" [value]="bu.id">{{ bu.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="op-grid op-grid--2 op-mt-xs">
+            <div class="op-field">
+              <label class="op-label">Type *</label>
+              <select [(ngModel)]="impact.type" class="op-select">
+                <option [ngValue]="null">Sélectionnez</option>
+                <option *ngFor="let t of financialOperatingLossTypes" [ngValue]="t">{{ t.label }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="op-field op-mt-xs">
+            <label class="op-label">Description</label>
+            <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
+              placeholder="Décrivez cet impact financier..."></textarea>
+          </div>
+
+          <div class="op-divider"></div>
+          <h4 class="op-h4">Détails Comptables</h4>
+
+          <div class="op-stack">
+            <div class="op-grid op-grid--3" *ngFor="let d of impact.details; let j = index">
+              <div class="op-field">
+                <label class="op-label">Type *</label>
+                <select [(ngModel)]="d.amountType" class="op-select">
+                  <option [ngValue]="null">Sélectionnez</option>
+                  <option *ngFor="let t of financialAmountTypes" [ngValue]="t.libelle">{{ t.label }}</option>
+                </select>
+              </div>
+              <div class="op-field">
+                <label class="op-label">Réf. comptable</label>
+                <input type="text" [(ngModel)]="d.accountingReference" class="op-input" />
+              </div>
+              <div class="op-field">
+                <label class="op-label">Date de comptabilisation</label>
+                <input type="date" [(ngModel)]="d.accountingDate" class="op-input" />
+              </div>
+              <div class="op-field">
+                <label class="op-label">Montant (€) *</label>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input 
+                    type="number" 
+                    [(ngModel)]="d.amount" 
+                    class="op-input" 
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                  />
+                  <button type="button" class="btn btn--danger" (click)="removeFinancialDetail(i, j)">x</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn--success" (click)="addFinancialDetail(i)">
+                + Ajouter un type de montant
+              </button>
+            </div>
+          </div>
+
+          <div class="op-stack-xs" *ngIf="errors['financial_' + i] || errors['financial_details_' + i]">
+            <p class="op-error op-error--row" *ngIf="errors['financial_' + i]">
+              <span class="op-error-icon" aria-hidden="true">!</span>
+              {{ errors['financial_' + i] }}
+            </p>
+            <p class="op-error op-error--row" *ngIf="errors['financial_details_' + i]">
+              <span class="op-error-icon" aria-hidden="true">!</span>
+              {{ errors['financial_details_' + i] }}
+            </p>
+          </div>
+
+          <div class="op-actions">
+            <button type="button" class="btn btn--primary" (click)="handleSubmitFinancial(impact)">
+              Associer
+            </button>
+          </div>
+        </div>
+
+        <div class="op-stack op-stack--lg">
+          <!-- ===== EXISTANTS (disabled) ===== -->
+          <div class="op-subcard"  *ngFor="let impact of existingFinancialLosses; trackBy: trackByIdString"
+              [id]="'impact-' + impact.id">
+            <div class="op-subcard-head" (click)="toggleImpactDetails($event, impact.id)" style="cursor:pointer;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <input type="checkbox"
+                        [checked]="selectedImpacts[impact.id]"
+                        (click)="$event.stopPropagation()"
+                        (change)="toggleImpactSelection(impact.id, existingAmounts[impact.id] || [])" />
+                  <h3 class="op-h3">{{ impact.libelle }}</h3>
+                  <div class="op-meta">
+                    <span>Créateur: <strong>{{ impact.creatorName }}</strong></span>
+                    <span>Date de création: {{ impact.createdAt | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  <!-- Badge status -->
+                  <span class="op-badge">
+                    {{ getStatutLabel(impact.state) }}
+                  </span>
+                  <span style="margin-left:auto">{{ expandedImpacts[impact.id] ? '▼' : '▶' }}</span>
+              </div>
+            </div>
+
+            
+            <div *ngIf="expandedImpacts[impact.id]">
+            <div class="op-grid op-grid--2">
+            <!-- Colonne gauche -->
+            <div class="op-stack">
+              <div class="op-field">
+                <label class="op-label">Entité</label>
+                <input class="op-input" [value]="impact.entityName" disabled />
+              </div>
+
+              <div class="op-field">
+                <label class="op-label">Type</label>
+                <input class="op-input" [value]="impact.type.label" disabled />
+              </div>
+            </div>
+
+            <!-- Colonne droite -->
+            <div class="op-field">
+              <label class="op-label">Description</label>
+              <textarea class="op-textarea" [value]="impact.description" disabled></textarea>
+            </div>
+          </div>
+
+            <div class="op-divider"></div>
+            <h4 class="op-h4">Montants associés</h4>
+            <div class="op-grid op-grid--3">
+              <div class="op-field">
+                <label class="op-label">Brut (€)</label>
+                <input class="op-input" [value]="impact.montantBrut | number:'1.0-0'" disabled />
+              </div>
+              <div class="op-field">
+                <label class="op-label">Net (€)</label>
+                <input class="op-input" [value]="impact.montantNet | number:'1.0-0'" disabled />
+              </div>
+              <div class="op-field">
+                <label class="op-label">Final (€)</label>
+                <input class="op-input" [value]="impact.montantFinal | number:'1.0-0'" disabled />
+              </div>
+            </div>
+
+            <div class="op-divider"></div>
+            <div class="op-section-header" (click)="toggleDetails(impact.id)" style="cursor:pointer;">
+              <h4 class="op-h4">Détails Comptables</h4>
+              <span>{{ expandedDetails[impact.id] ? '▼' : '▶' }}</span>
+            </div>
+
+            <div *ngIf="expandedDetails[impact.id]">
+                <div class="op-stack-sm" *ngFor="let amount of existingAmounts[impact.id]">
+                  <div class="op-subcard">
+                    <div class="op-meta" style="justify-content: flex-end;">
+                      <span>Ajouté par: <strong>{{ amount.creatorName }}</strong></span>
+                      <span>le {{ amount.createdAt | date:'dd/MM/yyyy' }}</span>
+                    </div>
+
+                        <!-- Badge status -->
+                        <span class="op-badge">
+                          {{ getReviewStatusLabel(amount.reviewStatus) }}
+                        </span>
+
+                    <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
+                      <input type="checkbox"
+                          [checked]="selectedAmounts[impact.id][amount.id]"
+                          (change)="toggleAmountSelection(impact.id, amount.id)" />
+                      <div class="op-field" style="flex: 1;">
+                        <label class="op-label">Type</label>
+                        <input class="op-input" [value]="amount.amountType.label || amount.amountType" disabled />
+                      </div>
+                      <div class="op-field" style="flex: 1;">
+                        <label class="op-label">Réf. comptable</label>
+                        <input class="op-input" [value]="amount.comptabilityRef" disabled />
+                      </div>
+                      <div class="op-field" style="flex: 1;">
+                        <label class="op-label">Date</label>
+                        <input class="op-input" [value]="(amount.comptabilisationDate | date:'dd/MM/yyyy') || 'N/R' " disabled />
+                      </div>
+                      <div class="op-field" style="flex: 1;">
+                        <label class="op-label">Montant (€)</label>
+                        <input class="op-input" [value]="amount.montant" disabled />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="op-divider"></div>
+              <h4 class="op-h4">Pièces jointes</h4>
+
+              <div class="op-attachments-row">
+                <button type="button"
+                        class="btn btn--primary"
+                        (click)="openFilesDialog(impact.id)">
+                  Consulter / Joindre des fichiers
+                </button>
+
+                <!-- (optionnel) petit compteur si déjà chargés -->
+                <span class="op-meta" *ngIf="attachedCounts?.[impact.id] !== undefined">
+                  {{ attachedCounts[impact.id] }} fichier(s)
+                </span>
+              </div>
+
+
+              <!-- Bouton pour ajouter un montant -->
+              <div class="op-actions">
+                <button type="button" class="btn btn--success"
+                        (click)="toggleAddAmountForm(impact.id)">
+                  + Ajouter un montant
+                </button>
+              </div>
+
+              <!-- Formulaire affiché seulement si l'impact est en mode ajout -->
+              <div class="op-subcard op-mt" *ngIf="showAddAmountForm[impact.id]">
+                <h4 class="op-h4">Nouveau montant</h4>
+                <div class="op-grid op-grid--3">
+                  <div class="op-field">
+                    <label class="op-label">Type *</label>
+                    <select [(ngModel)]="newAmounts[impact.id].amountType" class="op-select">
+                      <option [ngValue]="null">Sélectionnez</option>
+                      <option *ngFor="let t of financialAmountTypes" [ngValue]="t.libelle">{{ t.label }}</option>
+                    </select>
+                  </div>
+                  <div class="op-field">
+                    <label class="op-label">Réf. comptable</label>
+                    <input type="text" [(ngModel)]="newAmounts[impact.id].accountingReference" class="op-input" />
+                  </div>
+                  <div class="op-field">
+                    <label class="op-label">Date de comptabilisation</label>
+                    <input type="date" [(ngModel)]="newAmounts[impact.id].accountingDate" class="op-input" />
+                  </div>
+                  <div class="op-field">
+                    <label class="op-label">Montant (€) *</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="newAmounts[impact.id].amount" 
+                      class="op-input" 
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                      oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                    />
+                  </div>
+                </div>
+                <div class="op-actions" style="margin-top:8px;">
+                  <button type="button" class="btn btn--primary"
+                          (click)="addAmountToExistingImpact(impact.id)">
+                    Enregistrer
+                  </button>
+                  <button type="button" class="btn btn--ghost"
+                          (click)="toggleAddAmountForm(impact.id)">
+                    Annuler
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMPACTS NON FINANCIERS -->
+      <div class="op-card op-mb">
+        <div class="op-section-header">
+          <div class="op-section-title">
+            <h2 class="op-h2">Impacts Non Financiers</h2>
+          </div>
+          <button type="button" (click)="addNonFinancialImpact()" class="btn btn--primary">
+            Ajouter
+          </button>
+        </div>
+
+        <!-- Si rien du tout -->
+        <div *ngIf="existingNonFinancialLosses.length === 0 && formData.nonFinancialImpacts.length === 0"
+          class="op-empty">
+          <span class="op-empty-icon" aria-hidden="true"></span>
+          <p>Aucun impact non financier défini</p>
+          <p class="op-empty-sub">Cliquez sur « Ajouter » pour commencer</p>
+        </div>
+
+        <div class="op-stack op-stack--lg">
+          <!-- ===== NOUVEAUX (éditables) ===== -->
+          <div class="op-subcard" *ngFor="let impact of formData.nonFinancialImpacts; let i = index; trackBy: trackById">
+            <div class="op-subcard-head">
+              <h3 class="op-h3">Impact Non Financier #{{ i + 1 }}</h3>
+              <button type="button" (click)="removeItem('nonFinancialImpacts', impact.id)"
+                class="btn-icon-only btn--danger" aria-label="Supprimer" title="Supprimer">✕</button>
+            </div>
+
+            <div class="op-grid op-grid--2">
+              <div class="op-field">
+                <label class="op-label">Titre *</label>
+                <input type="text" [(ngModel)]="impact.title" class="op-input"
+                  [ngClass]="{'op-input--error': errors['nonfinancial_'+i]}" />
+              </div>
+              <div class="op-field">
+                <label class="op-label">Entité (Business Unit) *</label>
+                <select [(ngModel)]="impact.businessUnitId" class="op-select">
+                  <option value="">Sélectionnez</option>
+                  <option *ngFor="let bu of allBusinessUnits" [value]="bu.id">{{ bu.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="op-grid op-grid--2 op-mt-xs">
+              <div class="op-field">
+                <label class="op-label">Type de Conséquence *</label>
+                <select [(ngModel)]="impact.type" class="op-select">
+                  <option [ngValue]="null">Sélectionnez un type</option>
+                  <option *ngFor="let t of nonFinancialOperatingLossTypes" [ngValue]="t">{{ t.label }}</option>
+                </select>
+              </div>
+              <div class="op-field">
+                <label class="op-label">Type de montant</label>
+                <input class="op-input" [value]="estimeAmountType?.libelle || 'Montant estimé'" disabled />
+              </div>
+            </div>
+
+            <div class="op-grid op-grid--2 op-mt-xs">
+              <div class="op-field">
+                <label class="op-label">Montant estimé (€) *</label>
+                <input type="number" [(ngModel)]="impact.amount" class="op-input" placeholder="0" />
+              </div>
+              <div class="op-field">
+                <label class="op-label">Description</label>
+                <textarea rows="2" [(ngModel)]="impact.description" class="op-textarea"
+                  placeholder="Décrivez cet impact non financier..."></textarea>
+              </div>
+            </div>
+
+            <p class="op-error op-error--row" *ngIf="errors['nonfinancial_' + i]">
+              <span class="op-error-icon" aria-hidden="true">!</span>
+              {{ errors['nonfinancial_' + i] }}
+            </p>
+
+            <div class="op-actions">
+              <button type="button" class="btn btn--primary" (click)="handleSubmitNonFinancial(impact)">
+                Associer
+              </button>
+            </div>
+
+          </div>
+
+          <!-- ===== EXISTANTS (disabled) ===== -->
+          <div class="op-subcard" *ngFor="let impact of existingNonFinancialLosses; trackBy: trackByIdString"
+              [id]="'impact-' + impact.id">
+            <div class="op-subcard-head" (click)="toggleImpactDetails($event, impact.id)" style="cursor:pointer;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox"
+                      [checked]="selectedImpacts[impact.id]"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleImpactSelection(impact.id, existingAmounts[impact.id] || [])" />
+                <h3 class="op-h3">{{ impact.libelle }}</h3>
+                <div class="op-meta">
+                  <span>Créateur: <strong>{{ impact.creatorName }}</strong></span>
+                  <span>Date de création: {{ impact.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <!-- Badge status -->
+                <span class="op-badge">
+                  {{ getStatutLabel(impact.state) }}
+                </span>
+                <span style="margin-left:auto">{{ expandedImpacts[impact.id] ? '▼' : '▶' }}</span>
+              </div>
+            </div>
+
+            <div *ngIf="expandedImpacts[impact.id]">
+              <div class="op-grid op-grid--2">
+                <!-- Colonne gauche -->
+                <div class="op-stack">
+                  <div class="op-field">
+                    <label class="op-label">Entité</label>
+                    <input class="op-input" [value]="impact.entityName" disabled />
+                  </div>
+
+                  <div class="op-field">
+                    <label class="op-label">Type</label>
+                    <input class="op-input" [value]="impact.type.label" disabled />
+                  </div>
+                </div>
+
+                <!-- Colonne droite -->
+                <div class="op-field">
+                  <label class="op-label">Description</label>
+                  <textarea class="op-textarea" [value]="impact.description" disabled></textarea>
+                </div>
+              </div>
+
+              <div class="op-divider"></div>
+
+              <div class="op-section-header" (click)="toggleDetails(impact.id)" style="cursor:pointer;">
+                <h4 class="op-h4">Détails Comptables</h4>
+                <span>{{ expandedDetails[impact.id] ? '▼' : '▶' }}</span>
+              </div>
+
+              <div *ngIf="expandedDetails[impact.id]">
+                <div class="op-stack-sm" *ngFor="let amount of existingAmounts[impact.id]">
+                  <div class="op-subcard">
+                    <div class="op-meta" style="justify-content: flex-end;">
+                      <span>Ajouté par: <strong>{{ amount.creatorName }}</strong></span>
+                      <span>le {{ amount.createdAt | date:'dd/MM/yyyy' }}</span>
+                    </div>
+
+                    <!-- Badge status -->
+                    <span class="op-badge">
+                      {{ getReviewStatusLabel(amount.reviewStatus) }}
+                    </span>
+
+                    <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
+                      <input type="checkbox"
+                          [checked]="selectedAmounts[impact.id][amount.id]"
+                          (change)="toggleAmountSelection(impact.id, amount.id)" />
+                      <div class="op-field" style="flex: 1;">
+                        <label class="op-label">Type</label>
+                        <input class="op-input" [value]="amount.amountType.label || amount.amountType" disabled />
+                      </div>
+                      <div class="op-field" style="flex: 1;">
+                        <label class="op-label">Date</label>
+                        <input class="op-input" [value]="(amount.comptabilisationDate | date:'dd/MM/yyyy') || 'N/R'" disabled />
+                      </div>
+                      <div class="op-field" style="flex: 1;">
+                        <label class="op-label">Montant (€)</label>
+                        <input class="op-input" [value]="amount.montant" disabled />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="op-divider"></div>
+              <h4 class="op-h4">Pièces jointes</h4>
+
+              <div class="op-attachments-row">
+                <button type="button"
+                        class="btn btn--primary"
+                        (click)="openFilesDialog(impact.id)">
+                  Consulter / Joindre des fichiers
+                </button>
+
+                <!-- (optionnel) petit compteur si déjà chargés -->
+                <span class="op-meta" *ngIf="attachedCounts?.[impact.id] !== undefined">
+                  {{ attachedCounts[impact.id] }} fichier(s)
+                </span>
+              </div>
+
+              <!-- Bouton pour ajouter -->
+              <div class="op-actions">
+                <button type="button" class="btn btn--success"
+                        (click)="toggleAddAmountForm(impact.id)">
+                  + Ajouter un montant
+                </button>
+              </div>
+
+              <!-- Formulaire -->
+              <div class="op-subcard op-mt" *ngIf="showAddAmountForm[impact.id]">
+                <h4 class="op-h4">Nouveau montant</h4>
+                <div class="op-grid op-grid--3">
+                  <div class="op-field">
+                    <label class="op-label">Type *</label>
+                    <select [(ngModel)]="newAmounts[impact.id].amountType" class="op-select">
+                      <option [ngValue]="null">Sélectionnez</option>
+                      <option *ngFor="let t of nonFinancialAmountTypes" [ngValue]="t.libelle">{{ t.label }}</option>
+                    </select>
+                  </div>
+                  <div class="op-field">
+                    <label class="op-label">Date</label>
+                    <input type="date" [(ngModel)]="newAmounts[impact.id].accountingDate" class="op-input" />
+                  </div>
+                  <div class="op-field">
+                    <label class="op-label">Montant (€) *</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="newAmounts[impact.id].amount" 
+                      class="op-input" 
+                      placeholder="0"
+                      min="0"
+                      step="0.01"
+                      oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                    />
+                  </div>
+                </div>
+                <div class="op-actions" style="margin-top:8px;">
+                  <button type="button" class="btn btn--primary"
+                          (click)="addAmountToExistingImpact(impact.id)">
+                    Enregistrer
+                  </button>
+                  <button type="button" class="btn btn--ghost"
+                          (click)="toggleAddAmountForm(impact.id)">
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Erreurs générales -->
+      <div class="op-alert" *ngIf="errors['impacts']">
+        <span class="op-icon op-icon--danger" aria-hidden="true"></span>
+        <p class="op-alert-text">{{ errors['impacts'] }}</p>
+      </div>
+    </div>
+  </div>
+</section>

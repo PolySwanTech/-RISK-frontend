@@ -1,0 +1,96 @@
+
+<div class="methodology-card" *ngIf="!loading">
+  <ng-container *ngIf="!methodology; else viewCard">
+    <div class="card is-yellow">
+      <div class="card-header">
+        <h3><span class="dot"></span> Méthodologie appliquée</h3>
+        <small class="sub">Aucune méthodologie enregistrée — veuillez en créer une.</small>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="card-content form-grid">
+        <mat-form-field appearance="fill">
+          <mat-label>Nature du contrôle</mat-label>
+          <mat-select formControlName="controlNature" required>
+            <mat-option *ngFor="let n of controlNatureValues" [value]="n">
+              {{ getControlNature(n) }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('controlNature')?.invalid">Requis</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Mode d’exécution</mat-label>
+          <mat-select formControlName="executionMode" required>
+            <mat-option *ngFor="let m of executionModeValues" [value]="m">
+              {{ getExecutionMode(m) }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('executionMode')?.invalid">Requis</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full">
+          <mat-label>Données utilisées</mat-label>
+          <textarea
+            matInput
+            rows="3"
+            formControlName="scope"
+            placeholder="Ce que couvre le contrôle..."></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full">
+          <mat-label>Échantillon contrôlé</mat-label>
+          <textarea
+            matInput
+            rows="3"
+            formControlName="sampling"
+            placeholder="Méthode d’échantillonnage..."></textarea>
+        </mat-form-field>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary" [disabled]="form.invalid || submitting">
+            {{ submitting ? 'Enregistrement...' : 'Enregistrer la méthodologie' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </ng-container>
+
+  <ng-template #viewCard>
+    <div class="card is-yellow">
+      <div class="card-header">
+        <h3><span class="dot"></span> Méthodologie appliquée</h3>
+      </div>
+
+      <div class="card-content details-grid">
+        <div class="field">
+          <label>Type du contrôle</label>
+          <div class="value">{{ methodology?.controlNature || '—' }}</div>
+        </div>
+
+        <div class="field">
+          <label>Mode d’exécution</label>
+          <div class="value">{{ methodology?.executionMode || '—' }}</div>
+        </div>
+
+        <div class="field full">
+          <label>Données utilisées</label>
+          <div class="value">{{ methodology?.scope || '—' }}</div>
+        </div>
+
+        <div class="field full">
+          <label>Échantillon contrôlé</label>
+          <div class="value">{{ methodology?.sampling || '—' }}</div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<div class="methodology-card" *ngIf="loading">
+  <div class="card skeleton">
+    <div class="skeleton-line w60"></div>
+    <div class="skeleton-line w40"></div>
+    <div class="skeleton-line w90"></div>
+    <div class="skeleton-line w80"></div>
+  </div>
+</div>

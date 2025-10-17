@@ -5,3 +5,12 @@ export enum Type {
     AUTOMATIC = 'AUTOMATIC', 
     MANUAL = 'MANUAL'
 }
+
+
+export const ControlTypeLabels: Record<Type, string> = {
+    [Type.PREVENTIVE]: 'Préventif',
+    [Type.DETECTIVE]: 'Détectif',
+    [Type.CORRECTIVE]: 'Correctif',
+    [Type.AUTOMATIC]: 'Automatique',
+    [Type.MANUAL]: 'Manuel',
+}

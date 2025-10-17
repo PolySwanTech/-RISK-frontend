@@ -1,0 +1,52 @@
+<app-popup-header [title]="'Créer une mesure d’atténuation'" [showClose]="true" (close)="closePopup()"></app-popup-header>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Libellé</mat-label>
+      <input matInput formControlName="libelle" />
+    </mat-form-field>
+  </div>
+
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
+  </div>
+
+  <!-- Sélecteur de catégorie parent -->
+  <div class="row-add">
+    <mat-form-field appearance="outline">
+      <mat-label>Catégorie principale</mat-label>
+      <mat-select formControlName="parentType" (selectionChange)="onParentChange($event.value)">
+        <mat-option *ngFor="let t of parentTypes" [value]="t.code">{{ t.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Sélecteur de sous-catégorie (enfants) -->
+    <mat-form-field appearance="outline">
+      <mat-label>Sous-catégorie</mat-label>
+      <mat-select formControlName="type">
+        <mat-option *ngFor="let c of childTypes" [value]="c.code">{{ c.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <button style="margin-bottom: 10px;" mat-stroked-button (click)="create()" type="button">
+    <mat-icon>add</mat-icon>
+    Associer BU / Processus / Risque *
+  </button>
+
+  <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
+    <mat-chip> Équipe : {{ selectedBPR.bu.name }}</mat-chip>
+    <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
+    <mat-chip> Risque : {{ selectedBPR.risk.name }}</mat-chip>
+  </mat-chip-listbox>
+
+  <button mat-raised-button color="primary" type="submit">
+    <mat-icon>save</mat-icon> Créer
+  </button>
+
+</form>

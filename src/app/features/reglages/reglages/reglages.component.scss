@@ -1,0 +1,122 @@
+:host {
+    display: block;
+    background: #f5f7fa;
+    min-height: 100vh;
+    padding-bottom: 40px;
+}
+
+.group {
+    width: 80vw;
+    margin: 24px auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    ::ng-deep {
+        .mat-mdc-tab-header {
+            background-color: var(--mat-sys-on-primary-container);
+            border-bottom: none;
+            padding: 0 24px;
+        }
+
+        .mat-mdc-tab-labels {
+            gap: 12px;
+            color: white;
+        }
+
+        .mat-mdc-tab .mdc-tab__text-label {
+            color: white !important;
+        }
+
+        .mat-mdc-tab {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            min-width: 160px;
+            height: 64px;
+            opacity: 1;
+
+            &:hover {
+                color: rgba(255, 255, 255, 0.9);
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            &.mat-mdc-tab-disabled {
+                color: rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .mat-mdc-tab.mdc-tab--active {
+            color: white;
+
+            .mdc-tab__text-label {
+                font-weight: 600;
+                color: white;
+            }
+        }
+
+        // Indicateur actif
+        .mat-mdc-tab-header-pagination-chevron {
+            border-color: white;
+        }
+
+        .mdc-tab-indicator__content--underline {
+            border-color: white;
+            border-width: 3px;
+            border-radius: 3px 3px 0 0;
+        }
+
+        // Corps des tabs
+        .mat-mdc-tab-body-wrapper {
+            padding: 32px;
+            min-height: 500px;
+        }
+
+        .mat-mdc-tab-body-content {
+            overflow: visible;
+        }
+
+        // Animation améliorée
+        .mat-mdc-tab-body {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Style responsive
+@media (max-width: 768px) {
+    .group {
+        margin: 12px;
+        border-radius: 8px;
+
+        ::ng-deep {
+            .mat-mdc-tab-header {
+                padding: 0 12px;
+            }
+
+            .mat-mdc-tab {
+                min-width: 120px;
+                height: 56px;
+                font-size: 14px;
+            }
+
+            .mat-mdc-tab-body-wrapper {
+                padding: 16px;
+            }
+        }
+    }
+}

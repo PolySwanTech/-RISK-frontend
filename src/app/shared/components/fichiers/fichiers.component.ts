@@ -1,5 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
-import { Incident } from '../../../core/models/Incident';
+import { Component, Inject, inject, Input, Optional } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,88 +10,106 @@ import { MatInputModule } from '@angular/material/input';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CommonModule } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FileService } from '../../../core/services/file/file.service';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { TargetType } from '../../../core/enum/targettype.enum';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { PopupHeaderComponent } from '../popup-header/popup-header.component';
+import { forkJoin, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+import { MatDividerModule } from '@angular/material/divider';
 
-interface AttachedFile {
+
+export interface UploadedFile {
   id: string;
-  name: string;
+  filename: string;
+  objectKey: string;
+  contentType: string;
   size: number;
-  type: string;
+  etag: string;
   uploadedAt: Date;
-  url?: string;
+  uploadedBy: string;
+  description?: string;
+  isNew?: boolean;
+}
+
+// Fichier "en attente" uniquement côté UI
+interface PendingFile {
+  tempId: string;       // pour trackBy/suppression
+  file: File;           // l'objet File pour l'upload
+  filename: string;
+  size: number;
+  contentType: string;
+  description?: string;
 }
 
 @Component({
   selector: 'app-fichiers',
   imports: [MatCardModule, MatListModule, MatIconModule, FormsModule,
-    MatGridListModule, MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatTooltipModule, CommonModule],
+    MatGridListModule, MatButtonModule, MatFormFieldModule, PopupHeaderComponent,
+    MatInputModule, MatTooltipModule, CommonModule, MatDividerModule],
   templateUrl: './fichiers.component.html',
   styleUrl: './fichiers.component.scss'
 })
 export class FichiersComponent {
 
   private confirmService = inject(ConfirmService);
+  private snackbarService = inject(SnackBarService);
+  private fileService = inject(FileService);
+
   searchQuery: string = '';
   filteredFilesCount: number = 0;
 
-  @Input() idIncident: string | null = null;
-  @Input() closed: boolean | null = null;
-  @Input() attachedFiles: AttachedFile[] = []
+  @Input() targetType: TargetType = TargetType.INCIDENT; // défaut
+  @Input() targetId: string = '';                        // id incident OU impact
 
-  filteredFiles: AttachedFile[] = [];
+  @Input() incidentId: string = ''
+  @Input() incidentRef: string = ''
+  @Input() closed: boolean | null = null;
+  @Input() attachedFiles: UploadedFile[] = []
+
+  filteredFiles: UploadedFile[] = [];
 
   isDragOver = false;
+  pendingFiles: PendingFile[] = [];
+  isSaving = false;
+
+  constructor(@Optional() public dialogRef: MatDialogRef<FichiersComponent>, @Optional() @Inject(MAT_DIALOG_DATA) public data?: {
+    files?: UploadedFile[];
+    targetType?: TargetType;
+    targetId?: string;
+    closed?: boolean;
+  }) { }
 
   ngOnInit(): void {
-    this.attachedFiles = [
-      {
-        id: '1',
-        name: 'rapport-incident.pdf',
-        size: 2458624, // 2.4 MB
-        type: 'application/pdf',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '2',
-        name: 'capture-ecran-serveur.png',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '3',
-        name: 'capture-ecran-serveur.docx',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '4',
-        name: 'capture-ecran-serveur.csv',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      },
-      {
-        id: '5',
-        name: 'capture-ecran-serveur.txt',
-        size: 876544, // 856 KB
-        type: 'image/png',
-        uploadedAt: new Date('2025-05-22')
-      }
-    ];
-    this.filteredFiles = this.attachedFiles;
+    // Data du dialog > Inputs si fournis
+    if (this.data?.targetType) this.targetType = this.data.targetType;
+    if (this.data?.targetId) this.targetId = this.data.targetId;
+    if (this.data?.closed) this.closed = this.data.closed;
+
+    // Si des fichiers sont déjà fournis (dialog)
+    if (this.data?.files?.length) {
+      this.attachedFiles = this.data.files;
+      this.filteredFiles = this.data.files;
+      this.filteredFilesCount = this.filteredFiles.length;
+    }
+
+    // Sinon on charge depuis l’API si on a le contexte
+    if (!this.attachedFiles.length && this.targetId) {
+      this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+        this.attachedFiles = files;
+        this.filteredFiles = files;
+        this.filteredFilesCount = files.length;
+      });
+    }
+  }
+
+  closePopup(){
+    this.dialogRef.close();
   }
 
   formatDate(dateString: any) {
     return dateString ? dateString.toLocaleDateString("fr-FR") : null;
-  }
-
-  isNotClosed() {
-    if (this.closed) {
-      return false;
-    }
-    return true
   }
 
   normalize(str?: string): string {
@@ -106,11 +123,12 @@ export class FichiersComponent {
   }
 
   onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.handleFiles(Array.from(input.files));
-    }
+  const input = event.target as HTMLInputElement;
+  if (input.files) {
+    this.addPending(Array.from(input.files));
+    input.value = ''; // pour autoriser redépôt des mêmes noms
   }
+}
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -125,42 +143,108 @@ export class FichiersComponent {
   }
 
   onDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
-
-    if (event.dataTransfer?.files) {
-      this.handleFiles(Array.from(event.dataTransfer.files));
-    }
+  event.preventDefault();
+  event.stopPropagation();
+  this.isDragOver = false;
+  if (event.dataTransfer?.files) {
+    this.addPending(Array.from(event.dataTransfer.files));
   }
+}
 
-  private handleFiles(files: File[]): void {
-    const validFiles: File[] = [];
+private addPending(files: File[]) {
+  for (const file of files) {
+    if (!this.isValidFile(file)) {
+      this.confirmService.openConfirmDialog(
+        "Fichier non supporté",
+        `Le fichier ${file.name} n'est pas dans un format supporté.`,
+        false
+      );
+      continue;
+    }
+    this.pendingFiles.push({
+      tempId: crypto.randomUUID(),
+      file,
+      filename: file.name,
+      size: file.size,
+      contentType: file.type,
+      description: ''
+    });
+  }
+}
 
-    files.forEach(file => {
-      if (this.isValidFile(file)) {
-        this.uploadFile(file);
-        validFiles.push(file);
-      } else {
+  // private async handleFiles(files: File[]) {
+  //   const validFiles: File[] = [];
+
+  //   // On prépare toutes les promesses d'upload
+  //   const uploadPromises: Promise<void>[] = [];
+
+  //   for (const file of files) {
+  //     if (this.isValidFile(file)) {
+  //       validFiles.push(file);
+  //       uploadPromises.push(this.uploadFile(file)); // on stocke la promesse
+  //     } else {
+  //       this.confirmService.openConfirmDialog(
+  //         "Fichier non supporté",
+  //         `Le fichier ${file.name} n'est pas dans un format supporté.`,
+  //         false
+  //       );
+  //     }
+  //   }
+
+  //   if (validFiles.length > 0) {
+  //     try {
+  //       // attendre que TOUS les fichiers soient uploadés
+  //       await Promise.all(uploadPromises);
+
+  //       const fileNames = validFiles.map(f => f.name).join(", ");
+  //       const message =
+  //         validFiles.length === 1
+  //           ? `Le fichier ${fileNames} a été ajouté avec succès.`
+  //           : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
+
+  //       this.snackbarService.success("Fichier(s) ajouté(s) " + message);
+  //       this.ngOnInit();
+  //     } catch (error) {
+  //       this.confirmService.openConfirmDialog(
+  //         "Erreur",
+  //         "Une erreur est survenue lors de l'upload d'un ou plusieurs fichiers.",
+  //         false
+  //       );
+  //     }
+  //   }
+
+  // }
+
+  private async uploadFile(file: File): Promise<void> {
+
+    if (!this.targetId) {
+      this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
+      return;
+    }
+
+    this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
+      next: _ => {
+        // Refresh la liste
+        this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+        this.attachedFiles = files.map(f => ({
+          ...f,
+          isNew: f.filename === file.name
+        }));
+        this.filteredFiles = this.attachedFiles;
+        this.filteredFilesCount = this.filteredFiles.length;
+        });
+      },
+      error: _ => {
         this.confirmService.openConfirmDialog(
-          "Fichier non supporté",
-          `Le fichier ${file.name} n'est pas dans un format supporté.`,
+          "Erreur",
+          `Erreur lors de l'ajout du fichier ${file.name}.`,
           false
         );
       }
     });
-
-    if (validFiles.length > 0) {
-      const fileNames = validFiles.map(f => f.name).join(", ");
-      const message = validFiles.length === 1
-        ? `Le fichier ${fileNames} a été ajouté avec succès.`
-        : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
-
-      this.confirmService.openConfirmDialog("Fichier(s) ajouté(s)", message, false);
-    }
   }
 
-  private isValidFile(file: File): boolean {
+   private isValidFile(file: File): boolean {
     const validTypes = [
       'application/pdf',
       'application/msword',
@@ -177,70 +261,83 @@ export class FichiersComponent {
     return validTypes.includes(file.type);
   }
 
-  private uploadFile(file: File): void {
-    if (!this.idIncident) return;
+  downloadFile(file: UploadedFile, openInBrowser: boolean = false): void {
+    const action = openInBrowser ? 'Ouverture' : 'Téléchargement';
+    this.confirmService
+      .openConfirmDialog(action, `${action} de ${file.filename} en cours...`, false)
+      .subscribe();
 
-    // TODO: Implémenter l'upload vers votre API
-    // const formData = new FormData();
-    // formData.append('file', file);
-    // formData.append('incidentId', this.idIncident);
+    this.fileService.downloadFile(file.objectKey).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
 
-    // this.fileService.uploadFile(formData).subscribe({
-    //   next: (response) => {
-    //     this.confirmService.openConfirmDialog("Fichier ajouté", `${file.name} a été ajouté avec succès.`, false);
-    //     this.loadAttachedFiles(this.idIncident);
-    //   },
-    //   error: (error) => {
-    //     this.confirmService.openConfirmDialog("Erreur", `Erreur lors de l'upload de ${file.name}.`, false);
-    //   }
-    // });
-
-    // Simulation d'upload pour la démo
-    const newFile: AttachedFile = {
-      id: Date.now().toString(),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      uploadedAt: new Date()
-    };
-
-    this.attachedFiles.push(newFile);
-    this.filteredFiles = this.attachedFiles;
+        if (openInBrowser) {
+          // Ouvrir dans un nouvel onglet
+          window.open(url, '_blank');
+        } else {
+          // Télécharger
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = file.filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      },
+      error: (err) => {
+        console.error("Erreur lors du téléchargement :", err);
+      }
+    });
   }
 
-  downloadFile(file: AttachedFile): void {
-    // TODO: Implémenter le téléchargement depuis votre API
-    // this.fileService.downloadFile(file.id).subscribe(blob => {
-    //   const url = window.URL.createObjectURL(blob);
-    //   const link = document.createElement('a');
-    //   link.href = url;
-    //   link.download = file.name;
-    //   link.click();
-    //   window.URL.revokeObjectURL(url);
-    // });
+ removePending(tempId: string) {
+  this.pendingFiles = this.pendingFiles.filter(p => p.tempId !== tempId);
+}
 
-    // Simulation pour la démo
-    this.confirmService.openConfirmDialog("Téléchargement", `Téléchargement de ${file.name} en cours...`, false);
+clearPending() {
+  this.pendingFiles = [];
+}
+
+savePending() {
+  if (!this.targetId) {
+    this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
+    return;
+  }
+  if (this.pendingFiles.length === 0) {
+    this.snackbarService.info("Aucun fichier à enregistrer.");
+    return;
   }
 
-  deleteFile(fileId: string): void {
-    // TODO: Implémenter la suppression via votre API
-    // this.fileService.deleteFile(fileId).subscribe({
-    //   next: () => {
-    //     this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-    //     this.confirmService.openConfirmDialog("Fichier supprimé", "Le fichier a été supprimé avec succès.", false);
-    //   },
-    //   error: (error) => {
-    //     this.confirmService.openConfirmDialog("Erreur", "Erreur lors de la suppression du fichier.", false);
-    //   }
-    // });
+  this.isSaving = true;
 
-    // Simulation pour la démo
-    const file = this.attachedFiles.find(f => f.id === fileId);
-    this.attachedFiles = this.attachedFiles.filter(f => f.id !== fileId);
-    this.filteredFiles = this.attachedFiles;
-    this.confirmService.openConfirmDialog("Fichier supprimé", `${file?.name} a été supprimé avec succès.`, false);
-  }
+  const requests = this.pendingFiles.map(p =>
+    this.fileService.uploadFile(p.file, this.targetType, this.targetId, p.description ?? '').pipe(
+      catchError(err => {
+        this.snackbarService.error(`Échec upload: ${p.filename}`);
+        return of(null); // continue le lot
+      })
+    )
+  );
+
+  forkJoin(requests).pipe(finalize(() => (this.isSaving = false))).subscribe({
+    next: _ => {
+      // rafraîchit la liste des fichiers persistés
+      this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+        this.attachedFiles = files;
+        this.filteredFiles = files;
+        this.filteredFilesCount = files.length;
+        this.pendingFiles = []; // panier vidé
+        this.snackbarService.success("Fichiers enregistrés.");
+        this.dialogRef?.close({ updated: true });
+      });
+    },
+    error: _ => {
+      this.confirmService.openConfirmDialog("Erreur", "Erreur lors de l'enregistrement.", false);
+    }
+  });
+}
+
+
 
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 B';
@@ -280,7 +377,7 @@ export class FichiersComponent {
       this.filteredFiles = this.attachedFiles;
     } else {
       this.filteredFiles = this.attachedFiles.filter(file => {
-        const nameMatches = file.name.toLowerCase().includes(this.searchQuery);
+        const nameMatches = file.filename.toLowerCase().includes(this.searchQuery);
 
         // Format de la date : 22/05/2025
         const date = file.uploadedAt instanceof Date ? file.uploadedAt : new Date(file.uploadedAt);
@@ -300,5 +397,11 @@ export class FichiersComponent {
     this.filteredFiles = this.attachedFiles;
     this.filteredFilesCount = 0;
   }
+
+  preview(file: UploadedFile) {
+    this.downloadFile(file, true);
+  }
+
+  trackByTempId = (_: number, p: PendingFile) => p.tempId;
 
 }

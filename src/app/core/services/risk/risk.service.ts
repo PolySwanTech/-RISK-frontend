@@ -2,30 +2,63 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { RiskTemplate, RiskTemplateCreateDto } from '../../models/RiskTemplate';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RiskService {
 
+
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/risks/taxonomie';
+  baseUrl = environment.apiUrl + '/taxonomie';
 
   getById(id: string) {
     return this.http.get<RiskTemplate>(this.baseUrl + '/' + id)
   }
 
   save(dto: RiskTemplateCreateDto) {
-  return this.http.post(this.baseUrl, dto);
-}
-
-  getAll() {
-    return this.http.get<RiskTemplate[]>(this.baseUrl)
+    return this.http.post<RiskTemplate>(this.baseUrl, dto);
   }
 
-  getAllByProcess(processId: string = "") {
+  reasign(riskId: string, processId: string) {
+    return this.http.patch(this.baseUrl + '/reassign', { riskId, processId })
+  }
+
+  getAll(buId?: string): Observable<RiskTemplate[]> {
+    let params = new HttpParams();
+    if (buId) {
+      params = params.append('buId', buId);
+    }
+    return this.http.get<RiskTemplate[]>(this.baseUrl, { params });
+  }
+
+  getRisksTree(processId?: string) {
+    let params = new HttpParams();
+    const option = processId ? { params: params.set('processId', processId) } : {};
+    return this.http.get<any[]>(this.baseUrl + '/tree', option)
+  }
+
+  getRisksTreeByProcessId(processId: string) {
+    let params = new HttpParams();
+    return this.http.get<any[]>(this.baseUrl + '/tree/process', { params: params.set('processId', processId) })
+  }
+
+  getAllByProcess(processId: string = "", year: number = new Date().getFullYear()) {
     let params = new HttpParams();
     params = params.append('processId', processId);
-    return this.http.get<RiskTemplate[]>(this.baseUrl)
+    params = params.append('year', year);
+    return this.http.get<RiskTemplate[]>(this.baseUrl, { params })
+  }
+
+  getByParent(parentId: string) {
+    let params = new HttpParams();
+    params = params.append('parentId', parentId.toString());
+    return this.http.get<RiskTemplate[]>(this.baseUrl, { params: params });
+  }
+
+  getRiskOfIncident(incidentId: string) {
+    const params = new HttpParams().set('incidentId', incidentId);
+    return this.http.get<RiskTemplate>(`${this.baseUrl}/incident`, { params: params });
   }
 }

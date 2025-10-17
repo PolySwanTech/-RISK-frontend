@@ -1,48 +1,29 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient }         from '@angular/common/http';
-import { Observable }         from 'rxjs';
+import { HttpClient, HttpParams }         from '@angular/common/http';
 
-import { RiskEvaluation, RiskEvaluationCreateDto } from '../../../models/RiskEvaluation';
 import { environment } from '../../../../environments/environment';
-import { RiskLevel } from '../../../enum/riskLevel.enum';
+import { RiskLevelEnum } from '../../../enum/riskLevel.enum';
 
 
 @Injectable({ providedIn: 'root' })
 export class RiskEvaluationService {
 
   private readonly http     = inject(HttpClient);
-  private readonly baseUrl  = environment.apiUrl + '/risks/evaluations';
+  private readonly baseUrl  = environment.apiUrl + '/evaluations';
 
-  /* ------------------------------------------------------------------ */
-  /*  GET – détail d’une évaluation par son UUID                        */
-  /* ------------------------------------------------------------------ */
-  get(id: string): Observable<RiskEvaluation> {
-    return this.http.get<RiskEvaluation>(`${this.baseUrl}/${id}`);
+  saveEvaluation(riskId: string, evaluation: RiskLevelEnum, indicators: any[], brut: boolean) {
+    return this.http.post(this.baseUrl, { riskId, evaluation: { name: evaluation, color: "" }, brut, indicators, commentaire: "Test" })
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  GET – liste complète (ton contrôleur la renvoie sur GET /)        */
-  /* ------------------------------------------------------------------ */
-  getAll(): Observable<RiskEvaluation[]> {
-    return this.http.get<RiskEvaluation[]>(this.baseUrl);
+  getEvaluationsByBu(buId: string) {
+    const params = new HttpParams().set("buId", buId);
+    return this.http.get<any>(this.baseUrl + '/by-bu', { params: params })
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  POST – création d’une nouvelle évaluation                         */
-  /*       (l’UUID de l’utilisateur est injecté côté back via @Jwt)     */
-  /* ------------------------------------------------------------------ */
-  save(payload: RiskEvaluationCreateDto): Observable<RiskEvaluation> {
-    return this.http.post<RiskEvaluation>(this.baseUrl, payload);
+  getEvaluationsByRisk(riskId: string) {
+    const params = new HttpParams().set("riskId", riskId);
+    return this.http.get<any>(this.baseUrl + '/by-risk', { params: params })
   }
 
-  updateLevel(
-    evaluationId: string,
-    newLevel:     RiskLevel
-  ): Observable<RiskEvaluation[]> {
-    return this.http.put<RiskEvaluation[]>(
-      `${this.baseUrl}/${evaluationId}`,
-      newLevel                                    // corps = simple enum
-    );
-  }
 }
 

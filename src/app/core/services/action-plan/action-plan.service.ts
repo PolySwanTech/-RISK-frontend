@@ -1,7 +1,7 @@
 import { Priority } from '../../enum/Priority';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/ActionPlan';
 
 @Injectable({
@@ -9,7 +9,8 @@ import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/ActionPlan
 })
 export class ActionPlanService {
 
-  base = environment.apiUrl + '/risks/action-plans';
+  base = environment.apiUrl + '/action-plans';
+  baseAction = environment.apiUrl + '/actions';
   http = inject(HttpClient);
 
   createActionPlan(actionPlan: ActionPlanCreateDto) {
@@ -17,10 +18,15 @@ export class ActionPlanService {
   }
 
   getActionPlan(id: string) {
-    // const allPlans = this.getActionsPlan();
-    // return allPlans.find(plan => plan.id === id);
-
     return this.http.get<ActionPlan>(`${this.base}/${id}`);
+  }
+
+  startActionPlan(id: string) {
+    return this.http.put(`${this.base + '/start/' + id}`, null);
+  }
+
+  endActionPlan(id: string) {
+    return this.http.put(`${this.base + '/end/' + id}`, null);
   }
 
   getActionsPlan() {
@@ -28,6 +34,23 @@ export class ActionPlanService {
   }
 
   addActions(actions: Action[], id: string) {
-    return this.http.post(`${this.base}/${id}/actions`, actions);
+    return this.http.post(`${this.baseAction}`, actions, { params: { actionPlanId: id } });
+  }
+
+  getActionPlanByIncident(incidentId: string) {
+    const params = new HttpParams().set("incidentId", incidentId);
+    return this.http.get<ActionPlan>(`${this.base + '/incident'}`, { params: params });
+  }
+
+  finishAction(actionId: string) {
+    return this.http.put(this.baseAction + '/finish/' + actionId, {});
+  }
+
+  abandonAction(id: string) {
+    return this.http.put(`${this.baseAction}/deactivate/${id}`, {})
+  }
+
+  delete(id: string) {
+    return this.http.put(`${this.base}/${id}/deactivate`, {})
   }
 }

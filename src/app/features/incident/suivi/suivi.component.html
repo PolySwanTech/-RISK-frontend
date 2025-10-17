@@ -1,73 +1,43 @@
-@if(incident){
-<div style="margin: 15px;">
-    <app-go-back previousPageName="Détails de l'incident"
-        [currentPageName]="`Suivi de l'incident - ` + incident.title"></app-go-back>
+@if(history && history.length > 0) {
+<div class="body-container">
+    <app-go-back [title]="`Suivi de l'incident`"></app-go-back>
 </div>
 
 <div class="timeline-container">
-    <h2>Suivi de l’incident - {{incident.title}}</h2>
 
-    <div *ngIf="history.length === 0" class="empty">
-        <mat-icon>history</mat-icon> Aucun historique disponible.
-    </div>
+    <mat-vertical-stepper [linear]="false" #stepper>
+        <mat-step *ngFor="let entry of history" [completed]="true" [editable]="false">
 
-    <div class="timeline">
-        <div class="timeline-item" *ngFor="let entry of history">
-            <div class="timeline-icon" [ngClass]="entry.action.toLowerCase()">
-                <mat-icon>
-                    {{
-                    entry.action === 'CREATION' ? 'add_circle' :
-                    entry.action === 'MODIFICATION' ? 'edit' :
-                    entry.action === 'IMPACT_ADDED' ? 'track_changes' :
-                    'delete'
-                    }}
-                </mat-icon>
-            </div>
-
-            <div class="timeline-content mat-elevation-z2">
-                <div class="header">
-                    <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
-                    <span class="meta">
-                        Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
-                    </span>
-                </div>
-
+            <ng-template matStepLabel>
                 <div class="timeline-content mat-elevation-z2">
+                    <!-- Icône personnalisée -->
+
+
                     <div class="header">
-                        <strong>{{ TITRE_PAR_ACTION[entry.action] || entry.action }}</strong>
+                        <mat-icon class="timeline-icon">
+                            {{
+                            entry.action.toLowerCase().includes("création") ? 'add_circle' :
+                            entry.action.toLowerCase().includes("modi") ? 'edit' :
+                            entry.action.toLowerCase().includes("ajouté") ? 'track_changes' :
+                            entry.action.toLowerCase().includes("message") ? 'message' :
+                            'delete'
+                            }}
+                        </mat-icon>
                         <span class="meta">
                             Par {{ entry.performed_by }} le {{ entry.timestamp | date:'dd/MM/yyyy à HH:mm' }}
                         </span>
                     </div>
-
-                    <div *ngIf="entry.action === 'IMPACT_ADDED' && getImpactFromHistory(entry)">
-                        <p class="impact-summary">
-                            {{ getImpactFromHistory(entry) }}
-                        </p>
+                    <div class="header">
+                        <strong>{{ entry.action }}</strong>
                     </div>
 
+                    <label>Commentaires : </label>
                     <p *ngIf="entry.comment" class="comment">{{ entry.comment }}</p>
-
-                    <!-- <button *ngIf="entry.action !== 'CREATION' && entry.action !== 'CLOTURE'" mat-button
-                        (click)="openSnapshotDialog(entry)">
-                        <mat-icon>compare</mat-icon> Détails des changements
-                    </button> -->
                 </div>
-            </div>
+            </ng-template>
 
-        </div>
-        <div class="timeline-item" *ngFor="let msg of messages">
-            <div class="timeline-icon message">
-                <mat-icon>chat</mat-icon>
-            </div>
-            <div class="timeline-content mat-elevation-z2">
-                <div class="header">
-                    <strong>💬 Message ajouté</strong>
-                    <span class="meta">Par {{ msg.writter }} le {{ msg.date | date:'dd/MM/yyyy à HH:mm' }}</span>
-                </div>
-                <p class="comment">{{ msg.content }}</p>
-            </div>
-        </div>
-    </div>
+        </mat-step>
+    </mat-vertical-stepper>
+
 </div>
 }

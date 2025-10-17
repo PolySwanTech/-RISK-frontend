@@ -4,8 +4,6 @@
 
 }
 
-
-
 .plan-detail-container {
   display: flex;
   gap: 20px;
@@ -42,11 +40,6 @@ mat-card-title {
 mat-card-header {
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
-}
-
-mat-card-header span {
-  font-size: 20px;
-  font-weight: bold;
 }
 
 mat-card-content {
@@ -204,5 +197,43 @@ mat-card-content {
       color: #222;
       font-weight: 500;
     }
+
+
   }
+
+  .incident {
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+  }
+}
+
+.action-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 150vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+app-audit-button {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  pointer-events: auto;
+  z-index: 10000;
+  background-color: #1976d2;
+  color: white;
 }

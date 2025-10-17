@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Incident } from '../../models/Incident';
-import { EntiteResponsable } from '../../models/EntiteResponsable';
+import { BusinessUnit } from '../../models/BusinessUnit';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -11,32 +10,36 @@ import { environment } from '../../../environments/environment';
 export class EntitiesService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/users/bu'
+  baseUrl = environment.apiUrl + '/business-units'
 
-  loadEntities(): Observable<EntiteResponsable[]> {
-    return this.http.get<EntiteResponsable[]>(this.baseUrl);
+  loadEntities(onlyBL : boolean = false): Observable<BusinessUnit[]> {
+    return this.http.get<BusinessUnit[]>(this.baseUrl,  {params : { onlyBL }});
   }
 
-  findById(id : string): Observable<EntiteResponsable> {
-    return this.http.get<EntiteResponsable>(this.baseUrl + '/' + id);
+  findById(id : string): Observable<BusinessUnit> {
+    return this.http.get<BusinessUnit>(this.baseUrl + '/' + id);
   }
 
-  loadEntitiesTree(): Observable<EntiteResponsable[]> {
-    return this.http.get<EntiteResponsable[]>(this.baseUrl + '/tree');
+  loadEntitiesTree(): Observable<BusinessUnit[]> {
+    return this.http.get<BusinessUnit[]>(this.baseUrl + '/tree');
   }
 
-  save(entite: EntiteResponsable) {
+  save(entite: BusinessUnit) {
     return this.http.post(this.baseUrl, entite);
   }
 
-  getByProcess(processId: string): Observable<EntiteResponsable> {
-    return this.http.get<EntiteResponsable>(
+  getByProcess(processId: string): Observable<BusinessUnit> {
+    return this.http.get<BusinessUnit>(
       `${this.baseUrl}/byProcess`,
       { params: { processId } }
     );
   }
 
-  update(entite: EntiteResponsable) {
+  update(entite: BusinessUnit) {
     return this.http.put(this.baseUrl, entite);
+  }
+
+  delete(id : string){
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

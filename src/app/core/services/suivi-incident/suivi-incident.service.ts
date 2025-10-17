@@ -8,25 +8,25 @@ import { IncidentHistory } from '../../models/IncidentHistory';
   providedIn: 'root'
 })
 export class SuiviIncidentService {
+  
 
-  private base = environment.apiUrl + '/incidents/incident/suivi';
+  private base = environment.apiUrl + '/histories';
   private http = inject(HttpClient);
 
-
-  getSuiviIncidentById(id: string) {
-    let params = new HttpParams();
-    params = params.append('incidentId', id);
-    return this.http.get<SuiviIncident[]>(this.base, { params: params });
-  }
-
-  addSuiviIncident(content: string, incidentId: string, username: string) {
+  addSuiviIncident(content: string, incidentId: string) {
     let params = new HttpParams();
     params = params.append('incidentId', incidentId);
-    return this.http.post<SuiviIncident>(this.base, { content: content, username: username }, { params: params });
+    return this.http.post<SuiviIncident>(this.base, content, { params: params });
   }
 
   getIncidentHistory(incidentId: string) {
     const params = new HttpParams().set('incidentId', incidentId);
-    return this.http.get<IncidentHistory[]>(this.base + '/history', { params });
+    return this.http.get<IncidentHistory[]>(this.base, { params : params });
+  }
+
+  getLatestSuiviIncidentById(incidentId: string, limit : number = 2) {
+    return this.http.get<IncidentHistory[]>(`${this.base}/latest`, {
+      params: new HttpParams().set('incidentId', incidentId).set('limit', limit)
+    });
   }
 }

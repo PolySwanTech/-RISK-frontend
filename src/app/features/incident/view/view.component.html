@@ -1,139 +1,124 @@
-<div style="margin: 15px;">
-    @if(incident){
-    <app-go-back previousPageName="Liste des incidents"
-        [currentPageName]="`Détails de l'incident - ` + incident.title"></app-go-back>
+@if(incident){
+<app-go-back [title]="`Détails de l'incident`" [subtitle]="incident.reference" [buttons]="goBackButtons"></app-go-back>
+<div class="body-container">
     <div class="view-container">
         <div class="info-container">
-            <mat-card class="incident-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
-                <mat-card-header>
-                    <mat-card-title class="header-with-buttons">
-                        <span>Info globale</span>
-                        <span class="buttons-header">
-                            <button mat-raised-button class="btn-primary" (click)="addActionPlan()">
-                                <mat-icon>playlist_add_check</mat-icon>
-                                Plan d'action
-                            </button>
-                            <button mat-raised-button class="btn-green" (click)="downloadExport()">
-                                <mat-icon>file_download</mat-icon> Exporter
-                            </button>
-
-                            <button *ngIf="canClose && isNotClosed()" mat-raised-button class="btn-red"
-                                (click)="closeIncident()">
-                                <mat-icon>lock</mat-icon> Clôturer
-                            </button>
-
-                        </span>
-                    </mat-card-title>
-                </mat-card-header>
+            <mat-card class="incident-card">
                 <mat-card-content>
-                    <!-- Informations principales en cartes -->
-                    <div class="info-grid">
-                        <!-- Localisation -->
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <mat-icon>location_on</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Localisation</span>
-                                <span class="info-value">{{ incident.location }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Cause -->
-                        <div class="info-item">
-                            <div class="info-icon cause-icon">
-                                <mat-icon>error_outline</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Cause</span>
-                                <span class="info-value">{{ incident.cause.name }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Type de risque -->
-                        <div class="info-item">
-                            <div class="info-icon risk-icon">
-                                <mat-icon>warning</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Type de risque</span>
-                                <span class="info-value">{{ incident.riskName }} 
-                                    <!-- - Niveau {{ incident.risk.level }} -->
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Référence -->
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <mat-icon>confirmation_number</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Référence</span>
-                                <span class="info-value">{{ incident.reference }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Titre -->
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <mat-icon>title</mat-icon>
-                            </div>
-                            <div class="info-content">
-                                <span class="info-label">Libellé</span>
-                                <span class="info-value">{{ incident.title }}</span>
-                            </div>
-                        </div>
-
-                    </div>
-
                     <!-- Timeline des dates -->
-                    <div class="dates-timeline">
+                    <div class="timeline-horizontal">
                         <h3 class="timeline-title">
                             <mat-icon>schedule</mat-icon>
-                            Chronologie
+                            Chronologie de l'incident
                         </h3>
 
-                        <div class="timeline-container">
-                            <!-- Date de déclaration -->
-                            <div class="timeline-item">
-                                <div class="timeline-dot declaration"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Déclaration</span>
-                                    <span class="timeline-date">{{ incident.declaredAt| date : 'dd/MM/yyyy' }}</span>
+                        <div class="timeline-row">
+                            <div class="timeline-step">
+                                <div class="dot red"></div>
+                                <div class="date">{{ incident.survenueAt | date: 'dd/MM/yyyy' }}</div>
+                                <div class="label">
+                                    <mat-icon fontIcon="place"></mat-icon> Date de survenance
                                 </div>
                             </div>
 
-                            <!-- Date de survenance -->
-                            <div class="timeline-item">
-                                <div class="timeline-dot survenance"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Survenance</span>
-                                    <span class="timeline-date">{{ incident.survenueAt| date : 'dd/MM/yyyy' }}</span>
+                            <div class="timeline-segment">
+                                <div class="days-diff">
+                                    {{ getDaysDiff(incident.survenueAt, incident.detectedAt) == -1 ? 'N/R' :
+                                    getDaysDiff(incident.survenueAt, incident.detectedAt) + ' jours' }}
+                                </div>
+
+                                <div class="line-gradient" [ngStyle]="{
+     'background': 'linear-gradient(to right, ' + getLineColor(incident.survenueAt, incident.detectedAt) + ', ' + getLineColor(incident.survenueAt, incident.detectedAt) + ')'
+   }">
                                 </div>
                             </div>
 
-                            <!-- Date de détection -->
-                            <div class="timeline-item">
-                                <div class="timeline-dot detection"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Détection</span>
-                                    <span class="timeline-date">{{ incident.detectedAt| date : 'dd/MM/yyyy' }}</span>
+                            <div class="timeline-step">
+                                <div class="dot orange"></div>
+                                <div class="date">{{ incident.detectedAt | date: 'dd/MM/yyyy' }}</div>
+                                <div class="label">
+                                    <mat-icon fontIcon="search"></mat-icon> Date de détection
                                 </div>
                             </div>
 
-                            <!-- Date de clôture (si existe) -->
-                            @if(incident.closedAt) {
-                            <div class="timeline-item">
-                                <div class="timeline-dot closure"></div>
-                                <div class="timeline-content">
-                                    <span class="timeline-label">Clôture</span>
-                                    <span class="timeline-date">{{ incident.closedAt| date : 'dd/MM/yyyy' }}</span>
+                            <div class="timeline-segment">
+                                <div class="days-diff">
+                                    {{ getDaysDiff(incident.detectedAt, incident.declaredAt) == -1 ? 'N/R' :
+                                    getDaysDiff(incident.declaredAt, incident.detectedAt) + ' jours'}}
+                                </div>
+
+                                <div class="line-gradient" [ngStyle]="{
+     'background': 'linear-gradient(to right, ' + getLineColor(incident.detectedAt, incident.declaredAt) + ', ' + getLineColor(incident.detectedAt, incident.declaredAt) + ')'
+   }">
                                 </div>
                             </div>
-                            }
+
+                            <div class="timeline-step">
+                                <div class="dot green"></div>
+                                <div class="date">{{ incident.declaredAt | date: 'dd/MM/yyyy' }}</div>
+                                <div class="label">
+                                    <mat-icon fontIcon="calendar_today"></mat-icon> Date de déclaration
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Informations principales en cartes -->
+                    <mat-card class="general-info-card">
+                        <span class="section-header">
+                            <span class="pin-emoji">📌</span>
+                            <span>Informations générales</span>
+                        </span>
+
+                        <mat-card-content>
+                            <div class="info-pairs-grid">
+                                <div class="info-field">
+                                    <label>Créateur</label>
+                                    <div class="info-box">{{ incident.creatorName }}</div>
+                                </div>
+                                <div class="info-field">
+                                    <label>Intervenant</label>
+                                    <div class="info-box">{{ incident.intervenantName }}</div>
+                                </div>
+                                <div class="info-field">
+                                    <label>Localisation</label>
+                                    <div class="info-box">{{ incident.location ? incident.location : 'N/R' }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Cause</label>
+                                    <div class="info-box">{{ incident.cause ? incident.cause.name : 'N/R' }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Risque</label>
+                                    <div class="info-box">{{ incident.riskName ? incident.riskName : 'N/R' }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Risque Bâlois</label>
+                                    <div class="info-box">{{ incident.categoryBaloise ? incident.categoryBaloise.label :
+                                        'N/R' }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Référence</label>
+                                    <div class="info-box">{{ incident.reference }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Libellé</label>
+                                    <div class="info-box">{{ incident.title }}</div>
+                                </div>
+
+                                <div class="info-field">
+                                    <label>Entité Responsable</label>
+                                    <div class="info-box">{{ incident.teamName }}</div>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+
 
                     <!-- Description -->
                     <div class="description-section">
@@ -145,117 +130,67 @@
                             <p>{{ incident.commentaire }}</p>
                         </div>
                     </div>
-                </mat-card-content>
-            </mat-card>
 
-            <mat-card class="files-card" [ngStyle]="{'height': !incident.closedAt ? '930px' : '1020px'}">
-                <mat-card-header>
-                    <mat-card-title>
-                        <span>Pièces jointes</span>
-                        @if(isNotClosed()){
-                        <button mat-raised-button class="btn-primary" (click)="openFileUpload()">
-                            <mat-icon>attach_file</mat-icon>
-                            Ajouter
-                        </button>
-                        }
-                    </mat-card-title>
-                </mat-card-header>
-                <app-fichiers [idIncident]="incident.id" [closed]="isNotClosed()" style="height: 90%;"></app-fichiers>
-            </mat-card>
-            <mat-card class="state-card none">
-                <mat-card-header>
-                    <mat-card-title><span>Suivi</span>
-                        <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
-                    </mat-card-title>
+                    <div>
+                        <h3 class="description-title">
+                            <mat-icon>assessment</mat-icon>
+                            Impacts de l'incident
+                        </h3>
+                        @if(incident.state !== 'DRAFT'){
+                        <mat-card style="margin-bottom: 20px;">
+                            <div class="table-container">
+                                <table mat-table [dataSource]="impactDataSource" class="mat-elevation-z4">
 
-                </mat-card-header>
-                <mat-card-content>
-                    <div class="comment-section">
-                        <div class="comment-header-bar">
-                            <span>Messages les plus récents</span>
-                        </div>
-                        @for(s of suivi; track s.id){
-                        <div class="comment-card">
-                            <div class="comment-header">
-                                <mat-icon class="user-icon">person</mat-icon>
-                                <span class="username">
-                                    {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
-                                </span>
+                                    <ng-container *ngFor="let col of columns" [matColumnDef]="col.columnDef">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            {{ col.header }}
+                                        </th>
+
+                                        <td mat-cell *matCellDef="let row">
+                                            <ng-container *ngIf="col.type === 'currency'; else plainCell">
+                                                {{ col.cell(row) | currency:'EUR':'symbol':'1.0-2' }}
+                                            </ng-container>
+                                            <ng-template #plainCell>
+                                                {{ col.cell(row) }}
+                                            </ng-template>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedImpactColumns"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedImpactColumns;"></tr>
+
+                                    <tr class="mat-row no-data-row" *matNoDataRow>
+                                        <td class="mat-cell" [attr.colspan]="displayedImpactColumns.length">
+                                            <div class="no-data">
+                                                <span>Aucun résultat trouvé.</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                </table>
                             </div>
-                            <p class="comment-text">{{s.content}}</p>
-                        </div>
-                        }
-                        <mat-form-field>
-                            <mat-label>Message</mat-label>
-                            <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
-                        </mat-form-field>
-                        <button mat-raised-button class="btn-primary" (click)="sendMessage()">Envoyer</button>
-                    </div>
-                </mat-card-content>
-            </mat-card>
+                        </mat-card>
 
-        </div>
-        <div class="info2-container" style="display: flex; gap: 20px;">
-            <!-- Section Pièces jointes -->
-
-            <mat-card class="state-card display">
-                <mat-card-header>
-                    <mat-card-title><span>Suivi</span>
-                        <button mat-raised-button class="btn-primary" (click)="accessSuivi()">Accéder</button>
-                    </mat-card-title>
-
-                </mat-card-header>
-                <mat-card-content>
-                    <div class="comment-section">
-                        <div class="comment-header-bar">
-                            <span>Messages les plus récents</span>
-                        </div>
-                        @for(s of suivi; track s.id){
-                        <div class="comment-card">
-                            <div class="comment-header">
-                                <mat-icon class="user-icon">person</mat-icon>
-                                <span class="username">
-                                    {{ s.writter }} le {{ s.date | date: "d MMM y 'à' HH:mm" }}
-                                </span>
-                            </div>
-                            <p class="comment-text">{{s.content}}</p>
-                        </div>
-                        }
-                        <mat-form-field>
-                            <mat-label>Message</mat-label>
-                            <textarea matInput name="incident-com" id="commentaire" [(ngModel)]="message"></textarea>
-                        </mat-form-field>
-                        <button *ngIf="isNotClosed()" mat-raised-button class="btn-primary"
-                            (click)="sendMessage()">Envoyer</button>
-                    </div>
-                </mat-card-content>
-            </mat-card>
-
-            <mat-card class="state-card">
-                <mat-card-header>
-                    <mat-card-title>
-                        <span>Impacts -
-                            <strong>
-                                Total : {{ totalAmount | currency : 'EUR' }}
-                            </strong>
-                        </span>
-                        @if(isNotClosed()){
+                        @if(!isClosed()){
                         <button mat-raised-button class="btn-primary" (click)="addImpact()">
-                            Ajouter
-                            <mat-icon>add</mat-icon>
+                            Voir les détails
+                            <mat-icon>visibility</mat-icon>
                         </button>
                         }
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <div class="impacts-container">
-                        @for(impact of incident.impacts; track impact.id){
-                        <app-impact-card [impact]="impact" [businessUnits]="businessUnits"></app-impact-card>
+                        }
+                        @else {
+                        <div class="empty" style="margin: 20px 0;">
+                            <span>Aucun impact n'est disponible pour un incident en brouillon.</span>
+                        </div>
                         }
                     </div>
                 </mat-card-content>
             </mat-card>
+            <app-fichiers style="flex: 3;" [targetId]="idIncident" [closed]="isClosed()"></app-fichiers>
         </div>
     </div>
-    }
+
 </div>
+
+<app-audit-button [contextId]="incident.id" [contextTarget]="targetTypeEnum.INCIDENT"></app-audit-button>
+}

@@ -1,143 +1,32 @@
 <div class="process-container">
-    <app-go-back previousPageName="Paramétrage Global" currentPageName="Gestion des processus"
-        [redirectUrl]="['reglages']" />
 
-    <!-- Header avec glassmorphism -->
-    <div class="header-container">
-        <div class="header-content">
-            <div class="header-info">
-                <h1 class="main-title">Gestion des Processus</h1>
-            </div>
-
-            <button mat-raised-button class="btn-primary" (click)="add()">
-                <mat-icon>add</mat-icon>
-                Nouveau Processus
+    <!-- Barre de recherche par nom de process -->
+    <div class="search-bar">
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Rechercher un risque par process</mat-label>
+            <input matInput [(ngModel)]="searchTerm" placeholder="Nom du process...">
+            <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm=''">
+                <mat-icon>close</mat-icon>
             </button>
-        </div>
-
-        <!-- Barre de recherche -->
-        <div class="search-container">
-            <mat-icon class="search-icon">search</mat-icon>
-            <input type="text" placeholder="Rechercher un processus..." class="search-input" [(ngModel)]="searchTerm"
-                (input)="onSearch($event)" />
-        </div>
+        </mat-form-field>
     </div>
 
-    <!-- Arbre hiérarchique -->
-    <div class="hierarchy-container">
-        <div class="tree-wrapper">
-            <ng-container *ngFor="let node of filteredProcesses">
-                <div class="node-container" [ngClass]="'level-' + node.niveau">
+    <!-- Tableau unique des risques -->
+    <div class="risk-table">
+        <div class="table-header">
+            <div class="col-process">Processus</div>
+            <div class="col-risque">Exercice</div>
+            <div class="col-risque">Risque</div>
+            <div class="col-risque-brut">Evaluation</div>
+            <div class="col-risque-brut">Type d'évaluation</div>
+        </div>
 
-                    <!-- Ligne de connexion -->
-                    <div class="connection-line" *ngIf="node.niveau > 0"></div>
-
-                    <!-- Node principal -->
-                    <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
-                        <!-- Effet de brillance -->
-                        <div class="shine-effect"></div>
-
-                        <div class="node-content">
-                            <div class="node-left">
-                                <!-- Chevron d'expansion -->
-                                <div class="chevron-container" *ngIf="hasChildren(node)">
-                                    <mat-icon class="chevron-icon" [ngClass]="{'expanded': isExpanded(node.id)}">
-                                        chevron_right
-                                    </mat-icon>
-                                </div>
-
-                                <!-- Icône et infos -->
-                                <div class="node-info">
-                                    <div class="icon-container" [ngClass]="'icon-' + node.type">
-                                        <mat-icon>{{ getNodeIcon(node.type) }}</mat-icon>
-                                    </div>
-
-                                    <div class="text-info">
-                                        <h3 class="node-name" [ngClass]="'name-' + node.type">
-                                            {{ node.name }}
-                                        </h3>
-                                        <p class="node-description" *ngIf="hasChildren(node)">
-                                            {{ getChildrenCount(node) }} processus
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Badge de niveau -->
-                            <div class="level-badge" [ngClass]="'badge-' + node.type">
-                                Niveau {{ node.niveau }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Children avec animation -->
-                    <div class="children-container" [ngClass]="{'expanded': isExpanded(node.id)}"
-                        *ngIf="hasChildren(node)">
-                        <div class="children-wrapper">
-                            <ng-container *ngFor="let child of node.children">
-                                <ng-container
-                                    *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }"></ng-container>
-                            </ng-container>
-                        </div>
-                    </div>
-                </div>
-            </ng-container>
+        <div *ngFor="let item of filteredRisks()" class="table-row">
+            <div class="col-process">{{ item.processName }}</div>
+            <div class="col-process">{{ item.exercicePeriod.start | date : "dd/MM/yyyy" }} - {{ item.exercicePeriod.end | date : "dd/MM/yyyy" }} </div>
+            <div class="col-risque">{{ item.riskName }}</div>
+            <div class="col-risque-brut">{{ item.evaluation.name }}</div>
+            <div class="col-risque-brut">{{ item.brut ? 'Brute' : 'Nette' }}</div>
         </div>
     </div>
-
-    <!-- Template récursif pour les enfants -->
-    <ng-template #nodeTemplate let-node>
-        <div class="node-container" [ngClass]="'level-' + node.level">
-
-            <!-- Ligne de connexion -->
-            <div class="connection-line" *ngIf="node.level > 0"></div>
-
-            <!-- Node principal -->
-            <div class="process-node" [ngClass]="getNodeClasses(node)" (click)="toggleNode(node.id)">
-                <!-- Effet de brillance -->
-                <div class="shine-effect"></div>
-
-                <div class="node-content">
-                    <div class="node-left">
-                        <!-- Chevron d'expansion -->
-                        <div class="chevron-container" *ngIf="hasChildren(node)">
-                            <mat-icon class="chevron-icon" [ngClass]="{'expanded': isExpanded(node.id)}">
-                                chevron_right
-                            </mat-icon>
-                        </div>
-
-                        <!-- Icône et infos -->
-                        <div class="node-info">
-                            <div class="icon-container" [ngClass]="'icon-' + node.type">
-                                <mat-icon>{{ getNodeIcon(node.type) }}</mat-icon>
-                            </div>
-
-                            <div class="text-info">
-                                <h3 class="node-name" [ngClass]="'name-' + node.type">
-                                    {{ node.name }}
-                                </h3>
-                                <p class="node-description" *ngIf="hasChildren(node)">
-                                    {{ getChildrenCount(node) }} processus
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Badge de niveau -->
-                    <div class="level-badge" [ngClass]="'badge-' + node.type">
-                        Niveau {{ node.niveau }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Children avec animation -->
-            <div class="children-container" [ngClass]="{'expanded': isExpanded(node.id)}" *ngIf="hasChildren(node)">
-                <div class="children-wrapper">
-                    <ng-container *ngFor="let child of node.children">
-                        <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }"></ng-container>
-                    </ng-container>
-                </div>
-            </div>
-        </div>
-    </ng-template>
 </div>

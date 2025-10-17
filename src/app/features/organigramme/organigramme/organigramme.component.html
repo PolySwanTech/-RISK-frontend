@@ -14,7 +14,7 @@
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
         <button type="button" mat-icon-button disabled></button>
         <span>{{node.name}}</span>
-        <mat-checkbox [(ngModel)]="node.checked" (click)="$event.stopPropagation(); resetRole(node)">
+        <mat-checkbox [(ngModel)]="node.checked" (click)="$event.stopPropagation();">
         </mat-checkbox>
 
         @if(node.checked){
@@ -40,7 +40,9 @@
         @if(node.checked){
           <mat-form-field (click)="$event.stopPropagation(); resetRole(node)" appearance="outline" class="role-select">
             <mat-select (selectionChange)="onRoleChange(node)" [(ngModel)]="node.role" placeholder="Choisir un rôle">
-              <mat-option *ngFor="let role of roles" [value]="role">{{role.name}}</mat-option>
+              @for(role of roles; track role) {
+              <mat-option [value]="role">{{role.name}}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
         }

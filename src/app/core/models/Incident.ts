@@ -1,8 +1,8 @@
 import { State } from "../enum/state.enum";
 import { Cause } from "./Cause";
-import { Impact } from "./Impact";
-import { Process } from "./Process";
-import { RiskTemplate } from "./RiskTemplate";
+import { OperatingLoss } from "./OperatingLoss";
+import { BaloiseCategoryDto } from "./RiskReferentiel";
+
 
 export class Incident {
     id: string;
@@ -19,14 +19,23 @@ export class Incident {
 
     risk: string;
     riskName : string = "";
+    categoryBaloise : BaloiseCategoryDto;
     cause : Cause;
-    process: Process ;
-    equipeId?: string;
+    process: string ;
+    processName?: string ;
+    teamId?: string;
+    teamName?: string;
 
-    impacts: Impact[];
+    impacts: OperatingLoss[];
 
     state: State;
-    consequenceId?: string;
+    consequences: string[];
+    intervenantId?: string | null;
+    intervenantName?: string | null;
+    creatorId?: string | null;
+    creatorName?: string | null;
+
+
 
     constructor(
         id: string,
@@ -38,12 +47,17 @@ export class Incident {
         detectedAt: Date,
         closedAt: Date | null,
         risk: string,
+        categoryBaloise: BaloiseCategoryDto,
         cause: Cause,
-        process: Process,
-        equipeId?: string,
-        impacts: Impact[] = [],
+        process: string,
+        teamId?: string,
+        impacts: OperatingLoss[] = [],
         state: State = State.DRAFT,
-        consequenceId?: string
+        consequences: string[] = [],
+        intervenantId?: string | null,
+        intervenantName?: string,
+        creatorId?: string | null,
+        creatorName?: string,
     ){
         this.id = id;
         this.title = title;
@@ -54,12 +68,17 @@ export class Incident {
         this.detectedAt = detectedAt;
         this.closedAt = closedAt;
         this.risk = risk;
+        this.categoryBaloise = categoryBaloise;
         this.cause = cause;
         this.process = process;
-        this.equipeId = equipeId;
+        this.teamId = teamId;
         this.impacts = impacts;
         this.state = state;
-        this.consequenceId = consequenceId;
+        this.consequences = consequences;
+        this.intervenantId = intervenantId || null;
+        this.intervenantName = intervenantName || null;
+        this.creatorId = creatorId || null;
+        this.creatorName = creatorName || null;
     }
 
 

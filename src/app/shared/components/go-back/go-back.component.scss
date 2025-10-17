@@ -1,28 +1,111 @@
-.breadcrumb {
+.sticky {
+  position: fixed;
+  top: 0;
+  z-index : 1000;
+  left: 260px;
+  transition: left 0.3s ease;
+}
+
+.sticky-close {
+  left: 0px;
+}
+
+.header {
+  width: -webkit-fill-available;
+  background: white;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+
+  .header-content {
+    padding: 12px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    font-size: 16px;
-    color: #345c94;
-  
-    .breadcrumb-link {
-      cursor: pointer;
-      color: #345c94;
-      font-weight: bold;
-      text-decoration: underline;
-  
-      &:hover {
-        color: darken(#345c94, 10%);
+    flex-wrap: wrap; // Pour responsive
+
+    .header-left {
+      display: flex;
+      align-items: center;
+
+      .back-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        margin-right: 16px;
+        color: #333;
+
+        i {
+          font-size: 20px;
+        }
+
+        &:hover {
+          color: #007bff;
+        }
+      }
+
+      .header-info {
+        display: flex;
+        flex-direction: column;
+
+        .page-title {
+          margin: 0;
+          font-size: 20px;
+          font-weight: 600;
+          color: #222;
+        }
+
+        .page-subtitle {
+          margin: 4px 0 0 0;
+          font-size: 14px;
+          color: #666;
+        }
       }
     }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      /* espace entre les boutons */
+      flex-shrink: 0;
   
-    .breadcrumb-separator {
-      margin: 0 5px;
-      font-weight: bold;
-      color: #333;
-    }
-  
-    .breadcrumb-current {
-      font-weight: bold;
-      color: #333;
+
+      @media (min-width: 600px) {
+        margin-top: 0;
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+
+        &.btn-secondary {
+          background-color: #f0f0f0;
+          color: #333;
+
+          &:hover {
+            background-color: #e0e0e0;
+          }
+        }
+
+        &.btn-primary {
+          background-color: #007bff;
+          color: white;
+
+          &:hover {
+            background-color: #0069d9;
+          }
+        }
+
+        i {
+          font-size: 16px;
+        }
+      }
     }
   }
+}

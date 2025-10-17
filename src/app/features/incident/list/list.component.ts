@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, inject, OnInit, resource, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Incident } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
@@ -9,27 +8,34 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { HasPermissionDirective } from '../../../core/directives/has-permission.directive';
-import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { State } from '../../../core/enum/state.enum';
+import { State, StateLabels } from '../../../core/enum/state.enum';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuModule } from '@angular/material/menu';
+import * as XLSX from 'xlsx';
+import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
+import { Filter } from '../../../core/enum/filter.enum';
+import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
-    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule,
-    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule, MatTooltipModule, HasPermissionDirective, MatSelectModule, MatFormFieldModule, MatButtonModule],
+  imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule, MatMenuModule,
+    MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, GoBackComponent,
+    ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatCheckboxModule,
+    MatTooltipModule, MatSelectModule, MatFormFieldModule,
+    MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent, FormsModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   providers: [DatePipe]
@@ -37,65 +43,78 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 export class ListComponent implements OnInit {
 
-  private dialog = inject(MatDialog);
   private incidentService = inject(IncidentService)
   private datePipe = inject(DatePipe)
   private router = inject(Router);
-  private confirmService = inject(ConfirmService)
+  private route = inject(ActivatedRoute);
+
+  filterMode: 'general' | 'detailed' = 'general';
 
   columns = [
-    // {
-    //   columnDef: 'id',
-    //   header: 'Ref',
-    //   cell: (element: Incident) => `${element.id}`,
-    // },
     {
-      columnDef: 'référence',
+      columnDef: 'reference',
       header: 'Référence',
       cell: (element: Incident) => `${element.reference}`,
+      filterType: 'text',
+      icon: 'tag' // 🏷️
     },
     {
-      columnDef: 'titre',
+      columnDef: 'title',
       header: 'Libellé',
       cell: (element: Incident) => `${element.title}`,
+      filterType: 'text',
+      icon: 'title' // 📝
     },
     {
-      columnDef: 'dateDeclaration',
+      columnDef: 'declaredAt',
       header: 'Date de déclaration',
       cell: (element: Incident) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
+      filterType: 'date',
+      icon: 'event' // 📅
     },
     {
-      columnDef: 'dateSurvenance',
+      columnDef: 'survenueAt',
       header: 'Date de survenance',
       cell: (element: Incident) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
+      filterType: 'date',
+      icon: 'event_note' // 🗓️
     },
-
     {
-      columnDef: 'statut',
+      columnDef: 'state',
       header: 'Statut',
       cell: (incident: Incident) => `
-  <span class="badge ${incident.state.toLowerCase()}">
-    ${State[incident.state.toString() as keyof typeof State] || 'Inconnu'}
-  </span>
-`    }
+          <span class="badge ${incident.state.toLowerCase()}">
+            ${this.getStateLabel(incident.state)}
+          </span>
+        `, // ← label lisible
+      isBadge: 'state',                                                // ← si ton template gère les badges
+      filterType: 'select',
+      options: Object.values(State).map(s => ({                        // ← options = enum + label
+        value: s,
+        label: StateLabels[s]
+      })),
+      icon: 'flag'
+    }
   ];
 
-  displayedColumns = ['select', ...this.columns.map(c => c.columnDef), 'actions'];
+
+  goBackButtons: GoBackButton[] = []
+
+  filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
+
+  displayedColumns = ['select', ...this.columns.map(c => c.columnDef)];
   dataSource = new MatTableDataSource<Incident>([]);
+  filteredByRisk = false;
   selectedIncident: Incident | null = null;
   incidents: Incident[] = [];
 
+  searchQuery: string = '';
+
   selectedIncidents = new Set<string>();
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
-  dateTypeFilter = new FormControl('survenance');
-  startDateFilter = new FormControl('');
-  endDateFilter = new FormControl('');
-  categoryFilter = new FormControl('');
-  statusFilter = new FormControl('');
-
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -105,22 +124,58 @@ export class ListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadIncidents();
+    this.route.queryParams.subscribe(params => {
+      const riskId = params['riskId'];
+      const processId = params['processId'];
 
-    this.dateTypeFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
-    this.startDateFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
-    this.endDateFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
-    this.categoryFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
-    this.statusFilter.valueChanges.subscribe(() => this.applyAdvancedFilters());
+      if (riskId && processId) {
+        this.filteredByRisk = true;
+        this.incidentService.getIncidentByProcessAndRisk(processId, riskId).subscribe(data => {
+          this.incidents = data;
+          this.dataSource.data = data;
+        });
+
+        this.goBackButtons = [
+          {
+            label: 'Voir tous les incidents',
+            icon: 'list',
+            class: 'btn-primary',
+            show: true,
+            action: () => this.clearRiskFilter()
+          },
+          {
+            label: 'Exporter',
+            icon: 'file_download',
+            class: 'btn-green',
+            show: true,
+            action: () => this.exportExcel()
+          }
+        ];
+      } else {
+        this.filteredByRisk = false;
+        this.loadIncidents();
+
+        this.goBackButtons = [
+          {
+            label: 'Créer un incident',
+            icon: 'add',
+            class: 'btn-primary',
+            show: true,
+            permission: 'CREATE_INCIDENT',
+            action: () => this.add()
+          },
+          {
+            label: 'Exporter',
+            icon: 'file_download',
+            class: 'btn-green',
+            show: true,
+            action: () => this.exportExcel()
+          }
+        ];
+      }
+    });
   }
 
-  clearFilters(): void {
-    this.dateTypeFilter.setValue('survenance');
-    this.startDateFilter.setValue('');
-    this.endDateFilter.setValue('');
-    this.categoryFilter.setValue('');
-    this.statusFilter.setValue('');
-  }
 
   refreshData() {
     this.ngOnInit();
@@ -131,58 +186,9 @@ export class ListComponent implements OnInit {
     this.router.navigate(['incident', incident.id]);
   }
 
-  formatDate(date: any): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Les mois commencent à 0
-    const year = date.getFullYear();
-    return `${year}-${month}-${day}`;
+  clearRiskFilter() {
+    this.router.navigate(['incident']);
   }
-
-  applyAdvancedFilters() {
-    let filteredData = [...this.incidents];
-
-    if (this.startDateFilter.value || this.endDateFilter.value) {
-      filteredData = filteredData.filter(incident => {
-        const dateToCheck = this.dateTypeFilter.value === 'declaration'
-          ? incident.declaredAt
-          : incident.survenueAt;
-
-        if (!dateToCheck) return false;
-
-        const incidentDate = new Date(dateToCheck);
-        let isValid = true;
-
-        if (this.startDateFilter.value) {
-          const startDate = new Date(this.startDateFilter.value);
-          startDate.setHours(0, 0, 0, 0);
-          isValid = isValid && (incidentDate >= startDate);
-        }
-
-        if (this.endDateFilter.value) {
-          const endDate = new Date(this.endDateFilter.value);
-          endDate.setHours(23, 59, 59, 999);
-          isValid = isValid && (incidentDate <= endDate);
-        }
-        return isValid;
-      });
-    }
-
-    if (this.statusFilter.value) {
-      filteredData = filteredData.filter(incident =>
-        this.statusFilter.value === 'Clôturé' ? incident.closedAt !== null : incident.closedAt === null
-      );
-    }
-
-    this.dataSource.data = filteredData;
-  }
-
-  customFilterPredicate(data: Incident, filter: string): boolean {
-    // Convert the entire object (including nested objects) to a string and check if it contains the filter term
-    const stringifiedData = JSON.stringify(data).toLowerCase();  // Convert the entire data object to a string
-    return stringifiedData.includes(filter.toLowerCase()); // Check if the filter term is present in the stringified object
-  }
-
-
 
   loadIncidents() {
     this.incidentService.loadIncidents().subscribe(data => {
@@ -191,25 +197,12 @@ export class ListComponent implements OnInit {
     });
   }
 
-  // getUniqueCategories(): string[] {
-  //   return []
-  //   // return [...new Set(this.incidents.map(incident => incident.riskPrincipal?.taxonomie || 'Autre'))];
-  // }
-
-
   add() {
     this.router.navigate(
       ['incident', 'create']
     );
   }
 
-  onConfirmAction(incidentId: number) {
-
-    this.confirmService.openConfirmDialog("Suppression", "Voulez-vous vraiment supprimer cet élément ?")
-      .subscribe(res => {
-        // delete incidentId
-      })
-  }
   toggleIncidentSelection(incidentId: string) {
     if (this.selectedIncidents.has(incidentId)) {
       this.selectedIncidents.delete(incidentId);
@@ -232,11 +225,113 @@ export class ListComponent implements OnInit {
     }
   }
 
+  edit(row: Incident) {
+    this.router.navigate(['incident', 'create'], {
+      queryParams: { id: row.id }
+    })
+  }
+
   isAllSelected(): boolean {
     return this.selectedIncidents.size === this.dataSource.data.length && this.dataSource.data.length > 0;
   }
 
   isIndeterminate(): boolean {
     return this.selectedIncidents.size > 0 && this.selectedIncidents.size < this.dataSource.data.length;
+  }
+
+  isUpdatable(incident: Incident): boolean {
+    return incident!.state === State.DRAFT;
+  }
+
+  handleFiltersChanged(filters: Record<string, any>) {
+    let filtered = [...this.incidents];
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value === null || value === '') continue;
+
+      filtered = filtered.filter(incident => {
+        const fieldValue = incident[key as keyof Incident];
+
+        // ✅ Cas spécial : filtre par plage de dates { start, end }
+        if (value.start instanceof Date && value.end instanceof Date) {
+          if (!fieldValue) return false; // skip si vide
+
+          const incidentDate = new Date(fieldValue as string | number | Date); // <-- cast ici
+
+          const start = new Date(value.start);
+          const end = new Date(value.end);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(23, 59, 59, 999);
+
+          return incidentDate >= start && incidentDate <= end;
+        }
+
+
+        // ✅ Cas spécial : filtre par statut (clôturé ou en cours)
+        if (key === 'state') {
+          // Si le filtre renvoie encore les vieux libellés, on garde une compatibilité.
+          if (value === 'Clôturé') return incident.state === State.CLOSED;
+          if (value === 'En cours') return incident.state !== State.CLOSED;
+
+          // Sinon on filtre proprement par enum.
+          return incident.state === value; // value : State
+        }
+
+        // ✅ Cas standard : texte ou valeur simple
+        return fieldValue?.toString().toLowerCase().includes(value.toString().toLowerCase());
+      });
+    }
+
+    this.dataSource.data = filtered;
+  }
+
+  onSearchFiles(query: string): void {
+    this.searchQuery = query;
+
+    const lowerQuery = query.toLowerCase().trim();
+
+    const filtered = this.incidents.filter(incident => {
+      return (
+        incident.reference?.toLowerCase().includes(lowerQuery) ||
+        incident.title?.toLowerCase().includes(lowerQuery) ||
+        this.datePipe.transform(incident.declaredAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
+        this.datePipe.transform(incident.survenueAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
+        this.getStateLabel(incident.state).toLowerCase().includes(lowerQuery) ||     // ← NEW
+        (incident.closedAt ? 'clôturé' : 'en cours').includes(lowerQuery)            // compat “en cours/clôturé”
+      );
+    });
+
+    this.dataSource.data = filtered;
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.dataSource.data = this.incidents;
+  }
+
+  getStateLabel(s: State): string {
+    return StateLabels?.[s] ?? String(s);
+  }
+
+  exportExcel(filename: string = 'incidents.xlsx') {
+
+    this.incidentService.findAllByIds(this.selectedIncidents).subscribe(
+      list => {
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(list);
+
+        // Example of adding column widths
+        const columnWidths = list.length > 0
+          ? Object.keys(list[0]).map(key => ({ wch: key.length + 5 }))
+          : [];
+
+        worksheet['!cols'] = columnWidths; // Apply column widths
+
+        const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Incidents');
+
+        // Write to file
+        XLSX.writeFile(workbook, filename);
+      }
+    )
   }
 }

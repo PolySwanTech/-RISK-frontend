@@ -5,13 +5,14 @@ import { environment } from '../../../environments/environment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { SnackBarService } from '../snack-bar/snack-bar.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   
-  base = environment.apiUrl + '/users';
+  base = environment.apiUrl;
   http = inject(HttpClient);
   router = inject(Router);
   
@@ -20,6 +21,7 @@ export class AuthService {
   private permissions: { [teamId: string]: string[] } = {};
 
   private utilisateurConnecte!: Utilisateur;
+  private snackBarService = inject(SnackBarService);
   
   constructor() { }
   
@@ -50,7 +52,7 @@ export class AuthService {
         this.router.navigate(['/dashboard']);
       },
       error: err => {
-        alert("Nom ou mot de passe incorrect")
+        this.snackBarService.error("Nom ou mot de passe incorrect")
       }
     });;
   }
@@ -61,8 +63,14 @@ export class AuthService {
     this.router.navigate(['auth', 'login'])
   }
 
-  setPermissions(permissions: { [teamId: string]: string[] }): void {
-    this.permissions = permissions;
+  getUUID(): string | null {
+    const token: any = this.decryptToken();
+    return token?.uuid || null;
+  }
+
+  getName(): string | null {
+    const token: any = this.decryptToken();
+    return token?.username || null;
   }
   
   getPermissions(): { [teamId: string]: string[] } {
@@ -84,15 +92,19 @@ export class AuthService {
     return false;
   }
 
-  setUtilisateur(user: Utilisateur): void {
-    this.utilisateurConnecte = user;
+  getPermissionsByTeam(teamId: string): string[] {
+    const permsByTeam = this.getPermissions();
+    return permsByTeam[teamId] ?? [];
   }
 
-  getUtilisateur(): Utilisateur {
-    return this.utilisateurConnecte;
+  sameUser(userId: string): boolean {
+    const id = this.getUUID();
+    return id == userId;
   }
 
-  getUserById(id: string) {
-    return this.http.get<Utilisateur>(`${this.base}/${id}`)
+  sameUserName(username: string): boolean {
+    const name = this.getName();
+    return name == username;
   }
+
 }

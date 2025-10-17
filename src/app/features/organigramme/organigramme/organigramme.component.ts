@@ -8,15 +8,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTreeModule } from '@angular/material/tree';
-import { EntiteResponsable } from '../../../core/models/EntiteResponsable';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { CategorySelectionComponent } from '../../../shared/components/category-selection/category-selection.component';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { AddEntityDialogComponent } from '../../reglages/add-entity-dialog/add-entity-dialog.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-import { Role, RoleService } from '../../../core/services/role/role.service';
+import { RoleService } from '../../../core/services/role/role.service';
 import { forkJoin } from 'rxjs';
+import { Role, TeamMember } from '../../../core/models/TeamMember';
+import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 
 @Component({
   selector: 'app-organigramme',
@@ -28,41 +30,43 @@ import { forkJoin } from 'rxjs';
 })
 export class OrganigrammeComponent {
 
-  @Input() settings: boolean = true;
+  @Input() userId: string | null = null;
   @Output() rolesEvent = new EventEmitter<any>();
-  @Input() teamRoles: any[] = [];
 
-  entities: EntiteResponsable[] = [];
-  filteredEntities: EntiteResponsable[] = [];
+  teamRoles: TeamMember[] = [];
+  entities: BusinessUnit[] = [];
+  filteredEntities: BusinessUnit[] = [];
   roles: Role[] = [];
 
+  buRoles: { buId: string; roleName: string }[] = [];
+
+  private userService = inject(UtilisateurService);
+  private entityService = inject(EntitiesService);
   private roleService = inject(RoleService);
+  private dialog = inject(MatDialog);
 
   constructor(
-    private entityService: EntitiesService,
     @Optional() public dialogRef: MatDialogRef<CategorySelectionComponent>,
     @Optional() public dialogRefModif: MatDialogRef<CategorySelectionComponent>,
-    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
     forkJoin({
       entities: this.entityService.loadEntitiesTree(),
-      roles: this.roleService.getAllRoles()
-    }).subscribe(({ entities, roles }) => {
+      roles: this.roleService.getAllRoles(),
+      teamRoles: this.userService.getUserRoles(this.userId)
+    }).subscribe(({ entities, roles, teamRoles }) => {
       this.entities = entities;
       this.filteredEntities = this.entities;
       this.roles = roles;
-
-      if (this.teamRoles.length > 0) {
-        this.applyTeamRoles(this.teamRoles);
-      }
+      this.teamRoles = teamRoles;
+      this.applyTeamRoles(this.teamRoles);
     });
   }
 
-  childrenAccessor = (node: EntiteResponsable) => node.children ?? [];
+  childrenAccessor = (node: BusinessUnit) => node.children ?? [];
 
-  hasChild = (_: number, node: EntiteResponsable) => !!node.children && node.children.length > 0;
+  hasChild = (_: number, node: BusinessUnit) => !!node.children && node.children.length > 0;
 
   applyTeamRoles(teamRoles: any[]) {
     const markEntity = (nodes: any[]) => {
@@ -72,7 +76,7 @@ export class OrganigrammeComponent {
           node.checked = true;
 
           // Chercher le rôle dans la liste des rôles disponibles
-          const matchingRole = this.roles.find(r => r.name == match.role?.name);
+          const matchingRole = this.roles.find(r => r.name == match.roleName);
           node.role = matchingRole || null;
 
           this.onParentCheckChange(node, { checked: true });
@@ -91,7 +95,7 @@ export class OrganigrammeComponent {
     this.getLeafNodes(this.filteredEntities);
   }
 
-  openEntityDialog(entite?: EntiteResponsable, event?: Event) {
+  openEntityDialog(entite?: BusinessUnit, event?: Event) {
     if (event) {
       event.stopPropagation(); // Empêche la propagation du clic
     }
@@ -99,22 +103,8 @@ export class OrganigrammeComponent {
     const dialogRef = this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
       data: entite || null // Passe l'entité si c'est une modification, sinon null
-    });
-
-    dialogRef.afterClosed().subscribe(entiteResponsable => {
-      if (entiteResponsable) {
-        if(entiteResponsable.id == null){ // creation
-          this.entityService.save(entiteResponsable).subscribe(() => {
-            this.ngOnInit(); // Rafraîchir après ajout/modification
-          });
-        }
-        else{ // update
-          this.entityService.update(entiteResponsable).subscribe(() => {
-            this.ngOnInit(); // Rafraîchir après ajout/modification
-          });
-        }
-      }
-    });
+    })
+      .afterClosed().subscribe(_ => this.ngOnInit());
   }
 
   applyFilter(event: any) {
@@ -122,7 +112,7 @@ export class OrganigrammeComponent {
     this.filteredEntities = this.filterNodes(this.entities, filterValue);
   }
 
-  private filterNodes(nodes: EntiteResponsable[], filter: string): EntiteResponsable[] {
+  private filterNodes(nodes: BusinessUnit[], filter: string): BusinessUnit[] {
     return nodes
       .map(node => {
         const filteredChildren = node.children ? this.filterNodes(node.children, filter) : [];
@@ -137,7 +127,7 @@ export class OrganigrammeComponent {
         }
         return null;
       })
-      .filter((node): node is EntiteResponsable => node !== null);
+      .filter((node): node is BusinessUnit => node !== null);
   }
 
   confirmSelection() {
@@ -173,7 +163,12 @@ export class OrganigrammeComponent {
 
   onRoleChange(node: any): void {
     if (node.checked) {
-      this.propagateRoleToChildren(node, node.role);
+      // remove existing role if it exists
+      this.buRoles = this.buRoles.filter(val => val.buId !== node.id);
+      this.buRoles.push({ buId: node.id, roleName: node.role.name });
+    }
+    else {
+      this.buRoles = this.buRoles.filter(val => val.buId !== node.id);
     }
   }
 
@@ -203,6 +198,9 @@ export class OrganigrammeComponent {
     };
 
     traverse(tree);
-    this.rolesEvent.emit(leaves);
+  }
+
+  getRoles() {
+    return this.rolesEvent.emit(this.buRoles);
   }
 }

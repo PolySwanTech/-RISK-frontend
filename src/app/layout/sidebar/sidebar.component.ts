@@ -1,11 +1,11 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
@@ -16,6 +16,7 @@ import { HasPermissionDirective } from '../../core/directives/has-permission.dir
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { SidebarService } from '../../core/services/sidebar/sidebar.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -43,6 +44,8 @@ export class SidebarComponent implements OnInit {
 
   storageSubscription: any;
 
+  private sidebarService = inject(SidebarService);
+
   constructor(public authService: AuthService,
     private incidentService: IncidentService, private translate: TranslateService) {
     const browserLang = navigator.language.split('-')[0];
@@ -68,6 +71,10 @@ export class SidebarComponent implements OnInit {
 
   }
 
+  isAdmin() : boolean {
+    return this.authService.hasPermission('VIEW_PARAMETRAGE') || this.authService.hasPermission('VIEW_GESTION_UTILISATEURS') || this.authService.hasPermission('VIEW_GESTION_PERMISSIONS');
+  }
+
   changeLang(lang: any) {
     this.translate.use(lang ? lang : 'fr');
   }
@@ -91,4 +98,9 @@ export class SidebarComponent implements OnInit {
   onLogout() {
     this.authService.logout();
   }
+
+  onToggle(drawer: MatDrawer) {
+  drawer.toggle();
+  this.sidebarService.toggle();
+}
 }

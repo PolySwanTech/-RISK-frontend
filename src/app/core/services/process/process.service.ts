@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Process } from '../../models/Process';
 import { Observable } from 'rxjs/internal/Observable';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { Observable } from 'rxjs/internal/Observable';
 export class ProcessService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/users/processes'; ;
+  baseUrl = environment.apiUrl + '/processes';;
 
   getAllGroupedByBu() {
     return this.http.get<{ [key: string]: Process[] }>(this.baseUrl);
@@ -25,13 +26,31 @@ export class ProcessService {
     return this.http.get<Process>(`${this.baseUrl}/${id}`);
   }
 
-  createProcess(process : { name: string; bu: { id: string; name: string }; parentId?: string }){ 
-    return this.http.post<Process>(this.baseUrl , process)
+  createProcess(process: { name: string; bu: string, parentId?: string }) {
+    return this.http.post<Process>(this.baseUrl, process)
   }
 
-  getAllByEntite(entiteId : string){
-    let param = new HttpParams();
-    param = param.set('buId', entiteId);
-    return this.http.get<Process[]>(this.baseUrl, {params : param})
+  updateProcess(id: string, process: { name: string; parentId?: string }) {
+    return this.http.put<Process>(`${this.baseUrl}/${id}`, process);
+  }
+
+  getProcessTree(buId?: string): Observable<Process[]> {
+    const options = buId ? { params: new HttpParams().set('buId', buId) } : {};
+    return this.http.get<Process[]>(`${this.baseUrl}/tree`, options);
+  }
+
+  getProcessLeaf(buId: string): Observable<Process[]> {
+    const options = { params: new HttpParams().set('buId', buId) };
+    return this.http.get<Process[]>(`${this.baseUrl}/leaf`, options);
+  }
+
+  getAllByRisks(riskId: string) {
+    let params = new HttpParams();
+    params = params.append('riskId', riskId);
+    return this.http.get<Process[]>(this.baseUrl + '/by-dmr', { params: params });
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

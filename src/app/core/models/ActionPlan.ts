@@ -1,4 +1,5 @@
 import { Priority } from "../enum/Priority";
+import { ReviewStatus } from "../enum/reviewStatus.enum";
 import { Status } from "../enum/status.enum";
 import { RiskTemplate } from "./RiskTemplate";
 
@@ -9,14 +10,17 @@ export class Action {
     performedBy: string;
     performedAt: string;
     fileName: string;
-
+    reviewStatus: ReviewStatus;
+    actif: boolean;
     constructor(
         id: string,
         name: string,
         createdAt: Date,
         performedBy: string,
         performedAt: string,
-        fileName: string
+        fileName: string,
+        reviewStatus: ReviewStatus = ReviewStatus.PENDING,
+        actif: boolean = true   
     ) {
         this.id = id;
         this.name = name;
@@ -24,54 +28,63 @@ export class Action {
         this.performedBy = performedBy;
         this.performedAt = performedAt;
         this.fileName = fileName;
+        this.reviewStatus = reviewStatus;
+        this.actif = actif;
     }
 }
 
-export interface ActionPlanId{
-    id: string;
-    version: Date;
-}
 
 export class ActionPlan {
-    actionPlanId: ActionPlanId;
+    id: string;
+    reference: string;
     libelle: string;
     description: string;
     status: Status;
     priority: Priority;
     creator: string;
+    
+    teamId : string;
     userInCharge: string;
-
+    riskName : string = "";
     taxonomie: RiskTemplate | null;
     incidentId: string;
-    echeance: Date;
+    echeance: Date = new Date();
+
+    createdAt: Date = new Date();
 
     actions: Action[] = [];
 
-    reference : string = "";
+    incidentRef : string = "";
+    actif: boolean;
 
     constructor(
         id: string,
-        version: Date,
+        reference: string,
         libelle: string,
         description: string,
         status: Status,
         priority: Priority,
         creator: string,
+        teamId : string,
         userInCharge: string,
         taxonomie: RiskTemplate | null,
         incidentId: string,
-        echeance: Date
+        echeance: Date,
+        actif: true
     ) {
-        this.actionPlanId = { id, version };
+        this.id = id;
+        this.reference = reference;
         this.libelle = libelle;
         this.description = description;
         this.status = status;
         this.priority = priority;
         this.creator = creator;
+        this.teamId = teamId;
         this.userInCharge = userInCharge;
         this.taxonomie = taxonomie;
         this.incidentId = incidentId;
         this.echeance = echeance;
+        this.actif = actif;
     }
 
 }

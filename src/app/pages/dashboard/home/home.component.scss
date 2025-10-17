@@ -1,0 +1,26 @@
+mat-tab-group {
+  margin-top: 20px;
+}
+
+::ng-deep .mat-mdc-tab-labels {
+  justify-content: center;
+}
+
+.graphs-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+
+  > * {
+    flex: 1 1 45%;
+  }
+}
+
+.no-incidents {
+  text-align: center;
+  font-style: italic;
+  color: #777;
+  margin-top: 20px;
+}
