@@ -11,8 +11,6 @@ import { PermissionName } from "../../../core/enum/permission.enum";
 import { Incident } from "../../../core/models/Incident";
 import { IncidentService } from "../../../core/services/incident/incident.service";
 import { BaloiseCategoryChartComponent } from "../../../features/dashboard/baloise-category-chart/baloise-category-chart.component";
-import { BarChartComponent } from "../../../features/dashboard/bar-chart/bar-chart.component";
-import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { ActionPlanChartComponent } from "../action-plan-chart/action-plan-chart.component";
 import { ControlChartComponent } from "../control-chart/control-chart.component";
@@ -26,8 +24,8 @@ import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-home',
   imports: [MatCardModule, MatTabsModule, ActionPlanChartComponent, ControlChartComponent,
-    BarChartComponent, MatIconModule, GoBackComponent, MatDatepickerModule, MatInputModule, MatNativeDateModule,
-    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, FilterTableComponent, BaloiseCategoryChartComponent, IncidentsTrendChartComponent],
+    MatIconModule, GoBackComponent, MatDatepickerModule, MatInputModule, MatNativeDateModule,
+    MatOptionModule, MatSelectModule, MatFormFieldModule, FormsModule, MatButtonModule, BaloiseCategoryChartComponent, IncidentsTrendChartComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
