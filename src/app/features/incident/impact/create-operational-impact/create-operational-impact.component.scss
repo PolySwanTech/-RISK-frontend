@@ -405,6 +405,12 @@
   transition: all 0.3s ease;
   position: relative;
   box-shadow: var(--shadow-sm);
+
+  &.selected {
+    border-color: var(--color-primary); // ou une couleur visible comme un bleu
+    box-shadow: 0 0 8px var(--color-primary);
+    background: var(--card-bg-selected, #e6f0ff); // optionnel, fond différent quand sélectionné
+  }
 }
 
 .op-subcard:hover {

@@ -185,7 +185,9 @@
               <div *ngIf="expandedDetails[impact.id]">
                 @if(existingAmounts[impact.id]){
                 <div class="op-stack-sm" *ngFor="let amount of existingAmounts[impact.id]; trackBy: trackByAmountId">
-                  <div class="op-subcard">
+                  <div class="op-subcard"
+                    [class.selected]="selectedAmounts && selectedAmounts[impact.id] && selectedAmounts[impact.id][amount.id]"
+                    (click)="toggleAmountSelection(impact.id, amount.id)">
                     <div class="op-meta" style="justify-content: flex-end;">
                       <span>Ajouté par: <strong>{{ amount.creatorName }}</strong></span>
                       <span>le {{ amount.createdAt | date:'dd/MM/yyyy' }}</span>
@@ -197,11 +199,6 @@
                     </span>
 
                     <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
-                      <!-- <div *ngIf="selectedAmounts && selectedAmounts[impact.id][amount.id]">
-                        <input type="checkbox" [checked]="selectedAmounts[impact.id][amount.id]"
-                          (change)="toggleAmountSelection(impact.id, amount.id)" />
-                      </div> -->
-
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Type</label>
                         <span class="op-display-field">

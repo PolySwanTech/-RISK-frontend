@@ -23,6 +23,7 @@ import { OperatingLossState, OperatingLossStateLabels } from '../../../../core/e
 import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
 import { FileService } from '../../../../core/services/file/file.service';
 import { TargetType } from '../../../../core/enum/targettype.enum';
+import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
@@ -76,6 +77,7 @@ export class CreateOperationalImpactComponent implements OnInit {
   private equipeService = inject(EntitiesService);
   private snackBarService = inject(SnackBarService);
   private fileService = inject(FileService);
+  private confirmService = inject(ConfirmService);
 
   allBusinessUnits: BusinessUnit[] = [];
 
@@ -227,6 +229,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
 
   toggleAmountSelection(impactId: string, amountId: string) {
+
     this.selectedAmounts[impactId] = this.selectedAmounts[impactId] || {};
     const newState = !this.selectedAmounts[impactId][amountId];
     this.selectedAmounts[impactId][amountId] = newState;
@@ -357,47 +360,47 @@ export class CreateOperationalImpactComponent implements OnInit {
       return;
     }
 
-    if (!window.confirm(`Désactiver ${impactIds.length} impact(s) et ${amountIds.length} montant(s) sélectionné(s) ?`)) {
-      return;
-    }
-
-    const calls = [
-      ...impactIds.map(id =>
-        this.operatingLossService.deactivate(id).pipe(
-          catchError(err => {
-            console.error("Erreur désactivation impact", err);
-            this.snackBarService.error("Erreur désactivation impact");
-            return of(null);
-          })
-        )
-      ),
-      ...amountIds.map(({ impactId, amountId }) =>
-        this.amountService.deactivate(amountId).pipe(
-          catchError(err => {
-            console.error("Erreur désactivation montant", err);
-            this.snackBarService.error("Erreur désactivation montant");
-            return of(null);
-          }),
-          switchMap(() => {
-            // recharger les montants de l’impact
-            return this.amountService.listByOperatingLoss(impactId).pipe(
-              catchError(() => of([] as AmountDto[])),
-              switchMap(amountDtos => {
-                this.existingAmounts[impactId] = amountDtos.map(a => Amount.fromDto(a));
+    this.confirmService.openConfirmDialog("Désactiver", `Désactiver ${impactIds.length} impact(s) et ${amountIds.length} montant(s) sélectionné(s) ?`)
+      .subscribe(res => {
+        if (!res) return;
+        const calls = [
+          ...impactIds.map(id =>
+            this.operatingLossService.deactivate(id).pipe(
+              catchError(err => {
+                console.error("Erreur désactivation impact", err);
+                this.snackBarService.error("Erreur désactivation impact");
                 return of(null);
               })
-            );
-          })
-        )
-      )
-    ];
+            )
+          ),
+          ...amountIds.map(({ impactId, amountId }) =>
+            this.amountService.deactivate(amountId).pipe(
+              catchError(err => {
+                console.error("Erreur désactivation montant", err);
+                this.snackBarService.error("Erreur désactivation montant");
+                return of(null);
+              }),
+              switchMap(() => {
+                // recharger les montants de l’impact
+                return this.amountService.listByOperatingLoss(impactId).pipe(
+                  catchError(() => of([] as AmountDto[])),
+                  switchMap(amountDtos => {
+                    this.existingAmounts[impactId] = amountDtos.map(a => Amount.fromDto(a));
+                    return of(null);
+                  })
+                );
+              })
+            )
+          )
+        ];
 
-    forkJoin(calls).subscribe(() => {
-      this.snackBarService.success("Désactivation effectuée.");
-      this.refreshExistingOperatingLosses();
-      this.selectedImpacts = {};
-      this.selectedAmounts = {};
-    });
+        forkJoin(calls).subscribe(() => {
+          this.snackBarService.success("Désactivation effectuée.");
+          this.refreshExistingOperatingLosses();
+          this.selectedImpacts = {};
+          this.selectedAmounts = {};
+        });
+      })
   }
 
 
