@@ -6,6 +6,7 @@ import { CreateEvaluationComponent } from '../cartographie/create-evaluation/cre
 import { ReglagesComponent } from './reglages/reglages.component';
 import { CreateRisksReferentielComponent } from './risks/create-risks-referentiel/create-risks-referentiel.component';
 import { ProcessManagerComponent } from '../../shared/components/param-process/param-process.component';
+import { C16Component } from '../export/c16/c16.component';
 
 export const reglagesRoute: Routes = [
   { path: '', component: ReglagesComponent },
@@ -21,5 +22,8 @@ export const reglagesRoute: Routes = [
   },
   {
     path: 'process', component : ProcessManagerComponent
+  },
+  {
+    path: 'export', component : C16Component
   }
 ];
