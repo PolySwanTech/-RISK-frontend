@@ -298,8 +298,6 @@ export class CalculViewComponent {
   ngOnInit() {
 
     this.calculService.getValues().subscribe((values: BackendResponse) => {
-
-      console.log(values)
       this.allYearsData = Object.entries(values).map(([year, categories]) => {
         let biValue = 0;
 
@@ -535,94 +533,6 @@ export class CalculViewComponent {
       { wch: 18 }, // 2022 Accounting
       { wch: 18 }  // 2022 Prudential
     ];
-
-    // Appliquer les styles
-    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
-
-    for (let R = range.s.r; R <= range.e.r; ++R) {
-      for (let C = range.s.c; C <= range.e.c; ++C) {
-        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-        if (!ws[cellAddress]) continue;
-
-        if (!ws[cellAddress].s) ws[cellAddress].s = {};
-
-        // En-tête principal (ligne 0)
-        if (R === 0) {
-          ws[cellAddress].s = {
-            font: { bold: true, sz: 14, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "4472C4" } },
-            alignment: { horizontal: "center", vertical: "center" }
-          };
-        }
-
-        // En-têtes des années (ligne 2)
-        if (R === 2) {
-          ws[cellAddress].s = {
-            font: { bold: true, sz: 12, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "5B9BD5" } },
-            alignment: { horizontal: "center", vertical: "center" },
-            border: {
-              top: { style: "thin", color: { rgb: "000000" } },
-              bottom: { style: "thin", color: { rgb: "000000" } },
-              left: { style: "thin", color: { rgb: "000000" } },
-              right: { style: "thin", color: { rgb: "000000" } }
-            }
-          };
-        }
-
-        // Sous-en-têtes (ligne 3)
-        if (R === 3) {
-          ws[cellAddress].s = {
-            font: { bold: true, sz: 11, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "70AD47" } },
-            alignment: { horizontal: "center", vertical: "center" },
-            border: {
-              top: { style: "thin", color: { rgb: "000000" } },
-              bottom: { style: "thin", color: { rgb: "000000" } },
-              left: { style: "thin", color: { rgb: "000000" } },
-              right: { style: "thin", color: { rgb: "000000" } }
-            }
-          };
-        }
-
-        // Titres de sections (ILDC, SC, FC)
-        if (ws[cellAddress].v && typeof ws[cellAddress].v === 'string' &&
-          (ws[cellAddress].v.includes('Interest, leases and dividend') ||
-            ws[cellAddress].v.includes('Services component') ||
-            ws[cellAddress].v.includes('Financial component'))) {
-          ws[cellAddress].s = {
-            font: { bold: true, sz: 11, color: { rgb: "FFFFFF" } },
-            fill: { fgColor: { rgb: "ED7D31" } },
-            alignment: { horizontal: "left", vertical: "center" }
-          };
-        }
-
-        // Colonnes de codes
-        if (C === 0 && R > 3) {
-          ws[cellAddress].s = {
-            font: { bold: true, name: "Courier New" },
-            alignment: { horizontal: "center", vertical: "center" },
-            fill: { fgColor: { rgb: "F2F2F2" } }
-          };
-        }
-
-        // Colonnes de valeurs numériques
-        if (C >= 2 && R > 3) {
-          if (ws[cellAddress].v && typeof ws[cellAddress].v === 'number') {
-            ws[cellAddress].t = 'n';
-            ws[cellAddress].z = '#,##0.00';
-
-            // Couleur pour valeurs négatives
-            if (ws[cellAddress].v < 0) {
-              ws[cellAddress].s = {
-                ...ws[cellAddress].s,
-                font: { color: { rgb: "C00000" } }
-              };
-            }
-          }
-        }
-      }
-    }
 
     // Fusionner les cellules pour l'en-tête principal
     ws['!merges'] = [
