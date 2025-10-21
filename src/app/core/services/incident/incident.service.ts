@@ -50,9 +50,8 @@ export class IncidentService {
     return this.http.post(this.baseUrl + '/draft', incident);
   }
 
-  getIncidentByProcessAndRisk(processId: string, riskId: string): Observable<Incident[]> {
+  getIncidentByProcessAndRisk(riskId: string): Observable<Incident[]> {
     const params = new HttpParams()
-      .set('processId', processId)
       .set('riskId', riskId);
     return this.http.get<Incident[]>(this.baseUrl + '/search', { params });
   }

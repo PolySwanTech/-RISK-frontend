@@ -175,3 +175,18 @@ mat-tab-group {
     height: 56px;
   }
 }
+.controls-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  > * {
+    flex: 1 1 45%;
+  }
+}

@@ -42,7 +42,7 @@
     <mat-card class="total">
       <mat-card-title>Total d’incidents</mat-card-title>
       <mat-card-content>{{ totalIncidents }}</mat-card-content>
-      <p class="resolution-rate">Durée moyenne de résolution {{ resolutionRate }} j</p>
+      <p class="resolution-rate">Durée moyenne de résolution: {{ avgResolutionTime }}</p>
     </mat-card>
   </div>
 
@@ -73,15 +73,26 @@
 
     <!-- Onglet Contrôles -->
     <mat-tab label="Contrôles">
-      <div class="graphs-container">
-        <app-control-chart></app-control-chart>
+      <div class="controls-dashboard">
+        
+        <!-- Ligne 1 -->
+        <div class="controls-row">
+          <app-control-completion-rate></app-control-completion-rate>
+          <app-control-status-chart></app-control-status-chart>
+        </div>
+
+        <!-- Ligne 2 -->
+        <div class="controls-row">
+          <app-control-result-chart></app-control-result-chart>
+        </div>
+
       </div>
     </mat-tab>
+
 
     <!-- Onglet Plans d’action -->
     <mat-tab label="Plans d’action">
       <div class="graphs-container">
-        <app-action-plan-chart></app-action-plan-chart>
       </div>
     </mat-tab>
 

@@ -202,14 +202,10 @@ export class PlanActionPageDetailComponent implements OnInit {
     switch (status) {
       case Status.NOT_STARTED:
         return 'Non commencé';
-      case Status.NOT_ACHIEVED:
-        return 'Non réalisé';
       case Status.IN_PROGRESS:
         return 'En cours';
       case Status.ACHIEVED:
         return 'Clôturé';
-      case Status.NOT_ACHIEVED:
-        return 'Non réalisé';
       default:
         return 'Inconnu';
     }

@@ -1,6 +1,5 @@
 import { ControlDetailsPageComponent } from './../../pages/control-details-page/control-details-page.component';
 import { Routes } from '@angular/router';
-import { ControlChartComponent } from '../../pages/dashboard/control-chart/control-chart.component';
 import { ControlPageComponent } from '../../pages/control-page/control-page.component';
 import { ExecutionsListComponent } from '../../pages/executions-list/executions-list.component';
 

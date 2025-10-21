@@ -1,6 +1,6 @@
 <mat-card class="chart-container mat-elevation-z3">
   <mat-card-header>
-    <mat-card-title>📊 Contrôles par statut</mat-card-title>
+    <mat-card-title>Taux de réalisation des contrôles</mat-card-title>
   </mat-card-header>
 
   <mat-card-content>
@@ -21,7 +21,7 @@
     </ng-template>
   </mat-card-content>
 
-  <mat-card-footer *ngIf="!isLoading && total > 0">
-    Total : <strong>{{ total }}</strong> contrôles
+  <mat-card-footer>
+    {{ completedControls }} contrôles réalisés sur un total de {{ totalControls }} contrôles assignés
   </mat-card-footer>
 </mat-card>

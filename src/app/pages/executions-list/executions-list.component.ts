@@ -67,7 +67,6 @@ export class ExecutionsListComponent {
       options: [
         { value: Status.ACHIEVED, label: this.formatStatus(Status.ACHIEVED) },
         { value: Status.IN_PROGRESS, label: this.formatStatus(Status.IN_PROGRESS) },
-        { value: Status.NOT_ACHIEVED, label: this.formatStatus(Status.NOT_ACHIEVED) }
       ]
     },
     {
@@ -152,7 +151,6 @@ export class ExecutionsListComponent {
     switch (status) {
       case Status.ACHIEVED: return 'achieved';
       case Status.IN_PROGRESS: return 'in_progress';
-      case Status.NOT_ACHIEVED: return 'not_achieved';
       default: return 'status-default';
     }
   }

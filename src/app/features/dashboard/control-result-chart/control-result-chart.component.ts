@@ -2,31 +2,20 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
-import { ControlExecution } from '../../../core/models/ControlExecution';
-import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { EvaluationControl } from '../../../core/enum/evaluation-controle.enum';
+import { Subscription, forkJoin, of, switchMap, map, catchError } from 'rxjs';
 import { ControlService } from '../../../core/services/control/control.service';
+import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlExecution } from '../../../core/models/ControlExecution';
+import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-control-result-chart',
   standalone: true,
-  imports: [NgChartsModule, MatCardModule, CommonModule],
-  template: `
-  <mat-card class="chart-container mat-elevation-z3">
-    <mat-card-header>
-      <mat-card-title>🥧 Résultats des contrôles</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <canvas baseChart
-              [data]="data"
-              [options]="options"
-              type="doughnut">
-      </canvas>
-    </mat-card-content>
-  </mat-card>
-  `,
-  styles: [`.chart-container { height: 400px; }`]
+  imports: [NgChartsModule, MatCardModule, CommonModule, MatProgressSpinnerModule],
+  templateUrl: './control-result-chart.component.html',
+  styleUrls: ['./control-result-chart.component.scss']
 })
 export class ControlResultChartComponent implements OnInit, OnDestroy {
   data: ChartData<'doughnut'> = { labels: [], datasets: [] };
@@ -48,32 +37,83 @@ export class ControlResultChartComponent implements OnInit, OnDestroy {
       }
     }
   };
+
+  conformityRate = 0;
+  isLoading = true;
   private sub!: Subscription;
 
   constructor(private controlService: ControlService) {}
 
   ngOnInit() {
-    this.sub = this.controlService.getAllExecutions().subscribe(executions => {
-      this.buildChart(executions);
+    this.sub = this.controlService.getAllTemplates().pipe(
+      switchMap((templates: ControlTemplate[]) => {
+        if (!templates.length) return of([]);
+
+        // 🧩 Étape 1 : récupérer la dernière exécution de chaque contrôle
+        const lastExecRequests = templates.map(t =>
+          this.controlService.getLastExecution(t.id).pipe(
+            catchError(() => of(null))
+          )
+        );
+
+        return forkJoin(lastExecRequests);
+      }),
+      switchMap((executions: (ControlExecution | null)[]) => {
+        const validExecutions = executions.filter(e => !!e) as ControlExecution[];
+        if (!validExecutions.length) return of([]);
+
+        // 🧩 Étape 2 : pour chaque exécution, récupérer l’évaluation associée
+        const evaluationRequests = validExecutions.map(exec =>
+          this.controlService.getEvaluationByExecution(exec.id).pipe(
+            map((evaluation: any) => ({ exec, evaluation })),
+            catchError(() => of(null))
+          )
+        );
+
+        return forkJoin(evaluationRequests);
+      })
+    ).subscribe({
+      next: (results: any[]) => {
+        const validResults = results
+          .filter(r => r && r.evaluation && r.evaluation.evaluation) // garde seulement ceux évalués
+          .map(r => ({
+            evaluation: r.evaluation.evaluation as EvaluationControl
+          }));
+
+        this.buildChart(validResults.map(r => r.evaluation));
+        this.isLoading = false;
+      },
+      error: () => (this.isLoading = false)
     });
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    if (this.sub) this.sub.unsubscribe();
   }
 
-  private buildChart(executions: ControlExecution[]) {
+  /** 🧩 Construit le graphique des évaluations */
+  private buildChart(evaluations: EvaluationControl[]) {
     const counts: Record<EvaluationControl, number> = {} as Record<EvaluationControl, number>;
-    Object.values(EvaluationControl).forEach(ev => counts[ev] = 0);
+    Object.values(EvaluationControl).forEach(ev => (counts[ev] = 0));
 
-    executions.forEach(exec => counts[exec.evaluation]++);
+    evaluations.forEach(ev => {
+      if (ev in counts) counts[ev]++;
+    });
+
+    const labels = Object.values(EvaluationControl);
+    const values = labels.map(l => counts[l]);
+    const total = values.reduce((a, b) => a + b, 0);
+
+    // ✅ Calcul du taux de conformité global
+    const conform = counts[EvaluationControl.CONFORME] || 0;
+    this.conformityRate = total > 0 ? Math.round((conform / total) * 1000) / 10 : 0;
 
     this.data = {
-      labels: Object.values(EvaluationControl),
+      labels: labels.map(l => EvaluationControlLabels[l]),
       datasets: [
         {
-          data: Object.values(counts),
-          backgroundColor: ['#4caf50', '#ff9800', '#f44336'], // vert, orange, rouge
+          data: values,
+          backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], // vert / orange / rouge
           hoverOffset: 20
         }
       ]

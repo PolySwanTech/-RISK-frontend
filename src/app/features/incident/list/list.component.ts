@@ -130,7 +130,7 @@ export class ListComponent implements OnInit {
 
       if (riskId && processId) {
         this.filteredByRisk = true;
-        this.incidentService.getIncidentByProcessAndRisk(processId, riskId).subscribe(data => {
+        this.incidentService.getIncidentByProcessAndRisk(riskId).subscribe(data => {
           this.incidents = data;
           this.dataSource.data = data;
         });
