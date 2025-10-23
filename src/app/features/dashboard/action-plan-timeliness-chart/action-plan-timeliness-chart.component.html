@@ -1,0 +1,27 @@
+<mat-card class="chart-card mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>📅 Taux de clôture dans les délais</mat-card-title>
+    <mat-card-subtitle>À temps vs en retard</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="chart-container" *ngIf="!isLoading; else loading">
+      <canvas baseChart
+              [data]="data"
+              [options]="options"
+              type="doughnut">
+      </canvas>
+    </div>
+
+    <ng-template #loading>
+      <div class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </ng-template>
+  </mat-card-content>
+
+  <mat-card-footer *ngIf="!isLoading">
+    Performance :
+    <strong>{{ onTimeRate }}%</strong> à temps
+  </mat-card-footer>
+</mat-card>

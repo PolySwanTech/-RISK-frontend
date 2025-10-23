@@ -51,6 +51,8 @@ export class ActionPlan {
     echeance: Date = new Date();
 
     createdAt: Date = new Date();
+    
+    closedAt: Date | null = null;
 
     actions: Action[] = [];
 

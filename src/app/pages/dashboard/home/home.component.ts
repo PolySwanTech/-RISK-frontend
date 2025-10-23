@@ -6,7 +6,6 @@ import { MatOptionModule } from "@angular/material/core";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatSelectModule } from "@angular/material/select";
-import { Filter } from "../../../core/enum/filter.enum";
 import { PermissionName } from "../../../core/enum/permission.enum";
 import { Incident } from "../../../core/models/Incident";
 import { IncidentService } from "../../../core/services/incident/incident.service";
@@ -21,6 +20,11 @@ import { MatInputModule } from '@angular/material/input';
 import { ControlCompletionRateComponent } from "../../../features/dashboard/control-completion-rate/control-completion-rate.component";
 import { ControlResultChartComponent } from "../../../features/dashboard/control-result-chart/control-result-chart.component";
 import { ControlStatusChartComponent } from "../../../features/dashboard/control-status-chart/control-status-chart.component";
+import { ActionPlanTimelinessChartComponent } from "../../../features/dashboard/action-plan-timeliness-chart/action-plan-timeliness-chart.component";
+import { AverageImplementationDelayComponent } from "../../../features/dashboard/average-implementation-delay/average-implementation-delay.component";
+import { PriorityDistributionChartComponent } from "../../../features/dashboard/priority-distribution-chart/priority-distribution-chart.component";
+import { RiskEvaluationSummaryComponent } from "../../../features/dashboard/risk-evaluation-summary/risk-evaluation-summary.component";
+import { RiskCriticalityChartComponent } from "../../../features/dashboard/risk-criticality-chart/risk-criticality-chart.component";
 
 @Component({
   selector: 'app-home',
@@ -42,8 +46,13 @@ import { ControlStatusChartComponent } from "../../../features/dashboard/control
     FormsModule,
     MatButtonModule,
     BaloiseCategoryChartComponent,
-    IncidentsTrendChartComponent
-  ],
+    IncidentsTrendChartComponent,
+    ActionPlanTimelinessChartComponent,
+    AverageImplementationDelayComponent,
+    PriorityDistributionChartComponent,
+    RiskEvaluationSummaryComponent,
+    RiskCriticalityChartComponent
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

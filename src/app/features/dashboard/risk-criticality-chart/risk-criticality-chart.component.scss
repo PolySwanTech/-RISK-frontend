@@ -1,0 +1,28 @@
+.criticality-card {
+  background: #f9fafc;
+
+  mat-card-header {
+    border-left: 4px solid #f59e0b;
+    padding-left: 10px;
+    margin-bottom: 8px;
+  }
+
+  .chart-container {
+    height: 240px;
+    padding: 5px 10px;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 180px;
+  }
+
+  .footer {
+    text-align: right;
+    padding-top: 8px;
+    font-size: 14px;
+    color: #374151;
+  }
+}

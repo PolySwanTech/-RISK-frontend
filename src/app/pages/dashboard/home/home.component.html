@@ -93,6 +93,17 @@
     <!-- Onglet Plans d’action -->
     <mat-tab label="Plans d’action">
       <div class="graphs-container">
+        <app-action-plan-timeliness-chart></app-action-plan-timeliness-chart>
+        <app-priority-distribution-chart></app-priority-distribution-chart>
+        <app-average-implementation-delay></app-average-implementation-delay>
+      </div>
+    </mat-tab>
+
+       <!-- Onglet Carto -->
+    <mat-tab label="Cartographie">
+      <div class="graphs-container">
+          <app-risk-evaluation-summary></app-risk-evaluation-summary>
+          <app-risk-criticality-chart></app-risk-criticality-chart>
       </div>
     </mat-tab>
 

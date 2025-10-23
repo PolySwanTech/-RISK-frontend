@@ -1,0 +1,26 @@
+<mat-card class="criticality-card mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>⚡ Répartition par niveau de criticité</mat-card-title>
+    <mat-card-subtitle>Faible / Moyen / Élevé / Critique</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="chart-container" *ngIf="!isLoading; else loading">
+      <canvas baseChart 
+              [data]="data"
+              [options]="options"
+              chartType="bar">
+      </canvas>
+    </div>
+
+    <ng-template #loading>
+      <div class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </ng-template>
+
+    <div class="footer" *ngIf="!isLoading && total > 0">
+      <strong>Total :</strong> {{ total }} risques évalués
+    </div>
+  </mat-card-content>
+</mat-card>

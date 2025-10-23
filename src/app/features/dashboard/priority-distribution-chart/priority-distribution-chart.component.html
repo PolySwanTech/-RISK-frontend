@@ -1,0 +1,26 @@
+<mat-card class="chart-card mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>⚡ Répartition par priorité</mat-card-title>
+    <mat-card-subtitle>Haute / Moyenne / Basse</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="chart-container" *ngIf="!isLoading; else loading">
+      <canvas baseChart
+              [data]="data"
+              [options]="options"
+              type="bar">
+      </canvas>
+    </div>
+
+    <ng-template #loading>
+      <div class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </ng-template>
+  </mat-card-content>
+
+  <mat-card-footer *ngIf="!isLoading">
+    <strong>{{ highPriorityCount }}</strong> actions à haute priorité
+  </mat-card-footer>
+</mat-card>
