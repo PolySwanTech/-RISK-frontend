@@ -25,6 +25,7 @@ import { AverageImplementationDelayComponent } from "../../../features/dashboard
 import { PriorityDistributionChartComponent } from "../../../features/dashboard/priority-distribution-chart/priority-distribution-chart.component";
 import { RiskEvaluationSummaryComponent } from "../../../features/dashboard/risk-evaluation-summary/risk-evaluation-summary.component";
 import { RiskCriticalityChartComponent } from "../../../features/dashboard/risk-criticality-chart/risk-criticality-chart.component";
+import { TopCriticalRisksComponent } from "../../../features/dashboard/top-critical-risks/top-critical-risks.component";
 
 @Component({
   selector: 'app-home',
@@ -51,7 +52,8 @@ import { RiskCriticalityChartComponent } from "../../../features/dashboard/risk-
     AverageImplementationDelayComponent,
     PriorityDistributionChartComponent,
     RiskEvaluationSummaryComponent,
-    RiskCriticalityChartComponent
+    RiskCriticalityChartComponent,
+    TopCriticalRisksComponent
 ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

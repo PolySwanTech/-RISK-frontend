@@ -1,0 +1,65 @@
+.top-risks-card {
+  background: #f9fafc;
+
+  mat-card-header {
+    border-left: 4px solid #ef4444;
+    padding-left: 10px;
+    margin-bottom: 8px;
+  }
+
+  .top-risks-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    tr {
+      transition: background-color 0.2s;
+      &:hover {
+        background-color: #f3f4f6;
+      }
+    }
+
+    td {
+      padding: 8px 10px;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .rank {
+      font-weight: bold;
+      color: #ef4444;
+      text-align: center;
+      width: 40px;
+    }
+
+    .name {
+      font-weight: 500;
+      color: #111827;
+    }
+
+    .level {
+      text-align: right;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  }
+
+  .loading,
+  .empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 180px;
+    color: #6b7280;
+    font-size: 14px;
+  }
+}
