@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
@@ -29,8 +29,16 @@ export class AverageImplementationDelayComponent implements OnInit, OnDestroy {
       point: { radius: 4, backgroundColor: '#2563eb' }
     },
     scales: {
-      y: { beginAtZero: true, title: { display: true, text: 'Jours' } },
-      x: { title: { display: true, text: 'Mois' } }
+      y: { beginAtZero: true, title: { display: true, text: 'Nombre de plans d\'action' } },
+      x: {
+        type: 'linear',
+        min: 0,
+        max: 10,
+        ticks: {
+          stepSize: 1
+        },
+        title: { display: true, text: 'Nombre de semaines' }
+      }
     }
   };
 
@@ -38,7 +46,7 @@ export class AverageImplementationDelayComponent implements OnInit, OnDestroy {
   isLoading = true;
   private sub!: Subscription;
 
-  constructor(private actionPlanService: ActionPlanService) {}
+  private actionPlanService = inject(ActionPlanService)
 
   ngOnInit() {
     this.sub = this.actionPlanService.getActionsPlan().subscribe({
@@ -48,42 +56,36 @@ export class AverageImplementationDelayComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Grouper les plans par mois de clôture
-        const monthlyDurations: Record<string, number[]> = {};
-        const now = new Date();
+        // Compter le nombre de plans par nombre de semaines
+        const weeklyCounts: Record<number, number> = {};
 
         plans
-          .filter(p => p.closedAt && p.createdAt)
+          .filter(p => p.createdAt && p.closedAt)
           .forEach(plan => {
-            const created = new Date(plan.createdAt);
+            const started = new Date(plan.createdAt);
             const closed = new Date(plan.closedAt!);
-            const delayDays = (closed.getTime() - created.getTime()) / (1000 * 3600 * 24);
+            const delayWeeks = (closed.getTime() - started.getTime()) / (1000 * 3600 * 24 * 7);
+            const roundedWeeks = Math.ceil(delayWeeks); // arrondi à la semaine supérieure
 
-            const monthLabel = closed.toLocaleString('fr-FR', { month: 'short' });
-            if (!monthlyDurations[monthLabel]) monthlyDurations[monthLabel] = [];
-            monthlyDurations[monthLabel].push(delayDays);
+            if (roundedWeeks > 10) return; // Ignorer >10 semaines si tu veux fixer l'axe
+            weeklyCounts[roundedWeeks] = (weeklyCounts[roundedWeeks] || 0) + 1;
           });
 
-        // Calculer la moyenne par mois
-        const labels = Object.keys(monthlyDurations);
-        const monthlyAverages = labels.map(month => {
-          const delays = monthlyDurations[month];
-          const avg = delays.reduce((a, b) => a + b, 0) / delays.length;
-          return parseFloat(avg.toFixed(1));
-        });
+        // Générer les labels 0 à 10 semaines
+        const labels = Array.from({ length: 11 }, (_, i) => i); // 0,1,2,...,10
 
-        // Calcul global
-        const allDelays = Object.values(monthlyDurations).flat();
-        this.avgGlobalDelay = allDelays.length
-          ? Math.round(allDelays.reduce((a, b) => a + b, 0) / allDelays.length)
-          : 0;
+        // Construire le dataset correspondant aux counts
+        const dataCounts = labels.map(week => weeklyCounts[week] || 0);
+
+        // Calcul global : nombre total de plans
+        this.avgGlobalDelay = plans.length;
 
         this.data = {
           labels,
           datasets: [
             {
-              label: 'Délai moyen (jours)',
-              data: monthlyAverages,
+              label: 'Nombre de plans d’action',
+              data: dataCounts,
               borderColor: '#2563eb',
               backgroundColor: 'rgba(37, 99, 235, 0.2)',
               fill: true,
@@ -100,4 +102,5 @@ export class AverageImplementationDelayComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.sub) this.sub.unsubscribe();
   }
+
 }
