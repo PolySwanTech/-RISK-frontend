@@ -1,0 +1,52 @@
+<mat-card class="summary-card mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>📊 Vue Globale de l'Évaluation</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Total affiché -->
+    <div class="total-container" *ngIf="total > 0">
+      <span class="total-label">Total :</span>
+      <span class="total-value">{{ total }}</span>
+      <span class="total-sub">risques</span>
+    </div>
+
+    <!-- Barre principale -->
+    <div class="bar-container" *ngIf="total > 0">
+      <div
+        class="segment non-eval"
+        [style.flex]="nonEvalPct"
+        *ngIf="nonEvaluated > 0"
+      >
+        {{ nonEvaluated }} ({{ nonEvalPct }}%)
+      </div>
+      <div
+        class="segment brut"
+        [style.flex]="brutPct"
+        *ngIf="brutOnly > 0"
+      >
+        {{ brutOnly }} ({{ brutPct }}%)
+      </div>
+      <div
+        class="segment net"
+        [style.flex]="brutNetPct"
+        *ngIf="brutAndNet > 0"
+      >
+        {{ brutAndNet }} ({{ brutNetPct }}%)
+      </div>
+    </div>
+
+    <!-- Légende -->
+    <div class="legend">
+      <div class="item">
+        <span class="color red"></span> Non évalués
+      </div>
+      <div class="item">
+        <span class="color yellow"></span> Évaluation brut uniquement
+      </div>
+      <div class="item">
+        <span class="color blue"></span> Évaluation complète (Brut + Net)
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

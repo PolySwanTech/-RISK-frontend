@@ -1,0 +1,26 @@
+<mat-card class="chart-card mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>⏳ Délai moyen de mise en œuvre</mat-card-title>
+    <mat-card-subtitle>Évolution mensuelle</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="chart-container" *ngIf="!isLoading; else loading">
+      <canvas baseChart
+              [data]="data"
+              [options]="options"
+              type="line">
+      </canvas>
+    </div>
+
+    <ng-template #loading>
+      <div class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </ng-template>
+  </mat-card-content>
+
+  <mat-card-footer *ngIf="!isLoading">
+    Moyenne : <strong>{{ avgGlobalDelay }}</strong> jours
+  </mat-card-footer>
+</mat-card>

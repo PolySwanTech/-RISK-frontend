@@ -66,7 +66,6 @@ export class PopUpDetailExecutionComponent {
       switch (status) {
         case Status.ACHIEVED: return 'status-realise';
         case Status.IN_PROGRESS: return 'status-en-cours';
-        case Status.NOT_ACHIEVED: return 'status-non-realise';
         default: return 'status-default';
       }
     }

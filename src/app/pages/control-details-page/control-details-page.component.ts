@@ -141,7 +141,6 @@ export class ControlDetailsPageComponent implements OnInit {
     switch (status) {
       case Status.ACHIEVED: return 'achieved';
       case Status.IN_PROGRESS: return 'in_progress';
-      case Status.NOT_ACHIEVED: return 'not_achieved';
       default: return '';
     }
   }

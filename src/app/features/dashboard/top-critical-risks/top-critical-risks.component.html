@@ -1,0 +1,31 @@
+<mat-card class="top-risks-card mat-elevation-z3">
+  <mat-card-header>
+    <mat-card-title>🏆 Top 5 des risques les plus critiques</mat-card-title>
+    <mat-card-subtitle>Basé sur l’évaluation brute</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <ng-container *ngIf="!isLoading; else loading">
+      <table class="top-risks-table" *ngIf="topRisks.length > 0; else empty">
+        <tr *ngFor="let risk of topRisks; let i = index">
+          <td class="rank">{{ i + 1 }}</td>
+          <td class="name">{{ risk.name }}</td>
+          <td class="level">
+            <span class="color-dot" [style.background]="risk.color"></span>
+            {{ risk.label }}
+          </td>
+        </tr>
+      </table>
+    </ng-container>
+
+    <ng-template #loading>
+      <div class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </ng-template>
+
+    <ng-template #empty>
+      <div class="empty">Aucun risque évalué</div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

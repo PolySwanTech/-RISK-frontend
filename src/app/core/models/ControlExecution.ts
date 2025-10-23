@@ -1,5 +1,4 @@
 import { EvaluationControl } from "../enum/evaluation-controle.enum";
-import { Evaluation } from "../enum/evaluation.enum";
 import { ExecutionMode } from "../enum/exceutionmode.enum";
 import { Priority } from "../enum/Priority";
 import { Status } from "../enum/status.enum";
@@ -8,7 +7,6 @@ export class ControlExecution {
 
     id: string;
     priority: Priority;
-    executionMode : ExecutionMode;
     usedData : string;
     controlData : string;
     achievedAt: Date | null;
@@ -23,7 +21,6 @@ export class ControlExecution {
     constructor(
         id: string,
         priority: Priority,
-        executionMode: ExecutionMode,
         usedData: string,
         controlData: string,
         achievedAt: Date | null,
@@ -37,7 +34,6 @@ export class ControlExecution {
     ) {
         this.id = id;
         this.priority = priority;
-        this.executionMode = executionMode;
         this.usedData = usedData;
         this.controlData = controlData;
         this.achievedAt = achievedAt;
