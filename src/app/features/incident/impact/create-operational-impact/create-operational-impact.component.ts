@@ -589,6 +589,8 @@ export class CreateOperationalImpactComponent implements OnInit {
 
   // ---------- Submit Financier ----------
   handleSubmitFinancial(impact: FinancialImpact) {
+    console.log(this.incidentId)
+    console.log(this.currentBusinessUnitId);
     if (!this.incidentId || !this.currentBusinessUnitId) return;
 
     // Vérifier s'il existe déjà un impact avec la même BU et le même type
