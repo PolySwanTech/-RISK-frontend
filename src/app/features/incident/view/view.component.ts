@@ -21,7 +21,7 @@ import { State } from '../../../core/enum/state.enum';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, map, of } from 'rxjs';
 import { OperatingLossService } from '../../../core/services/operating-loss/operating-loss.service';
 import { saveAs } from 'file-saver';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
@@ -148,19 +148,20 @@ export class ViewComponent implements OnInit {
 
   async loadIncident(id: string) {
     this.incident = await firstValueFrom(this.incidentService.getIncidentById(id));
-    try {
-      const actionPlan = await firstValueFrom(this.actionPlanService.getActionPlanByIncident(id));
-      this.planActionId = actionPlan?.id ?? '';
-    } catch (error) {
-      this.planActionId = null;
-    }
+    this.actionPlanService.getActionPlanByIncident(id).pipe(
+      map(actionPlan => actionPlan?.id ?? ''),
+      catchError(() => {
+        console.log("Aucun plan d'action");
+        return of(''); // fallback si erreur
+      })
+    ).subscribe(planActionId => this.planActionId = planActionId);
     this.goBackButtons = [
       {
         label: "Consulter le plan d'action",
         icon: 'playlist_add_check',
         class: 'btn-primary',
         show: this.canShowActions() && !this.isDraft() && this.planActionId != null && (this.sameCreator() || this.sameIntervenant()),
-        permission: {teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN']},
+        permission: { teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN'] },
         action: () => this.gotoActionPlan(this.planActionId as string)
       },
       {
@@ -168,7 +169,7 @@ export class ViewComponent implements OnInit {
         icon: 'playlist_add_check',
         class: 'btn-primary',
         show: this.canShowActions() && !this.isDraft() && this.planActionId == null && (this.sameCreator() || this.sameIntervenant()),
-        permission: {teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN', 'CREATE_ACTION_PLAN']},
+        permission: { teamId: this.incident?.teamId, permissions: ['VIEW_ACTION_PLAN', 'CREATE_ACTION_PLAN'] },
         action: () => this.addActionPlan(this.incident)
       },
       {
@@ -176,7 +177,7 @@ export class ViewComponent implements OnInit {
         icon: 'edit',
         class: 'btn-green',
         show: this.canShowActions() && !this.isDraft(),
-        permission: {teamId: this.incident?.teamId, permissions: ['UPDATE_INCIDENT']},
+        permission: { teamId: this.incident?.teamId, permissions: ['UPDATE_INCIDENT'] },
         action: () => this.goToModification()
       },
       {
@@ -205,19 +206,19 @@ export class ViewComponent implements OnInit {
         icon: 'lock',
         class: 'btn-red',
         show: this.canClose() && (this.sameCreator() || this.sameIntervenant()),
-        permission: {teamId: this.incident?.teamId, permissions: ['CLOSED_INCIDENT']},
+        permission: { teamId: this.incident?.teamId, permissions: ['CLOSED_INCIDENT'] },
         action: () => this.closeIncident()
       },
 
     ];
   }
 
-  sameCreator(){
-   return this.authService.sameUser(this.incident?.creatorId || '');
+  sameCreator() {
+    return this.authService.sameUser(this.incident?.creatorId || '');
   }
 
-  sameIntervenant(){
-   return this.authService.sameUser(this.incident?.intervenantId || '');
+  sameIntervenant() {
+    return this.authService.sameUser(this.incident?.intervenantId || '');
   }
 
 
@@ -246,7 +247,7 @@ export class ViewComponent implements OnInit {
     });
   }
 
- async extractTokenInfo() {
+  async extractTokenInfo() {
     this.permissions = await this.authService.getPermissionsByTeam(this.incident?.teamId ?? '');
   }
 
@@ -378,9 +379,9 @@ export class ViewComponent implements OnInit {
     const diffTime = Math.abs(date2.getTime() - date1.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if(diffDays < 0){
+    if (diffDays < 0) {
       return 'black';
-    }else if (diffDays < 30) {
+    } else if (diffDays < 30) {
       return 'green';
     } else if (diffDays < 60) {
       return 'orange';
@@ -390,8 +391,8 @@ export class ViewComponent implements OnInit {
   }
 
   getDaysDiff(from: Date | string, to: Date | string): number {
-    if(from == null || to == null)
-        return -1;
+    if (from == null || to == null)
+      return -1;
     const date1 = new Date(from);
     const date2 = new Date(to);
     const diffTime = Math.abs(date2.getTime() - date1.getTime());

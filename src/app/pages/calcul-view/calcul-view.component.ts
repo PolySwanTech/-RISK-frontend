@@ -10,9 +10,11 @@ import { CalculService } from '../../core/services/calcul/calcul.service';
 import { ConfirmService } from '../../core/services/confirm/confirm.service';
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
 import { MatInputModule } from '@angular/material/input';
-import { ChartConfiguration, ChartEvent, ChartOptions } from 'chart.js';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
+import { codeToEnumKeyMap } from '../../core/enum/sma.enum';
 
 interface DataItem {
   id: number;
@@ -62,6 +64,27 @@ interface BackendResponse {
   [year: string]: {
     [categoryName: string]: CategoryResponse;
   };
+}
+
+export function fillRowsFromEnumCodes(
+  rows: string[][],
+  dataByYear: { [year: string]: { [enumKey: string]: number } },
+  years: string[],
+  data: string[][]
+): void {
+  rows.forEach(row => {
+    const dataRow = [...row];
+    const code = row[0];
+    const enumKey = codeToEnumKeyMap[code];
+
+    years.forEach(year => {
+      const yearLabelMap = dataByYear[year] || {};
+      const value = enumKey ? (yearLabelMap[enumKey] ?? 0) : 0;
+      dataRow.push(value.toString(), '');
+    });
+
+    data.push(dataRow);
+  });
 }
 
 @Component({
@@ -189,14 +212,9 @@ export class CalculViewComponent {
       icon: 'download',
       class: 'btn-green', // tu peux garder ce nom si tu l’as stylé dans ton CSS
       show: true,
-      action: () => { } // si une fonction existe, sinon remplace ou crées-en une
+      action: () => this.exportExcel()
     }
   ];
-
-  ILM: number = 0;
-
-  historiqueCalculs: any[] = [];
-  displayedColumns = ['periode', 'bi', 'bic', 'ilm', 'exigenceFinale', 'statut'];
 
   biCardVisible = false;
   biCardX = 0;
@@ -260,7 +278,6 @@ export class CalculViewComponent {
       ];
     };
   }
-
 
   rebuildYears() {
     this.lineChartData.labels = this.years;
@@ -389,9 +406,146 @@ export class CalculViewComponent {
     }
   }
 
+  exportExcel(): void {
+    const wb = XLSX.utils.book_new();
 
-  exportExcel() {
-    alert('Export Excel non implémenté');
+    // Créer les données pour la feuille
+    const data: any[][] = [];
+
+    // En-tête principal
+    data.push(['C 16.02 - OPERATIONAL RISK - Business Indicator Component (OPR BIC)']);
+    data.push([]);
+
+    // En-têtes des colonnes
+    const headerRow1 = ['', ''];
+    const headerRow2 = ['Code', 'Description'];
+
+    const years = [2023, 2024, 2025];
+
+    years.map(y => y.toString()).forEach(year => {
+      headerRow1.push(year, '');
+      headerRow2.push('Accounting Value', 'Value - Prudential Boundary Approach');
+    });
+
+    data.push(headerRow1);
+    data.push(headerRow2);
+
+    // 1. ILDC Section
+    data.push(['', '1. Interest, leases and dividend component (ILDC)', '', '', '', '', '', '']);
+
+    const dataByYear: { [year: string]: { [label: string]: number } } = {};
+
+    years.map(y => y.toString()).forEach(year => {
+      const yearData = this.allYearsData.find(d => d.label === year);
+      const labelValueMap: { [label: string]: number } = {};
+
+      if (yearData)
+        yearData.sections.forEach(category => {
+          category?.sections?.forEach(subCategory => {
+            subCategory?.data?.forEach(item => {
+              labelValueMap[item.name] = item.value;
+            });
+          });
+        });
+
+      dataByYear[year] = labelValueMap;
+    });
+
+    const ildcRows = [
+      ['0010', 'Interest component'],
+      ['0020', 'Net Income'],
+      ['0030', 'Interest Income (including from leased assets (Financial & Operating))'],
+      ['0040', '  Interest Income'],
+      ['0050', '  Income from leased assets (Financial&Operating) other than Interest income'],
+      ['0060', '  Profits from leased assets (Financial&Operating)'],
+      ['0070', '(Interest expenses (including from leased assets (Financial&Operating)))'],
+      ['0080', '  (Interest expenses)'],
+      ['0090', '  (Expenses from operating leased assets other than Interest expenses)'],
+      ['0100', '  (Losses from operating leased assets)'],
+      ['0110', 'Asset component'],
+      ['0120', '  Total assets'],
+      ['0130', '  Cash balances at central banks and other demand deposits'],
+      ['0140', '  Debt securities'],
+      ['0150', '  Loans and advances'],
+      ['0160', '  Derivatives'],
+      ['0170', '  Trading and economic hedges'],
+      ['0180', '  Hedge accounting'],
+      ['0190', '  Assets subject to leases'],
+      ['0200', 'Dividend component'],
+      ['0210', '  Dividend income']
+    ];
+
+    const scRows = [
+      ['0220', 'Other operating income'],
+      ['0230', '  Other operating income from members belonging to the same IPS'],
+      ['0240', '  Profit from non-current assets and disposal groups classified as held for sale'],
+      ['0250', '  Other'],
+      ['0260', '(Other operating expenses)'],
+      ['0270', '  (Other operating expenses from members belonging to the same IPS)'],
+      ['0280', '  (Total losses, expenses, provisions and other financial impacts due to operational risk events)'],
+      ['0290', '  (Losses from non-current assets and disposal groups classified as held for sale)'],
+      ['0300', '  (Other)'],
+      ['0310', 'Fee and commission income component'],
+      ['0320', '  Fee and commission income'],
+      ['0330', '  of which: from members belonging to the same IPS'],
+      ['0340', '(Fee and commission expenses component)'],
+      ['0350', '  (Fee and commission expenses)'],
+      ['0360', '  (of which: from members belonging to the same IPS)']
+    ];
+
+    const fcRows = [
+      ['0370', 'Trading book component'],
+      ['0380', '  Net profit or (-)loss applicable to trading book'],
+      ['0390', '  Gains or (-) losses on financial assets and liabilities held for trading, net'],
+      ['0400', '  Trading book - Gains or (-) losses from hedge accounting, net'],
+      ['0410', '  Trading book - Exchange differences [gain or (-) loss], net'],
+      ['0420', 'Banking book component'],
+      ['0430', '  Net profit or (-)loss applicable to banking book'],
+      ['0440', '  Gains or (-) losses on derecognition of financial assets and liabilities not measured at fair value through profit or loss, net'],
+      ['0450', '  Gains or (-) losses on non-trading financial assets mandatorily at fair value through profit or loss, net'],
+      ['0460', '  Gains or (-) losses on financial assets and liabilities designated at fair value through profit or loss, net'],
+      ['0470', '  Banking book - Gains or (-) losses from hedge accounting, net'],
+      ['0480', '  Banking book - Exchange differences [gain or (-) loss], net']
+    ];
+    // 1. Interest, Leases and Dividend Component (ILDC)
+    fillRowsFromEnumCodes(ildcRows, dataByYear, years.map(y => y.toString()), data);
+
+    // 2. Services Component Section (SC)
+    data.push([]);
+    data.push(['', '2. Services component (SC)', '', '', '', '', '', '']);
+    fillRowsFromEnumCodes(scRows, dataByYear, years.map(y => y.toString()), data);
+
+    // 3. Financial Component Section (FC)
+    data.push([]);
+    data.push(['', '3. Financial component (FC)', '', '', '', '', '', '']);
+    fillRowsFromEnumCodes(fcRows, dataByYear, years.map(y => y.toString()), data);
+    // Créer la feuille de calcul
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Définir les largeurs de colonnes
+    ws['!cols'] = [
+      { wch: 8 },  // Code
+      { wch: 80 }, // Description
+      { wch: 18 }, // 2024 Accounting
+      { wch: 18 }, // 2024 Prudential
+      { wch: 18 }, // 2023 Accounting
+      { wch: 18 }, // 2023 Prudential
+      { wch: 18 }, // 2022 Accounting
+      { wch: 18 }  // 2022 Prudential
+    ];
+
+    // Fusionner les cellules pour l'en-tête principal
+    ws['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, // Titre principal
+      { s: { r: 2, c: 2 }, e: { r: 2, c: 3 } }, // 2024
+      { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } }, // 2023
+      { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } }  // 2022
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'C16.02 - OPR BIC');
+
+    // Télécharger le fichier
+    XLSX.writeFile(wb, `C16_Operational_Risk_${new Date().toISOString().split('T')[0]}.xlsx`);
   }
 
   formatCurrency(value: number): string {

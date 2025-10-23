@@ -197,7 +197,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         {
           id: Date.now(),
           title: '',
-          businessUnitId: '',
+          businessUnitId: this.currentBusinessUnitId ? this.currentBusinessUnitId : '',
           type: null,
           description: '',
           details: [{ amountType: null, accountingReference: '', accountingDate: '', amount: '' }],
@@ -589,9 +589,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
   // ---------- Submit Financier ----------
   handleSubmitFinancial(impact: FinancialImpact) {
-    console.log(this.incidentId)
-    console.log(this.currentBusinessUnitId);
-    if (!this.incidentId || !this.currentBusinessUnitId) return;
+    if (!this.incidentId || !impact.businessUnitId) return;
 
     // Vérifier s'il existe déjà un impact avec la même BU et le même type
     const duplicate = this.existingFinancialLosses.find(
