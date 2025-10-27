@@ -2,8 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment'
-import { Utilisateur } from '../../models/Utilisateur';
-import { UtilisateurProfil } from '../../models/UtilisateurProfil';
+import { Utilisateur, UtilisateurProfil } from '../../models/Utilisateur';
 import { TeamMember } from '../../models/TeamMember';
 
 @Injectable({

@@ -6,11 +6,10 @@ import { UtilisateurService } from '../../../../core/services/utilisateur/utilis
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
-import { UtilisateurProfil } from '../../../../core/models/UtilisateurProfil';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateUserComponent } from '../../create/create-user/create-user.component';
 import { MatButtonModule } from '@angular/material/button';
-import { Utilisateur } from '../../../../core/models/Utilisateur';
+import { Utilisateur, UtilisateurProfil } from '../../../../core/models/Utilisateur';
 import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { MatCardModule } from '@angular/material/card';
 

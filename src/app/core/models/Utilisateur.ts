@@ -23,3 +23,11 @@ export class Utilisateur {
         this.equipe = equipe;
     }
 }
+
+export class UtilisateurProfil {
+    id!: string;
+    username!: string;
+    email!: string;
+    equipeName?: string;
+    role?: string;
+}  
