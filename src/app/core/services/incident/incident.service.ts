@@ -71,8 +71,9 @@ export class IncidentService {
 
   downloadPDF(incidentId: string) {
     /* TODO : ajouter l'ecran de chargement "PDF en cours" */
+    const header = new HttpHeaders().set('X-Show-Loader', 'true');
     const url = `${this.baseUrl}/${incidentId}/pdf`;
-    return this.http.get(url, { responseType: 'blob' });
+    return this.http.get(url, { headers: header, responseType: 'blob' },);
   }
 
   findAllByIds(ids: Set<string>): Observable<Incident[]> {
