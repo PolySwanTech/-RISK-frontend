@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
@@ -19,7 +18,6 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private passwordService = inject(PasswordService);
   private fb = inject(FormBuilder);
-  private router = inject(Router);
 
   loginForm: FormGroup;
   resetMdpForm: FormGroup;

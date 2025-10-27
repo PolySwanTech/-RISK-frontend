@@ -1,4 +1,4 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { PopupHeaderComponent } from '../popup-header/popup-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';

@@ -2,17 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // ✅ Ajouté
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute } from '@angular/router';
-import { IncidentService } from '../../../core/services/incident/incident.service';
-import { Incident } from '../../../core/models/Incident';
 import { SuiviIncidentService } from '../../../core/services/suivi-incident/suivi-incident.service';
-import { SnapshotDialogComponent } from '../snapshot-dialog/snapshot-dialog.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog';
-import { SuiviIncident } from '../../../core/models/SuiviIncident';
-import { EntitiesService } from '../../../core/services/entities/entities.service';
-import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { IncidentHistory } from '../../../core/models/IncidentHistory';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';

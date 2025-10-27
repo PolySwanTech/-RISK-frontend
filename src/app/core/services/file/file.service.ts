@@ -7,9 +7,10 @@ import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { FichiersComponent } from '../../../shared/components/fichiers/fichiers.component';
+import { UploadedFile } from '../../models/uploaded-file';
 
 // modèle tel que renvoyé par le back (nullable possible)
-export interface FileEntity {
+interface FileEntity {
   id: string;
   filename: string | null;
   objectKey: string;
@@ -21,18 +22,6 @@ export interface FileEntity {
   description?: string | null;
 }
 
-// ce que ton UI consomme
-export interface UploadedFile {
-  id: string;
-  filename: string;
-  objectKey: string;
-  contentType: string;
-  size: number;
-  etag: string;
-  uploadedAt: Date;
-  uploadedBy: string;
-  description: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class FileService {

@@ -1,26 +1,111 @@
-<mat-card class="chart-card mat-elevation-z3">
-  <mat-card-header>
-    <mat-card-title>Délai moyen de mise en œuvre</mat-card-title>
-    <mat-card-subtitle>Répartition par nombre de semaines</mat-card-subtitle>
-  </mat-card-header>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+  <div class="max-w-7xl mx-auto">
 
-  <mat-card-content>
-    <div class="chart-container" *ngIf="!isLoading; else loading">
-      <canvas baseChart
-              [data]="data"
-              [options]="options"
-              type="line">
-      </canvas>
+    <!-- En-tête du dashboard -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-slate-800 mb-2">
+        Délai moyen des plans d'action
+      </h1>
+      <p class="text-slate-600">Suivi et analyse des performances par équipe</p>
     </div>
 
-    <ng-template #loading>
-      <div class="loading">
-        <mat-spinner diameter="40"></mat-spinner>
+    <!-- Carte de la moyenne globale -->
+    <div
+      class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-slate-600 text-sm font-medium mb-1">Moyenne Globale</p>
+          <p class="text-5xl font-bold" [class.text-green-600]="globalAverage <= target"
+            [class.text-amber-600]="globalAverage > target">
+            {{ globalAverage }}
+            <span class="text-2xl text-slate-500">semaines</span>
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-slate-600 text-sm font-medium mb-1">Objectif</p>
+          <p class="text-3xl font-bold text-slate-700">
+            {{ target }}
+            <span class="text-lg text-slate-500">semaines</span>
+          </p>
+        </div>
+        <div class="flex items-center">
+          <div class="h-16 w-16 rounded-full flex items-center justify-center"
+            [class.bg-green-100]="globalAverage <= target" [class.bg-amber-100]="globalAverage > target">
+            <svg *ngIf="globalAverage <= target" class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <svg *ngIf="globalAverage > target" class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+              </path>
+            </svg>
+          </div>
+        </div>
       </div>
-    </ng-template>
-  </mat-card-content>
+    </div>
 
-  <mat-card-footer *ngIf="!isLoading">
-    Moyenne : <strong>{{ avgGlobalDelay }}</strong> semaines
-  </mat-card-footer>
-</mat-card>
+    <!-- Grille des graphiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+      <!-- Graphique en ligne -->
+      <div
+        class="bg-white rounded-xl shadow-lg p-6 border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center mb-4">
+          <div class="h-10 w-1 bg-blue-500 rounded-full mr-3"></div>
+          <h2 class="text-xl font-semibold text-slate-800">Évolution mensuelle</h2>
+        </div>
+        <div class="h-80">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Graphique en barres -->
+      <div
+        class="bg-white rounded-xl shadow-lg p-6 border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center mb-4">
+          <div class="h-10 w-1 bg-purple-500 rounded-full mr-3"></div>
+          <h2 class="text-xl font-semibold text-slate-800">Performance par équipe</h2>
+        </div>
+        <div class="h-80">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jauge -->
+    <div
+      class="bg-white rounded-xl shadow-lg p-6 border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center mb-4">
+        <div class="h-10 w-1 bg-emerald-500 rounded-full mr-3"></div>
+        <h2 class="text-xl font-semibold text-slate-800">Indicateur de performance global</h2>
+      </div>
+      <div class="flex flex-col items-center justify-center py-6">
+        <div class="relative h-64 w-full max-w-md">
+          <canvas id="donutChart"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center" style="top: 45%;">
+            <p class="text-5xl font-bold" [class.text-green-600]="globalAverage <= target"
+              [class.text-amber-600]="globalAverage > target">
+              {{ globalAverage }}
+            </p>
+            <p class="text-slate-500 text-sm mt-1">semaines</p>
+            <p class="text-slate-400 text-xs mt-2">vs objectif {{ target }} sem.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 mt-4">
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full" [class.bg-green-500]="globalAverage <= target"
+              [class.bg-amber-500]="globalAverage > target"></div>
+            <span class="text-sm text-slate-600">Réalisé</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full bg-slate-300"></div>
+            <span class="text-sm text-slate-600">Écart objectif</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

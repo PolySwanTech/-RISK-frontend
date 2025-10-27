@@ -19,8 +19,6 @@ export class AuthService {
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 
   private permissions: { [teamId: string]: string[] } = {};
-
-  private utilisateurConnecte!: Utilisateur;
   private snackBarService = inject(SnackBarService);
   
   constructor() { }

@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { ToDoType } from '../../enum/to-do.enum';
 import { ToDo } from '../../models/ToDo';
 
 @Injectable({

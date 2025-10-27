@@ -3,7 +3,7 @@ import { Component, Input, Output, EventEmitter, inject, HostListener } from '@a
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RiskLevel, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
@@ -126,24 +126,7 @@ export class MatrixComponent {
   private cellKey(row: number, col: number): string {
     return `${row},${col}`;
   }
-
-  private buildLabels(matrixId: string) {
-    return [
-      ...this.rowLabels.map((label, i) => ({
-        label,
-        labelType: 'row',
-        matrix: matrixId,
-        position: this.rowLabels.length - i
-      })),
-      ...this.colLabels.map((label, i) => ({
-        label,
-        labelType: 'col',
-        matrix: matrixId,
-        position: i + 1
-      }))
-    ];
-  }
-
+  
   cellStyle(cell: any) {
   const bg = cell?.riskLevel?.color || '#fff'; // blanc si rien
   return {

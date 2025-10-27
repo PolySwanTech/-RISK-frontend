@@ -7,11 +7,10 @@ import { ControlService } from '../../../../core/services/control/control.servic
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
 import { MatIcon } from '@angular/material/icon';
-import { FichiersComponent } from '../../../../shared/components/fichiers/fichiers.component';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { TargetType } from '../../../../core/enum/targettype.enum';
 import { FileService } from '../../../../core/services/file/file.service';
@@ -34,7 +33,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   executionId!: string;
   canValidate: boolean = false;
 
-  private dialog = inject(MatDialog);
   private fileService = inject(FileService);
 
   @Output() close = new EventEmitter<void>();

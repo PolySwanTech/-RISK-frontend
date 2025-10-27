@@ -16,7 +16,6 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ListProcessComponent } from '../../features/process/list-process/list-process.component';
-import { Permission } from '../../core/models/permission';
 
 @Component({
   selector: 'app-cartographie',

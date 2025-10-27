@@ -66,7 +66,7 @@ interface BackendResponse {
   };
 }
 
-export function fillRowsFromEnumCodes(
+function fillRowsFromEnumCodes(
   rows: string[][],
   dataByYear: { [year: string]: { [enumKey: string]: number } },
   years: string[],
@@ -179,7 +179,6 @@ export class CalculViewComponent {
         callbacks: {
           label: function (context) {
             const year = context.label;
-            const result = context.chart.data.datasets[0].data[context.dataIndex]; // juste la valeur par défaut
             // Si tu as accès à annualResult via closure
             const annualResult = (context.chart as any).annualResult as any;
             const r = annualResult ? annualResult[year] : null;

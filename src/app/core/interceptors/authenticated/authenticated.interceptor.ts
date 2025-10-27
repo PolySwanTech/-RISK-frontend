@@ -1,7 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { tap } from 'rxjs';
-import { SnackBarService } from '../../services/snack-bar/snack-bar.service';
-import { inject } from '@angular/core';
 
 export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
 

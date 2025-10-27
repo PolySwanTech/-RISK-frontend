@@ -1,11 +1,10 @@
 import { UtilisateurService } from './../../../../core/services/utilisateur/utilisateur.service';
-import { Component, Inject, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from '../../../../core/services/auth/auth.service';
-import { Equipe, EquipeService } from '../../../../core/services/equipe/equipe.service';
+import { Equipe } from '../../../../core/services/equipe/equipe.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';

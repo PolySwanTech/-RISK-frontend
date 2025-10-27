@@ -7,7 +7,7 @@ import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -19,7 +19,7 @@ import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatCardHeader, MatCardModule } from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 
 @Component({

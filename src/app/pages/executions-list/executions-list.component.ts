@@ -1,6 +1,6 @@
 import { ControlService } from './../../core/services/control/control.service';
-import { AfterViewInit, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject, Input, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { DatePipe, CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,7 +39,6 @@ import { Priority } from '../../core/enum/Priority';
 export class ExecutionsListComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  private router = inject(Router);
   private route = inject(ActivatedRoute);
   private controlService = inject(ControlService);
   private dialog = inject(MatDialog);

@@ -18,20 +18,7 @@ import { PopupHeaderComponent } from '../popup-header/popup-header.component';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { MatDividerModule } from '@angular/material/divider';
-
-
-export interface UploadedFile {
-  id: string;
-  filename: string;
-  objectKey: string;
-  contentType: string;
-  size: number;
-  etag: string;
-  uploadedAt: Date;
-  uploadedBy: string;
-  description?: string;
-  isNew?: boolean;
-}
+import { UploadedFile } from '../../../core/models/uploaded-file';
 
 // Fichier "en attente" uniquement côté UI
 interface PendingFile {
@@ -104,7 +91,7 @@ export class FichiersComponent {
     }
   }
 
-  closePopup(){
+  closePopup() {
     this.dialogRef.close();
   }
 
@@ -123,12 +110,12 @@ export class FichiersComponent {
   }
 
   onFileSelected(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (input.files) {
-    this.addPending(Array.from(input.files));
-    input.value = ''; // pour autoriser redépôt des mêmes noms
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addPending(Array.from(input.files));
+      input.value = ''; // pour autoriser redépôt des mêmes noms
+    }
   }
-}
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -143,108 +130,65 @@ export class FichiersComponent {
   }
 
   onDrop(event: DragEvent): void {
-  event.preventDefault();
-  event.stopPropagation();
-  this.isDragOver = false;
-  if (event.dataTransfer?.files) {
-    this.addPending(Array.from(event.dataTransfer.files));
-  }
-}
-
-private addPending(files: File[]) {
-  for (const file of files) {
-    if (!this.isValidFile(file)) {
-      this.confirmService.openConfirmDialog(
-        "Fichier non supporté",
-        `Le fichier ${file.name} n'est pas dans un format supporté.`,
-        false
-      );
-      continue;
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+    if (event.dataTransfer?.files) {
+      this.addPending(Array.from(event.dataTransfer.files));
     }
-    this.pendingFiles.push({
-      tempId: crypto.randomUUID(),
-      file,
-      filename: file.name,
-      size: file.size,
-      contentType: file.type,
-      description: ''
-    });
   }
-}
 
-  // private async handleFiles(files: File[]) {
-  //   const validFiles: File[] = [];
-
-  //   // On prépare toutes les promesses d'upload
-  //   const uploadPromises: Promise<void>[] = [];
-
-  //   for (const file of files) {
-  //     if (this.isValidFile(file)) {
-  //       validFiles.push(file);
-  //       uploadPromises.push(this.uploadFile(file)); // on stocke la promesse
-  //     } else {
-  //       this.confirmService.openConfirmDialog(
-  //         "Fichier non supporté",
-  //         `Le fichier ${file.name} n'est pas dans un format supporté.`,
-  //         false
-  //       );
-  //     }
-  //   }
-
-  //   if (validFiles.length > 0) {
-  //     try {
-  //       // attendre que TOUS les fichiers soient uploadés
-  //       await Promise.all(uploadPromises);
-
-  //       const fileNames = validFiles.map(f => f.name).join(", ");
-  //       const message =
-  //         validFiles.length === 1
-  //           ? `Le fichier ${fileNames} a été ajouté avec succès.`
-  //           : `Les fichiers ${fileNames} ont été ajoutés avec succès.`;
-
-  //       this.snackbarService.success("Fichier(s) ajouté(s) " + message);
-  //       this.ngOnInit();
-  //     } catch (error) {
-  //       this.confirmService.openConfirmDialog(
-  //         "Erreur",
-  //         "Une erreur est survenue lors de l'upload d'un ou plusieurs fichiers.",
-  //         false
-  //       );
-  //     }
-  //   }
-
-  // }
-
-  private async uploadFile(file: File): Promise<void> {
-
-    if (!this.targetId) {
-      this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
-      return;
-    }
-
-    this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
-      next: _ => {
-        // Refresh la liste
-        this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
-        this.attachedFiles = files.map(f => ({
-          ...f,
-          isNew: f.filename === file.name
-        }));
-        this.filteredFiles = this.attachedFiles;
-        this.filteredFilesCount = this.filteredFiles.length;
-        });
-      },
-      error: _ => {
+  private addPending(files: File[]) {
+    for (const file of files) {
+      if (!this.isValidFile(file)) {
         this.confirmService.openConfirmDialog(
-          "Erreur",
-          `Erreur lors de l'ajout du fichier ${file.name}.`,
+          "Fichier non supporté",
+          `Le fichier ${file.name} n'est pas dans un format supporté.`,
           false
         );
+        continue;
       }
-    });
+      this.pendingFiles.push({
+        tempId: crypto.randomUUID(),
+        file,
+        filename: file.name,
+        size: file.size,
+        contentType: file.type,
+        description: ''
+      });
+    }
   }
 
-   private isValidFile(file: File): boolean {
+  // private async uploadFile(file: File): Promise<void> {
+
+  //   if (!this.targetId) {
+  //     this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
+  //     return;
+  //   }
+
+  //   this.fileService.uploadFile(file, this.targetType, this.targetId).subscribe({
+  //     next: _ => {
+  //       // Refresh la liste
+  //       this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+  //         this.attachedFiles = files.map(f => ({
+  //           ...f,
+  //           isNew: f.filename === file.name
+  //         }));
+  //         this.filteredFiles = this.attachedFiles;
+  //         this.filteredFilesCount = this.filteredFiles.length;
+  //       });
+  //     },
+  //     error: _ => {
+  //       this.confirmService.openConfirmDialog(
+  //         "Erreur",
+  //         `Erreur lors de l'ajout du fichier ${file.name}.`,
+  //         false
+  //       );
+  //     }
+  //   });
+  // }
+
+  private isValidFile(file: File): boolean {
     const validTypes = [
       'application/pdf',
       'application/msword',
@@ -290,52 +234,52 @@ private addPending(files: File[]) {
     });
   }
 
- removePending(tempId: string) {
-  this.pendingFiles = this.pendingFiles.filter(p => p.tempId !== tempId);
-}
-
-clearPending() {
-  this.pendingFiles = [];
-}
-
-savePending() {
-  if (!this.targetId) {
-    this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
-    return;
-  }
-  if (this.pendingFiles.length === 0) {
-    this.snackbarService.info("Aucun fichier à enregistrer.");
-    return;
+  removePending(tempId: string) {
+    this.pendingFiles = this.pendingFiles.filter(p => p.tempId !== tempId);
   }
 
-  this.isSaving = true;
+  clearPending() {
+    this.pendingFiles = [];
+  }
 
-  const requests = this.pendingFiles.map(p =>
-    this.fileService.uploadFile(p.file, this.targetType, this.targetId, p.description ?? '').pipe(
-      catchError(err => {
-        this.snackbarService.error(`Échec upload: ${p.filename}`);
-        return of(null); // continue le lot
-      })
-    )
-  );
-
-  forkJoin(requests).pipe(finalize(() => (this.isSaving = false))).subscribe({
-    next: _ => {
-      // rafraîchit la liste des fichiers persistés
-      this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
-        this.attachedFiles = files;
-        this.filteredFiles = files;
-        this.filteredFilesCount = files.length;
-        this.pendingFiles = []; // panier vidé
-        this.snackbarService.success("Fichiers enregistrés.");
-        this.dialogRef?.close({ updated: true });
-      });
-    },
-    error: _ => {
-      this.confirmService.openConfirmDialog("Erreur", "Erreur lors de l'enregistrement.", false);
+  savePending() {
+    if (!this.targetId) {
+      this.confirmService.openConfirmDialog("Erreur", "Aucune cible définie pour l’upload.", false);
+      return;
     }
-  });
-}
+    if (this.pendingFiles.length === 0) {
+      this.snackbarService.info("Aucun fichier à enregistrer.");
+      return;
+    }
+
+    this.isSaving = true;
+
+    const requests = this.pendingFiles.map(p =>
+      this.fileService.uploadFile(p.file, this.targetType, this.targetId, p.description ?? '').pipe(
+        catchError(err => {
+          this.snackbarService.error(`Échec upload: ${p.filename}`);
+          return of(null); // continue le lot
+        })
+      )
+    );
+
+    forkJoin(requests).pipe(finalize(() => (this.isSaving = false))).subscribe({
+      next: _ => {
+        // rafraîchit la liste des fichiers persistés
+        this.fileService.getFiles(this.targetType, this.targetId).subscribe(files => {
+          this.attachedFiles = files;
+          this.filteredFiles = files;
+          this.filteredFilesCount = files.length;
+          this.pendingFiles = []; // panier vidé
+          this.snackbarService.success("Fichiers enregistrés.");
+          this.dialogRef?.close({ updated: true });
+        });
+      },
+      error: _ => {
+        this.confirmService.openConfirmDialog("Erreur", "Erreur lors de l'enregistrement.", false);
+      }
+    });
+  }
 
 
 

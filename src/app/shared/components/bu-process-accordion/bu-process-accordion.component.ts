@@ -13,7 +13,7 @@ import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
@@ -21,7 +21,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CreateRisksComponent } from '../../../features/reglages/risks/create-risks/create-risks.component';
 
-export interface ProcessNode {
+interface ProcessNode {
   id: string;
   name: string;
   children?: ProcessNode[];
@@ -407,6 +407,7 @@ export class BuProcessAccordionComponent {
   private viewRisks(process: ProcessNode) {
     this.riskService.getRisksTreeByProcessId(process.id).subscribe({
       next: (risks) => {
+        console.log(risks)
         const riskNodes = risks.map(r => ({
           id: r.id,
           name: r.libelle,
@@ -428,20 +429,6 @@ export class BuProcessAccordionComponent {
         this.snackBarService.info("Erreur lors du chargement des risques");
       }
     });
-  }
-
-  private emitSelection(node: ProcessNode) {
-    switch (this.view) {
-      case 'bu':
-        this.buSelected.emit(node);
-        break;
-      case 'process':
-        this.processSelected.emit(node);
-        break;
-      case 'risks':
-        this.riskSelected.emit(node);
-        break;
-    }
   }
 
   // ---- Navigation dans le fil d'Ariane ----

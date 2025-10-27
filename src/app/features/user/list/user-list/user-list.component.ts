@@ -59,7 +59,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   }
 
   openEditDialog(user: Utilisateur): void {
-    const dialogRef = this.dialog.open(CreateUserComponent, {
+    this.dialog.open(CreateUserComponent, {
       width: '700px',
       data:
       {

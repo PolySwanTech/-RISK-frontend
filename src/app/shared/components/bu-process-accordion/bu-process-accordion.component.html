@@ -1,5 +1,4 @@
-<div class="wrapper" *ngIf="currentNodes?.length">
-
+<div class="wrapper" >
   <div class="search-section">
     <div class="search-input-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
@@ -118,9 +117,4 @@
       </mat-list>
     </div>
   </div>
-</div>
-
-<div *ngIf="!currentNodes?.length" class="empty">
-  <mat-spinner></mat-spinner>
-  Chargement des données...
 </div>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,14 +14,14 @@ import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EquipeService } from '../../../core/services/equipe/equipe.service';
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ConsequenceService } from '../../../core/services/consequence/consequence.service';
 import { Consequence } from '../../../core/models/Consequence';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
-import { finalize, firstValueFrom, forkJoin, map, tap } from 'rxjs';
+import { firstValueFrom, forkJoin, map, tap } from 'rxjs';
 import { Incident } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
@@ -62,7 +62,17 @@ import { RiskSelectionMode } from '../../../core/enum/risk-enum';
   templateUrl: './create.component.html',
   styleUrl: './create.component.scss'
 })
-export class CreateComponent implements OnInit {
+export class CreateComponent implements OnInit, OnDestroy {
+  
+  ngOnDestroy(): void {
+    this.confirmService.openConfirmDialog("Sauvegarde", "Vous êtes sur le point de quitter la création d'incident, voulez-vous l'enregistrer en tant que brouillon").subscribe(
+      res => {
+        if(res){
+          this.addDraft();
+        }
+      }
+    )
+  }
 
   private _formBuilder = inject(FormBuilder);
   private route = inject(ActivatedRoute);

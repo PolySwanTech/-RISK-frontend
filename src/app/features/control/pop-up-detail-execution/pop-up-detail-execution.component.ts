@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, Inject } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -26,7 +26,7 @@ export class PopUpDetailExecutionComponent {
   s : any = { exec: null, view: null };
 
   constructor(public dialogRef: MatDialogRef<PopUpDetailExecutionComponent>,
-      @Inject(MAT_DIALOG_DATA) public data: any, private cdRef: ChangeDetectorRef
+      @Inject(MAT_DIALOG_DATA) public data: any
     ) {
     }
 

@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, Output, EventEmitter, Optional } from '@angular/core';
+import { Component, inject, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';

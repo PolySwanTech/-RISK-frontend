@@ -1,5 +1,4 @@
 import { EvaluationControl } from "../enum/evaluation-controle.enum";
-import { ExecutionMode } from "../enum/exceutionmode.enum";
 import { Priority } from "../enum/Priority";
 import { Status } from "../enum/status.enum";
 

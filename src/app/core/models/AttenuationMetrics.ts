@@ -1,5 +1,4 @@
 import { EvaluationControl } from "../enum/evaluation-controle.enum";
-import { RiskTemplate } from "./RiskTemplate";
 
 export class AttenuationMetrics {
   id!: string;             // UUID

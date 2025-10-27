@@ -20,7 +20,6 @@ import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
-import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 import { MatIconModule } from '@angular/material/icon';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';

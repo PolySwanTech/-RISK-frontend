@@ -11,8 +11,6 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ModifEntityDialogComponent } from '../../../features/reglages/modif-entity-dialog/modif-entity-dialog.component';
-import { GoBackComponent } from "../go-back/go-back.component";
 
 @Component({
   selector: 'app-category-selection',

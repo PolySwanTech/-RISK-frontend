@@ -100,7 +100,7 @@ export class OrganigrammeComponent {
       event.stopPropagation(); // Empêche la propagation du clic
     }
 
-    const dialogRef = this.dialog.open(AddEntityDialogComponent, {
+    this.dialog.open(AddEntityDialogComponent, {
       width: '500px',
       data: entite || null // Passe l'entité si c'est une modification, sinon null
     })

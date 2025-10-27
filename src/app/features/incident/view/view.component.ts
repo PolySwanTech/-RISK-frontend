@@ -176,7 +176,7 @@ export class ViewComponent implements OnInit {
         label: "Modifier",
         icon: 'edit',
         class: 'btn-green',
-        show: this.canShowActions() && !this.isDraft(),
+        show: this.canShowActions() && this.isDraft(),
         permission: { teamId: this.incident?.teamId, permissions: ['UPDATE_INCIDENT'] },
         action: () => this.goToModification()
       },
