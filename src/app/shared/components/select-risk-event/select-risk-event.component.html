@@ -21,7 +21,7 @@
       <mat-select [(value)]="selectedCategoryLevel1" (selectionChange)="onCategoryLevel1Change()">
         <mat-option [value]="null">Toutes les catégories</mat-option>
         <mat-option *ngFor="let cat of categoriesLevel1" [value]="cat.libelle">
-          {{ format(cat.libelle) }}
+          {{ cat.label }}
         </mat-option>
       </mat-select>
       <mat-icon matPrefix>folder</mat-icon>
@@ -32,7 +32,7 @@
       <mat-select [(value)]="selectedCategoryLevel2" (selectionChange)="onCategoryLevel2Change()">
         <mat-option [value]="null">Toutes les sous-catégories</mat-option>
         <mat-option *ngFor="let cat of categoriesLevel2" [value]="cat.libelle">
-          {{ format(cat.libelle) }}
+          {{ cat.label }}
         </mat-option>
       </mat-select>
       <mat-icon matPrefix>subdirectory_arrow_right</mat-icon>
@@ -72,7 +72,7 @@
       <!-- Liste des résultats -->
       <div *ngFor="let result of searchResults" class="search-result-item" (click)="selectSearchResult(result)">
         <div class="search-result-header">
-          <strong class="search-result-name">{{ format(result.libelle) }}</strong>
+          <strong class="search-result-name">{{ result.label }}</strong>
           <span class="search-result-type type-risque">{{ searchTypeLabel }}</span>
         </div>
         <div class="search-result-path" *ngIf="result.description">{{ result.description }}</div>
@@ -114,7 +114,7 @@
       <ng-container *ngIf="currentLevel === 'categories' && navigationMode === NavigationMode.Hierarchical">
         <mat-list-item *ngFor="let cat of currentItems" (click)="selectCategory(cat)">
           <mat-icon matListIcon>folder</mat-icon>
-          <h3 matLine>{{ format(cat.libelle) }}</h3>
+          <h3 matLine>{{ cat.label }}</h3>
           <mat-icon matSuffix>chevron_right</mat-icon>
         </mat-list-item>
       </ng-container>
@@ -123,7 +123,7 @@
       <ng-container *ngIf="currentLevel === 'subcategories' && navigationMode === NavigationMode.Hierarchical">
         <mat-list-item *ngFor="let sub of currentItems" (click)="selectSubCategory(sub)">
           <mat-icon matListIcon>subdirectory_arrow_right</mat-icon>
-          <h3 matLine>{{ format(sub.libelle) }}</h3>
+          <h3 matLine>{{ sub.label }}</h3>
           <mat-icon matSuffix>chevron_right</mat-icon>
         </mat-list-item>
       </ng-container>

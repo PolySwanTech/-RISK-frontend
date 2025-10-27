@@ -20,7 +20,7 @@
               Associer un Risque Bâlois*
             </button>
             <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="balois">
-              <mat-chip> Catégorie Bâloise : {{ format(balois.libelle) }}</mat-chip>
+              <mat-chip> Catégorie Bâloise : {{ balois.label }}</mat-chip>
             </mat-chip-listbox>
 
             <!-- Description --------------------------------------------------- -->

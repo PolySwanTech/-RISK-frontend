@@ -1,20 +1,12 @@
 import { PermissionName } from "../enum/permission.enum";
 import { BusinessUnit } from "./BusinessUnit"
 
-export enum Right {
-    VIEWER = 'VIEWER',
-    EDITOR = 'EDITOR',
-    ADMIN = 'ADMIN',
-    CENTRAL = 'CENTRAL'
-}
-
 export class Utilisateur {
     id: string;
     username: string;
     email: string;
     password: string;
     equipe: BusinessUnit;
-    right: Right;
     permissions: PermissionName[] = [];
 
     constructor(
@@ -23,13 +15,11 @@ export class Utilisateur {
         email: string,
         password: string,
         equipe: BusinessUnit,
-        right: Right
     ) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.equipe = equipe;
-        this.right = right;
     }
 }

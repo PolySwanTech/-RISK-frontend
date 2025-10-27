@@ -17,7 +17,7 @@ import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
 import { Process } from '../../../../core/models/Process';
-import { BaloiseCategoryDto, baloisFormatLabel, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
+import { BaloiseCategoryDto, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
 import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
 import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -86,15 +86,15 @@ export class CreateRisksReferentielComponent {
     const buId = this.route.snapshot.queryParams["buId"];
     const id = this.route.snapshot.paramMap.get('id');
 
-    const balois = this.route.snapshot.queryParams['bal']
+    const balois = JSON.parse(localStorage.getItem('balois') || "")
 
     if (balois) {
 
       this.balois = {
-        libelle: balois,
-        label: balois,
+        libelle: balois.libelle,
+        label: balois.label,
         definition: null,
-        parent: null
+        parent: balois.parent
       }
 
       this.infoForm.get('balois')?.setValue(balois);
@@ -138,12 +138,6 @@ export class CreateRisksReferentielComponent {
     });
   }
 
-  format(label?: string): string {
-    return baloisFormatLabel(label ?? '');
-  }
-
-
-
   submit(): void {
     if (this.infoForm.invalid) {
       console.error('Formulaire invalide:', this.infoForm.errors);
@@ -151,6 +145,7 @@ export class CreateRisksReferentielComponent {
     }
 
     const category = this.infoForm.get('balois')?.value;
+    
 
     if (!category) {
       console.error('Catégorie obligatoire !');
@@ -159,7 +154,7 @@ export class CreateRisksReferentielComponent {
 
     const payload: RiskReferentielCreateDto = {
       libelle: this.infoForm.get('libellePerso')!.value!,
-      category: category!,
+      category: category!.libelle,
       description: this.infoForm.get('description')!.value!,
     };
 

@@ -16,7 +16,7 @@ export class RiskReferentiel {
 // -------------  DTO -------------
 export interface RiskReferentielCreateDto {
   libelle:        string;
-  category: BaloiseCategoryDto;
+  category: string;
   description: string;
 }
 
@@ -25,18 +25,4 @@ export interface BaloiseCategoryDto {
   definition: string | null;
   parent: string | null;
   label: string;
-}
-
-export function baloisFormatLabel(label: string | undefined): string {
-  if (!label) return '';
-
-  const words = label.toLowerCase().split('_');
-
-  return words
-    .map((word, index) =>
-      index === 0
-        ? word.charAt(0).toUpperCase() + word.slice(1)
-        : word
-    )
-    .join(' ');
 }

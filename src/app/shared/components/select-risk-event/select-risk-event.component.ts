@@ -15,7 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { RiskReferentielService } from '../../../core/services/risk/risk-referentiel.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
-import { BaloiseCategoryDto, baloisFormatLabel } from '../../../core/models/RiskReferentiel';
+import { BaloiseCategoryDto } from '../../../core/models/RiskReferentiel';
 import { RiskSelectionMode, Level } from '../../../core/enum/risk-enum';
 
 export enum NavigationMode {
@@ -305,8 +305,8 @@ export class SelectRiskEventComponent implements OnInit {
         this.updateView(
           Level.Subcategories,
           subs,
-          `Sous-catégories de ${this.format(category.libelle)}`,
-          [this.format(category.libelle)]
+          `Sous-catégories de ${category.label}`,
+          [category.label]
         );
 
         // 👉 Auto-sélection de la sous-catégorie si précisé
@@ -330,8 +330,8 @@ export class SelectRiskEventComponent implements OnInit {
     this.updateView(
       Level.Referentiels,
       filtered,
-      `Taxonomie : ${this.format(sub.libelle)}`,
-      [this.format(this.selections.category?.libelle), this.format(sub.libelle)]
+      `Taxonomie : ${sub.label}`,
+      [this.selections.category!.label, sub.label]
     );
   }
 
@@ -347,8 +347,8 @@ export class SelectRiskEventComponent implements OnInit {
         events,
         `Événements liés à ${ref.libelle}`,
         [
-          this.format(this.selections.category?.libelle),
-          this.format(this.selections.subcategory?.libelle),
+          this.selections.category?.label,
+          this.selections.subcategory?.label,
           ref.libelle
         ].filter(Boolean)
       );
@@ -356,10 +356,10 @@ export class SelectRiskEventComponent implements OnInit {
   }
 
   addReferentiel() {
+    localStorage.setItem("balois", JSON.stringify(this.selections.subcategory))
     this.router.navigate(['reglages', 'risks', 'create-referentiel'],
       {
         queryParams: {
-          bal: this.selections.subcategory?.libelle,
           next: `reglages?label=Taxonmie&cat1=${this.selections.category?.libelle}&cat2=${this.selections.subcategory?.libelle}`
         }
       })
@@ -374,20 +374,8 @@ export class SelectRiskEventComponent implements OnInit {
     if (!ref?.category) return [];
 
     const categories: string[] = [];
-
-    // Ajouter la catégorie actuelle
-    if (ref.category.label) {
-      categories.push(this.format(ref.category.label));
-    }
-
-    // Retrouver le parent de la catégorie actuelle
-    const currentCategory = this.allCategories.find(
-      c => c.label === ref.category.label
-    );
-
-    if (currentCategory?.parent) {
-      categories.unshift(this.format(currentCategory.parent));
-    }
+    categories.push(ref.category.parent)
+    categories.push(ref.category.label)
 
     return categories;
   }
@@ -423,10 +411,6 @@ export class SelectRiskEventComponent implements OnInit {
 
   private resetSelections(): void {
     this.selections = {};
-  }
-
-  format(label?: string): string {
-    return baloisFormatLabel(label ?? '');
   }
 
   get searchPlaceholder(): string {

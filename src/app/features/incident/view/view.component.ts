@@ -14,7 +14,6 @@ import { MatInputModule } from '@angular/material/input';
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { CommonModule, DatePipe } from '@angular/common';
-import { SuiviIncident } from '../../../core/models/SuiviIncident';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FichiersComponent } from "../../../shared/components/fichiers/fichiers.component";
 import { State } from '../../../core/enum/state.enum';
@@ -72,8 +71,6 @@ export class ViewComponent implements OnInit {
   idIncident: string = "";
 
   targetTypeEnum = TargetType
-
-  suivi: SuiviIncident[] = []
 
   businessUnits: BusinessUnit[] = [];
 
