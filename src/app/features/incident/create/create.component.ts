@@ -13,7 +13,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EquipeService } from '../../../core/services/equipe/equipe.service';
 import { NgIf, NgFor } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ConsequenceService } from '../../../core/services/consequence/consequence.service';
@@ -32,6 +31,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
 import { SelectRiskEventComponent } from '../../../shared/components/select-risk-event/select-risk-event.component';
 import { RiskSelectionMode } from '../../../core/enum/risk-enum';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
 
 
 
@@ -142,7 +142,7 @@ export class CreateComponent implements OnInit, OnDestroy {
   private incidentService = inject(IncidentService);
   private riskService = inject(RiskService);
   riskCategoryService = inject(RiskCategoryService);
-  private equipeService = inject(EquipeService);
+  private entitiesService = inject(EntitiesService);
   private causeService = inject(CauseService);
   consequenceService = inject(ConsequenceService);
   private processService = inject(ProcessService);
@@ -275,7 +275,7 @@ export class CreateComponent implements OnInit, OnDestroy {
   }
 
   fetchTeams(): Promise<any> {
-    return firstValueFrom(this.equipeService.getAllEquipes().pipe(
+    return firstValueFrom(this.entitiesService.loadEntities().pipe(
       tap((teams) => this.listTeams = teams)
     ));
   }

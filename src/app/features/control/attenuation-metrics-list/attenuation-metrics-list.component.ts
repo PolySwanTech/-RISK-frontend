@@ -14,7 +14,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
 import { forkJoin } from 'rxjs';
 
-import { AttenuationMetricsService } from '../../../core/services/attenuationMetrics/attenuation-metrics.service';
+import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 import { AttenuationMetrics, AttenuationMetricsTypeDto } from '../../../core/models/AttenuationMetrics';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 import { CreateAttenuationMetricsComponent } from '../create-attenuation-metrics/create-attenuation-metrics.component';

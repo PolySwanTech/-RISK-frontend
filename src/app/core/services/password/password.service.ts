@@ -7,7 +7,6 @@ import { environment } from '../../../environments/environment';
 })
 export class PasswordService {
 
-
   private base = environment.apiUrl + '/password';
   private http = inject(HttpClient);
 

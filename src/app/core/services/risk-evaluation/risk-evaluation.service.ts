@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams }         from '@angular/common/http';
 
-import { environment } from '../../../../environments/environment';
-import { RiskLevelEnum } from '../../../enum/riskLevel.enum';
+import { environment } from '../../../environments/environment';
+import { RiskLevelEnum } from '../../enum/riskLevel.enum';
 
 
 @Injectable({ providedIn: 'root' })

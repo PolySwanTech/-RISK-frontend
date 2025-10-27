@@ -9,20 +9,11 @@ import { Observable } from 'rxjs/internal/Observable';
 })
 export class ProcessService {
 
-  http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/processes';;
-
-  getAllGroupedByBu() {
-    return this.http.get<{ [key: string]: Process[] }>(this.baseUrl);
-  }
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl + '/processes';;
 
   getAll(): Observable<Process[]> {
     return this.http.get<Process[]>(this.baseUrl);
-  }
-
-  /** Récupère un process par son UUID */
-  get(id: string): Observable<Process> {
-    return this.http.get<Process>(`${this.baseUrl}/${id}`);
   }
 
   createProcess(process: { name: string; bu: string, parentId?: string }) {
@@ -41,15 +32,5 @@ export class ProcessService {
   getProcessLeaf(buId: string): Observable<Process[]> {
     const options = { params: new HttpParams().set('buId', buId) };
     return this.http.get<Process[]>(`${this.baseUrl}/leaf`, options);
-  }
-
-  getAllByRisks(riskId: string) {
-    let params = new HttpParams();
-    params = params.append('riskId', riskId);
-    return this.http.get<Process[]>(this.baseUrl + '/by-dmr', { params: params });
-  }
-
-  delete(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

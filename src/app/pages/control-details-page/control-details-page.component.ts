@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { Status, StatusLabels } from '../../core/enum/status.enum';
-import { ControlService } from '../../core/services/control/control.service';
+import { ControlService } from '../../core/services/dmr/control/control.service';
 import { ControlTemplate } from '../../core/models/ControlTemplate';
 import { ControlExecution } from '../../core/models/ControlExecution';
 import { ControlEvaluationView } from '../../core/models/ControlEvaluation';

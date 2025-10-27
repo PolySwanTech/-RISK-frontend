@@ -1,12 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { ControlTemplate, ControlTemplateCreateDto } from '../../models/ControlTemplate';
-import { ControlExecution } from '../../models/ControlExecution';
-import { RiskTemplate } from '../../models/RiskTemplate';
-import { ControlEvaluation } from '../../models/ControlEvaluation';
+import { environment } from '../../../../environments/environment';
+import { ControlTemplate, ControlTemplateCreateDto } from '../../../models/ControlTemplate';
+import { ControlExecution } from '../../../models/ControlExecution';
+import { ControlEvaluation } from '../../../models/ControlEvaluation';
 import { Observable } from 'rxjs';
-import { ControlMethodology, ControlMethodologyCreateDto } from '../../models/ControlMethodology';
+import { ControlMethodology, ControlMethodologyCreateDto } from '../../../models/ControlMethodology';
 import { map } from 'rxjs/operators';
 
 @Injectable({
@@ -14,11 +13,11 @@ import { map } from 'rxjs/operators';
 })
 export class ControlService {
 
-  http = inject(HttpClient);
-  baseUrlTemp = environment.apiUrl + '/controls/templates';
-  baseUrlExec = environment.apiUrl + '/controls/executions';
-  baseUrlEval = environment.apiUrl + '/controls/evaluations';
-  baseUrlMeth = environment.apiUrl + '/controls/methodologies';
+  private http = inject(HttpClient);
+  private baseUrlTemp = environment.apiUrl + '/controls/templates';
+  private baseUrlExec = environment.apiUrl + '/controls/executions';
+  private baseUrlEval = environment.apiUrl + '/controls/evaluations';
+  private baseUrlMeth = environment.apiUrl + '/controls/methodologies';
 
 
   createControl(control: ControlTemplateCreateDto) {
@@ -47,10 +46,6 @@ export class ControlService {
     const queryString = params.length ? `?${params.join('&')}` : '';
 
     return this.http.get<ControlExecution[]>(`${this.baseUrlExec}${queryString}`);
-  }
-
-  getAllTemplatesByProcessAndRisk(selectedProcess: any, selectedRisk: RiskTemplate) {
-    return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`)
   }
 
   createExecution(data: any) {

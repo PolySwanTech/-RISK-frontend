@@ -4,7 +4,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { Subscription, forkJoin } from 'rxjs';
-import { ControlService } from '../../../core/services/control/control.service';
+import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { ControlTemplate } from '../../../core/models/ControlTemplate';
 import { ControlExecution } from '../../../core/models/ControlExecution';
 import { Status, StatusLabels } from '../../../core/enum/status.enum';

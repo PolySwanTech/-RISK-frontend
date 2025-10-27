@@ -19,10 +19,6 @@ export class MatrixService {
     return this.http.get<Matrix>(this.baseUrl, { params: params });
   }
 
-  saveMatrix(matrix: any): Observable<Matrix> {
-    return this.http.post<Matrix>(`${this.baseUrl}`, matrix);
-  }
-
   updateCells(cells: any[]): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}/cells`, cells);
   }

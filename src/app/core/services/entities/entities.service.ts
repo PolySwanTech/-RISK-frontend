@@ -9,14 +9,14 @@ import { environment } from '../../../environments/environment';
 })
 export class EntitiesService {
 
-  http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/business-units'
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl + '/business-units'
 
-  loadEntities(onlyBL : boolean = false): Observable<BusinessUnit[]> {
-    return this.http.get<BusinessUnit[]>(this.baseUrl,  {params : { onlyBL }});
+  loadEntities(onlyBL: boolean = false): Observable<BusinessUnit[]> {
+    return this.http.get<BusinessUnit[]>(this.baseUrl, { params: { onlyBL } });
   }
 
-  findById(id : string): Observable<BusinessUnit> {
+  findById(id: string): Observable<BusinessUnit> {
     return this.http.get<BusinessUnit>(this.baseUrl + '/' + id);
   }
 
@@ -28,18 +28,11 @@ export class EntitiesService {
     return this.http.post(this.baseUrl, entite);
   }
 
-  getByProcess(processId: string): Observable<BusinessUnit> {
-    return this.http.get<BusinessUnit>(
-      `${this.baseUrl}/byProcess`,
-      { params: { processId } }
-    );
-  }
-
   update(entite: BusinessUnit) {
     return this.http.put(this.baseUrl, entite);
   }
 
-  delete(id : string){
+  delete(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

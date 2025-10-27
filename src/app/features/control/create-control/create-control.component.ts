@@ -13,7 +13,7 @@ import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
-import { ControlService } from '../../../core/services/control/control.service';
+import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';

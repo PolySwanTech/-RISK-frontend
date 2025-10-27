@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
-import { ControlService } from '../../../core/services/control/control.service';
+import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { ControlTemplate } from '../../../core/models/ControlTemplate';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';

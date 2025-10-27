@@ -1,4 +1,4 @@
-import { ControlService } from './../../core/services/control/control.service';
+import { ControlService } from '../../core/services/dmr/control/control.service';
 import { Component, inject, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe, CommonModule, CurrencyPipe } from '@angular/common';

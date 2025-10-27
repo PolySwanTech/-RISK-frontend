@@ -8,13 +8,10 @@ import { Observable } from 'rxjs/internal/Observable';
   providedIn: 'root'
 })
 export class OperatingLossTypeService {
-  baseUrl = environment.apiUrl + '/operating-loss-types';
-  
-  http = inject(HttpClient);
 
-  getAll(): Observable<OperatingLossTypeDto[]> {
-    return this.http.get<OperatingLossTypeDto[]>(this.baseUrl);
-  }
+  private baseUrl = environment.apiUrl + '/operating-loss-types';
+  private http = inject(HttpClient);
+
   findByOperatingLossFamily(family: string): Observable<OperatingLossTypeDto[]> {
     return this.http.get<OperatingLossTypeDto[]>(`${this.baseUrl}/by-family/${family}`);
   }

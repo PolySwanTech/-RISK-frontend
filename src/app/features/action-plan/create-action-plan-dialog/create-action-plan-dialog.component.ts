@@ -11,7 +11,6 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Status } from '../../../core/enum/status.enum';
@@ -21,6 +20,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -44,7 +45,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private actionPlanService = inject(ActionPlanService);
   dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
   private confirmService = inject(ConfirmService);
-  private equipeService = inject(EquipeService);
+  private entitiesService = inject(EntitiesService);
   private riskService = inject(RiskService);
   private router = inject(Router);
   priorities = Object.values(Priority);
@@ -52,7 +53,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference: string }
   ) { }
 
-  listTeams: Equipe[] = [];
+  listTeams: BusinessUnit[] = [];
 
   risks: RiskTemplate[] = [];
 
@@ -89,7 +90,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
 
   fetchTeams(): void {
-    this.equipeService.getAllEquipes().subscribe({
+    this.entitiesService.loadEntities().subscribe({
       next: teams => {
         this.listTeams = teams;
       },

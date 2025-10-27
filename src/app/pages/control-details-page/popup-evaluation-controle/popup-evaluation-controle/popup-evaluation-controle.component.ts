@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
 import { Evaluation } from '../../../../core/enum/evaluation.enum';
-import { ControlService } from '../../../../core/services/control/control.service';
+import { ControlService } from '../../../../core/services/dmr/control/control.service';
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';

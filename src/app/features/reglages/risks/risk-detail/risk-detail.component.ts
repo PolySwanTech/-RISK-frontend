@@ -10,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
-import { ControlService } from '../../../../core/services/control/control.service';
+import { ControlService } from '../../../../core/services/dmr/control/control.service';
 import { catchError, forkJoin, of } from 'rxjs';
 import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
@@ -21,7 +21,7 @@ import { Degree, DegreeLabels } from '../../../../core/enum/degree.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { Incident } from '../../../../core/models/Incident';
 import { IncidentService } from '../../../../core/services/incident/incident.service';
-import { RiskEvaluationService } from '../../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
+import { RiskEvaluationService } from '../../../../core/services/risk-evaluation/risk-evaluation.service';
 import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { State, StateLabels } from '../../../../core/enum/state.enum';
 

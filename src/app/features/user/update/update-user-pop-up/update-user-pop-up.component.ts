@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { Equipe, EquipeService } from '../../../../core/services/equipe/equipe.service';
+import { EntitiesService } from '../../../../core/services/entities/entities.service';
 
 @Component({
   selector: 'app-update-user-pop-up',
@@ -27,7 +28,7 @@ import { Equipe, EquipeService } from '../../../../core/services/equipe/equipe.s
 })
 export class UpdateUserPopUpComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private equipeService = inject(EquipeService);
+  private entitiesService = inject(EntitiesService);
 
   form: FormGroup;
   equipes: Equipe[] = [];
@@ -61,7 +62,7 @@ export class UpdateUserPopUpComponent implements OnInit {
   }
 
   loadEquipes() {
-    this.equipeService.getAllEquipes().subscribe(equipes => {
+    this.entitiesService.loadEntities().subscribe(equipes => {
       this.equipes = equipes;
 
       const matched = equipes.find(e => e.name === this.data.equipeName);

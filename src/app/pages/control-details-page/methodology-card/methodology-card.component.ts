@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 
-import { ControlService } from '../../../core/services/control/control.service';
+import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { ControlMethodology, ControlMethodologyCreateDto } from '../../../core/models/ControlMethodology';
 import { ControlNature, ControlNatureLabels } from '../../../core/enum/ControlNature.enum';
 import { ExecutionMode, ExecutionModeLabels } from '../../../core/enum/exceutionmode.enum';

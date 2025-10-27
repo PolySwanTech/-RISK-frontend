@@ -10,9 +10,8 @@ import { saveAs } from 'file-saver';
 })
 export class IncidentService {
 
-  baseUrl = environment.apiUrl + '/incidents'
-
-  http = inject(HttpClient);
+  private baseUrl = environment.apiUrl + '/incidents'
+  private http = inject(HttpClient);
 
   loadIncidents(): Observable<Incident[]> {
     return this.http.get<Incident[]>(this.baseUrl);
@@ -46,10 +45,6 @@ export class IncidentService {
     );
   }
 
-  draftIncident(incident: any): Observable<any> {
-    return this.http.post(this.baseUrl + '/draft', incident);
-  }
-
   getIncidentByProcessAndRisk(riskId: string): Observable<Incident[]> {
     const params = new HttpParams()
       .set('riskId', riskId);
@@ -75,12 +70,9 @@ export class IncidentService {
   }
 
   downloadPDF(incidentId: string) {
+    /* TODO : ajouter l'ecran de chargement "PDF en cours" */
     const url = `${this.baseUrl}/${incidentId}/pdf`;
     return this.http.get(url, { responseType: 'blob' });
-  }
-
-  hasActionPlan(incidentId: string): Observable<string | null> {
-    return this.http.get<string | null>(`${this.baseUrl}/${incidentId}/action-plan`);
   }
 
   findAllByIds(ids: Set<string>): Observable<Incident[]> {

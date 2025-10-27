@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from '../../../../core/services/auth/auth.service';
-import { Equipe } from '../../../../core/services/equipe/equipe.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -12,6 +11,7 @@ import { OrganigrammeComponent } from "../../../organigramme/organigramme/organi
 import { MatButtonModule } from '@angular/material/button';
 import { arrayNotEmptyValidator } from '../../../../shared/validators/custom-validators';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
+import { BusinessUnit } from '../../../../core/models/BusinessUnit';
 
 @Component({
   selector: 'app-create-user',
@@ -29,7 +29,7 @@ export class CreateUserComponent implements OnInit {
   organigrammeComponent!: OrganigrammeComponent;
 
   private _formBuilder = inject(FormBuilder);
-  equipes: Equipe[] = [];
+  equipes: BusinessUnit[] = [];
   teamRoles: any[] = [];
   title: string = "Créer";
 

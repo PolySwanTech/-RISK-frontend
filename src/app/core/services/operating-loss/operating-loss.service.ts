@@ -9,12 +9,10 @@ import { OperatingLossState } from '../../enum/operatingLossState.enum';
 })
 export class OperatingLossService {
 
-  baseUrl = environment.apiUrl + '/operating-losses';
+  private baseUrl = environment.apiUrl + '/operating-losses';
+  private http = inject(HttpClient);
 
-  http = inject(HttpClient);
-
-
-  create(operatingLoss: CreateOperatingLossDto, message : string) {
+  create(operatingLoss: CreateOperatingLossDto, message: string) {
     return this.http.post<string>(this.baseUrl, { operatingLoss, message })
   }
 
@@ -27,9 +25,8 @@ export class OperatingLossService {
   }
 
   updateState(id: string, state: OperatingLossState) {
-  return this.http.put<void>(`${this.baseUrl}/${id}/state`, { state });
-}
-
+    return this.http.put<void>(`${this.baseUrl}/${id}/state`, { state });
+  }
 
   deactivate(id: string) {
     return this.http.put<void>(`${this.baseUrl}/${id}/deactivate`, {});

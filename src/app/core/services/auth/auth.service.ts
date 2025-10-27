@@ -12,9 +12,9 @@ import { SnackBarService } from '../snack-bar/snack-bar.service';
 })
 export class AuthService {
   
-  base = environment.apiUrl;
-  http = inject(HttpClient);
-  router = inject(Router);
+  private base = environment.apiUrl;
+  private http = inject(HttpClient);
+  private router = inject(Router);
   
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 

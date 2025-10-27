@@ -9,7 +9,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ActivatedRoute } from '@angular/router';
-import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation/risk-evaluation.service';
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
 
 @Component({
   selector: 'app-list-process',

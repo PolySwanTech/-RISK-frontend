@@ -9,19 +9,11 @@ import { RiskReferentielCreateDto, RiskReferentiel } from '../../models/RiskRefe
 })
 export class RiskReferentielService {
 
-  http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/referentiels';
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl + '/referentiels';
 
   create(dto: RiskReferentielCreateDto): Observable<RiskReferentiel> {
     return this.http.post<RiskReferentiel>(this.baseUrl, dto);
-  }
-
-  update(id: string, dto: RiskReferentielCreateDto): Observable<RiskReferentiel> {
-    return this.http.put<RiskReferentiel>(`${this.baseUrl}/${id}`, dto);
-  }
-
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
   getById(id: string): Observable<RiskReferentiel> {

@@ -10,11 +10,4 @@ export class SidebarService {
     this.isClosed.next(!this.isClosed.value);
   }
 
-  setState(state: boolean) {
-    this.isClosed.next(state);
-  }
-
-  getState() {
-    return this.isClosed.value;
-  }
 }

@@ -6,7 +6,7 @@ import { Evaluation } from '../../../core/enum/evaluation.enum';
 import { ControlEvaluationView, ControlEvaluation } from '../../../core/models/ControlEvaluation';
 import { ControlExecution } from '../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { ControlService } from '../../../core/services/control/control.service';
+import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 import { TargetType } from '../../../core/enum/targettype.enum';

@@ -3,9 +3,7 @@ import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule } 
 import { ProcessService } from '../../../core/services/process/process.service';
 import { Process } from '../../../core/models/Process';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Equipe, EquipeService } from '../../../core/services/equipe/equipe.service';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,6 +11,8 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
 
 @Component({
   selector: 'app-create-process',
@@ -24,15 +24,14 @@ import { SelectArborescenceComponent } from "../../../shared/components/select-a
 })
 export class CreateProcessComponent {
   processForm: FormGroup;
-  businessUnits: Equipe[] = [];
+  businessUnits: BusinessUnit[] = [];
   processes: Process[] = [];
 
-  processService = inject(ProcessService);
-  equipeService = inject(EquipeService);
-  router = inject(Router);
-  fb = inject(FormBuilder);
-  dialogRef = inject(MatDialogRef<CreateProcessComponent>);
-  snackBarService = inject(SnackBarService);
+  private processService = inject(ProcessService);
+  private entitiesService = inject(EntitiesService);
+  private fb = inject(FormBuilder);
+  private dialogRef = inject(MatDialogRef<CreateProcessComponent>);
+  private snackBarService = inject(SnackBarService);
 
   ope = 'Créer'
 
@@ -58,7 +57,7 @@ export class CreateProcessComponent {
   }
 
   ngOnInit() {
-    this.equipeService.getAllEquipes().subscribe(data => {
+    this.entitiesService.loadEntities().subscribe(data => {
       this.businessUnits = data;
 
       if (this.businessUnits.length === 1) {

@@ -28,15 +28,6 @@ export class AmountService {
     );
   }
 
-  /** GET /amounts/{id} */
-  get(id: string): Observable<AmountDto> {
-    return this.http.get<AmountDto>(`${this.baseUrl}/${id}`);
-  }
-
-  /** PATCH /amounts/{id} */
-  update(id: string, dto: CreateAmountDto): Observable<AmountDto> {
-    return this.http.patch<AmountDto>(`${this.baseUrl}/${id}`, dto);
-  }
 
   updateReviewStatus(id: string, status: ReviewStatus) {
     return this.http.put<void>(`${this.baseUrl}/${id}/review-status`, { status });
@@ -44,10 +35,6 @@ export class AmountService {
 
 
   /** DELETE /amounts/{id} */
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
-  }
-
   deactivate(id: string): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}/deactivate`, {});
   }

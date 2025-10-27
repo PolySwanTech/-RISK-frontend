@@ -10,11 +10,8 @@ import { environment } from '../../../environments/environment';
 export class AmountTypeService {
   baseUrl = environment.apiUrl + '/amount-types';
   
-  http = inject(HttpClient);
+  private http = inject(HttpClient);
 
-  getAll(): Observable<AmountTypeDto[]> {
-    return this.http.get<AmountTypeDto[]>(this.baseUrl);
-  }
   findByOperatingLossFamily(family: string): Observable<AmountTypeDto[]> {
     return this.http.get<AmountTypeDto[]>(`${this.baseUrl}/by-family/${family}`);
   }

@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { ControlService } from '../../../core/services/control/control.service';
+import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { Status, StatusLabels } from '../../../core/enum/status.enum';
 import { PopupEvaluationControleComponent } from '../../../pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 import { EvaluationCardComponent } from "../../../pages/control-details-page/evaluation-card/evaluation-card.component";

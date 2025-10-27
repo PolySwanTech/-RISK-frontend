@@ -13,7 +13,7 @@ import { PopupHeaderComponent } from '../../../shared/components/popup-header/po
 import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { AttenuationMetricsCreateDto, AttenuationMetricsTypeDto } from '../../../core/models/AttenuationMetrics';
-import { AttenuationMetricsService } from '../../../core/services/attenuationMetrics/attenuation-metrics.service';
+import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 
 @Component({
   selector: 'app-create-attenuation-metrics',
