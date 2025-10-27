@@ -134,15 +134,7 @@ export class ExecutionsListComponent {
         this.dataSource.data = executions;
       });
     }
-    this.goBackButtons = [
-      // {
-      //   label: 'Ajouter un impact',
-      //   icon: 'add',
-      //   class: 'btn-primary',
-      //   show: true,
-      //   action: () => this.addImpact()
-      // }
-    ];
+    this.goBackButtons = [];
   }
 
   getStatusClass(status?: Status): string {

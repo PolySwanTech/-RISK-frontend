@@ -1,6 +1,6 @@
 <app-go-back title="Module cartographie" [buttons]="goBackButtons"></app-go-back>
 <div class="dashboard-container">
-  
+
   <mat-card class="filters-card">
 
     <mat-card-content>
@@ -25,31 +25,13 @@
               <mat-icon>info</mat-icon>
             </button>
           </mat-form-field>
-
-          <!-- <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Date d'Exercice</mat-label>
-            <mat-select [(ngModel)]="selectedYear" required>
-              <mat-option value="" disabled>— Sélectionnez une année d'exercice —</mat-option>
-              <mat-option *ngFor="let year of years" [value]="year">
-                {{ year }}
-              </mat-option>
-            </mat-select>
-            <button mat-icon-button matSuffix matTooltip="Sélectionnez l'année d'exercice pour cet incident.">
-              <mat-icon>info</mat-icon>
-            </button>
-          </mat-form-field> -->
         </div>
-
-        <!-- <button mat-raised-button class="btn btn-primary" [disabled]="!selectedYear || !selectedBu"
-          (click)="viewCarto()">
-          Voir la cartographie
-        </button> -->
       </div>
     </mat-card-content>
   </mat-card>
 
   @if(selectedBu){
- <app-list-process></app-list-process>  
+  <app-list-process></app-list-process>
   }
 
 </div>
