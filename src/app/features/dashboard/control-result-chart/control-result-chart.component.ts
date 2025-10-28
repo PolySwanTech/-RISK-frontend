@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { Subscription, forkJoin, of, switchMap, map, catchError } from 'rxjs';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlTemplateListViewDto } from '../../../core/models/ControlTemplate';
 import { ControlExecution } from '../../../core/models/ControlExecution';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -46,7 +46,7 @@ export class ControlResultChartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sub = this.controlService.getAllTemplates().pipe(
-      switchMap((templates: ControlTemplate[]) => {
+      switchMap((templates: ControlTemplateListViewDto[]) => {
         if (!templates.length) return of([]);
 
         // 🧩 Étape 1 : récupérer la dernière exécution de chaque contrôle

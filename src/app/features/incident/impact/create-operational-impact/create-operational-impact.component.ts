@@ -607,10 +607,10 @@ export class CreateOperationalImpactComponent implements OnInit {
     const incidentId = this.incidentId;
 
     const dto: CreateOperatingLossDto = {
-      type: impact.type!,
       incidentId,
-      businessUnitId: impact.businessUnitId,
       libelle: impact.title,
+      businessUnitId: impact.businessUnitId,
+      type: impact.type!,
       description: impact.description || null,
     };
 

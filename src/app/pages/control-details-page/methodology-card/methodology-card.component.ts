@@ -6,7 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlMethodology, ControlMethodologyCreateDto } from '../../../core/models/ControlMethodology';
+import { ControlMethodologyCreateDto, ControlMethodologyViewDto } from '../../../core/models/ControlMethodology';
 import { ControlNature, ControlNatureLabels } from '../../../core/enum/ControlNature.enum';
 import { ExecutionMode, ExecutionModeLabels } from '../../../core/enum/exceutionmode.enum';
 
@@ -23,7 +23,7 @@ export class MethodologyCardComponent implements OnInit {
 
   loading = true;
   submitting = false;
-  methodology: ControlMethodology | null = null;
+  methodology: ControlMethodologyViewDto | null = null;
 
   form: FormGroup;
 

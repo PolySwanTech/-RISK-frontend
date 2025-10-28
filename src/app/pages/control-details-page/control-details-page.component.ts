@@ -4,8 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { ControlService } from '../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../core/models/ControlTemplate';
-import { ControlExecution } from '../../core/models/ControlExecution';
+import { ControlDetailsView } from '../../core/models/ControlTemplate';
 import { ControlEvaluationView } from '../../core/models/ControlEvaluation';
 
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
@@ -19,6 +18,7 @@ import { EvaluationCardComponent } from './evaluation-card/evaluation-card.compo
 import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 import { AuthService } from '../../core/services/auth/auth.service';
+import { ControlExecutionDetails } from '../../core/models/ControlExecution';
 
 @Component({
   selector: 'app-control-details-page',
@@ -43,8 +43,8 @@ export class ControlDetailsPageComponent implements OnInit {
   private dialog = inject(MatDialog);
   private authService = inject(AuthService);
 
-  control: ControlTemplate | null = null;
-  controlExecutions: ControlExecution[] | null = null;
+  control: ControlDetailsView | null = null;
+  controlExecutions: ControlExecutionDetails[] | null = null;
 
   recurrenceLabels = { ...RecurrenceLabels };
 
@@ -59,7 +59,7 @@ export class ControlDetailsPageComponent implements OnInit {
   ];
 
   // === Carrousel (4 dernières exécutions) ===
-  slides: Array<{ exec: ControlExecution; view: ControlEvaluationView | null }> = [];
+  slides: Array<{ exec: ControlExecutionDetails; view: ControlEvaluationView | null }> = [];
   currentSlide = 0;
 
   isDragging = false;
@@ -218,7 +218,7 @@ export class ControlDetailsPageComponent implements OnInit {
   /** === FIN carrousel === */
 
   // === Calculations pour l’en-tête ===
-  get currentOrLatestExecution(): ControlExecution | null {
+  get currentOrLatestExecution(): ControlExecutionDetails | null {
     return this.controlExecutions?.[0] ?? null;
   }
 

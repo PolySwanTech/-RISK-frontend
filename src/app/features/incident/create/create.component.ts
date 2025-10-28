@@ -21,7 +21,7 @@ import { RiskCategoryService } from '../../../core/services/risk/risk-category.s
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
 import { firstValueFrom, forkJoin, map, tap } from 'rxjs';
-import { Incident } from '../../../core/models/Incident';
+import { Incident, IncidentCreateDto } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -301,7 +301,7 @@ export class CreateComponent implements OnInit, OnDestroy {
     this.incidentForm3.get('intervenant')!.setValue(event.id);
   }
 
-  private convertFormToIncident(isDraft: boolean = false) {
+  private convertFormToIncident(isDraft: boolean = false) : IncidentCreateDto {
     return {
       reference: this.incidentForm1.value.reference || "",
       state: "",

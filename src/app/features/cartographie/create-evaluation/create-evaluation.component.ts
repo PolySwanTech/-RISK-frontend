@@ -14,7 +14,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlTemplateListViewDto } from '../../../core/models/ControlTemplate';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
@@ -78,7 +78,7 @@ export class CreateEvaluationComponent implements OnInit {
 
   indicators: Indicator[] = [];
 
-  controls: ControlTemplate[] = [];
+  controls: ControlTemplateListViewDto[] = [];
 
   selectedRisk: RiskTemplate | null = null;
   selectedBU: BusinessUnit | null = null;

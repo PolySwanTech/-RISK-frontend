@@ -7,7 +7,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatSelectModule } from "@angular/material/select";
 import { PermissionName } from "../../../core/enum/permission.enum";
-import { Incident } from "../../../core/models/Incident";
+import { IncidentListViewDto } from "../../../core/models/Incident";
 import { IncidentService } from "../../../core/services/incident/incident.service";
 import { BaloiseCategoryChartComponent } from "../../../features/dashboard/baloise-category-chart/baloise-category-chart.component";
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
@@ -60,8 +60,8 @@ import { TopCriticalRisksComponent } from "../../../features/dashboard/top-criti
 })
 export class HomeComponent implements OnInit {
 
-  incidents: Incident[] = [];
-  filteredIncidents: Incident[] = [];
+  incidents: IncidentListViewDto[] = [];
+  filteredIncidents: IncidentListViewDto[] = [];
 
   startDate: Date | null = null;
   endDate: Date | null = null;
@@ -141,7 +141,7 @@ export class HomeComponent implements OnInit {
     this.avgResolutionTime = this.calculateAverageResolutionTime(incidents);
   }
 
-  private calculateAverageResolutionTime(incidents: Incident[]): string {
+  private calculateAverageResolutionTime(incidents: IncidentListViewDto[]): string {
     const resolved = incidents.filter(i => i.closedAt && i.declaredAt);
 
     // Calcul des durées en jours

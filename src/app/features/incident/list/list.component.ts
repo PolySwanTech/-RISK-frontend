@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Incident } from '../../../core/models/Incident';
+import { Incident, IncidentListDto, IncidentListViewDto } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -54,28 +54,28 @@ export class ListComponent implements OnInit {
     {
       columnDef: 'reference',
       header: 'Référence',
-      cell: (element: Incident) => `${element.reference}`,
+      cell: (element: IncidentListViewDto) => `${element.reference}`,
       filterType: 'text',
       icon: 'tag' // 🏷️
     },
     {
       columnDef: 'title',
       header: 'Libellé',
-      cell: (element: Incident) => `${element.title}`,
+      cell: (element: IncidentListViewDto) => `${element.title}`,
       filterType: 'text',
       icon: 'title' // 📝
     },
     {
       columnDef: 'declaredAt',
       header: 'Date de déclaration',
-      cell: (element: Incident) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
+      cell: (element: IncidentListViewDto) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
       filterType: 'date',
       icon: 'event' // 📅
     },
     {
       columnDef: 'survenueAt',
       header: 'Date de survenance',
-      cell: (element: Incident) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
+      cell: (element: IncidentListViewDto) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
       filterType: 'date',
       icon: 'event_note' // 🗓️
     },
@@ -103,10 +103,10 @@ export class ListComponent implements OnInit {
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
   displayedColumns = ['select', ...this.columns.map(c => c.columnDef)];
-  dataSource = new MatTableDataSource<Incident>([]);
+  dataSource = new MatTableDataSource<IncidentListViewDto | IncidentListDto>([]);
   filteredByRisk = false;
-  selectedIncident: Incident | null = null;
-  incidents: Incident[] = [];
+  selectedIncident: IncidentListViewDto | IncidentListDto | null = null;
+  incidents: IncidentListViewDto[] | IncidentListDto[] = [];
 
   searchQuery: string = '';
 
@@ -182,7 +182,7 @@ export class ListComponent implements OnInit {
   }
 
   // This method will be triggered when a row is clicked
-  onRowClick(incident: Incident) {
+  onRowClick(incident: IncidentListViewDto) {
     this.router.navigate(['incident', incident.id]);
   }
 
@@ -225,7 +225,7 @@ export class ListComponent implements OnInit {
     }
   }
 
-  edit(row: Incident) {
+  edit(row: IncidentListViewDto) {
     this.router.navigate(['incident', 'create'], {
       queryParams: { id: row.id }
     })
@@ -239,7 +239,7 @@ export class ListComponent implements OnInit {
     return this.selectedIncidents.size > 0 && this.selectedIncidents.size < this.dataSource.data.length;
   }
 
-  isUpdatable(incident: Incident): boolean {
+  isUpdatable(incident: IncidentListViewDto): boolean {
     return incident!.state === State.DRAFT;
   }
 
@@ -250,7 +250,7 @@ export class ListComponent implements OnInit {
       if (value === null || value === '') continue;
 
       filtered = filtered.filter(incident => {
-        const fieldValue = incident[key as keyof Incident];
+        const fieldValue = incident[key as keyof IncidentListDto];
 
         // ✅ Cas spécial : filtre par plage de dates { start, end }
         if (value.start instanceof Date && value.end instanceof Date) {

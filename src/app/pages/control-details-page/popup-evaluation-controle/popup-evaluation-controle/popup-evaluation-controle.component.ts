@@ -137,8 +137,11 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
-    this.controlService.createEvaluation(this.evaluationData).subscribe(() => {
+    this.controlService.createEvaluation(this.evaluationData).subscribe(resp => {
       this.dialogRef.close();
+    },
+    err => {
+      this.snackBarService.error(err.error.message || 'Erreur lors de la soumission de l’évaluation');
     });
   }
 

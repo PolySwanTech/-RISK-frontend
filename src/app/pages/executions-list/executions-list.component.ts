@@ -20,7 +20,7 @@ import { GlobalSearchBarComponent } from '../../shared/components/global-search-
 import { MatPaginator } from '@angular/material/paginator';
 import { Filter } from '../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
-import { ControlExecution } from '../../core/models/ControlExecution';
+import { ControlExecution, ControlExecutionTableView } from '../../core/models/ControlExecution';
 import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../core/enum/evaluation-controle.enum';
 import { PopUpDetailExecutionComponent } from '../../features/control/pop-up-detail-execution/pop-up-detail-execution.component';
@@ -47,7 +47,7 @@ export class ExecutionsListComponent {
 
   executionId: string = this.route.snapshot.paramMap.get('id') || '';
 
-  executions: ControlExecution[] = [];
+  executions: ControlExecutionTableView[] = [];
 
   goBackButtons: GoBackButton[] = [];
 
@@ -119,7 +119,7 @@ export class ExecutionsListComponent {
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
-  dataSource = new MatTableDataSource<ControlExecution>([]);
+  dataSource = new MatTableDataSource<ControlExecutionTableView>([]);
 
   @Input() closed: boolean = false;
 

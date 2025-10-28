@@ -63,7 +63,7 @@
                     <div class="info-block">
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
-                            <label>Risk</label>
+                            <label>Risque</label>
                             <span class="badge type">
                                 {{ actionPlan.riskName }}
                             </span>
@@ -72,17 +72,15 @@
                     }
 
                     @if(actionPlan.incidentRef){
-                    <div class="info-block">
+                    <div class="info-block clickable" (click)="goToIncident()">
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Incident</label>
                             <div class="incident">
                                 <span class="badge status" [ngClass]="actionPlan.incidentRef.toLowerCase()">
                                     {{ actionPlan.incidentRef }}
+                                    <mat-icon class="suffix-icon">arrow_forward</mat-icon>
                                 </span>
-                                <button mat-raised-button class="btn-primary" (click)="goToIncident()">
-                                    Accéder
-                                </button>
                             </div>
                         </div>
                     </div>

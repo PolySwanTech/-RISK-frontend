@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlTemplateListViewDto } from '../../../core/models/ControlTemplate';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -65,21 +65,21 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'reference',
       header: 'Référence',
-      cell: (e: ControlTemplate) => e.reference,
+      cell: (e: ControlTemplateListViewDto) => e.reference,
       filterType: 'text',
       icon: 'tag' // 🏷️
     },
     {
       columnDef: 'libelle',
       header: 'Nom du contrôle',
-      cell: (e: ControlTemplate) => e.libelle,
+      cell: (e: ControlTemplateListViewDto) => e.libelle,
       filterType: 'text',
       icon: 'title' // 📝
     },
     {
       columnDef: 'processName',
       header: 'Processus métier',
-      cell: (e: ControlTemplate) => e.processName,
+      cell: (e: ControlTemplateListViewDto) => e.processName,
       filterType: 'text',
       icon: 'business_center' // 🏢
     },
@@ -87,7 +87,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'type',
       header: 'Type de contrôle',
-      cell: (e: ControlTemplate) => this.getTypeLabel(e.controlType),
+      cell: (e: ControlTemplateListViewDto) => this.getTypeLabel(e.controlType),
       isBadge: 'type',
       filterType: 'select',
       options: Object.values(Type).map(key => ({
@@ -100,7 +100,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'Fréquence',
       header: 'Fréquence',
-      cell: (e: ControlTemplate) => this.getRecurrenceLabel(e.frequency),
+      cell: (e: ControlTemplateListViewDto) => this.getRecurrenceLabel(e.frequency),
       filterType: 'select',
       options: Object.values(Recurrence).map(key => ({
         value: key,
@@ -133,7 +133,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'actif',
       header: 'Statut',
-      cell: (e: ControlTemplate) => e.actif ? 'Actif' : 'Suspendu',
+      cell: (e: ControlTemplateListViewDto) => e.actif ? 'Actif' : 'Suspendu',
       isBadge: 'statut',
       filterType: 'select',
       options: [
@@ -146,7 +146,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'nextExecution',
       header: 'Prochaine échéance',
-      cell: (e: ControlTemplate) => this.datePipe.transform(e.nextExecution, 'dd/MM/yyyy') || '',
+      cell: (e: ControlTemplateListViewDto) => this.datePipe.transform(e.nextExecution, 'dd/MM/yyyy') || '',
       filterType: 'date',
       icon: 'event' // 📅
     }
@@ -157,20 +157,20 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   selectedRange: { start: Date | null; end: Date | null } = { start: null, end: null };
 
   displayedColumns = [...this.columns.map(c => c.columnDef), 'actions'];
-  dataSource = new MatTableDataSource<ControlTemplate>([]);
+  dataSource = new MatTableDataSource<ControlTemplateListViewDto>([]);
 
   controlService = inject(ControlService);
   userService = inject(UtilisateurService);
   router = inject(Router);
   dialog = inject(MatDialog);
 
-  controls: ControlTemplate[] = [];
+  controls: ControlTemplateListViewDto[] = [];
 
   goBackButtons: GoBackButton[] = [];
 
   searchQuery: string = '';
 
-  selectedControl: ControlTemplate | null = null;
+  selectedControl: ControlTemplateListViewDto | null = null;
 
   getTypeLabel(t: Type): string {
     return ControlTypeLabels[t] || t;
@@ -257,7 +257,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     )
   }
 
-  onRowClick(control: ControlTemplate) {
+  onRowClick(control: ControlTemplateListViewDto) {
     this.router.navigate(['control', 'details', control.id]);
   }
 
@@ -320,7 +320,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     this.dataSource.data = filtered;
   }
 
-  activeOrSuspendControl(control: ControlTemplate) {
+  activeOrSuspendControl(control: ControlTemplateListViewDto) {
     if (control.actif) {
       // suspend
       this.controlService.suspendControl(control.id).subscribe(_ => this.snackBarService.info('Le contrôle a été suspendu avec succès.'));

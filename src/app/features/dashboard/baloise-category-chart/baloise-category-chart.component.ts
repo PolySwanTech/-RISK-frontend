@@ -4,7 +4,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { Incident } from '../../../core/models/Incident';
+import { IncidentListViewDto } from '../../../core/models/Incident';
 import { IncidentFilterService } from '../../../core/services/incident-filter/incident-filter.service';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { BaloiseCategoryDto } from '../../../core/models/RiskReferentiel';
@@ -24,7 +24,7 @@ interface SelectedParent {
   styleUrls: ['./baloise-category-chart.component.scss']
 })
 export class BaloiseCategoryChartComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() incidents: Incident[] = [];
+  @Input() incidents: IncidentListViewDto[] = [];
 
   drillLevel: DrillLevel = 'parent';
   selectedParent: SelectedParent | null = null;
@@ -83,7 +83,7 @@ export class BaloiseCategoryChartComponent implements OnInit, OnDestroy, OnChang
   }
 
   // 🔧 Construction du graphique
-  private buildChart(source: Incident[]) {
+  private buildChart(source: IncidentListViewDto[]) {
     const counts: Record<string, number> = {};
 
     if (this.drillLevel === 'parent') {
@@ -142,7 +142,7 @@ export class BaloiseCategoryChartComponent implements OnInit, OnDestroy, OnChang
       this.buildChart(this.incidents);
     });
 
-    this.filterService.setFilter('category', (inc: Incident) =>
+    this.filterService.setFilter('category', (inc: IncidentListViewDto) =>
       inc.categoryBaloise?.parent === parentCat.libelle
     );
   }

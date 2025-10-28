@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { Incident } from '../../../core/models/Incident';
+import { IncidentListViewDto } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 
 @Component({
@@ -16,7 +16,7 @@ import { State } from '../../../core/enum/state.enum';
   styleUrls: ['./incidents-trend-chart.component.scss']
 })
 export class IncidentsTrendChartComponent implements OnInit, OnChanges {
-  @Input() incidents: Incident[] = [];
+  @Input() incidents: IncidentListViewDto[] = [];
   
   trendText: string = '';
   trendValue: number = 0;

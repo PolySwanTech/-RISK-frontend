@@ -12,18 +12,18 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { ControlService } from '../../../../core/services/dmr/control/control.service';
 import { catchError, forkJoin, of } from 'rxjs';
-import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
 import { Status, StatusLabels } from '../../../../core/enum/status.enum';
 import { ControlTypeLabels, Type } from '../../../../core/enum/controltype.enum';
 import { Recurrence, RecurrenceLabels } from '../../../../core/enum/recurrence.enum';
 import { Degree, DegreeLabels } from '../../../../core/enum/degree.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
-import { Incident } from '../../../../core/models/Incident';
+import { IncidentListDto } from '../../../../core/models/Incident';
 import { IncidentService } from '../../../../core/services/incident/incident.service';
 import { RiskEvaluationService } from '../../../../core/services/risk-evaluation/risk-evaluation.service';
 import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { State, StateLabels } from '../../../../core/enum/state.enum';
+import { ControlExecutionView } from '../../../../core/models/ControlExecution';
 
 
 @Component({
@@ -43,14 +43,11 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   private controlService = inject(ControlService);
   private incidentService = inject(IncidentService);
   
-  controlExecutions: Record<string, ControlExecution[] | null> = {};
+  controlExecutions: Record<string, ControlExecutionView[] | null> = {};
   controlEvaluationCache: Record<string, ControlEvaluationView | null> = {};
-  linkedIncidents: Incident[] = [];
+  linkedIncidents: IncidentListDto[] = [];
   riskEvaluations: RiskEvaluationDto[] = [];
   groupedEvaluations?: { period: string, brut?: RiskEvaluationDto, net?: RiskEvaluationDto }[] = [];
-
-
-  
 
   goBackButtons = [
     // {
@@ -103,7 +100,6 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
           this.router.navigate(['/reglages/risks']);
         }
       });
-
   }
 
   loadControlExecutions(controlId: string): void {

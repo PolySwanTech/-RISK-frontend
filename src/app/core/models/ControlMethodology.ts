@@ -2,19 +2,19 @@ import { ControlNature } from "../enum/ControlNature.enum";
 import { ExecutionMode } from "../enum/exceutionmode.enum";
 
 export interface ControlMethodology {
-  id: string;
   controlTemplateId: string;
   controlNature: ControlNature;
   executionMode: ExecutionMode;
   scope?: string | null;
-  sampling?: string | null;
-  createdBy?: string | null;  
+  sampling?: string | null;  
 }
 
-export interface ControlMethodologyCreateDto {
-  controlTemplateId: string;
-  controlNature: ControlNature;
-  executionMode: ExecutionMode;
-  scope?: string;
-  sampling?: string;
-}
+export type ControlMethodologyViewDto = Required<Pick<
+  ControlMethodology,
+  'controlNature' | 'executionMode' | 'scope' | 'sampling'
+>>;
+
+export type ControlMethodologyCreateDto = Pick<
+  ControlMethodology,
+  'controlTemplateId' | 'controlNature' | 'executionMode' | 'scope' | 'sampling'
+>;
