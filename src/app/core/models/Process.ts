@@ -1,3 +1,5 @@
+import { RiskTemplate } from "./RiskTemplate";
+
 export class Process {
     id!: string;
     name!: string;
@@ -7,7 +9,7 @@ export class Process {
     buName?: string;
     parentName?: string;
     enfants: Process[] = [];
-    risks: RiskDto[] = [];
+    risks: RiskTemplate[] = [];
     niveau?: number;
 
     constructor(init?: Partial<Process>) {
