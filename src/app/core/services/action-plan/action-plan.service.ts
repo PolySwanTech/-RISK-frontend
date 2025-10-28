@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/ActionPlan';
+import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/action-plan/ActionPlan';
 
 @Injectable({
   providedIn: 'root'

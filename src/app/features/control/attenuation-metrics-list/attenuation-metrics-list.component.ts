@@ -15,7 +15,7 @@ import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionP
 import { forkJoin } from 'rxjs';
 
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
-import { AttenuationMetrics, AttenuationMetricsTypeDto } from '../../../core/models/AttenuationMetrics';
+import { AttenuationMetrics, AttenuationMetricsTypeDto } from '../../../core/models/dmr/AttenuationMetrics';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 import { CreateAttenuationMetricsComponent } from '../create-attenuation-metrics/create-attenuation-metrics.component';
 import { TargetType } from '../../../core/enum/targettype.enum';

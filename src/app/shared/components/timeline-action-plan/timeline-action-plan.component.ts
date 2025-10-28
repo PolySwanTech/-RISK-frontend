@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit, OnDestroy, Input } from "@angular/core";
-import { ActionPlan } from "../../../core/models/ActionPlan";
+import { ActionPlan } from "../../../core/models/action-plan/ActionPlan";
 
 interface TimelinePoint {
   date: Date;

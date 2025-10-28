@@ -12,7 +12,7 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
-import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
+import { ControlTemplateCreateDto } from '../../../core/models/dmr/ControlTemplate';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Priority, PriorityLabels } from '../../../core/enum/Priority';

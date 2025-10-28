@@ -4,9 +4,9 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { ControlService } from '../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../core/models/ControlTemplate';
-import { ControlExecution } from '../../core/models/ControlExecution';
-import { ControlEvaluationView } from '../../core/models/ControlEvaluation';
+import { ControlTemplate } from '../../core/models/dmr/ControlTemplate';
+import { ControlExecution } from '../../core/models/dmr/ControlExecution';
+import { ControlEvaluationView } from '../../core/models/dmr/ControlEvaluation';
 
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';

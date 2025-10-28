@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { addDays, addMonths, addWeeks } from 'date-fns';
-import { ControlExecution } from '../../../../core/models/ControlExecution';
+import { ControlExecution } from '../../../../core/models/dmr/ControlExecution';
 
 @Component({
   standalone: true,

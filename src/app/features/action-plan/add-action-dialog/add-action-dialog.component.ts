@@ -1,7 +1,7 @@
 import { Component, inject, Inject } from '@angular/core';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Action } from '../../../core/models/ActionPlan';
+import { Action } from '../../../core/models/action-plan/ActionPlan';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';

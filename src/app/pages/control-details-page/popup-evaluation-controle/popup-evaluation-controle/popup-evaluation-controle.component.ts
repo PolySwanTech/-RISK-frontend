@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
+import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/dmr/ControlEvaluation';
 import { Evaluation } from '../../../../core/enum/evaluation.enum';
 import { ControlService } from '../../../../core/services/dmr/control/control.service';
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
-import { ControlExecution } from '../../../../core/models/ControlExecution';
+import { ControlExecution } from '../../../../core/models/dmr/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';

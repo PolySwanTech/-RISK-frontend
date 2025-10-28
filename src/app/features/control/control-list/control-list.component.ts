@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlTemplate } from '../../../core/models/dmr/ControlTemplate';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';

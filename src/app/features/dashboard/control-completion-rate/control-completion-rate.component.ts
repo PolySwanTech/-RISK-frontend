@@ -5,8 +5,8 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { forkJoin, Subscription } from 'rxjs';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
-import { ControlExecution } from '../../../core/models/ControlExecution';
+import { ControlTemplate } from '../../../core/models/dmr/ControlTemplate';
+import { ControlExecution } from '../../../core/models/dmr/ControlExecution';
 import { Status } from '../../../core/enum/status.enum';
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 

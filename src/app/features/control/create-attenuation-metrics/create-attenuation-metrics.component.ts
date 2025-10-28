@@ -12,7 +12,7 @@ import { MatChip, MatChipListbox } from '@angular/material/chips';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
-import { AttenuationMetricsCreateDto, AttenuationMetricsTypeDto } from '../../../core/models/AttenuationMetrics';
+import { AttenuationMetricsCreateDto, AttenuationMetricsTypeDto } from '../../../core/models/dmr/AttenuationMetrics';
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 
 @Component({

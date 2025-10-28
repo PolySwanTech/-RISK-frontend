@@ -17,7 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
-import { ActionPlan } from "../../core/models/ActionPlan";
+import { ActionPlan } from "../../core/models/action-plan/ActionPlan";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
 import { Priority, PriorityLabels } from '../../core/enum/Priority';
 import { Status, StatusLabels } from '../../core/enum/status.enum';

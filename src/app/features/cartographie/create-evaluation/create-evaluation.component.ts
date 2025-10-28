@@ -14,7 +14,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlTemplate } from '../../../core/models/dmr/ControlTemplate';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
@@ -25,7 +25,7 @@ import { GoBackComponent } from '../../../shared/components/go-back/go-back.comp
 import { ActivatedRoute, Router } from '@angular/router';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
-import { AttenuationMetrics } from '../../../core/models/AttenuationMetrics';
+import { AttenuationMetrics } from '../../../core/models/dmr/AttenuationMetrics';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 
 interface Indicator {

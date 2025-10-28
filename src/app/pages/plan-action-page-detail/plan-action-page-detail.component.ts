@@ -13,7 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActionPlanService } from '../../core/services/action-plan/action-plan.service';
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Action, ActionPlan } from '../../core/models/ActionPlan';
+import { Action, ActionPlan } from '../../core/models/action-plan/ActionPlan';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
 import { firstValueFrom } from 'rxjs';

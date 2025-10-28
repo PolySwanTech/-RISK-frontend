@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { ActionPlan } from '../../../core/models/ActionPlan';
+import { ActionPlan } from '../../../core/models/action-plan/ActionPlan';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Priority } from '../../../core/enum/Priority';
 

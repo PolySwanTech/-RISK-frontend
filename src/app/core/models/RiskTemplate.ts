@@ -1,6 +1,6 @@
 import { OperatingLossState } from "../enum/operatingLossState.enum";
-import { AttenuationMetrics } from "./AttenuationMetrics";
-import { ControlTemplate } from "./ControlTemplate";
+import { AttenuationMetrics } from "./dmr/AttenuationMetrics";
+import { ControlTemplate } from "./dmr/ControlTemplate";
 import { RiskEvaluation } from "./RiskEvaluation";
 import { RiskReferentiel } from "./RiskReferentiel";
 

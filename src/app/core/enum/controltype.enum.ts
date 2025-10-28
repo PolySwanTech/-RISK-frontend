@@ -1,4 +1,4 @@
-export enum Type {
+export enum ControlType {
     PREVENTIVE = 'PREVENTIVE',
     DETECTIVE = 'DETECTIVE', 
     CORRECTIVE = 'CORRECTIVE', 
@@ -7,10 +7,10 @@ export enum Type {
 }
 
 
-export const ControlTypeLabels: Record<Type, string> = {
-    [Type.PREVENTIVE]: 'Préventif',
-    [Type.DETECTIVE]: 'Détectif',
-    [Type.CORRECTIVE]: 'Correctif',
-    [Type.AUTOMATIC]: 'Automatique',
-    [Type.MANUAL]: 'Manuel',
+export const ControlTypeLabels: Record<ControlType, string> = {
+    [ControlType.PREVENTIVE]: 'Préventif',
+    [ControlType.DETECTIVE]: 'Détectif',
+    [ControlType.CORRECTIVE]: 'Correctif',
+    [ControlType.AUTOMATIC]: 'Automatique',
+    [ControlType.MANUAL]: 'Manuel',
 }

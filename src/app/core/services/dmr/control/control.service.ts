@@ -1,11 +1,11 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { ControlTemplate, ControlTemplateCreateDto } from '../../../models/ControlTemplate';
-import { ControlExecution } from '../../../models/ControlExecution';
-import { ControlEvaluation } from '../../../models/ControlEvaluation';
+import { ControlTemplate, ControlTemplateCreateDto } from '../../../models/dmr/ControlTemplate';
+import { ControlExecution } from '../../../models/dmr/ControlExecution';
+import { ControlEvaluation } from '../../../models/dmr/ControlEvaluation';
 import { Observable } from 'rxjs';
-import { ControlMethodology, ControlMethodologyCreateDto } from '../../../models/ControlMethodology';
+import { ControlMethodology, ControlMethodologyCreateDto } from '../../../models/dmr/ControlMethodology';
 import { map } from 'rxjs/operators';
 
 @Injectable({

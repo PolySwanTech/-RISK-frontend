@@ -1,5 +1,5 @@
 import { Component, Inject, inject, OnInit } from '@angular/core';
-import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/ActionPlan';
+import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/action-plan/ActionPlan';
 import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';

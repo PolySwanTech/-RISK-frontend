@@ -1,29 +1,36 @@
-import { Process } from "./Process"
+import { ProcessDto } from "./Process";
 
 export class BusinessUnit {
-    id : string
-    name : string
-    lm : boolean // make cash
-    children : BusinessUnit[] = []
-    childrenVisible = false
-    parent : BusinessUnit | null = null
-    parentId : string | null = null
-    process: Process[] = []
-    niveau?: number
+    id!: string;
+    name!: string;
+    lm: boolean = false;
+    active: boolean = true;
+    parentId?: string | null;
+    children: BusinessUnit[] = [];
+    process: ProcessDto[] = [];
+    niveau?: number;
 
-    constructor(
-        id : string,
-        name : string, 
-        lm : boolean,
-        children : BusinessUnit[] = [],
-        parent : BusinessUnit | null = null,
-        process: Process[] = []
-    ){
-        this.id = id;
-        this.name = name;
-        this.lm = lm;
-        this.children = children;
-        this.parent = parent;
-        this.process = process;
+    constructor(init?: Partial<BusinessUnit>) {
+        Object.assign(this, init);
     }
 }
+
+export type BusinessUnitDto = Required<
+    Pick<BusinessUnit, 'id' | 'name' | 'lm' | 'parentId' | 'process' | 'niveau'>
+>;
+
+export interface BusinessUnitWithChildDto
+    extends Required<
+        Pick<BusinessUnit, 'id' | 'name' | 'lm' | 'parentId' | 'process'>
+    > {
+    children: BusinessUnitWithChildDto[];
+}
+
+export type BusinessUnitCreateDto = Pick<
+    Required<BusinessUnit>,
+    'name' | 'lm' | 'parentId'
+>;
+
+export type BusinessUnitUpdateDto = Partial<
+  Omit<BusinessUnit, 'children' | 'process'>
+> & { id: string };
