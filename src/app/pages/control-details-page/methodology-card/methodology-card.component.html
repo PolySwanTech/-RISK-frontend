@@ -12,7 +12,7 @@
           <mat-label>Nature du contrôle</mat-label>
           <mat-select formControlName="controlNature" required>
             <mat-option *ngFor="let n of controlNatureValues" [value]="n">
-              {{ getControlNature(n) }}
+              {{ n | enumLabel: 'controlNature' }}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="form.get('controlNature')?.invalid">Requis</mat-error>
@@ -22,7 +22,7 @@
           <mat-label>Mode d’exécution</mat-label>
           <mat-select formControlName="executionMode" required>
             <mat-option *ngFor="let m of executionModeValues" [value]="m">
-              {{ getExecutionMode(m) }}
+              {{ m | enumLabel: 'executionMode' }}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="form.get('executionMode')?.invalid">Requis</mat-error>

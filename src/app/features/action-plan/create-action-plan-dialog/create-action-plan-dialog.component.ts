@@ -3,7 +3,7 @@ import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/Ac
 import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { Priority, PriorityLabels } from '../../../core/enum/Priority';
+import { Priority } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,6 +22,7 @@ import { MatCardModule } from '@angular/material/card';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -35,7 +36,7 @@ import { BusinessUnit } from '../../../core/models/BusinessUnit';
     MatNativeDateModule,
     MatCardModule,
     PopupHeaderComponent,
-    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule
+    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule, EnumLabelPipe
   ],
   templateUrl: './create-action-plan-dialog.component.html',
   styleUrl: './create-action-plan-dialog.component.scss'
@@ -98,11 +99,6 @@ export class CreateActionPlanDialogComponent implements OnInit {
         console.error("Erreur lors du chargement des équipes", err);
       }
     });
-  }
-
-
-  formatPriority(p: Priority): string {
-    return PriorityLabels[p] || p;
   }
 
   // Ajouter une action à la liste

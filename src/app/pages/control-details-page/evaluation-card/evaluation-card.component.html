@@ -9,11 +9,11 @@
             <div class="eval-header" *ngIf="evaluationView">
                 <div class="eval-left">
                     <span class="section-label">Évaluation du contrôle</span>
-                    <span class="pill" [ngClass]="'badge ' + evalClass">{{ evalLabel }}</span>
+                    <span class="pill" [ngClass]="'badge ' + evalClass">{{ evaluationView.evaluation | enumLabel:'evaluationControl' }}</span>
                 </div>
 
                 <div class="eval-right">
-                    <span class="chip" [ngClass]="'badge ' + reviewBadgeClass">{{ reviewBadgeLabel }}</span>
+                    <span class="chip" [ngClass]="'badge ' + reviewBadgeClass">{{ evaluationView.reviewStatus | enumLabel:'reviewStatus'}}</span>
                     <span class="meta" *ngIf="evaluationView?.evaluatedAt">
                         Évaluée le {{ evaluationView.evaluatedAt | date:'dd/MM/yyyy' }}
                     </span>
@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="val-status">
-                    <span [ngClass]="'badge ' + reviewBadgeClass">{{ reviewBadgeLabel }}</span>
+                    <span [ngClass]="'badge ' + reviewBadgeClass">{{ evaluationView.reviewStatus | enumLabel:'reviewStatus'}}</span>
                 </div>
 
                 <div class="val-field full">

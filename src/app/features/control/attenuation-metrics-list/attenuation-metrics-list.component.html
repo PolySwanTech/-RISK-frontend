@@ -123,7 +123,7 @@
                         m.evaluation === 'NON_APPLICABLE' ? 'remove_circle_outline' : 'help_outline'
                       }}
                     </mat-icon>
-                    <span>{{ m.evaluation ? getEvaluationLabel(m.evaluation) : 'Non évaluée' }}</span>
+                    <span>{{ m.evaluation | enumLabel : 'evaluationControl' }}</span>
                   </div>
                 </span>
               </div>
@@ -179,7 +179,7 @@
                             key === 'NON_CONFORME' ? 'cancel' : 'remove_circle_outline'
                           }}
                         </mat-icon>
-                        {{ getEvaluationLabel(key) }}
+                        {{ key | enumLabel : 'evaluationControl' }}
                       </mat-option>
                     </mat-select>
                   </mat-form-field>

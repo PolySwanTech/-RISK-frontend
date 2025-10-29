@@ -10,6 +10,16 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ActivatedRoute } from '@angular/router';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+
+interface GroupedRisk {
+  processName: string;
+  riskName: string;
+  category: string;
+  exercicePeriod: { start: string; end: string };
+  brutEvaluation: { color: string; name: string } | null;
+  netEvaluation: { color: string; name: string } | null;
+}
 
 @Component({
   selector: 'app-list-process',
@@ -23,7 +33,8 @@ import { RiskEvaluationService } from '../../../core/services/risk-evaluation/ri
     MatFormFieldModule,
     FormsModule,
     MatCardModule,
-    MatBadgeModule
+    MatBadgeModule,
+    EnumLabelPipe
   ],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'
@@ -36,6 +47,7 @@ export class ListProcessComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   allRisks: any[] = [];
+  groupedRisks: GroupedRisk[] = [];
   searchTerm: string = '';
   selectedYear: number = new Date().getFullYear();
 
@@ -45,18 +57,50 @@ export class ListProcessComponent implements OnInit {
 
       if (this.buId) {
         this.riskEvaluationService.getEvaluationsByBu(this.buId).subscribe(buEval => {
+          console.log(buEval) 
           this.allRisks = buEval.evaluations;
+          this.groupRisks();
         });
       } else {
-        this.allRisks = []; // pas de BU sélectionnée
+        this.allRisks = [];
+        this.groupedRisks = [];
       }
     });
   }
 
-  filteredRisks() {
-    if (!this.searchTerm) return this.allRisks;
-    return this.allRisks.filter(item =>
-      item.processName.toLowerCase().includes(this.searchTerm.toLowerCase())
+  groupRisks(): void {
+    const grouped = new Map<string, GroupedRisk>();
+
+    this.allRisks.forEach(item => {
+      const key = `${item.processName}-${item.riskName}-${item.exercicePeriod.start}-${item.exercicePeriod.end}`;
+      
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          processName: item.processName,
+          riskName: item.riskName,
+          category: item.category,
+          exercicePeriod: item.exercicePeriod,
+          brutEvaluation: null,
+          netEvaluation: null
+        });
+      }
+
+      const risk = grouped.get(key)!;
+      if (item.brut) {
+        risk.brutEvaluation = item.evaluation;
+      } else {
+        risk.netEvaluation = item.evaluation;
+      }
+    });
+
+    this.groupedRisks = Array.from(grouped.values());
+  }
+
+  filteredRisks(): GroupedRisk[] {
+    if (!this.searchTerm) return this.groupedRisks;
+    return this.groupedRisks.filter(item =>
+      item.processName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      item.riskName.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 }

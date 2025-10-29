@@ -35,7 +35,7 @@
         <mat-label>Priorité</mat-label>
         <mat-select [(ngModel)]="actionPlan.priority" name="priority">
           <mat-option *ngFor="let priority of priorities" [value]="priority">
-            {{ formatPriority(priority) }}
+            {{ priority | enumLabel: 'priority' }}
           </mat-option>
         </mat-select>
         <button mat-icon-button matSuffix matTooltip="Niveau d'importance de ce plan d'action.">

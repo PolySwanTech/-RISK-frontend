@@ -13,23 +13,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { ControlService } from '../../../../core/services/dmr/control/control.service';
 import { catchError, forkJoin, of } from 'rxjs';
 import { ControlEvaluationView } from '../../../../core/models/ControlEvaluation';
-import { Status, StatusLabels } from '../../../../core/enum/status.enum';
-import { ControlTypeLabels, Type } from '../../../../core/enum/controltype.enum';
-import { Recurrence, RecurrenceLabels } from '../../../../core/enum/recurrence.enum';
-import { Degree, DegreeLabels } from '../../../../core/enum/degree.enum';
-import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { IncidentListDto } from '../../../../core/models/Incident';
 import { IncidentService } from '../../../../core/services/incident/incident.service';
 import { RiskEvaluationService } from '../../../../core/services/risk-evaluation/risk-evaluation.service';
-import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
-import { State, StateLabels } from '../../../../core/enum/state.enum';
 import { ControlExecutionView } from '../../../../core/models/ControlExecution';
+import { EnumLabelPipe } from '../../../../shared/pipes/enum-label.pipe';
 
 
 @Component({
   standalone: true,
   imports: [
-    CommonModule, MatDividerModule, GoBackComponent, MatProgressSpinnerModule, MatExpansionModule, MatIconModule],
+    CommonModule, MatDividerModule, GoBackComponent, MatProgressSpinnerModule, 
+    MatExpansionModule, MatIconModule, EnumLabelPipe
+  ],
   selector: 'app-risk-detail',
   templateUrl: './risk-detail.component.html',
   styleUrls: ['./risk-detail.component.scss']
@@ -130,36 +126,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   selectTab(tab: 'controls' | 'evaluations' | 'mitigations' ): void {
     this.activeTab = tab;
   }
-
-  getStatusLabel(s: Status | undefined): string {
-    return s ? StatusLabels[s] : '—';
-  }
-
-  getControlTypeLabel(t: Type): string {
-    return ControlTypeLabels[t] || '—';
-  }
-
-  getFrequencyLabel(freq: Recurrence): string {
-    return RecurrenceLabels[freq] || '—';
-  }
-
-  getControlLevelLabel(level: Degree): string {
-    return DegreeLabels[level] || '—';
-  }
-
-  getEvaluationControlLabel(e: EvaluationControl | undefined): string {
-    return e ? EvaluationControlLabels[e] : '—';
-  }
-
-  getEvaluationLabel(e: RiskLevelEnum | undefined): string {
-    return e ? RiskLevelLabels[e] : '—';
-  }
-
-  getStateLabel(s: State | undefined): string {
-    return s ? StateLabels[s] : '—';
-  }
     
-
   evalLabel(s: string | undefined): string {
     if (!s) return '—';
     const v = (s || '').toUpperCase();

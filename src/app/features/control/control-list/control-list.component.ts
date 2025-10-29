@@ -24,14 +24,13 @@ import { GlobalSearchBarComponent } from "../../../shared/components/global-sear
 import { Filter } from '../../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util';
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
-import { RiskLevelEnum, RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
-import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
-import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
-import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
+import { Degree } from '../../../core/enum/degree.enum';
+import { Recurrence } from '../../../core/enum/recurrence.enum';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-control-list',
@@ -43,7 +42,7 @@ import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.serv
     GlobalSearchBarComponent, GoBackComponent, MatMenuModule,
     FilterTableComponent
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, EnumLabelPipe],
   templateUrl: './control-list.component.html',
   styleUrl: './control-list.component.scss'
 })
@@ -58,6 +57,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   fb = inject(FormBuilder);
 
   private snackBarService = inject(SnackBarService);
+  private enumLabelPipe = inject(EnumLabelPipe);
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -87,7 +87,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'type',
       header: 'Type de contrôle',
-      cell: (e: ControlTemplateListViewDto) => this.getTypeLabel(e.controlType),
+      cell: (e: ControlTemplateListViewDto) => this.enumLabelPipe.transform(e.controlType, 'controlType'),
       isBadge: 'type',
       filterType: 'select',
       options: Object.values(Type).map(key => ({
@@ -100,11 +100,11 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'Fréquence',
       header: 'Fréquence',
-      cell: (e: ControlTemplateListViewDto) => this.getRecurrenceLabel(e.frequency),
+      cell: (e: ControlTemplateListViewDto) => this.enumLabelPipe.transform(e.frequency, 'recurrence'),
       filterType: 'select',
       options: Object.values(Recurrence).map(key => ({
         value: key,
-        label: RecurrenceLabels[key]
+        label: this.enumLabelPipe.transform(key, 'recurrence')
       })),
       icon: 'schedule' // ⏰
     },
@@ -112,12 +112,12 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'controlLevel',
       header: 'Degré de contrôle',
-      cell: (e: any) => this.getDegresLabel(e.controlLevel),
+      cell: (e: any) => this.enumLabelPipe.transform(e.controlLevel, 'degree'),
       isBadge: 'control',
       filterType: 'select',
       options: Object.values(Degree).map(key => ({
         value: key,
-        label: DegreeLabels[key]
+        label: this.enumLabelPipe.transform(key, 'degree')
       })),
       icon: 'tune' // 🎚️
     },
@@ -171,26 +171,6 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   searchQuery: string = '';
 
   selectedControl: ControlTemplateListViewDto | null = null;
-
-  getTypeLabel(t: Type): string {
-    return ControlTypeLabels[t] || t;
-  }
-
-  getPriorityLabel(p: Priority): string {
-    return PriorityLabels[p] || p;
-  }
-
-  getDegresLabel(d: Degree): string {
-    return DegreeLabels[d] || d;
-  }
-
-  getRecurrenceLabel(key: Recurrence): string {
-    return RecurrenceLabels[key] || key;
-  }
-
-  getRiskLabel(risk: RiskLevelEnum): string {
-    return RiskLevelLabels[risk] || risk;
-  }
 
   getBadgeClass(type: string, value: any) {
     switch (type) {
@@ -309,10 +289,10 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         (c.processName?.toLowerCase().includes(query) || '') ||
         (c.responsable?.toLowerCase().includes(query) || '') ||
         (c.creator?.toLowerCase().includes(query) || '') ||
-        this.getTypeLabel(c.controlType).toLowerCase().includes(query) ||
-        this.getRiskLabel(c.riskLevel.name).toLowerCase().includes(query) ||
-        this.getDegresLabel(c.controlLevel).toLowerCase().includes(query) ||
-        this.getRecurrenceLabel(c.frequency).toLowerCase().includes(query) ||
+        this.enumLabelPipe.transform(c.controlType, 'controlType').toLowerCase().includes(query) ||
+        this.enumLabelPipe.transform(c.riskLevel.name, 'riskLevel').toLowerCase().includes(query) ||
+        this.enumLabelPipe.transform(c.controlLevel, 'degree').toLowerCase().includes(query) ||
+        this.enumLabelPipe.transform(c.frequency, 'recurrence').toLowerCase().includes(query) ||
         (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
       );
     }
@@ -378,19 +358,19 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
         // ✅ Champs enum mappés via fonctions
         if (key === 'type') {
-          return this.getTypeLabel(control.controlType).toLowerCase() === this.getTypeLabel(value).toLowerCase();
+          return this.enumLabelPipe.transform(control.controlType, 'controlType').toLowerCase() === this.enumLabelPipe.transform(value, 'controlType').toLowerCase();
         }
 
         if (key === 'riskLevel') {
-          return this.getRiskLabel(control.riskLevel.name).toLowerCase() === this.getRiskLabel(value).toLowerCase();
+          return this.enumLabelPipe.transform(control.riskLevel.name, 'riskLevel').toLowerCase() === this.enumLabelPipe.transform(value, 'riskLevel').toLowerCase();
         }
 
         if (key === 'controlLevel') {
-          return this.getDegresLabel(control.controlLevel).toLowerCase() === this.getDegresLabel(value).toLowerCase();
+          return this.enumLabelPipe.transform(control.controlLevel, 'degree').toLowerCase() === this.enumLabelPipe.transform(value, 'degree').toLowerCase();
         }
 
         if (key === 'Fréquence') {
-          return this.getRecurrenceLabel(control.frequency).toLowerCase() === this.getRecurrenceLabel(value).toLowerCase();
+          return this.enumLabelPipe.transform(control.frequency, 'recurrence').toLowerCase() === this.enumLabelPipe.transform(value, 'recurrence').toLowerCase();
         }
 
         // ✅ Champ texte : reference, libelle, processName, creatorName, etc.

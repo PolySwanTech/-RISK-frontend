@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -31,6 +32,7 @@ import { TopCriticalRisksComponent } from "../../../features/dashboard/top-criti
   selector: 'app-home',
   standalone: true,
   imports: [
+    CommonModule,
     MatCardModule,
     MatTabsModule,
     ControlCompletionRateComponent,
@@ -74,6 +76,9 @@ export class HomeComponent implements OnInit {
   draftIncidents = 0;
   avgResolutionTime = '';
   resolutionRate = 0;
+
+  // Etat UI
+  showFilters = false;
 
   goBackButtons: GoBackButton[] = [
     {
@@ -139,6 +144,16 @@ export class HomeComponent implements OnInit {
       : 0;
 
     this.avgResolutionTime = this.calculateAverageResolutionTime(incidents);
+  }
+
+  /** UI: toggle d'affichage des filtres avancés */
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
+  }
+
+  /** Indicateur simple: alerte si trop d'incidents en cours */
+  get hasHighOpenIncidents() {
+    return this.inProgressIncidents > Math.max(5, Math.round(this.totalIncidents * 0.25));
   }
 
   private calculateAverageResolutionTime(incidents: IncidentListViewDto[]): string {

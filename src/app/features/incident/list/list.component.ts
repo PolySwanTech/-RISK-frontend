@@ -26,6 +26,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 
 @Component({
@@ -38,7 +39,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent, FormsModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
-  providers: [DatePipe]
+  providers: [DatePipe, EnumLabelPipe]
 })
 
 export class ListComponent implements OnInit {
@@ -47,6 +48,7 @@ export class ListComponent implements OnInit {
   private datePipe = inject(DatePipe)
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private enumLabelPipe = inject(EnumLabelPipe);
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -84,7 +86,7 @@ export class ListComponent implements OnInit {
       header: 'Statut',
       cell: (incident: Incident) => `
           <span class="badge ${incident.state.toLowerCase()}">
-            ${this.getStateLabel(incident.state)}
+            ${this.enumLabelPipe.transform(incident.state, 'state')}
           </span>
         `, // ← label lisible
       isBadge: 'state',                                                // ← si ton template gère les badges
@@ -296,7 +298,7 @@ export class ListComponent implements OnInit {
         incident.title?.toLowerCase().includes(lowerQuery) ||
         this.datePipe.transform(incident.declaredAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
         this.datePipe.transform(incident.survenueAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
-        this.getStateLabel(incident.state).toLowerCase().includes(lowerQuery) ||     // ← NEW
+        this.enumLabelPipe.transform(incident.state, 'state').toLowerCase().includes(lowerQuery) ||     // ← NEW
         (incident.closedAt ? 'clôturé' : 'en cours').includes(lowerQuery)            // compat “en cours/clôturé”
       );
     });
@@ -307,10 +309,6 @@ export class ListComponent implements OnInit {
   clearSearch(): void {
     this.searchQuery = '';
     this.dataSource.data = this.incidents;
-  }
-
-  getStateLabel(s: State): string {
-    return StateLabels?.[s] ?? String(s);
   }
 
   exportExcel(filename: string = 'incidents.xlsx') {

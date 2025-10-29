@@ -19,11 +19,12 @@ import { BusinessUnit } from '../../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../../core/services/entities/entities.service';
 import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
-import { OperatingLossState, OperatingLossStateLabels } from '../../../../core/enum/operatingLossState.enum';
-import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
+import { OperatingLossState } from '../../../../core/enum/operatingLossState.enum';
+import { ReviewStatus } from '../../../../core/enum/reviewStatus.enum';
 import { FileService } from '../../../../core/services/file/file.service';
 import { TargetType } from '../../../../core/enum/targettype.enum';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
+import { EnumLabelPipe } from '../../../../shared/pipes/enum-label.pipe';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
@@ -57,7 +58,7 @@ type Errors = Record<string, string>;
 @Component({
   selector: 'app-create-operational-impact',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoBackComponent],
+  imports: [CommonModule, FormsModule, GoBackComponent, EnumLabelPipe],
   templateUrl: './create-operational-impact.component.html',
   styleUrl: './create-operational-impact.component.scss',
 })
@@ -725,14 +726,6 @@ export class CreateOperationalImpactComponent implements OnInit {
     if (window.confirm('Êtes-vous sûr de vouloir annuler ? Toutes les données saisies seront perdues.')) {
       this.resetForm();
     }
-  }
-
-  getReviewStatusLabel(status: ReviewStatus): string {
-    return ReviewStatusLabels[status] || 'Inconnu';
-  }
-
-  getStatutLabel(state: OperatingLossState): string {
-    return OperatingLossStateLabels[state] || 'En attente';
   }
 
   resetForm() {

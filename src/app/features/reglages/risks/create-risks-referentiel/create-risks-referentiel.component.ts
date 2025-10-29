@@ -13,7 +13,7 @@ import { GoBackComponent } from '../../../../shared/components/go-back/go-back.c
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { ProcessService } from '../../../../core/services/process/process.service';
 
-import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
+import { RiskLevelEnum } from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 
 import { Process } from '../../../../core/models/Process';
@@ -67,7 +67,6 @@ export class CreateRisksReferentielComponent {
 
   riskLevels = Object.values(RiskLevelEnum);
   impactTypes = Object.values(RiskImpactType);
-  riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
 
   isBaloisPreselected = false;

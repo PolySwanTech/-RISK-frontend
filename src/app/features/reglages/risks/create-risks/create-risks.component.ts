@@ -19,7 +19,7 @@ import { ProcessService } from '../../../../core/services/process/process.servic
 import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
 
 import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/RiskTemplate';
-import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
+import { RiskLevelEnum} from '../../../../core/enum/riskLevel.enum';
 import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
 import { Process } from '../../../../core/models/Process';
 import { BaloiseCategoryDto, RiskReferentiel } from '../../../../core/models/RiskReferentiel';
@@ -76,7 +76,6 @@ export class CreateRisksComponent implements OnInit {
 
   riskLevels = Object.values(RiskLevelEnum);
   impactTypes = Object.values(RiskImpactType);
-  riskLabels = RiskLevelLabels;
   impactLabels = RiskImpactTypeLabels;
   redirectUrl?: string;
 

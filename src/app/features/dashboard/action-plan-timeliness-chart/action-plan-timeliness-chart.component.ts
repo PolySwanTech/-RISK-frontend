@@ -22,6 +22,7 @@ export class ActionPlanTimelinessChartComponent implements OnInit, OnDestroy {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '65%',
+    layout: { padding: 14 },
     plugins: {
       legend: { position: 'top' },
       tooltip: {
@@ -82,7 +83,7 @@ export class ActionPlanTimelinessChartComponent implements OnInit, OnDestroy {
             {
               data: [onTime, late],
               backgroundColor: ['#10b981', '#ef4444'],
-              hoverOffset: 20
+              hoverOffset: 8
             }
           ]
         };

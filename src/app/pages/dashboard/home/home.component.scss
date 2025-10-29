@@ -2,20 +2,95 @@ mat-tab-group {
   margin-top: 20px;
 }
 
+/* Conteneur principal centré avec largeur max */
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px 24px;
+}
+
+/* Palette et accents */
+:root {
+  --rv-primary: #345c94;
+  --rv-accent: #d6aa81;
+}
+
+/* Toolbar */
+.dashboard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 80px;
+  margin: 8px 0 12px;
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  background: rgba(0,0,0,.04);
+  color: #333;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+.badge-danger {
+  background: #ffe8e8;
+  color: #b42318;
+  border-color: #ffd0d0;
+}
+
+/* Thème sombre retiré à la demande: on garde le layout clair par défaut */
+
+/* Bandeau KPI */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 8px 0 24px;
+}
+
+.kpi-card {
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  background: #fff7f0;
+  border: 1px solid rgba(0,0,0,.05);
+  transition: transform .15s ease, box-shadow .2s ease;
+  padding: 12px 14px;
+}
+
+.kpi-header { display: flex; align-items: center; gap: 8px; color: #2b3a55; font-weight: 600; font-size: 13px; }
+.kpi-header mat-icon { color: var(--rv-primary); }
+.kpi-value { font-size: 32px; line-height: 1.15; font-weight: 900; color: #111827; margin-top: 6px; }
+.kpi-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+.kpi-primary { border-top: 5px solid red; }
+.kpi-warn    { border-top: 5px solid #ff9800; }
+.kpi-success { border-top: 5px solid #16a34a; }
+
+.section-title {
+  margin: 12px 0 8px;
+  font-weight: 700;
+  color: #2b3a55;
+  border-left: 4px solid var(--rv-primary);
+  padding-left: 8px;
+}
+
 ::ng-deep .mat-mdc-tab-labels {
   justify-content: center;
 }
 
 .graphs-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
   align-items: stretch;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
-
-  > * {
-    flex: 1 1 45%;
-  }
 }
 
 .no-incidents {
@@ -30,9 +105,11 @@ mat-tab-group {
 }
 
 .filter-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 0;
 }
 
 .cards-container {
@@ -80,18 +157,19 @@ mat-tab-group {
   mat-card {
     text-align: center;
     border-radius: 16px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     transition: all 0.2s ease-in-out;
-    background-color: #fff;
+    background-color: #fff7f0;
+    border: 1px solid rgba(0,0,0,.05);
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
     }
 
     mat-card-title {
       font-size: 14px;
-      color: #555;
+      color: #2b3a55;
     }
 
     mat-card-content {
@@ -114,44 +192,46 @@ mat-tab-group {
     width: 100%;
 
     .total {
-      border-top: 5px solid #1976d2;
-      width: 30%;
-      min-width: 260px;
+      border-top: 5px solid var(--rv-primary);
+      width: 32%;
+      min-width: 280px;
+      max-width: 480px;
       mat-card-content {
-        color: #1976d2;
+        color: var(--rv-primary);
       }
     }
   }
 
   /* Niveau intermédiaire */
   .pyramid-middle {
-    display: flex;
-    justify-content: space-around;
-    gap: 40px;
-    width: 70%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 920px;
 
     .in-progress {
-      border-top: 5px solid #ff9800;
+      border-top: 5px solid #eab308;
       flex: 1;
       mat-card-content {
-        color: #ff9800;
+        color: #eab308;
       }
     }
 
     .resolved {
-      border-top: 5px solid #4caf50;
+      border-top: 5px solid #16a34a;
       flex: 1;
       mat-card-content {
-        color: #4caf50;
+        color: #16a34a;
       }
     }
   }
 
   /* Responsive */
   @media (max-width: 900px) {
-    .pyramid-middle,
     .pyramid-top .total {
-      width: 60%;
+      width: 100%;
+      max-width: 100%;
     }
   }
 }
@@ -163,9 +243,10 @@ mat-tab-group {
 .filter-container {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   justify-content: flex-end;
   margin-bottom: 25px;
+  flex-wrap: wrap;
 
   mat-form-field {
     width: 220px;
@@ -175,18 +256,121 @@ mat-tab-group {
     height: 56px;
   }
 }
-.controls-dashboard {
+
+/* Panneau filtres */
+.filter-panel {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.06);
+  border-left: 4px solid var(--rv-primary);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-panel.compact {
+  padding: 8px 10px;
+}
+
+.filter-panel.compact .mat-mdc-form-field-infix {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.range-field .mat-date-range-input-inner[matStartDate],
+.range-field .mat-date-range-input-inner[matEndDate] {
+  min-width: 120px;
+}
+
+.filter-actions {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.filter-panel .mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: rgba(0,0,0,.15);
+}
+.controls-dashboard {
+  display: grid;
+  gap: 24px;
 }
 
 .controls-row {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
 
-  > * {
-    flex: 1 1 45%;
+/* Grille spécifique onglet Contrôles: 2 cartes puis 1 pleine largeur */
+.controls-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.controls-grid > :nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .controls-grid {
+    grid-template-columns: 1fr;
   }
 }
+
+/* Grille spécifique onglet Cartographie: 1 carte sur première ligne, 2 sur seconde */
+.risks-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.risks-grid > :first-child {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .risks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Effets subtils sur les cartes */
+.chart-container, .trend-card, .incident-pyramid mat-card {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.chart-container:hover, .trend-card:hover, .incident-pyramid mat-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Ajustements mobiles */
+@media (max-width: 600px) {
+  .filter-container {
+    justify-content: stretch;
+  }
+
+  .filter-container button {
+    width: 100%;
+  }
+}
+
+/* Hauteurs cohérentes pour cartes de graphes */
+.graphs-container .mat-mdc-card, .graphs-container mat-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+
+.graphs-container .mat-mdc-card-content, .graphs-container mat-card-content {
+  flex: 1;
+}
+
+/* Option: imposer une hauteur mini (décommenter si besoin)
+.graphs-container canvas {
+  min-height: 260px;
+}
+*/

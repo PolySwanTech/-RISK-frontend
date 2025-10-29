@@ -14,16 +14,17 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
-import { Priority, PriorityLabels } from '../../../core/enum/Priority';
-import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
+import { Degree } from '../../../core/enum/degree.enum';
+import { Priority } from '../../../core/enum/Priority';
+import { Recurrence } from '../../../core/enum/recurrence.enum';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { Type } from '../../../core/enum/controltype.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { MatChipListbox, MatChip } from "@angular/material/chips";
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-create-control',
@@ -39,7 +40,8 @@ import { MatChipListbox, MatChip } from "@angular/material/chips";
     MatIconModule, PopupHeaderComponent,
     FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, PopupHeaderComponent,
     MatChipListbox,
-    MatChip
+    MatChip,
+    EnumLabelPipe
 ],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
@@ -89,22 +91,6 @@ export class CreateControlComponent {
   recurences = Object.values(Recurrence);
 
   ngOnInit() {
-  }
-
-  getTypeLabel(type: Type): string {
-    return ControlTypeLabels[type];
-  }
-
-  getPriorityLabel(priority: Priority): string {
-    return PriorityLabels[priority];
-  }
-
-  getDegresLabel(d: Degree): string {
-    return DegreeLabels[d];
-  }
-
-  getRecurrenceLabel(recurrence: Recurrence): string {
-    return RecurrenceLabels[recurrence];
   }
 
   onSubmit() {

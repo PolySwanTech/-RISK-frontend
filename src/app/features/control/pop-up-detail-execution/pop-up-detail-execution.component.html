@@ -10,8 +10,7 @@
 
           <div class="meta-line">
 
-            <span class="badge" [ngClass]="getStatusClass(s.exec.status)">{{ formatStatus(s.exec.status)
-              }}</span>
+            <span class="badge" [ngClass]="getStatusClass(s.exec.status)">{{ s.exec.status | enumLabel:'status' }}</span>
             <span class="meta-date">Planifiée le {{ s.exec.plannedAt | date:'dd/MM/yyyy' }}</span>
             <span class="meta-date" *ngIf="s.view?.evaluatedAt">• Évaluée le {{ s.view?.evaluatedAt |
               date:'dd/MM/yyyy' }}</span>

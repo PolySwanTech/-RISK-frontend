@@ -1,32 +1,72 @@
 <div class="process-container">
-
-    <!-- Barre de recherche par nom de process -->
+    <!-- Barre de recherche -->
     <div class="search-bar">
         <mat-form-field appearance="outline" class="w-full">
             <mat-label>Rechercher un risque par process</mat-label>
-            <input matInput [(ngModel)]="searchTerm" placeholder="Nom du process...">
+            <input matInput [(ngModel)]="searchTerm" placeholder="Nom du process ou du risque...">
             <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm=''">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
     </div>
 
-    <!-- Tableau unique des risques -->
-    <div class="risk-table">
-        <div class="table-header">
-            <div class="col-process">Processus</div>
-            <div class="col-risque">Exercice</div>
-            <div class="col-risque">Risque</div>
-            <div class="col-risque-brut">Evaluation</div>
-            <div class="col-risque-brut">Type d'évaluation</div>
-        </div>
+    <!-- Affichage en cartes -->
+    <div class="risk-cards-grid">
+        <mat-card *ngFor="let risk of filteredRisks()" class="risk-card">
+            <mat-card-header>
+                <mat-card-title>{{ risk.processName }}</mat-card-title>
+                <mat-card-subtitle>{{ risk.riskName }}</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content>
+                <div class="risk-info">
+                    <div class="info-row">
+                        <mat-icon class="info-icon">category</mat-icon>
+                        <span class="info-label">Catégorie:</span>
+                        <span class="info-value">{{ risk.category }}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <mat-icon class="info-icon">date_range</mat-icon>
+                        <span class="info-label">Exercice:</span>
+                        <span class="info-value">
+                            {{ risk.exercicePeriod.start | date: 'dd/MM/yyyy' }} - 
+                            {{ risk.exercicePeriod.end | date: 'dd/MM/yyyy' }}
+                        </span>
+                    </div>
+                </div>
 
-        <div *ngFor="let item of filteredRisks()" class="table-row">
-            <div class="col-process">{{ item.processName }}</div>
-            <div class="col-process">{{ item.exercicePeriod.start | date : "dd/MM/yyyy" }} - {{ item.exercicePeriod.end | date : "dd/MM/yyyy" }} </div>
-            <div class="col-risque">{{ item.riskName }}</div>
-            <div class="col-risque-brut">{{ item.evaluation.name }}</div>
-            <div class="col-risque-brut">{{ item.brut ? 'Brute' : 'Nette' }}</div>
-        </div>
+                <div class="evaluations-container">
+                    <div class="evaluation-box" *ngIf="risk.brutEvaluation">
+                        <div class="evaluation-header">
+                            <mat-icon>warning</mat-icon>
+                            <span>Évaluation Brute</span>
+                        </div>
+                        <div class="evaluation-badge" 
+                             [style.background-color]="risk.brutEvaluation.color"
+                             [class.dark-text]="risk.brutEvaluation.name === 'LOW'">
+                            {{ risk.brutEvaluation.name | enumLabel:'riskLevel' }}
+                        </div>
+                    </div>
+
+                    <div class="evaluation-box" *ngIf="risk.netEvaluation">
+                        <div class="evaluation-header">
+                            <mat-icon>shield</mat-icon>
+                            <span>Évaluation Nette</span>
+                        </div>
+                        <div class="evaluation-badge" 
+                             [style.background-color]="risk.netEvaluation.color"
+                             [class.dark-text]="risk.netEvaluation.name === 'LOW'">
+                            {{ risk.netEvaluation.name | enumLabel:'riskLevel' }}
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <div *ngIf="filteredRisks().length === 0" class="no-results">
+        <mat-icon>search_off</mat-icon>
+        <p>Aucun risque trouvé</p>
     </div>
 </div>

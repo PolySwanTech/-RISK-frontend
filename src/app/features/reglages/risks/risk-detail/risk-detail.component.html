@@ -32,11 +32,11 @@
           <div class="metric">
             <div class="metric-value risk-dual-badge">
               <span class="left">
-                {{ getEvaluationLabel(groupedEvaluations?.[0]?.brut?.evaluation?.name) }}
+                {{ groupedEvaluations?.[0]?.brut?.evaluation?.name | enumLabel:'riskLevel' }}
               </span>
               <span class="separator">|</span>
               <span class="right">
-                {{ getEvaluationLabel(groupedEvaluations?.[0]?.net?.evaluation?.name) }}
+                {{ groupedEvaluations?.[0]?.net?.evaluation?.name | enumLabel:'riskLevel' }}
               </span>
             </div>
             <div class="metric-label">Évaluations (Brute | Nette)</div>
@@ -63,7 +63,7 @@
 
               <div class="incident-footer">
                 <span class="incident-status badge" [ngClass]="incident?.state">
-                  {{ getStateLabel(incident.state) }}
+                  {{ incident.state | enumLabel:'state' }}
                 </span>
               </div>
             </div>
@@ -125,17 +125,17 @@
       <!-- Contenu header sous forme de "metrics" -->
       <mat-panel-description class="control-metrics">
           <div class="metric">
-            <div class="metric-value badge type">{{ getControlTypeLabel(control.controlType) }}</div>
+            <div class="metric-value badge type">{{ control.controlType | enumLabel: 'controlType' }}</div>
           </div>
           <div class="metric">
-            <div class="metric-value badge freq">{{ getFrequencyLabel(control.frequency) }}</div>
+            <div class="metric-value badge freq">{{ control.frequency | enumLabel: 'recurrence' }}</div>
           </div>
           <div class="metric">
-            <div class="metric-value badge level">{{ getControlLevelLabel(control.controlLevel) }}</div>
+            <div class="metric-value badge level">{{ control.controlLevel | enumLabel: 'degree' }}</div>
           </div>
           <div class="metric">
             <div class="metric-value badge status">
-              {{ getStatusLabel(controlExecutions[control.id]?.[0]?.status) }}
+              {{ (controlExecutions[control.id]?.[0]?.status | enumLabel:'status') || 'N/R' }}
             </div>
           </div>
         </mat-panel-description>
@@ -157,7 +157,7 @@
             <div>
               <div class="exec-status">Statut : 
                 <span class="badge" [ngClass]="exec.status">
-                  {{ getStatusLabel(exec.status) }}
+                  {{ (exec.status | enumLabel:'status') || 'N/R' }}
                 </span>
               </div>
               <div class="exec-eval" *ngIf="controlEvaluationCache[exec.id]">
@@ -201,10 +201,10 @@
               </div>
 
               <div class="incident-title">
-                <span>Brute : {{ group.brut ? getEvaluationLabel(group.brut.evaluation.name) : 'N/R' }}</span>
+                <span>Brute : {{ group.brut ? (group.brut.evaluation.name | enumLabel:'riskLevel') : 'N/R' }}</span>
               </div>
               <div class="incident-title">
-                <span>Nette : {{ group.net ? getEvaluationLabel(group.net.evaluation.name) : 'N/R' }}</span>
+                <span>Nette : {{ group.net ? (group.net.evaluation.name | enumLabel:'riskLevel') : 'N/R' }}</span>
               </div>
 
               <div class="evaluateur">

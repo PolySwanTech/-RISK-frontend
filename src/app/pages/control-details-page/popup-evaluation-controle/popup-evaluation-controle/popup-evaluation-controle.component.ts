@@ -9,7 +9,7 @@ import { ControlExecution } from '../../../../core/models/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
-import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
+import { ReviewStatus } from '../../../../core/enum/reviewStatus.enum';
 import { MatIcon } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { TargetType } from '../../../../core/enum/targettype.enum';
@@ -201,8 +201,4 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     if (s === ReviewStatus.REJECTED) return 'pill-danger';
     return 'pill-default';
   }
- get reviewBadgeLabel(): string {
-     const s = this.evaluationView?.reviewStatus;
-     return s ? ReviewStatusLabels[s] : '—';
-   }
 }

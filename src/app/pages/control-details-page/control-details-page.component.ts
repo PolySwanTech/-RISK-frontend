@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { Status, StatusLabels } from '../../core/enum/status.enum';
+import { Status } from '../../core/enum/status.enum';
 import { ControlService } from '../../core/services/dmr/control/control.service';
 import { ControlDetailsView } from '../../core/models/ControlTemplate';
 import { ControlEvaluationView } from '../../core/models/ControlEvaluation';
@@ -19,6 +19,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 import { AuthService } from '../../core/services/auth/auth.service';
 import { ControlExecutionDetails } from '../../core/models/ControlExecution';
+import { EnumLabelPipe } from '../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-control-details-page',
@@ -30,7 +31,8 @@ import { ControlExecutionDetails } from '../../core/models/ControlExecution';
     EvaluationCardComponent,
     RouterModule,
     MethodologyCardComponent,
-    HasPermissionDirective
+    HasPermissionDirective,
+    EnumLabelPipe
   ],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
@@ -144,9 +146,6 @@ export class ControlDetailsPageComponent implements OnInit {
       default: return '';
     }
   }
-
-  formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
-
 
   openEvaluationDetailsPopup(executionId: string, action: string): void {
     this.dialog.open(PopupEvaluationControleComponent, {

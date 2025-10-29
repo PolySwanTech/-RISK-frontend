@@ -43,7 +43,7 @@
 
     <div class="info-row">
       <span class="label">Risque inhérent :</span>
-      <span class="value badge" [ngClass]="riskBrut">{{ riskBrut }}</span>
+      <span class="value badge" [ngClass]="lastEvalBrute?.evaluation?.name | enumLabel: 'riskLevel'">{{ lastEvalBrute?.evaluation?.name | enumLabel: 'riskLevel'}}</span>
     </div>
 
     <div class="info-row">
