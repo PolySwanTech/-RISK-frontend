@@ -6,6 +6,6 @@ export enum EvaluationControl {
 
 export const EvaluationControlLabels: Record<EvaluationControl, string> = {
   [EvaluationControl.CONFORME]: 'Conforme',
-  [EvaluationControl.NON_CONFORME]: 'Non conforme',
-  [EvaluationControl.PARTIELLEMENT_CONFORME]: 'Partiellement conforme'
+  [EvaluationControl.PARTIELLEMENT_CONFORME]: 'Partiellement conforme',
+  [EvaluationControl.NON_CONFORME]: 'Non conforme'
 };

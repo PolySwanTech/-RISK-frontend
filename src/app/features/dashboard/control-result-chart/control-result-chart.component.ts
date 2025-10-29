@@ -22,6 +22,7 @@ export class ControlResultChartComponent implements OnInit, OnDestroy {
   options: ChartOptions<'doughnut'> = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: { padding: 14 },
     plugins: {
       legend: { position: 'right' },
       tooltip: {
@@ -113,7 +114,7 @@ export class ControlResultChartComponent implements OnInit, OnDestroy {
       datasets: [
         {
           data: values,
-          backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], // vert / orange / rouge
+          backgroundColor: ['#10b981', '#ef4444', '#f59e0b'], // vert / orange / rouge
           hoverOffset: 20
         }
       ]
