@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/action-plan/ActionPlan';
+import { ActionPlan, ActionPlanCreationDto, ActionPlanDto, ActionPlanListDto } from '../../models/action-plan/ActionPlan';
+import { ActionCreationDto } from '../../models/action-plan/Action';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +13,12 @@ export class ActionPlanService {
   baseAction = environment.apiUrl + '/actions';
   http = inject(HttpClient);
 
-  createActionPlan(actionPlan: ActionPlanCreateDto) {
+  createActionPlan(actionPlan: ActionPlanCreationDto) {
     return this.http.post<string>(this.base, actionPlan);
   }
 
   getActionPlan(id: string) {
-    return this.http.get<ActionPlan>(`${this.base}/${id}`);
+    return this.http.get<ActionPlanDto>(`${this.base}/${id}`);
   }
 
   startActionPlan(id: string) {
@@ -29,10 +30,10 @@ export class ActionPlanService {
   }
 
   getActionsPlan() {
-    return this.http.get<ActionPlan[]>(this.base);
+    return this.http.get<ActionPlanListDto[]>(this.base);
   }
 
-  addActions(actions: Action[], id: string) {
+  addActions(actions: ActionCreationDto[], id: string) {
     return this.http.post(`${this.baseAction}`, actions, { params: { actionPlanId: id } });
   }
 

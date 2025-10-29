@@ -14,8 +14,8 @@
 
                 <div class="eval-right">
                     <span class="chip" [ngClass]="'badge ' + reviewBadgeClass">{{ reviewBadgeLabel }}</span>
-                    <span class="meta" *ngIf="evaluationView?.evaluatedAt">
-                        Évaluée le {{ evaluationView.evaluatedAt | date:'dd/MM/yyyy' }}
+                    <span class="meta" *ngIf="evaluationView.createdAt">
+                        Évaluée le {{ evaluationView.createdAt| date:'dd/MM/yyyy' }}
                     </span>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                 <div class="val-grid">
                     <div class="val-field">
                         <label>Nom du valideur / manager</label>
-                        <div class="val-input">{{ ev.reviewedBy || '—' }}</div>
+                        <div class="val-input">{{ ev.performedById || '—' }}</div>
                     </div>
 
                     <div class="val-field">

@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { addDays, addMonths, addWeeks } from 'date-fns';
 import { ControlExecution } from '../../../../core/models/dmr/ControlExecution';
+import { Range } from '../../../../core/models/range';
 
 @Component({
   standalone: true,
@@ -24,7 +25,7 @@ export class PlanifierExecutionPopupComponent {
   @Input() controlVersion!: Date;
   @Output() close = new EventEmitter<void>();
   @Output() planifier = new EventEmitter<any>();
-  @Input() frequence!: string;
+  @Input() frequence!: Range;
   @Input() isEditing = false;
   @Input() executionToEdit?: ControlExecution;
   @Input() lastPlannedAt?: string | Date | null;
@@ -71,7 +72,7 @@ export class PlanifierExecutionPopupComponent {
 
   initFormForEditing() {
     const exec = this.executionToEdit!;
-    const userId = this.utilisateurs.find(u => u.username === exec.performedBy)?.id ?? null;
+    const userId = this.utilisateurs.find(u => u.username === exec.performedById) ?? null;
 
     this.form.patchValue({
       evaluator: userId,
@@ -116,7 +117,7 @@ export class PlanifierExecutionPopupComponent {
   }
 
 
-  private calculerDatePlanifieeParDefaut(date: Date, freq: string | undefined): string {
+  private calculerDatePlanifieeParDefaut(date: Date, freq: Range): string {
     if (!freq) return date.toISOString().substring(0, 10);
 
     const d = {
@@ -126,7 +127,7 @@ export class PlanifierExecutionPopupComponent {
       QUARTERLY: addMonths(date, 3),
       SEMESTERLY: addMonths(date, 6),
       YEARLY: addMonths(date, 12),
-    }[freq];
+    }[freq.id];
 
     return d?.toISOString().substring(0, 10) ?? date.toISOString().substring(0, 10);
   }

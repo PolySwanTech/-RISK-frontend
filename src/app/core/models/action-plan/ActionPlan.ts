@@ -29,7 +29,6 @@ export type ActionPlanCreationDto = Omit<
     | 'id'
     | 'reference'
     | 'user'
-    | 'teamInCharge'
     | 'risk'
     | 'incident'
     | 'createdAt'
@@ -37,7 +36,6 @@ export type ActionPlanCreationDto = Omit<
     | 'actions'
     | 'actif'
 > & {
-    userInCharge: string;   // UUID côté back
     taxonomieId: string;    // UUID côté back
     incidentId?: string;    // UUID côté back, optionnel
 };

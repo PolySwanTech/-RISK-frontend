@@ -29,7 +29,7 @@ export class SelectEntitiesComponent {
   selectedEntity: any;
   @Output() entitieSelected = new EventEmitter<any>();
 
-  aucunEntite = new BusinessUnit('', 'Aucun', false, [], null);
+  aucunEntite = new BusinessUnit();
 
   constructor(
     private entitiesService: EntitiesService) {

@@ -1,15 +1,14 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ControlEvaluation, ControlEvaluationView } from '../../../../core/models/dmr/ControlEvaluation';
-import { Evaluation } from '../../../../core/enum/evaluation.enum';
+import { ControlEvaluationCreateDto, ControlEvaluationDto } from '../../../../core/models/dmr/ControlEvaluation';
 import { ControlService } from '../../../../core/services/dmr/control/control.service';
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { ControlExecution } from '../../../../core/models/dmr/ControlExecution';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
-import { ReviewStatus, ReviewStatusLabels } from '../../../../core/enum/reviewStatus.enum';
+import { ReviewStatus } from '../../../../core/enum/reviewStatus.enum';
 import { MatIcon } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { TargetType } from '../../../../core/enum/targettype.enum';
@@ -29,7 +28,7 @@ type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   showAsCard: boolean = false;
-  evaluationView: ControlEvaluationView | null = null;
+  evaluationView: ControlEvaluationDto | null = null;
   executionId!: string;
   canValidate: boolean = false;
 
@@ -45,12 +44,12 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   mode: PopupMode = 'FORM';
   controlId : string = '';
   blockers: ControlExecution[] = [];
-  evalDetails?: ControlEvaluationView;
+  evalDetails?: ControlEvaluationDto;
   reviewComment = '';
 
-  evaluationData: ControlEvaluation = {
+  evaluationData: ControlEvaluationCreateDto = {
     executionId: '',
-    evaluation: Evaluation.MEDIUM,
+    evaluation: EvaluationControl.PARTIELLEMENT_CONFORME,
     resume: '',
     comments: ''
   };
@@ -107,7 +106,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     this.evalDetails = undefined;
     this.reviewComment = '';
     this.controlService.getEvaluationByExecution(executionId).subscribe({
-      next: (res: any) => { this.evalDetails = res as ControlEvaluationView; },
+      next: (res: any) => { this.evalDetails = res as ControlEvaluationDto; },
       error: () => {
         this.confirmService.openConfirmDialog("Cette execution n'a pas encore d'évalutation soumise.", "", false).subscribe();
         this.evaluationData.executionId = executionId;
@@ -119,7 +118,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   startEvaluationFor(executionId: string): void {
     this.evaluationData = {
       executionId,
-      evaluation: Evaluation.MEDIUM,
+      evaluation: EvaluationControl.PARTIELLEMENT_CONFORME,
       resume: '',
       comments: ''
     };
@@ -188,7 +187,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     const v = this.evaluationView;
     if (!v) return false;
     return (v.reviewStatus === 'APPROVED' || v.reviewStatus === 'REEXAM_REQUESTED'
-      || !!v.reviewedAt || !!v.reviewedBy || !!v.reviewComment);
+      || !!v.reviewedAt || !!v.reviewedById || !!v.reviewComment);
   }
   get reviewBadgeClass(): string {
     const s = this.evaluationView?.reviewStatus;
@@ -199,7 +198,8 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
     return 'pill-default';
   }
  get reviewBadgeLabel(): string {
-     const s = this.evaluationView?.reviewStatus;
-     return s ? ReviewStatusLabels[s] : '—';
+    //  const s = this.evaluationView?.reviewStatus;
+    //  return s ? ReviewStatusLabels[s] : '—';
+     return '—';
    }
 }

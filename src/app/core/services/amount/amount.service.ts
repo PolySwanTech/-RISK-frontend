@@ -1,11 +1,8 @@
-// src/app/services/amount.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-
-// Adapte ces chemins selon ton projet
-import { AmountDto, CreateAmountDto } from '../../models/Amount';
+import { AmountListDto, CreateAmountDto } from '../../models/Amount';
 import { ReviewStatus } from '../../enum/reviewStatus.enum';
 
 @Injectable({ providedIn: 'root' })
@@ -14,16 +11,16 @@ export class AmountService {
   private baseUrl = `${environment.apiUrl}/amounts`;
 
   /** POST /amounts/operating-losses/{operatingLossId} */
-  create(operatingLossId: string, dto: CreateAmountDto): Observable<AmountDto> {
-    return this.http.post<AmountDto>(
+  create(operatingLossId: string, dto: CreateAmountDto){
+    return this.http.post<CreateAmountDto>(
       `${this.baseUrl}/operating-losses/${operatingLossId}`,
       dto
     );
   }
 
   /** GET /amounts/operating-losses/{operatingLossId} */
-  listByOperatingLoss(operatingLossId: string, all? : boolean): Observable<AmountDto[]> {
-    return this.http.get<AmountDto[]>(
+  listByOperatingLoss(operatingLossId: string, all? : boolean): Observable<AmountListDto[]> {
+    return this.http.get<AmountListDto[]>(
       all ? `${this.baseUrl}/operating-losses/${operatingLossId}?all=${all}` : `${this.baseUrl}/operating-losses/${operatingLossId}`
     );
   }

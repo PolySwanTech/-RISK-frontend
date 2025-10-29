@@ -8,7 +8,7 @@ import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 
 import { OperatingLossFamily } from '../../../../core/enum/operatingLossFamily.enum';
-import { Amount, AmountDto, AmountTypeDto, CreateAmountDto } from '../../../../core/models/Amount';
+import { AmountListDto, AmountTypeDto, CreateAmountDto } from '../../../../core/models/Amount';
 import { OperatingLossTypeDto, CreateOperatingLossDto, OperatingLoss } from '../../../../core/models/OperatingLoss';
 import { AmountTypeService } from '../../../../core/services/amount/amount-type.service';
 import { AmountService } from '../../../../core/services/amount/amount.service';
@@ -29,7 +29,7 @@ import { ConfirmService } from '../../../../core/services/confirm/confirm.servic
 interface FinancialImpactDetail {
   amountType: string | null;
   accountingReference: string;
-  accountingDate: string;
+  accountingDate: Date | undefined;
   amount: string;
 }
 interface FinancialImpact {
@@ -99,7 +99,7 @@ export class CreateOperationalImpactComponent implements OnInit {
   nonFinancialAmountTypes: AmountTypeDto[] = [];
   estimeAmountType: AmountTypeDto | null = null;
 
-  newAmounts: Record<string, { amountType: string | null; accountingReference: string; accountingDate: string; amount: string }> = {};
+  newAmounts: Record<string, { amountType: string | null; accountingReference: string; accountingDate: Date | undefined; amount: string }> = {};
   showAddAmountForm: Record<string, boolean> = {};
 
   // ---------- Expansion ----------
@@ -113,7 +113,7 @@ export class CreateOperationalImpactComponent implements OnInit {
   existingOperatingLosses: OperatingLoss[] = [];
   existingFinancialLosses: OperatingLoss[] = [];
   existingNonFinancialLosses: OperatingLoss[] = [];
-  existingAmounts: Record<string, Amount[]> = {};
+  existingAmounts: Record<string, AmountListDto[]> = {};
   selectedImpacts: Record<string, boolean> = {};
   selectedAmounts: Record<string, Record<string, boolean>> = {};
   trackByIdString = (_: number, item: { id: string }) => item.id;
@@ -200,19 +200,19 @@ export class CreateOperationalImpactComponent implements OnInit {
           businessUnitId: this.currentBusinessUnitId ? this.currentBusinessUnitId : '',
           type: null,
           description: '',
-          details: [{ amountType: null, accountingReference: '', accountingDate: '', amount: '' }],
+          details: [{ amountType: null, accountingReference: '', accountingDate: undefined, amount: '' }],
         },
       ],
     };
   }
   addFinancialDetail(i: number) {
-    this.formData.financialImpacts[i].details.push({ amountType: null, accountingReference: '', accountingDate: '', amount: '' });
+    this.formData.financialImpacts[i].details.push({ amountType: null, accountingReference: '', accountingDate: undefined, amount: '' });
   }
   removeFinancialDetail(i: number, j: number) {
     this.formData.financialImpacts[i].details.splice(j, 1);
   }
 
-  toggleImpactSelection(impactId: string, amounts: Amount[]) {
+  toggleImpactSelection(impactId: string, amounts: AmountListDto[]) {
     const newState = !this.selectedImpacts[impactId];
     this.selectedImpacts[impactId] = newState;
 
@@ -223,7 +223,7 @@ export class CreateOperationalImpactComponent implements OnInit {
     amounts.forEach(a => this.selectedAmounts[impactId][a.id] = newState);
   }
 
-  trackByAmountId(index: number, amount: Amount) {
+  trackByAmountId(index: number, amount: AmountListDto) {
     return amount.id;
   }
 
@@ -245,7 +245,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     // init form si pas encore fait
     if (!this.newAmounts[operatingLossId]) {
-      this.newAmounts[operatingLossId] = { amountType: null, accountingReference: '', accountingDate: '', amount: '' };
+      this.newAmounts[operatingLossId] = { amountType: null, accountingReference: '', accountingDate: undefined, amount: '' };
     }
   }
 
@@ -269,8 +269,9 @@ export class CreateOperationalImpactComponent implements OnInit {
     const dto: CreateAmountDto = {
       amountType: form.amountType,
       montant: +form.amount,
-      comptabilityRef: form.accountingReference || null,
-      comptabilisationDate: form.accountingDate || null,
+      comptabilityRef: form.accountingReference || undefined,
+      comptabilisationDate: form.accountingDate || undefined,
+      operatingLossId: operatingLossId
     };
 
     this.amountService.create(operatingLossId, dto)
@@ -383,9 +384,9 @@ export class CreateOperationalImpactComponent implements OnInit {
               switchMap(() => {
                 // recharger les montants de l’impact
                 return this.amountService.listByOperatingLoss(impactId).pipe(
-                  catchError(() => of([] as AmountDto[])),
+                  catchError(() => of([] as AmountListDto[])),
                   switchMap(amountDtos => {
-                    this.existingAmounts[impactId] = amountDtos.map(a => Amount.fromDto(a));
+                    this.existingAmounts[impactId] = amountDtos;
                     return of(null);
                   })
                 );
@@ -422,10 +423,9 @@ export class CreateOperationalImpactComponent implements OnInit {
       });
   }
 
-  loadAmountsForOperatingLoss(operatingLossId: string): Observable<Amount[]> {
+  loadAmountsForOperatingLoss(operatingLossId: string): Observable<AmountListDto[]> {
     return this.amountService.listByOperatingLoss(operatingLossId).pipe(
-      catchError(() => of([] as AmountDto[])),
-      map(amountDtos => amountDtos.map(a => Amount.fromDto(a))),
+      catchError(() => of([] as AmountListDto[])),
       tap(amounts => {
         this.existingAmounts[operatingLossId] = amounts;
       })
@@ -510,9 +510,9 @@ export class CreateOperationalImpactComponent implements OnInit {
           }),
           switchMap(() =>
             this.amountService.listByOperatingLoss(impactId).pipe(
-              catchError(() => of([] as AmountDto[])),
+              catchError(() => of([] as AmountListDto[])),
               switchMap(amountDtos => {
-                this.existingAmounts[impactId] = amountDtos.map(a => Amount.fromDto(a));
+                this.existingAmounts[impactId] = amountDtos;
                 return of(null);
               })
             )
@@ -573,7 +573,7 @@ export class CreateOperationalImpactComponent implements OnInit {
             'Chaque détail doit avoir un type de montant et un montant numérique.';
         }
         const dateInvalid = imp.details.some(
-          (d) => d.accountingDate && !/^\d{4}-\d{2}-\d{2}$/.test(d.accountingDate)
+          (d) => d.accountingDate && !/^\d{4}-\d{2}-\d{2}$/.test(d.accountingDate.toString())
         );
         if (dateInvalid) {
           newErrors[`financial_details_${i}`] =
@@ -621,8 +621,9 @@ export class CreateOperationalImpactComponent implements OnInit {
           const amountDto: CreateAmountDto = {
             amountType: d.amountType!,
             montant: +d.amount,
-            comptabilityRef: d.accountingReference || null,
-            comptabilisationDate: d.accountingDate || null,
+            comptabilityRef: d.accountingReference || undefined,
+            comptabilisationDate: d.accountingDate || undefined,
+            operatingLossId: operatingLossId
           };
           return this.amountService.create(operatingLossId, amountDto);
         });
@@ -676,8 +677,9 @@ export class CreateOperationalImpactComponent implements OnInit {
         const amountDto: CreateAmountDto = {
           amountType: this.estimeAmountType!.libelle,
           montant: +impact.amount,
-          comptabilityRef: null,
-          comptabilisationDate: null,
+          comptabilityRef: "",
+          comptabilisationDate: undefined,
+          operatingLossId: operatingLossId
         };
         return this.amountService.create(operatingLossId, amountDto);
       }),

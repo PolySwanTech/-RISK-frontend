@@ -16,7 +16,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf, NgFor } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ConsequenceService } from '../../../core/services/consequence/consequence.service';
-import { Consequence } from '../../../core/models/Consequence';
 import { RiskCategoryService } from '../../../core/services/risk/risk-category.service';
 import { Cause } from '../../../core/models/Cause';
 import { CauseService } from '../../../core/services/cause/cause.service';
@@ -134,8 +133,6 @@ export class CreateComponent implements OnInit, OnDestroy {
   errorMessage = signal('');
   hasTeam = true;
   listTeams: any[] = [];
-
-  listConsequence: Consequence[] = [];
 
   listCauses: Cause[] = [];
 

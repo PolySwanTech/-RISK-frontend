@@ -5,8 +5,8 @@ export interface Action {
     id: string;
     name: string;
     createdAt: Date;
-    performedBy: Utilisateur;
-    performedAt: Date;
+    performedBy: Utilisateur | undefined;
+    performedAt: Date | undefined;
     reviewStatus: ReviewStatus
     actif: boolean;
 }

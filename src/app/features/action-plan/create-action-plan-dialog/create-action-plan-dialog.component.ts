@@ -1,5 +1,5 @@
 import { Component, Inject, inject, OnInit } from '@angular/core';
-import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/action-plan/ActionPlan';
+import { ActionPlan, ActionPlanCreationDto } from '../../../core/models/action-plan/ActionPlan';
 import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
@@ -13,7 +13,6 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Status } from '../../../core/enum/status.enum';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,6 +21,8 @@ import { MatCardModule } from '@angular/material/card';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
+import { ActionCreationDto } from '../../../core/models/action-plan/Action';
+import { ReviewStatus } from '../../../core/enum/reviewStatus.enum';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -57,11 +58,9 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   risks: RiskTemplate[] = [];
 
-  actionPlan: ActionPlan = new ActionPlan(
-    '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', '', null, '', new Date(), true);
+  actionPlan: ActionPlan | null = null;
 
-  actions: Action[] = []
+  actions: ActionCreationDto[] = []
 
   ngOnInit(): void {
     this.fetchTeams();
@@ -73,20 +72,21 @@ export class CreateActionPlanDialogComponent implements OnInit {
   }
 
   getRisk() {
-  if (this.data && this.data.incidentId) {
-    // Récupère le risque de l'incident
-    this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
-      this.actionPlan.taxonomie = risk;
-      // Ici, on met à jour la liste des risques pour afficher l'élément de l'incident
-      this.risks = [risk]; // Si tu veux que la liste contienne uniquement ce risque
-    });
-  } else {
-    // Si pas d'incident, récupère tous les risques
-    this.riskService.getAll().subscribe(data => {
-      this.risks = data;
-    });
+    if (!this.actionPlan) return
+    if (this.data && this.data.incidentId) {
+      // Récupère le risque de l'incident
+      this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
+        this.actionPlan!.risk = risk;
+        // Ici, on met à jour la liste des risques pour afficher l'élément de l'incident
+        this.risks = [risk]; // Si tu veux que la liste contienne uniquement ce risque
+      });
+    } else {
+      // Si pas d'incident, récupère tous les risques
+      this.riskService.getAll().subscribe(data => {
+        this.risks = data;
+      });
+    }
   }
-}
 
 
   fetchTeams(): void {
@@ -107,10 +107,18 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Ajouter une action à la liste
   addAction() {
-    this.actions.push(new Action('', '', new Date(), '', '', ''));
+    let action : ActionCreationDto = {
+      actionPlanId : "",
+      name : "",
+      performedAt : undefined,
+      performedBy : undefined,
+      actif : true,
+      reviewStatus : ReviewStatus.PENDING
+    }
+    this.actions.push(action);
   }
 
-  updateAction(index: number, action: Action) {
+  updateAction(index: number, action: ActionCreationDto) {
     // Mettre à jour l'action à l'index spécifié
     this.actions[index] = action;
   }
@@ -122,16 +130,17 @@ export class CreateActionPlanDialogComponent implements OnInit {
 
   // Soumettre le plan d'action
   submitActionPlan() {
+    if (!this.actionPlan) return;
     const incidentId = this.data?.incidentId ?? undefined;
 
-    const dto: ActionPlanCreateDto = {
+    const dto: ActionPlanCreationDto = {
       libelle: this.actionPlan.libelle,
       description: this.actionPlan.description,
       status: this.actionPlan.status,
       priority: this.actionPlan.priority,
       echeance: this.actionPlan.echeance,
-      userInCharge: this.actionPlan.userInCharge,
-      taxonomieId: this.actionPlan.taxonomie?.id ?? null,
+      teamInCharge: this.actionPlan.teamInCharge,
+      taxonomieId: this.actionPlan.risk.id ?? null,
       incidentId               // undefined si pas d’incident
     };
 

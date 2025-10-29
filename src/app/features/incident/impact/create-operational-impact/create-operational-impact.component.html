@@ -209,14 +209,14 @@
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Référence comptable</label>
                         <span class="op-display-field">
-                          {{ amount.comptabilityRef || 'N/R' }}
+                          {{ amount.createdAt || 'N/R' }}
                         </span>
                       </div>
 
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Date de comptabilisation</label>
                         <span class="op-display-field">
-                          {{ amount.comptabilisationDate ? (amount.comptabilisationDate | date: "dd/MM/yyyy") : 'N/R' }}
+                          {{ amount.createdAt ? (amount.createdAt | date: "dd/MM/yyyy") : 'N/R' }}
                         </span>
                       </div>
 
@@ -448,7 +448,7 @@
                       </div>
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Date</label>
-                        <input class="op-input" [value]="(amount.comptabilisationDate | date:'dd/MM/yyyy') || 'N/R'"
+                        <input class="op-input" [value]="(amount.createdAt| date:'dd/MM/yyyy') || 'N/R'"
                           disabled />
                       </div>
                       <div class="op-field" style="flex: 1;">

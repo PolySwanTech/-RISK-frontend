@@ -8,7 +8,7 @@ export interface Amount {
   amountType: AmountTypeDto;
   montant: number;
   comptabilityRef?: string;
-  comptabilisationDate: Date;
+  comptabilisationDate: Date | undefined;
   reviewStatus: ReviewStatus;
   createdAt: Date;
   creator: Utilisateur;

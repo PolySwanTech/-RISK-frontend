@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { ControlTemplate, ControlTemplateCreateDto } from '../../../models/dmr/ControlTemplate';
 import { ControlExecution } from '../../../models/dmr/ControlExecution';
-import { ControlEvaluation } from '../../../models/dmr/ControlEvaluation';
+import { ControlEvaluationCreateDto } from '../../../models/dmr/ControlEvaluation';
 import { Observable } from 'rxjs';
 import { ControlMethodology, ControlMethodologyCreateDto } from '../../../models/dmr/ControlMethodology';
 import { map } from 'rxjs/operators';
@@ -56,7 +56,7 @@ export class ControlService {
     return this.http.put(`${this.baseUrlExec}/update`, data);
   }
 
-  createEvaluation(evaluation: ControlEvaluation): Observable<any> {
+  createEvaluation(evaluation: ControlEvaluationCreateDto): Observable<any> {
     return this.http.post(`${this.baseUrlEval}`, evaluation);
   }
 

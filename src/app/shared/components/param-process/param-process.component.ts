@@ -30,6 +30,8 @@ export class ProcessManagerComponent implements OnInit {
   newSubprocesses: Array<{ name: string }> = [];
   riskDispatch: { [riskId: string]: number } = {};
 
+  processToggled: Map<string, boolean> = new Map();
+
   viewedRisks: RiskTemplate[] = []
 
   buId: string = ''
@@ -128,7 +130,10 @@ export class ProcessManagerComponent implements OnInit {
 
   toggleExpand(process: Process, event: Event) {
     event.stopPropagation();
-    process.expanded = !process.expanded;
+    // récupère la valeur actuelle ou false si undefined
+    const current = this.processToggled.get(process.id) ?? false;
+    // met la valeur inverse dans la map
+    this.processToggled.set(process.id, !current);
   }
 
   getLevelLabel(level: number | undefined): string {
@@ -189,11 +194,9 @@ export class ProcessManagerComponent implements OnInit {
     if (!this.selectedProcess || !this.canConfirmDispatch()) return;
 
     const newChildren: Process[] = this.newSubprocesses.map((sp, index) => {
-      const child = new Process(
-        sp.name,
-        this.selectedProcess!.bu,
-        this.selectedProcess!.id
-      );
+      const child = new Process()
+      child.name = sp.name;
+      child.buName = this.selectedProcess!.buName;
       return child;
     });
 

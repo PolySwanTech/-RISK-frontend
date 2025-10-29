@@ -71,7 +71,7 @@ export class ExecutionsListComponent {
     {
       columnDef: 'priority',
       header: 'Priorité',
-      cell: (execution: ControlExecution) => this.getPriorityBarHtml(execution.priority),
+      cell: (execution: ControlExecution) => this.getPriorityBarHtml(execution.priority || null),
       filterType: 'select',
       icon: 'priority_high'
     },
@@ -93,24 +93,24 @@ export class ExecutionsListComponent {
       filterType: 'date',
       icon: 'event_available'
     },
-    {
-      columnDef: 'evaluation',
-      header: 'Évaluation',
-      cell: (execution: ControlExecution) => `<span class="badge ${this.getEvalClass(execution.evaluation)}">
-       ${EvaluationControlLabels[execution.evaluation] || ''}
-     </span>`,
-      filterType: 'select',
-      icon: 'grading',
-      options: [
-        { value: EvaluationControl.CONFORME, label: EvaluationControlLabels[EvaluationControl.CONFORME] || '' },
-        { value: EvaluationControl.PARTIELLEMENT_CONFORME, label: EvaluationControlLabels[EvaluationControl.PARTIELLEMENT_CONFORME] || '' },
-        { value: EvaluationControl.NON_CONFORME, label: EvaluationControlLabels[EvaluationControl.NON_CONFORME] || '' }
-      ]
-    },
+    // {
+    //   columnDef: 'evaluation',
+    //   header: 'Évaluation',
+    //   cell: (execution: ControlExecution) => `<span class="badge ${this.getEvalClass(execution.evaluations)}">
+    //    ${EvaluationControlLabels[execution.evaluations] || ''}
+    //  </span>`,
+    //   filterType: 'select',
+    //   icon: 'grading',
+    //   options: [
+    //     { value: EvaluationControl.CONFORME, label: EvaluationControlLabels[EvaluationControl.CONFORME] || '' },
+    //     { value: EvaluationControl.PARTIELLEMENT_CONFORME, label: EvaluationControlLabels[EvaluationControl.PARTIELLEMENT_CONFORME] || '' },
+    //     { value: EvaluationControl.NON_CONFORME, label: EvaluationControlLabels[EvaluationControl.NON_CONFORME] || '' }
+    //   ]
+    // },
     {
       columnDef: 'performedBy',
       header: 'Exécuté par',
-      cell: (execution: ControlExecution) => execution.performedBy || '',
+      cell: (execution: ControlExecution) => execution.performedById || '',
       filterType: 'text',
       icon: 'person'
     },
@@ -166,7 +166,8 @@ export class ExecutionsListComponent {
     }
   }
 
-  getPriorityBarHtml(priority: Priority): string {
+  getPriorityBarHtml(priority: Priority | null): string {
+    if(priority == null) return ""
     const priorityConfig = {
       [Priority.MAXIMUM]: {
         label: 'Maximale',

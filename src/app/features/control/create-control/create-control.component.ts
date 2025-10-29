@@ -14,12 +14,12 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplateCreateDto } from '../../../core/models/dmr/ControlTemplate';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
+import { ControlDegree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Priority, PriorityLabels } from '../../../core/enum/Priority';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { ControlType, ControlTypeLabels } from '../../../core/enum/controltype.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
@@ -75,8 +75,8 @@ export class CreateControlComponent {
   listEntities: any[] = [];
 
   priorities = Object.values(Priority);
-  types = Object.values(Type);
-  levels = Object.values(Degree);
+  types = Object.values(ControlType);
+  levels = Object.values(ControlDegree);
 
   selectedBPR: any;
 
@@ -91,7 +91,7 @@ export class CreateControlComponent {
   ngOnInit() {
   }
 
-  getTypeLabel(type: Type): string {
+  getTypeLabel(type: ControlType): string {
     return ControlTypeLabels[type];
   }
 
@@ -99,7 +99,7 @@ export class CreateControlComponent {
     return PriorityLabels[priority];
   }
 
-  getDegresLabel(d: Degree): string {
+  getDegresLabel(d: ControlDegree): string {
     return DegreeLabels[d];
   }
 
@@ -115,9 +115,7 @@ export class CreateControlComponent {
       description: this.form.value.description,
       frequency: this.form.value.frequency,
       controlType: this.form.value.type,
-      processId: this.form.value.processId,
       level: this.form.value.level,
-      priority: this.form.value.priority,
       riskId: this.form.value.riskId,
     };
 

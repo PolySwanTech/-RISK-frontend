@@ -11,7 +11,7 @@
           <div class="process-item" [class.selected]="selectedProcess?.id === process.id"
             (click)="selectProcess(process)">
             <span class="toggle" (click)="toggleExpand(process, $event)">
-              {{ process.enfants && process.enfants.length > 0 ? (process.expanded ? '▼' : '▶') : '•' }}
+              {{ process.enfants && process.enfants.length > 0 ? (processToggled.get(process.id) ? '▼' : '▶') : '•' }}
             </span>
             <span class="process-name">{{ process.name }}</span>
             <span class="badge" [class]="'badge-' + process.niveau">{{ getLevelLabel(process.niveau) }}</span>
@@ -19,7 +19,7 @@
               {{ process.risks.length }} risque(s)
             </span>
           </div>
-          <div *ngIf="process.expanded" class="children">
+          <div *ngIf="processToggled.get(process.id)" class="children">
             <ng-container *ngTemplateOutlet="processTree; context: {$implicit: process.enfants}"></ng-container>
           </div>
         </div>

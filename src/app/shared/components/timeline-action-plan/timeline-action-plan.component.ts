@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit, OnDestroy, Input } from "@angular/core";
-import { ActionPlan } from "../../../core/models/action-plan/ActionPlan";
+import { ActionPlanDto } from "../../../core/models/action-plan/ActionPlan";
 
 interface TimelinePoint {
   date: Date;
@@ -24,7 +24,7 @@ interface TimelineSegment {
 })
 export class TimelineActionPlanComponent implements OnInit, OnDestroy {
 
-  @Input() actionPlan : ActionPlan | null = null;
+  @Input() actionPlan : ActionPlanDto | null = null;
   
   creationDate: Date = new Date();
   dueDate: Date =  new Date();

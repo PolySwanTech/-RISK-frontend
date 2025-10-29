@@ -17,7 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
-import { ActionPlan } from "../../core/models/action-plan/ActionPlan";
+import { ActionPlan, ActionPlanListDto } from "../../core/models/action-plan/ActionPlan";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
 import { Priority, PriorityLabels } from '../../core/enum/Priority';
 import { Status, StatusLabels } from '../../core/enum/status.enum';
@@ -54,42 +54,42 @@ export class PlanActionPageComponent implements OnInit {
     {
       columnDef: 'reference',
       header: 'Référence',
-      cell: (element: ActionPlan) => `${element.reference}`,
+      cell: (element: ActionPlanListDto) => `${element.reference}`,
       filterType: 'text',
       icon: 'tag' // 🏷️
     },
     {
       columnDef: 'ref_incident',
       header: 'Référence Incident',
-      cell: (element: ActionPlan) => `${element.incidentRef != '' ? element.incidentRef : 'N/A'}`,
+      cell: (element: ActionPlanListDto) => `${element.incidentRef ? element.incidentRef : 'N/A'}`,
       filterType: 'text',
       icon: 'tag' // 🏷️
     },
     {
       columnDef: 'libelle',
       header: 'Titre',
-      cell: (element: ActionPlan) => `${element.libelle}`,
+      cell: (element: ActionPlanListDto) => `${element.libelle}`,
       filterType: 'text',
       icon: 'title' // 📝
     },
     {
       columnDef: 'userInCharge',
       header: 'Responsable',
-      cell: (element: ActionPlan) => `${element.userInCharge}`,
+      cell: (element: ActionPlanListDto) => `${element.userInCharge ? element.userInCharge : 'N/A'}`,
       filterType: 'text',
       icon: 'person' // 👤
     },
     {
       columnDef: 'echeance',
       header: 'Date d\'échéance',
-      cell: (element: ActionPlan) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
+      cell: (element: ActionPlanListDto) => this.datePipe.transform(element.echeance, 'dd/MM/yyyy') || '',
       filterType: 'date',
       icon: 'event' // 📅
     },
     {
       columnDef: 'priority',
       header: 'Priorité',
-      cell: (element: ActionPlan) => this.getPriorityBarHtml(element.priority),
+      cell: (element: ActionPlanListDto) => this.getPriorityBarHtml(element.priority),
       filterType: 'select',
       icon: 'signal_cellular_alt', // 📶
       options: [
@@ -101,7 +101,7 @@ export class PlanActionPageComponent implements OnInit {
     {
       columnDef: 'status',
       header: 'Statut',
-      cell: (element: ActionPlan) => `
+      cell: (element: ActionPlanListDto) => `
       <span class="badge ${element.status.toLowerCase()}">
         ${this.getReadableStatut(element.status)}
       </span>
@@ -123,7 +123,7 @@ export class PlanActionPageComponent implements OnInit {
 
   dataSource = new MatTableDataSource<any>([]);
 
-  actionPlans: ActionPlan[] = [];
+  actionPlans: ActionPlanListDto[] = [];
 
   priorities = Object.values(Priority);
   statuses = Object.values(Status);
@@ -305,31 +305,31 @@ export class PlanActionPageComponent implements OnInit {
     }
 
     // 4. Recherche textuelle
-    if (this.searchQuery && this.searchQuery.trim() != '') {
-      const query = this.searchQuery.toLowerCase();
-      filteredData = filteredData.filter(actionPlan => {
-        const idMatches = actionPlan.reference?.toString().toLowerCase().includes(query);
-        const creatorMatches = actionPlan.creator?.toLowerCase().includes(query);
-        const nameMatches = actionPlan.libelle?.toLowerCase().includes(query);
-        const descriptionMatches = actionPlan.description?.toLowerCase().includes(query);
-        const responsableMatches = actionPlan.userInCharge?.toLowerCase().includes(query);
-        const priorityMatches = actionPlan.priority?.toLowerCase().includes(query);
+    // if (this.searchQuery && this.searchQuery.trim() != '') {
+    //   const query = this.searchQuery.toLowerCase();
+    //   filteredData = filteredData.filter(actionPlan => {
+    //     const idMatches = actionPlan.reference?.toString().toLowerCase().includes(query);
+    //     const creatorMatches = actionPlan.user.username?.toLowerCase().includes(query);
+    //     const nameMatches = actionPlan.libelle?.toLowerCase().includes(query);
+    //     const descriptionMatches = actionPlan.description?.toLowerCase().includes(query);
+    //     const responsableMatches = actionPlan.teamInCharge.name?.toLowerCase().includes(query);
+    //     const priorityMatches = actionPlan.priority?.toLowerCase().includes(query);
 
-        const date = actionPlan.echeance instanceof Date ? actionPlan.echeance : new Date(actionPlan.echeance);
-        const formattedDate = date.toLocaleDateString('fr-FR');
-        const dateMatches = formattedDate.includes(query);
+    //     const date = actionPlan.echeance instanceof Date ? actionPlan.echeance : new Date(actionPlan.echeance);
+    //     const formattedDate = date.toLocaleDateString('fr-FR');
+    //     const dateMatches = formattedDate.includes(query);
 
-        return (
-          idMatches ||
-          creatorMatches ||
-          nameMatches ||
-          descriptionMatches ||
-          responsableMatches ||
-          priorityMatches ||
-          dateMatches
-        );
-      });
-    }
+    //     return (
+    //       idMatches ||
+    //       creatorMatches ||
+    //       nameMatches ||
+    //       descriptionMatches ||
+    //       responsableMatches ||
+    //       priorityMatches ||
+    //       dateMatches
+    //     );
+    //   });
+    // }
 
     // Mise à jour de la data
     this.dataSource.data = filteredData;
@@ -344,7 +344,8 @@ export class PlanActionPageComponent implements OnInit {
 
 
   loadActionPlans() {
-    this.actionPlanService.getActionsPlan().subscribe((data: ActionPlan[]) => {
+    this.actionPlanService.getActionsPlan().subscribe(data => {
+      console.log(data)
       this.dataSource.data = data;
       this.actionPlans = data;
     });
@@ -394,7 +395,7 @@ export class PlanActionPageComponent implements OnInit {
       if (value === null || value === '' || value === undefined) continue;
 
       filtered = filtered.filter(actionPlan => {
-        const itemValue = actionPlan[key as keyof ActionPlan];
+        const itemValue = actionPlan[key as keyof ActionPlanListDto];
 
         // 🎯 Cas plage de dates
         if (typeof value === 'object' && value.start && value.end) {

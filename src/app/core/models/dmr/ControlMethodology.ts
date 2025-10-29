@@ -12,10 +12,10 @@ export class ControlMethodology {
 }
 
 // DTO pour création
-export type ControlMethodologyCreateDto = Required<Pick<ControlMethodology, 'controlTemplateId' | 'controlNature' | 'executionMode' | 'createdById'>> & Partial<Pick<ControlMethodology, 'scope' | 'sampling'>>;
+export type ControlMethodologyCreateDto = Required<Pick<ControlMethodology, 'controlTemplateId' | 'controlNature' | 'executionMode'>> & Partial<Pick<ControlMethodology, 'scope' | 'sampling'>>;
 
 // DTO pour mise à jour
-export type ControlMethodologyUpdateDto = Partial<Omit<ControlMethodology, 'id' | 'controlTemplateId' | 'createdById'>>;
+export type ControlMethodologyUpdateDto = Partial<Omit<ControlMethodology, 'id' | 'controlTemplateId'>>;
 
 // DTO affichage
 export type ControlMethodologyDto = ControlMethodology;

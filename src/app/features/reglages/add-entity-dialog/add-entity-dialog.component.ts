@@ -32,22 +32,22 @@ export class AddEntityDialogComponent {
     parent: [null]
   });
 
-  BusinessUnit = new BusinessUnit("", '', false, [], null);
+  BusinessUnit = new BusinessUnit();
 
   titlePage = "Création d'une entité responsable";
 
-  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService,
+  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService: EntitiesService,
     @Inject(MAT_DIALOG_DATA) public data: BusinessUnit, private cdRef: ChangeDetectorRef
   ) {
-    this.BusinessUnit = data || new BusinessUnit("", '', false, [], null);
+    this.BusinessUnit = data || new BusinessUnit();
   }
 
   ngOnInit(): void {
-    if(this.data){
+    if (this.data) {
       this.titlePage = "Modification de l'entité responsable : " + this.data.name;
       this.formGroup.get('name')?.setValue(this.data.name);
       this.formGroup.get('lm')?.setValue(this.data.lm);
-      this.formGroup.get('parent')?.setValue(this.data.parent);
+      this.formGroup.get('parent')?.setValue(this.data.parentId);
     }
     setTimeout(() => {
       this.cdRef.detectChanges(); // Force la détection des changements
@@ -68,7 +68,7 @@ export class AddEntityDialogComponent {
   change() {
   }
 
-  goBack(){
+  goBack() {
     this.dialogRef.close();
   }
 }

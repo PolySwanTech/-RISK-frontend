@@ -67,7 +67,7 @@ export class ControlStatusChartComponent implements OnInit, OnDestroy {
     Object.values(Status).forEach(status => (counts[status] = 0));
 
     executions.forEach(exec => {
-      if (exec.status in counts) counts[exec.status]++;
+      if (exec.status && exec.status in counts) counts[exec.status]++;
     });
 
     const labels = Object.values(Status);

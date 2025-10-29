@@ -13,7 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActionPlanService } from '../../core/services/action-plan/action-plan.service';
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Action, ActionPlan } from '../../core/models/action-plan/ActionPlan';
+import { ActionPlanDto } from '../../core/models/action-plan/ActionPlan';
 import { Priority } from '../../core/enum/Priority';
 import { Status } from '../../core/enum/status.enum';
 import { firstValueFrom } from 'rxjs';
@@ -29,6 +29,7 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { AuditButtonComponent } from '../../shared/components/audit/audit-button/audit-button.component';
 import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 import { TimelineActionPlanComponent } from '../../shared/components/timeline-action-plan/timeline-action-plan.component';
+import { Action } from '../../core/models/action-plan/Action';
 
 @Component({
   selector: 'app-plan-action-page-detail',
@@ -54,7 +55,7 @@ export class PlanActionPageDetailComponent implements OnInit {
   private snackBarService = inject(SnackBarService)
   private auditService = inject(AuditService);
 
-  actionPlan: ActionPlan | null = null;
+  actionPlan: ActionPlanDto | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
 
   progressionPercent: number = 0;
@@ -119,7 +120,7 @@ export class PlanActionPageDetailComponent implements OnInit {
           icon: 'play_arrow',
           class: 'btn-purple',
           show: !!canStart,
-          permission: { teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN'] },
+          permission: { teamId: this.actionPlan?.userInCharge, permissions: ['UPDATE_ACTION_PLAN'] },
           action: () => this.startActionPlan()
         },
         {
@@ -127,7 +128,7 @@ export class PlanActionPageDetailComponent implements OnInit {
           icon: 'check',
           class: 'btn-primary',
           show: !!canEnd,
-          permission: { teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN'] },
+          permission: { teamId: this.actionPlan?.userInCharge, permissions: ['UPDATE_ACTION_PLAN'] },
           action: () => this.endActionPlan()
         }
       ];

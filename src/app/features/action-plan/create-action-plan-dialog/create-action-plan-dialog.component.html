@@ -14,7 +14,7 @@
     <!-- Libellé -->
     <mat-form-field appearance="outline">
       <mat-label>Libellé</mat-label>
-      <input matInput [(ngModel)]="actionPlan.libelle" name="libelle" required>
+      <input matInput [(ngModel)]="actionPlan!.libelle" name="libelle" required>
       <button mat-icon-button matSuffix matTooltip="Titre ou nom du plan d'action.">
         <mat-icon>info</mat-icon>
       </button>
@@ -23,7 +23,7 @@
     <!-- Description -->
     <mat-form-field appearance="outline">
       <mat-label>Description</mat-label>
-      <textarea matInput [(ngModel)]="actionPlan.description" name="description" required></textarea>
+      <textarea matInput [(ngModel)]="actionPlan!.description" name="description" required></textarea>
       <button mat-icon-button matSuffix matTooltip="Détails sur le plan d'action.">
         <mat-icon>info</mat-icon>
       </button>
@@ -33,7 +33,7 @@
       <!-- Priorité -->
       <mat-form-field appearance="outline">
         <mat-label>Priorité</mat-label>
-        <mat-select [(ngModel)]="actionPlan.priority" name="priority">
+        <mat-select [(ngModel)]="actionPlan!.priority" name="priority">
           <mat-option *ngFor="let priority of priorities" [value]="priority">
             {{ formatPriority(priority) }}
           </mat-option>
@@ -46,7 +46,7 @@
       <!-- Risk -->
       <mat-form-field appearance="outline">
         <mat-label>Risque</mat-label>
-        <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}"
+        <mat-select [(ngModel)]="actionPlan!.risk" name="risk" [ngModelOptions]="{standalone: true}"
           [disabled]="data && data.incidentId">
           <mat-option *ngFor="let risk of risks" [value]="risk">
             {{ risk.riskReferentiel.libelle }}
@@ -62,7 +62,7 @@
       <!-- Échéance -->
       <mat-form-field appearance="outline">
         <mat-label>Échéance</mat-label>
-        <input matInput [matDatepicker]="pickerEcheance" [(ngModel)]="actionPlan.echeance" name="echeance" required>
+        <input matInput [matDatepicker]="pickerEcheance" [(ngModel)]="actionPlan!.echeance" name="echeance" required>
         <mat-datepicker-toggle matSuffix [for]="pickerEcheance"></mat-datepicker-toggle>
         <mat-datepicker #pickerEcheance></mat-datepicker>
         <button mat-icon-button matSuffix matTooltip="Date limite de réalisation du plan.">
@@ -73,7 +73,7 @@
       <!-- Équipe -->
       <mat-form-field appearance="outline">
         <mat-label>Choisissez une équipe</mat-label>
-        <mat-select [(ngModel)]="actionPlan.userInCharge" [ngModelOptions]="{standalone: true}">
+        <mat-select [(ngModel)]="actionPlan!.teamInCharge" [ngModelOptions]="{standalone: true}">
           <mat-option *ngFor="let team of listTeams" [value]="team.id">
             {{ team.name }}
           </mat-option>

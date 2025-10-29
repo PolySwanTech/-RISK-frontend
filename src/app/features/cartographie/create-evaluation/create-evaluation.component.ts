@@ -16,17 +16,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { ControlTemplate } from '../../../core/models/dmr/ControlTemplate';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
-import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
-import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { ControlDegree, DegreeLabels } from '../../../core/enum/degree.enum';
+import { ControlType, ControlTypeLabels } from '../../../core/enum/controltype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
-import { Range } from '../matrix-settings/matrix-settings.component';
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 import { AttenuationMetrics } from '../../../core/models/dmr/AttenuationMetrics';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
+import { Range } from '../../../core/models/range';
 
 interface Indicator {
   frequenceId: number;
@@ -137,11 +137,11 @@ export class CreateEvaluationComponent implements OnInit {
     return RecurrenceLabels[rec];
   }
 
-  getDegreeLabels(degree: Degree) {
+  getDegreeLabels(degree: ControlDegree) {
     return DegreeLabels[degree];
   }
 
-  getControlTypeLabels(controlType: Type) {
+  getControlTypeLabels(controlType: ControlType) {
     return ControlTypeLabels[controlType];
   }
 

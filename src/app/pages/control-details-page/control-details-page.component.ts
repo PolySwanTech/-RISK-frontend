@@ -4,9 +4,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { Status, StatusLabels } from '../../core/enum/status.enum';
 import { ControlService } from '../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../core/models/dmr/ControlTemplate';
+import { ControlTemplateDto } from '../../core/models/dmr/ControlTemplate';
 import { ControlExecution } from '../../core/models/dmr/ControlExecution';
-import { ControlEvaluationView } from '../../core/models/dmr/ControlEvaluation';
 
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
 import { GoBackButton, GoBackComponent } from '../../shared/components/go-back/go-back.component';
@@ -19,6 +18,7 @@ import { EvaluationCardComponent } from './evaluation-card/evaluation-card.compo
 import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 import { AuthService } from '../../core/services/auth/auth.service';
+import { ControlEvaluationDto } from '../../core/models/dmr/ControlEvaluation';
 
 @Component({
   selector: 'app-control-details-page',
@@ -43,23 +43,23 @@ export class ControlDetailsPageComponent implements OnInit {
   private dialog = inject(MatDialog);
   private authService = inject(AuthService);
 
-  control: ControlTemplate | null = null;
+  control: ControlTemplateDto | null = null;
   controlExecutions: ControlExecution[] | null = null;
 
-  recurrenceLabels = { ...RecurrenceLabels };
+  recurrenceLabels = RecurrenceLabels;
 
   // Popups
   showPopup = false;
 
   // Cache des vues d'évaluation
-  evaluationCache: Record<string, ControlEvaluationView | null> = {};
+  evaluationCache: Record<string, ControlEvaluationDto | null> = {};
 
   // Boutons GoBack (seulement Planifier + Historique)
   goBackButtons: GoBackButton[] = [
   ];
 
   // === Carrousel (4 dernières exécutions) ===
-  slides: Array<{ exec: ControlExecution; view: ControlEvaluationView | null }> = [];
+  slides: Array<{ exec: ControlExecution; view: ControlEvaluationDto | null }> = [];
   currentSlide = 0;
 
   isDragging = false;
@@ -99,7 +99,7 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   sameCreator() {
-    return this.authService.sameUserName(this.control?.creator || '');
+    return this.authService.sameUser(this.control?.creatorId || '');
   }
 
   sameEvaluator(s: string) {
@@ -119,7 +119,7 @@ export class ControlDetailsPageComponent implements OnInit {
 
       forkJoin(calls).subscribe(views => {
         this.evaluationCache = {};
-        executions.forEach((e, i) => this.evaluationCache[e.id] = views[i] as ControlEvaluationView | null);
+        executions.forEach((e, i) => this.evaluationCache[e.id] = views[i] as ControlEvaluationDto | null);
         this.buildSlides();
       });
     });

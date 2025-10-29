@@ -1,9 +1,9 @@
-import { Evaluation } from "../../enum/evaluation.enum";
+import { EvaluationControl } from "../../enum/evaluation-controle.enum";
 import { ReviewStatus } from "../../enum/reviewStatus.enum";
 
 export class ControlEvaluation {
   id!: string;
-  evaluation?: Evaluation;
+  evaluation?: EvaluationControl;
   resume?: string;
   createdAt?: string;
   comments?: string;

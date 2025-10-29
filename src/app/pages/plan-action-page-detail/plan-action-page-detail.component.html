@@ -104,7 +104,7 @@
                         <mat-card-title>
                             @if(actionPlan.status == statusEnum.NOT_STARTED){
                             <button mat-raised-button class="btn-primary"
-                                *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                *appHasPermission="{teamId: this.actionPlan?.userInCharge, permissions: ['UPDATE_ACTION_PLAN']}"
                                 (click)="openAddActionDialog()">
                                 <mat-icon>add</mat-icon>
                                 <span>Ajouter</span>
@@ -135,7 +135,7 @@
                                         </p>
                                         @if(canAbandonAction(action)){
                                         <button
-                                            *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                            *appHasPermission="{teamId: this.actionPlan?.userInCharge, permissions: ['UPDATE_ACTION_PLAN']}"
                                             mat-icon-button class="btn-red" matTooltip="Abandonner"
                                             (click)="abandon(action)">
                                             <mat-icon>delete</mat-icon>
@@ -144,7 +144,7 @@
                                     </div>
                                     @if(!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED){
                                     <button mat-raised-button
-                                        *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                        *appHasPermission="{teamId: this.actionPlan?.userInCharge, permissions: ['UPDATE_ACTION_PLAN']}"
                                         class="btn-primary" (click)="viewFiles(action.id)">
                                         <mat-icon>upload</mat-icon>
                                         Déposer un justificatif

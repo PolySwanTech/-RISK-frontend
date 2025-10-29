@@ -131,7 +131,7 @@
             <div class="metric-value badge freq">{{ getFrequencyLabel(control.frequency) }}</div>
           </div>
           <div class="metric">
-            <div class="metric-value badge level">{{ getControlLevelLabel(control.controlLevel) }}</div>
+            <div class="metric-value badge level">{{ getControlLevelLabel(control.level) }}</div>
           </div>
           <div class="metric">
             <div class="metric-value badge status">
@@ -168,7 +168,7 @@
               </div>
             </div>
             <div>            
-              <div class="exec-responsible"> Éxecuté par: <strong>{{ exec.performedBy || 'N/R' }}</strong> le {{ exec.plannedAt | date:'dd/MM/yyyy' }} </div>
+              <div class="exec-responsible"> Éxecuté par: <strong>{{ exec.performedById || 'N/R' }}</strong> le {{ exec.plannedAt | date:'dd/MM/yyyy' }} </div>
             </div>
           </div>
         </div>

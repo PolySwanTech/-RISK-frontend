@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { ActionPlan } from '../../../core/models/action-plan/ActionPlan';
+import { ActionPlanListDto } from '../../../core/models/action-plan/ActionPlan';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Priority } from '../../../core/enum/Priority';
 
@@ -50,7 +50,7 @@ export class PriorityDistributionChartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sub = this.actionPlanService.getActionsPlan().subscribe({
-      next: (plans: ActionPlan[]) => {
+      next: (plans: ActionPlanListDto[]) => {
         if (!plans || plans.length === 0) {
           this.isLoading = false;
           return;

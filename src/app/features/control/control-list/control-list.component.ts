@@ -26,8 +26,8 @@ import { buildFilterFromColumn } from '../../../shared/utils/filter-builder.util
 import { FilterTableComponent } from "../../../shared/components/filter-table/filter-table.component";
 import { RiskLevelEnum, RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
 import { Priority, PriorityLabels } from '../../../core/enum/Priority';
-import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
-import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
+import { ControlType, ControlTypeLabels } from '../../../core/enum/controltype.enum';
+import { ControlDegree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
@@ -79,7 +79,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
     {
       columnDef: 'processName',
       header: 'Processus métier',
-      cell: (e: ControlTemplate) => e.processName,
+      cell: (e: ControlTemplate) => "",
       filterType: 'text',
       icon: 'business_center' // 🏢
     },
@@ -90,7 +90,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       cell: (e: ControlTemplate) => this.getTypeLabel(e.controlType),
       isBadge: 'type',
       filterType: 'select',
-      options: Object.values(Type).map(key => ({
+      options: Object.values(ControlType).map(key => ({
         value: key,
         label: ControlTypeLabels[key]
       })),
@@ -115,7 +115,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       cell: (e: any) => this.getDegresLabel(e.controlLevel),
       isBadge: 'control',
       filterType: 'select',
-      options: Object.values(Degree).map(key => ({
+      options: Object.values(ControlDegree).map(key => ({
         value: key,
         label: DegreeLabels[key]
       })),
@@ -143,13 +143,13 @@ export class ControlListComponent implements OnInit, AfterViewInit {
       icon: 'toggle_on' // 🔛
     },
 
-    {
-      columnDef: 'nextExecution',
-      header: 'Prochaine échéance',
-      cell: (e: ControlTemplate) => this.datePipe.transform(e.nextExecution, 'dd/MM/yyyy') || '',
-      filterType: 'date',
-      icon: 'event' // 📅
-    }
+    // {
+    //   columnDef: 'nextExecution',
+    //   header: 'Prochaine échéance',
+    //   cell: (e: ControlTemplate) => this.datePipe.transform(e.nextExecution, 'dd/MM/yyyy') || '',
+    //   filterType: 'date',
+    //   icon: 'event' // 📅
+    // }
   ];
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
@@ -172,20 +172,20 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   selectedControl: ControlTemplate | null = null;
 
-  getTypeLabel(t: Type): string {
-    return ControlTypeLabels[t] || t;
+  getTypeLabel(t: ControlType | undefined): string {
+    return t ? ControlTypeLabels[t] : '-';
   }
 
   getPriorityLabel(p: Priority): string {
     return PriorityLabels[p] || p;
   }
 
-  getDegresLabel(d: Degree): string {
-    return DegreeLabels[d] || d;
+  getDegresLabel(d: ControlDegree | undefined): string {
+    return d ? DegreeLabels[d] : "-";
   }
 
-  getRecurrenceLabel(key: Recurrence): string {
-    return RecurrenceLabels[key] || key;
+  getRecurrenceLabel(key: Recurrence | undefined): string {
+    return key ? RecurrenceLabels[key] : "-"
   }
 
   getRiskLabel(risk: RiskLevelEnum): string {
@@ -277,45 +277,45 @@ export class ControlListComponent implements OnInit, AfterViewInit {
   applyFilters(start?: string, end?: string) {
     let filtered = [...this.controls];
 
-    const toStartOfDay = (str?: string) => {
-      if (!str) return null;
-      const d = new Date(str);
-      d.setHours(0, 0, 0, 0); // début de la journée
-      return d;
-    };
+    // const toStartOfDay = (str?: string) => {
+    //   if (!str) return null;
+    //   const d = new Date(str);
+    //   d.setHours(0, 0, 0, 0); // début de la journée
+    //   return d;
+    // };
 
-    const toEndOfDay = (str?: string) => {
-      if (!str) return null;
-      const d = new Date(str);
-      d.setHours(23, 59, 59, 999); // fin de la journée
-      return d;
-    };
+    // const toEndOfDay = (str?: string) => {
+    //   if (!str) return null;
+    //   const d = new Date(str);
+    //   d.setHours(23, 59, 59, 999); // fin de la journée
+    //   return d;
+    // };
 
-    const dateStart = toStartOfDay(start);
-    const dateEnd = toEndOfDay(end);
+    // const dateStart = toStartOfDay(start);
+    // const dateEnd = toEndOfDay(end);
 
-    if (dateStart && dateEnd) {
-      filtered = filtered.filter(item => {
-        const itemDate = new Date(item.nextExecution);
-        return itemDate >= dateStart && itemDate <= dateEnd;
-      });
-    }
+    // if (dateStart && dateEnd) {
+    //   filtered = filtered.filter(item => {
+    //     const itemDate = new Date(item.nextExecution);
+    //     return itemDate >= dateStart && itemDate <= dateEnd;
+    //   });
+    // }
 
-    if (this.searchQuery && this.searchQuery.trim().length > 0) {
-      const query = this.searchQuery.trim().toLowerCase();
-      filtered = filtered.filter(c =>
-        (c.reference?.toLowerCase().includes(query) || '') ||
-        (c.libelle?.toLowerCase().includes(query) || '') ||
-        (c.processName?.toLowerCase().includes(query) || '') ||
-        (c.responsable?.toLowerCase().includes(query) || '') ||
-        (c.creator?.toLowerCase().includes(query) || '') ||
-        this.getTypeLabel(c.controlType).toLowerCase().includes(query) ||
-        this.getRiskLabel(c.riskLevel.name).toLowerCase().includes(query) ||
-        this.getDegresLabel(c.controlLevel).toLowerCase().includes(query) ||
-        this.getRecurrenceLabel(c.frequency).toLowerCase().includes(query) ||
-        (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
-      );
-    }
+    // if (this.searchQuery && this.searchQuery.trim().length > 0) {
+    //   const query = this.searchQuery.trim().toLowerCase();
+    //   filtered = filtered.filter(c =>
+    //     (c.reference?.toLowerCase().includes(query) || '') ||
+    //     (c.libelle?.toLowerCase().includes(query) || '') ||
+    //     (c.processName?.toLowerCase().includes(query) || '') ||
+    //     (c.responsable?.toLowerCase().includes(query) || '') ||
+    //     (c.creator?.toLowerCase().includes(query) || '') ||
+    //     this.getTypeLabel(c.controlType).toLowerCase().includes(query) ||
+    //     this.getRiskLabel(c.riskLevel.name).toLowerCase().includes(query) ||
+    //     this.getDegresLabel(c.controlLevel).toLowerCase().includes(query) ||
+    //     this.getRecurrenceLabel(c.frequency).toLowerCase().includes(query) ||
+    //     (c.actif ? 'Actif' : 'Suspendu').toLowerCase().includes(query)
+    //   );
+    // }
 
     this.dataSource.data = filtered;
   }
@@ -381,13 +381,13 @@ export class ControlListComponent implements OnInit, AfterViewInit {
           return this.getTypeLabel(control.controlType).toLowerCase() === this.getTypeLabel(value).toLowerCase();
         }
 
-        if (key === 'riskLevel') {
-          return this.getRiskLabel(control.riskLevel.name).toLowerCase() === this.getRiskLabel(value).toLowerCase();
-        }
+        // if (key === 'riskLevel') {
+        //   return this.getRiskLabel(control.riskId).toLowerCase() === this.getRiskLabel(value).toLowerCase();
+        // }
 
-        if (key === 'controlLevel') {
-          return this.getDegresLabel(control.controlLevel).toLowerCase() === this.getDegresLabel(value).toLowerCase();
-        }
+        // if (key === 'controlLevel') {
+        //   return this.getDegresLabel(control.controlLevel).toLowerCase() === this.getDegresLabel(value).toLowerCase();
+        // }
 
         if (key === 'Fréquence') {
           return this.getRecurrenceLabel(control.frequency).toLowerCase() === this.getRecurrenceLabel(value).toLowerCase();

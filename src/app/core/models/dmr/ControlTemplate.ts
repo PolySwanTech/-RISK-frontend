@@ -1,8 +1,7 @@
-import { Range } from "../../../features/cartographie/matrix-settings/matrix-settings.component";
 import { ControlType } from "../../enum/controltype.enum";
 import { ControlDegree } from "../../enum/degree.enum";
 import { EvaluationControl } from "../../enum/evaluation-controle.enum";
-import { Evaluation } from "../../enum/evaluation.enum";
+import { Recurrence } from "../../enum/recurrence.enum";
 import { ControlExecution } from "./ControlExecution";
 
 export class ControlTemplate {
@@ -10,7 +9,7 @@ export class ControlTemplate {
   reference?: string;
   libelle!: string;
   description?: string;
-  frequency?: Range;
+  frequency?: Recurrence;
   controlType?: ControlType;
   level?: ControlDegree;
   generalEvaluation?: EvaluationControl;

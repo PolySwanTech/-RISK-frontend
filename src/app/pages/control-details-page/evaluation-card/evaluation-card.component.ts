@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
-import { Evaluation } from '../../../core/enum/evaluation.enum';
-import { ControlEvaluationView, ControlEvaluation } from '../../../core/models/dmr/ControlEvaluation';
+import { EvaluationControl } from '../../../core/enum/evaluation-controle.enum';
+import { ControlEvaluationCreateDto, ControlEvaluationDto } from '../../../core/models/dmr/ControlEvaluation';
 import { ControlExecution } from '../../../core/models/dmr/ControlExecution';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
@@ -11,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 import { TargetType } from '../../../core/enum/targettype.enum';
 import { FileService } from '../../../core/services/file/file.service';
-import { ReviewStatus, ReviewStatusLabels } from '../../../core/enum/reviewStatus.enum';
+import { ReviewStatus } from '../../../core/enum/reviewStatus.enum';
 import { HasPermissionDirective } from "../../../core/directives/has-permission.directive";
 import { AuthService } from '../../../core/services/auth/auth.service';
 
@@ -26,7 +25,7 @@ type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 export class EvaluationCardComponent {
 
   @Input() showAsCard: boolean = false;
-  @Input() evaluationView: ControlEvaluationView | null = null;
+  @Input() evaluationView: ControlEvaluationDto | null = null;
 
   @Input() initialMode?: PopupMode;
 
@@ -43,12 +42,12 @@ export class EvaluationCardComponent {
 
   mode: PopupMode = 'FORM';
   blockers: ControlExecution[] = [];
-  evalDetails?: ControlEvaluationView;
+  evalDetails?: ControlEvaluationDto;
   reviewComment = '';
 
-  evaluationData: ControlEvaluation = {
+  evaluationData: ControlEvaluationCreateDto = {
     executionId: '',
-    evaluation: Evaluation.MEDIUM,
+    evaluation: EvaluationControl.PARTIELLEMENT_CONFORME,
     resume: '',
     comments: ''
   };
@@ -98,7 +97,7 @@ export class EvaluationCardComponent {
   }
 
   sameCreator() {
-    return this.authService.sameUserName(this.evaluationView?.performedBy || '');
+    return this.authService.sameUser(this.evaluationView?.performedById || '');
   }
 
   openDetails(executionId: string): void {
@@ -106,7 +105,7 @@ export class EvaluationCardComponent {
     this.evalDetails = undefined;
     this.reviewComment = '';
     this.controlService.getEvaluationByExecution(executionId).subscribe({
-      next: (res: any) => { this.evalDetails = res as ControlEvaluationView; },
+      next: (res: any) => { this.evalDetails = res as ControlEvaluationDto; },
       error: () => {
         this.confirmService.openConfirmDialog("Cette execution n'a pas encore d'évalutation soumise.", "", false).subscribe();
         this.evaluationData.executionId = executionId;
@@ -131,17 +130,17 @@ export class EvaluationCardComponent {
   }
 
   get evalLabel(): string {
-    if (this.evaluationView) {
-      return EvaluationControlLabels[this.evaluationView.evaluation]
-    }
-    else {
+    // if (this.evaluationView) {
+    //   return EvaluationControlLabels[this.evaluationView.evaluation]
+    // }
+    // else {
       return '—';
-    }
+    // }
   }
 
   get evalClass(): string {
-    if (this.evaluationView) {
-      switch (this.evaluationView.evaluation) {
+    if (this.evaluationView && this.evaluationView.evaluation) {
+      switch (this.evaluationView.evaluation!) {
         case EvaluationControl.CONFORME: return 'conforme';
         case EvaluationControl.NON_CONFORME: return 'non_conforme';
         case EvaluationControl.PARTIELLEMENT_CONFORME: return 'partiel';
@@ -166,7 +165,8 @@ export class EvaluationCardComponent {
   }
   
   get reviewBadgeLabel(): string {
-    const s = this.evaluationView?.reviewStatus;
-    return s ? ReviewStatusLabels[s] : '—';
+    // const s = this.evaluationView?.reviewStatus;
+    // return s ? ReviewStatusLabels[s] : '—';
+    return '—';
   }
 }

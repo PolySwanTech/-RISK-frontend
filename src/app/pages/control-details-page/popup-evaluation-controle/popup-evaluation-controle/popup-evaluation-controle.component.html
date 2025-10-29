@@ -21,7 +21,7 @@
                             <div class="item" *ngFor="let b of blockers">
                                 <div class="left">
                                     <div class="date">Planifiée le {{ b.plannedAt | date: 'dd/MM/yyyy' }}</div>
-                                    <div class="who">Attribuée à {{ b.performedBy }}</div>
+                                    <div class="who">Attribuée à {{ b.performedById }}</div>
                                     <span class="badge small" [ngClass]="{
                       'status-realise': b.status === 'ACHIEVED',
                       'status-en-cours': b.status === 'IN_PROGRESS',

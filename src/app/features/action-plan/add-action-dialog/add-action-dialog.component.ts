@@ -1,7 +1,6 @@
 import { Component, inject, Inject } from '@angular/core';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Action } from '../../../core/models/action-plan/ActionPlan';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +10,8 @@ import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.serv
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { ActionCreationDto } from '../../../core/models/action-plan/Action';
+import { ReviewStatus } from '../../../core/enum/reviewStatus.enum';
 
 @Component({
   selector: 'app-add-action-dialog',
@@ -25,7 +26,7 @@ export class AddActionDialogComponent {
   private snackBarService = inject(SnackBarService);
   private dialogRef = inject(MatDialogRef<AddActionDialogComponent>);
 
-  actions: Action[] = [];
+  actions: ActionCreationDto[] = [];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: { actionPlanId: string }) { }
 
@@ -47,7 +48,15 @@ export class AddActionDialogComponent {
   }
 
   addAction() {
-    this.actions.push(new Action('', '', new Date(), '', '', ''));
+    let action: ActionCreationDto = {
+      name: "",
+      actif: true,
+      actionPlanId: this.data.actionPlanId,
+      performedAt: undefined,
+      performedBy: undefined,
+      reviewStatus: ReviewStatus.PENDING
+    }
+    this.actions.push(action);
   }
 
   removeAction(index: number) {

@@ -13,17 +13,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { ControlService } from '../../../../core/services/dmr/control/control.service';
 import { catchError, forkJoin, of } from 'rxjs';
 import { ControlExecution } from '../../../../core/models/dmr/ControlExecution';
-import { ControlEvaluationView } from '../../../../core/models/dmr/ControlEvaluation';
 import { Status, StatusLabels } from '../../../../core/enum/status.enum';
-import { ControlTypeLabels, Type } from '../../../../core/enum/controltype.enum';
+import { ControlType, ControlTypeLabels } from '../../../../core/enum/controltype.enum';
 import { Recurrence, RecurrenceLabels } from '../../../../core/enum/recurrence.enum';
-import { Degree, DegreeLabels } from '../../../../core/enum/degree.enum';
+import { ControlDegree, DegreeLabels } from '../../../../core/enum/degree.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../../../core/enum/evaluation-controle.enum';
 import { Incident } from '../../../../core/models/Incident';
 import { IncidentService } from '../../../../core/services/incident/incident.service';
 import { RiskEvaluationService } from '../../../../core/services/risk-evaluation/risk-evaluation.service';
 import { RiskLevelEnum, RiskLevelLabels } from '../../../../core/enum/riskLevel.enum';
 import { State, StateLabels } from '../../../../core/enum/state.enum';
+import { ControlEvaluationDto } from '../../../../core/models/dmr/ControlEvaluation';
 
 
 @Component({
@@ -42,15 +42,15 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private controlService = inject(ControlService);
   private incidentService = inject(IncidentService);
-  
+
   controlExecutions: Record<string, ControlExecution[] | null> = {};
-  controlEvaluationCache: Record<string, ControlEvaluationView | null> = {};
+  controlEvaluationCache: Record<string, ControlEvaluationDto | null> = {};
   linkedIncidents: Incident[] = [];
   riskEvaluations: RiskEvaluationDto[] = [];
   groupedEvaluations?: { period: string, brut?: RiskEvaluationDto, net?: RiskEvaluationDto }[] = [];
 
 
-  
+
 
   goBackButtons = [
     // {
@@ -67,7 +67,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
     //   show: true,
     //   action: () => {} // à ajouter si fonction disponible
     // }
-    ];
+  ];
 
   // get frequency() : number | string {
   //   return (this.risk?.dmr?.[0]?.probability || 0) * 10 || '-';
@@ -95,8 +95,8 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
             this.loadControlExecutions(control.id);
           });
 
-          this.incidentService.getIncidentByProcessAndRisk(risk.id).subscribe(incidents => {this.linkedIncidents = incidents;});
-          this.riskEvaluationService.getEvaluationsByRisk(risk.id).subscribe(evals => {this.riskEvaluations = evals; this.groupEvaluations();});
+          this.incidentService.getIncidentByProcessAndRisk(risk.id).subscribe(incidents => { this.linkedIncidents = incidents; });
+          this.riskEvaluationService.getEvaluationsByRisk(risk.id).subscribe(evals => { this.riskEvaluations = evals; this.groupEvaluations(); });
         },
         error: () => {
           this.loading = false;
@@ -107,21 +107,21 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   }
 
   loadControlExecutions(controlId: string): void {
-  this.controlService.getAllExecutions(controlId).subscribe(executions => {
-    const sorted = [...executions].sort((a, b) =>
-      new Date(b.plannedAt as any).getTime() - new Date(a.plannedAt as any).getTime()
-    );
-    this.controlExecutions[controlId] = sorted;
+    this.controlService.getAllExecutions(controlId).subscribe(executions => {
+      const sorted = [...executions].sort((a, b) =>
+        new Date(b.plannedAt as any).getTime() - new Date(a.plannedAt as any).getTime()
+      );
+      this.controlExecutions[controlId] = sorted;
 
-    const calls = executions.map(e =>
-      this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
-    );
+      const calls = executions.map(e =>
+        this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
+      );
 
-    forkJoin(calls).subscribe(views => {
-      executions.forEach((e, i) => this.controlEvaluationCache[e.id] = views[i] as ControlEvaluationView | null);
+      forkJoin(calls).subscribe(views => {
+        executions.forEach((e, i) => this.controlEvaluationCache[e.id] = views[i] as ControlEvaluationDto | null);
+      });
     });
-  });
-}
+  }
 
 
   ngOnDestroy(): void {
@@ -131,7 +131,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
 
   activeTab = 'controls';
 
-  selectTab(tab: 'controls' | 'evaluations' | 'mitigations' ): void {
+  selectTab(tab: 'controls' | 'evaluations' | 'mitigations'): void {
     this.activeTab = tab;
   }
 
@@ -139,15 +139,18 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
     return s ? StatusLabels[s] : '—';
   }
 
-  getControlTypeLabel(t: Type): string {
+  getControlTypeLabel(t: ControlType | undefined): string {
+    if (!t) return '-';
     return ControlTypeLabels[t] || '—';
   }
 
-  getFrequencyLabel(freq: Recurrence): string {
+  getFrequencyLabel(freq: Recurrence | undefined): string {
+    if (!freq) return '-';
     return RecurrenceLabels[freq] || '—';
   }
-
-  getControlLevelLabel(level: Degree): string {
+  
+  getControlLevelLabel(level: ControlDegree | undefined): string {
+    if (!level) return '-';
     return DegreeLabels[level] || '—';
   }
 
@@ -162,7 +165,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   getStateLabel(s: State | undefined): string {
     return s ? StateLabels[s] : '—';
   }
-    
+
 
   evalLabel(s: string | undefined): string {
     if (!s) return '—';
@@ -200,5 +203,5 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
       queryParams: { riskId: this.risk.id, processId: this.risk!.processId }
     });
   }
-    
+
 }
