@@ -1,16 +1,116 @@
+// À ajouter dans entity-dialog.component.scss ou dans styles.scss pour une utilisation globale
 
+.section {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
 
-mat-dialog-content {
-    overflow: hidden;
+  &:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+
+    .section-icon {
+      color: var(--mat-sys-primary) !important;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+  }
 }
 
-.toggle-container {
-    margin-left: 4%;
+.forms-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .full-width {
+    width: 100%;
+
+    ::ng-deep {
+      .mat-mdc-text-field-wrapper {
+        background: white;
+      }
+
+      .mat-mdc-form-field-focus-overlay {
+        background-color: transparent;
+      }
+    }
+  }
+
+  .toggle-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: var(--mat-sys-primary) !important;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+
+    .toggle-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+
+      .toggle-icon {
+        color: #64748b;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .toggle-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .toggle-label {
+          font-size: 14px;
+          font-weight: 600;
+          color: #1e293b;
+          margin: 0;
+        }
+
+        .toggle-description {
+          font-size: 12px;
+          color: #64748b;
+        }
+      }
+    }
+
+    mat-slide-toggle {
+      flex-shrink: 0;
+    }
+  }
 }
 
-
-
-
-mat-slide-toggle{
-    margin-top: 5px;
+.hierarchy-container {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }

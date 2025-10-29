@@ -216,7 +216,7 @@ export class PlanActionPageDetailComponent implements OnInit {
     let files = await firstValueFrom(this.fileService.getFiles(targetType, actionId))
 
     this.fileService.openFiles(files, targetType, actionId).afterClosed().subscribe(result => {
-      if (!closed) {
+      if (!closed && result) {
         this.confirmService.openConfirmDialog("Fichier uploadé avec succès", "Voulez-vous cloturer l'action ?", true).subscribe(
           result => {
             if (result) {

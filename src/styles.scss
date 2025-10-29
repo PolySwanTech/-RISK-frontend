@@ -999,3 +999,35 @@ mat-calendar {
         font-style: italic;
     }
 }
+
+.custom-dialog-container {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: 16px;
+    
+    .mat-mdc-dialog-surface {
+      padding: 0 !important;
+      overflow: hidden !important;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+  }
+}
+
+// Style général pour tous les dialogs personnalisés
+.mat-mdc-dialog-container {
+  &:has(app-base-popup) {
+    padding: 0 !important;
+    overflow: hidden !important;
+    
+    .mat-mdc-dialog-surface {
+      padding: 0 !important;
+      overflow: hidden !important;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}

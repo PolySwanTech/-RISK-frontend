@@ -1,120 +1,151 @@
-<app-popup-header [title]="'Créer un plan d\'action'" [showClose]="true" (close)="closePopup()"></app-popup-header>
-<div class="container">
-  <form (ngSubmit)="submitActionPlan()">
+<app-base-popup 
+  [title]="data ? 'Créer un plan d\'action pour ' + data.reference : 'Créer un plan d\'action'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
 
-    <!-- Référence de l'incident -->
-    <mat-form-field appearance="outline" *ngIf="data">
-      <mat-label>Référence de l'incident</mat-label>
-      <input matInput [(ngModel)]="data.reference" name="reference" disabled required>
-      <button mat-icon-button matSuffix matTooltip="Identifiant unique lié à l'incident.">
-        <mat-icon>info</mat-icon>
-      </button>
-    </mat-form-field>
-
-    <!-- Libellé -->
-    <mat-form-field appearance="outline">
-      <mat-label>Libellé</mat-label>
-      <input matInput [(ngModel)]="actionPlan.libelle" name="libelle" required>
-      <button mat-icon-button matSuffix matTooltip="Titre ou nom du plan d'action.">
-        <mat-icon>info</mat-icon>
-      </button>
-    </mat-form-field>
-
-    <!-- Description -->
-    <mat-form-field appearance="outline">
-      <mat-label>Description</mat-label>
-      <textarea matInput [(ngModel)]="actionPlan.description" name="description" required></textarea>
-      <button mat-icon-button matSuffix matTooltip="Détails sur le plan d'action.">
-        <mat-icon>info</mat-icon>
-      </button>
-    </mat-form-field>
-
-    <div class="row-add">
-      <!-- Priorité -->
-      <mat-form-field appearance="outline">
-        <mat-label>Priorité</mat-label>
-        <mat-select [(ngModel)]="actionPlan.priority" name="priority">
-          <mat-option *ngFor="let priority of priorities" [value]="priority">
-            {{ priority | enumLabel: 'priority' }}
-          </mat-option>
-        </mat-select>
-        <button mat-icon-button matSuffix matTooltip="Niveau d'importance de ce plan d'action.">
+  <!-- Section Informations générales -->
+  <div class="section">
+    <div class="section-header">
+      <mat-icon class="section-icon">info</mat-icon>
+      <h3 class="section-title">Informations générales</h3>
+    </div>
+    
+    <div class="forms-container">
+      <!-- Référence de l'incident -->
+      <mat-form-field appearance="outline" *ngIf="data" class="full-width">
+        <mat-label>Référence de l'incident</mat-label>
+        <input matInput [(ngModel)]="data.reference" name="reference" disabled required>
+        <mat-icon matPrefix>tag</mat-icon>
+        <button mat-icon-button matSuffix matTooltip="Identifiant unique lié à l'incident.">
           <mat-icon>info</mat-icon>
         </button>
       </mat-form-field>
 
-      <!-- Risk -->
-      <mat-form-field appearance="outline">
-        <mat-label>Risque</mat-label>
-        <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}"
-          [disabled]="data && data.incidentId">
-          <mat-option *ngFor="let risk of risks" [value]="risk">
-            {{ risk.riskReferentiel.libelle }}
-          </mat-option>
-        </mat-select>
-        <button mat-icon-button matSuffix matTooltip="Risque associé à ce plan d'action.">
+      <!-- Libellé -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Libellé</mat-label>
+        <input matInput [(ngModel)]="actionPlan.libelle" name="libelle" placeholder="Ex: Mise à jour des procédures" required>
+        <mat-icon matPrefix>title</mat-icon>
+        <button mat-icon-button matSuffix matTooltip="Titre ou nom du plan d'action.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="actionPlan.description" name="description" 
+                  rows="4" placeholder="Décrivez les objectifs et le contexte du plan d'action" required></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+        <button mat-icon-button matSuffix matTooltip="Détails sur le plan d'action.">
           <mat-icon>info</mat-icon>
         </button>
       </mat-form-field>
     </div>
+  </div>
 
-    <div class="row-add">
-      <!-- Échéance -->
-      <mat-form-field appearance="outline">
-        <mat-label>Échéance</mat-label>
-        <input matInput [matDatepicker]="pickerEcheance" [(ngModel)]="actionPlan.echeance" name="echeance" required>
-        <mat-datepicker-toggle matSuffix [for]="pickerEcheance"></mat-datepicker-toggle>
-        <mat-datepicker #pickerEcheance></mat-datepicker>
-        <button mat-icon-button matSuffix matTooltip="Date limite de réalisation du plan.">
-          <mat-icon>info</mat-icon>
-        </button>
-      </mat-form-field>
-
-      <!-- Équipe -->
-      <mat-form-field appearance="outline">
-        <mat-label>Choisissez une équipe</mat-label>
-        <mat-select [(ngModel)]="actionPlan.userInCharge" [ngModelOptions]="{standalone: true}">
-          <mat-option *ngFor="let team of listTeams" [value]="team.id">
-            {{ team.name }}
-          </mat-option>
-        </mat-select>
-        <button mat-icon-button matSuffix matTooltip="Équipe responsable de l'exécution du plan.">
-          <mat-icon>info</mat-icon>
-        </button>
-      </mat-form-field>
+  <!-- Section Paramètres -->
+  <div class="section">
+    <div class="section-header">
+      <mat-icon class="section-icon">settings</mat-icon>
+      <h3 class="section-title">Paramètres et priorité</h3>
     </div>
-
-    <!-- Actions -->
-    <div class="actions-container">
-      <h3 class="description-cont">
-        <div class="description-title">
-          <mat-icon>description</mat-icon>
-          Actions à effectuer
-        </div>
-        <div class="add-action">
-          <button mat-raised-button type="button" class="btn-green" (click)="addAction()">
-            <mat-icon>add</mat-icon>
-            Ajouter une action
+    
+    <div class="forms-container">
+      <div class="row-fields">
+        <!-- Priorité -->
+        <mat-form-field appearance="outline">
+          <mat-label>Priorité</mat-label>
+          <mat-select [(ngModel)]="actionPlan.priority" name="priority">
+            <mat-option *ngFor="let priority of priorities" [value]="priority">
+              {{ priority | enumLabel: 'priority' }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>priority_high</mat-icon>
+          <button mat-icon-button matSuffix matTooltip="Niveau d'importance de ce plan d'action.">
+            <mat-icon>info</mat-icon>
           </button>
-        </div>
-      </h3>
+        </mat-form-field>
+
+        <!-- Échéance -->
+        <mat-form-field appearance="outline">
+          <mat-label>Échéance</mat-label>
+          <input matInput [matDatepicker]="pickerEcheance" [(ngModel)]="actionPlan.echeance" name="echeance" required>
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-datepicker-toggle matSuffix [for]="pickerEcheance"></mat-datepicker-toggle>
+          <mat-datepicker #pickerEcheance></mat-datepicker>
+          <button mat-icon-button matSuffix matTooltip="Date limite de réalisation du plan.">
+            <mat-icon>info</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div class="row-fields">
+        <!-- Risque -->
+        <mat-form-field appearance="outline">
+          <mat-label>Risque</mat-label>
+          <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}"
+            [disabled]="data && data.incidentId">
+            <mat-option *ngFor="let risk of risks" [value]="risk">
+              {{ risk.riskReferentiel.libelle }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>warning</mat-icon>
+          <button mat-icon-button matSuffix matTooltip="Risque associé à ce plan d'action.">
+            <mat-icon>info</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Équipe -->
+        <mat-form-field appearance="outline">
+          <mat-label>Équipe responsable</mat-label>
+          <mat-select [(ngModel)]="actionPlan.userInCharge" [ngModelOptions]="{standalone: true}">
+            <mat-option *ngFor="let team of listTeams" [value]="team.id">
+              {{ team.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>group</mat-icon>
+          <button mat-icon-button matSuffix matTooltip="Équipe responsable de l'exécution du plan.">
+            <mat-icon>info</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Actions -->
+  <div class="section">
+    <div class="section-header">
+      <mat-icon class="section-icon">check_circle</mat-icon>
+      <h3 class="section-title">Actions à effectuer</h3>
+      <div class="section-header-actions">
+        <button mat-raised-button type="button" class="btn-add-action" (click)="addAction()">
+          <mat-icon>add</mat-icon>
+          Ajouter une action
+        </button>
+      </div>
     </div>
 
     <div class="actions-list">
-      <div class="add-action" *ngFor="let action of actions; let i = index">
+      <div class="action-item" *ngFor="let action of actions; let i = index">
         <mat-form-field appearance="outline" class="action-field">
+          <mat-label>Action {{ i + 1 }}</mat-label>
           <input matInput [(ngModel)]="action.name" [ngModelOptions]="{standalone: true}"
-            placeholder="Entrez une action">
+            placeholder="Ex: Réviser la documentation">
+          <mat-icon matPrefix>task_alt</mat-icon>
           <button mat-icon-button matSuffix matTooltip="Supprimer cette action" type="button" (click)="removeAction(i)">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
       </div>
-    </div>
 
-    <!-- Bouton -->
-    <button mat-raised-button class="btn-primary" type="submit">
-      Créer le Plan d'Action
-    </button>
-  </form>
-</div>
+      <div class="empty-state" *ngIf="actions.length === 0">
+        <mat-icon>playlist_add</mat-icon>
+        <p>Aucune action ajoutée. Cliquez sur "Ajouter une action" pour commencer.</p>
+      </div>
+    </div>
+  </div>
+
+</app-base-popup>

@@ -357,10 +357,12 @@ export class PlanActionPageComponent implements OnInit {
 
   add() {
     this.dialog.open(CreateActionPlanDialogComponent, {
-      width: '800px !important',
-      height: '550px',
-      minWidth: '800px',
-      maxWidth: '800px',
+        width: '800px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+        disableClose: false,
+        autoFocus: false
     });
   }
 

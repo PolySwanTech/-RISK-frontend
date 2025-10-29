@@ -19,7 +19,7 @@ export class ReglagesComponent implements OnInit {
 
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
-  
+
   private entitiesService = inject(EntitiesService)
 
   selectedTabIndex = 0;
@@ -45,11 +45,20 @@ export class ReglagesComponent implements OnInit {
   addBu() {
     this.dialog.open(AddEntityDialogComponent,
       {
-        width: '800px'
+        width: '700px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+        disableClose: false,
+        autoFocus: false
+
       }
     ).afterClosed().subscribe(bu => {
-      this.entitiesService.save(bu).subscribe(resp => {
-      })
+      if (bu) {
+        this.entitiesService.save(bu).subscribe(resp => {
+        })
+      }
+
     })
   }
 }

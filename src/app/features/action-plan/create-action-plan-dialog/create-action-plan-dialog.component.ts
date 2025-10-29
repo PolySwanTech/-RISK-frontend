@@ -19,13 +19,14 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
-import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
 
 @Component({
   selector: 'app-create-action-plan-dialog',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -35,8 +36,13 @@ import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
     MatDatepickerModule,
     MatNativeDateModule,
     MatCardModule,
-    PopupHeaderComponent,
-    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule, EnumLabelPipe
+    MatButtonModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatSuffix,
+    MatTooltipModule,
+    EnumLabelPipe,
+    BasePopupComponent
   ],
   templateUrl: './create-action-plan-dialog.component.html',
   styleUrl: './create-action-plan-dialog.component.scss'
@@ -49,24 +55,46 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private entitiesService = inject(EntitiesService);
   private riskService = inject(RiskService);
   private router = inject(Router);
+  
   priorities = Object.values(Priority);
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference: string }
-  ) { }
-
+  popupActions: PopupAction[] = [];
   listTeams: BusinessUnit[] = [];
-
   risks: RiskTemplate[] = [];
+  actions: Action[] = [];
 
   actionPlan: ActionPlan = new ActionPlan(
     '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', '', null, '', new Date(), true);
+    '', '', '', null, '', new Date(), true
+  );
 
-  actions: Action[] = []
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference: string }) { }
 
   ngOnInit(): void {
     this.fetchTeams();
     this.getRisk();
+    this.initActions();
+  }
+
+  initActions(): void {
+    this.popupActions = [
+      {
+        label: 'Annuler',
+        icon: 'close',
+        color: 'red',
+        onClick: () => this.closePopup()
+      },
+      {
+        label: 'Créer le Plan d\'Action',
+        icon: 'check',
+        primary: true,
+        disabled: () => this.isFormInvalid(),
+        onClick: () => this.submitActionPlan()
+      }
+    ];
+  }
+
+  getDialogRef() {
+    return this.dialogRef;
   }
 
   closePopup() {
@@ -74,21 +102,17 @@ export class CreateActionPlanDialogComponent implements OnInit {
   }
 
   getRisk() {
-  if (this.data && this.data.incidentId) {
-    // Récupère le risque de l'incident
-    this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
-      this.actionPlan.taxonomie = risk;
-      // Ici, on met à jour la liste des risques pour afficher l'élément de l'incident
-      this.risks = [risk]; // Si tu veux que la liste contienne uniquement ce risque
-    });
-  } else {
-    // Si pas d'incident, récupère tous les risques
-    this.riskService.getAll().subscribe(data => {
-      this.risks = data;
-    });
+    if (this.data && this.data.incidentId) {
+      this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
+        this.actionPlan.taxonomie = risk;
+        this.risks = [risk];
+      });
+    } else {
+      this.riskService.getAll().subscribe(data => {
+        this.risks = data;
+      });
+    }
   }
-}
-
 
   fetchTeams(): void {
     this.entitiesService.loadEntities().subscribe({
@@ -101,23 +125,17 @@ export class CreateActionPlanDialogComponent implements OnInit {
     });
   }
 
-  // Ajouter une action à la liste
   addAction() {
     this.actions.push(new Action('', '', new Date(), '', '', ''));
   }
 
-  updateAction(index: number, action: Action) {
-    // Mettre à jour l'action à l'index spécifié
-    this.actions[index] = action;
-  }
-
-  // Supprimer une action de la liste
   removeAction(index: number) {
     this.actions.splice(index, 1);
   }
 
-  // Soumettre le plan d'action
   submitActionPlan() {
+    if (this.isFormInvalid()) return;
+
     const incidentId = this.data?.incidentId ?? undefined;
 
     const dto: ActionPlanCreateDto = {
@@ -128,18 +146,31 @@ export class CreateActionPlanDialogComponent implements OnInit {
       echeance: this.actionPlan.echeance,
       userInCharge: this.actionPlan.userInCharge,
       taxonomieId: this.actionPlan.taxonomie?.id ?? null,
-      incidentId               // undefined si pas d’incident
+      incidentId
     };
 
     this.actionPlanService.createActionPlan(dto)
       .subscribe(id => {
-        this.actionPlanService.addActions(this.actions, id).subscribe(() => {
-        });
+        this.actionPlanService.addActions(this.actions, id).subscribe(() => {});
         this.dialogRef.close();
         this.confirmService.openConfirmDialog(
-          "Création avec succès", "Aller à la consultation ?").subscribe((value) => {
-            value ? this.router.navigate(['/action-plan', id]) : this.ngOnInit();
-          })
+          "Création avec succès", "Aller à la consultation ?"
+        ).subscribe((value) => {
+          value ? this.router.navigate(['/action-plan', id]) : this.ngOnInit();
+        });
       });
+  }
+
+  isFormInvalid(): boolean {
+    return (
+      !this.actionPlan.libelle ||
+      !this.actionPlan.description ||
+      !this.actionPlan.echeance ||
+      !this.actionPlan.priority ||
+      !this.actionPlan.userInCharge ||
+      !this.actionPlan.taxonomie ||
+      this.actions.length === 0 ||
+      this.actions.some(a => !a.name || a.name.trim() === '')
+    );
   }
 }
