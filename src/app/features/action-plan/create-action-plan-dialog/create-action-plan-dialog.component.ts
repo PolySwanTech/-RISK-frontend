@@ -1,4 +1,4 @@
-import { Component, Inject, inject, OnInit } from '@angular/core';
+import { Component, Inject, inject, OnInit, HostListener } from '@angular/core';
 import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/ActionPlan';
 import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -23,6 +23,13 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
+import { DraftService } from '../../../core/services/draft.service';
+
+export interface ActionPlanDialogData {
+  incidentId?: string;
+  reference?: string;
+  draftId?: string; // ID du brouillon à restaurer
+}
 
 @Component({
   selector: 'app-create-action-plan-dialog',
@@ -49,30 +56,62 @@ import { BasePopupComponent, PopupAction } from '../../../shared/components/base
 })
 export class CreateActionPlanDialogComponent implements OnInit {
 
+  private readonly COMPONENT_NAME = 'CreateActionPlanDialog';
+
   private actionPlanService = inject(ActionPlanService);
   dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
   private confirmService = inject(ConfirmService);
   private entitiesService = inject(EntitiesService);
   private riskService = inject(RiskService);
   private router = inject(Router);
+  private draftService = inject(DraftService);
   
   priorities = Object.values(Priority);
   popupActions: PopupAction[] = [];
   listTeams: BusinessUnit[] = [];
   risks: RiskTemplate[] = [];
   actions: Action[] = [];
+  
+  // Stocke l'ID du brouillon en cours d'édition (si applicable)
+  private currentDraftId: string | null = null;
 
-  actionPlan: ActionPlan = new ActionPlan(
+  actionPlan: any = new ActionPlan(
     '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
     '', '', '', null, '', new Date(), true
   );
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference: string }) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: ActionPlanDialogData | null) { }
 
   ngOnInit(): void {
     this.fetchTeams();
     this.getRisk();
+    
+    // Charger le brouillon si un draftId est fourni
+    if (this.data?.draftId) {
+      this.loadDraft(this.data.draftId);
+      this.currentDraftId = this.data.draftId;
+      // Cacher ce brouillon pendant l'édition
+      this.draftService.hideDraft(this.data.draftId);
+    }
+
+    this.dialogRef.backdropClick().subscribe(() => {
+      if (this.hasFormData()) {
+        this.saveDraft();
+      } else if (this.currentDraftId) {
+        this.draftService.showDraft(this.currentDraftId);
+      }
+    });
+    
     this.initActions();
+  }
+
+  loadDraft(draftId: string): void {
+    const draft = this.draftService.getDraftById(draftId);
+    if (draft) {
+      this.actionPlan = { ...this.actionPlan, ...draft.data.actionPlan };
+      this.actions = draft.data.actions || [];
+      console.log('Brouillon de plan d\'action restauré:', draft);
+    }
   }
 
   initActions(): void {
@@ -97,7 +136,64 @@ export class CreateActionPlanDialogComponent implements OnInit {
     return this.dialogRef;
   }
 
+  hasFormData(): boolean {
+    return !!(
+      this.actionPlan.libelle ||
+      this.actionPlan.description ||
+      this.actions.length > 0
+    );
+  }
+
+  saveDraft(): void {
+    if (!this.hasFormData()) {
+      return;
+    }
+
+    const draftData = {
+      actionPlan: {
+        libelle: this.actionPlan.libelle,
+        description: this.actionPlan.description,
+        priority: this.actionPlan.priority,
+        echeance: this.actionPlan.echeance,
+        userInCharge: this.actionPlan.userInCharge,
+        taxonomie: this.actionPlan.taxonomie
+      },
+      actions: this.actions,
+      incidentData: this.data ? {
+        incidentId: this.data.incidentId,
+        reference: this.data.reference
+      } : null
+    };
+
+    const title = `${this.actionPlan.libelle || 'Nouveau plan d\'action'}`;
+
+    // Si on édite un brouillon existant, on le met à jour
+    if (this.currentDraftId) {
+      this.draftService.updateDraft(
+        this.currentDraftId,
+        title,
+        draftData,
+        true // visible = true
+      );
+    } else {
+      // Sinon on crée un nouveau brouillon
+      this.currentDraftId = this.draftService.createDraft(
+        this.COMPONENT_NAME,
+        title,
+        draftData,
+        true // visible = true
+      );
+    }
+  }
+
   closePopup() {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    } else if (this.currentDraftId) {
+      // Si on ferme sans données mais qu'on avait un brouillon, le réafficher
+      this.draftService.showDraft(this.currentDraftId);
+    }
+    
     this.dialogRef.close();
   }
 
@@ -136,7 +232,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   submitActionPlan() {
     if (this.isFormInvalid()) return;
 
-    const incidentId = this.data?.incidentId ?? undefined;
+    const incidentId: string | null = this.data?.incidentId ?? null;
 
     const dto: ActionPlanCreateDto = {
       libelle: this.actionPlan.libelle,
@@ -145,13 +241,19 @@ export class CreateActionPlanDialogComponent implements OnInit {
       priority: this.actionPlan.priority,
       echeance: this.actionPlan.echeance,
       userInCharge: this.actionPlan.userInCharge,
-      taxonomieId: this.actionPlan.taxonomie?.id ?? null,
+      taxonomieId: this.actionPlan.taxonomie ?? null,
       incidentId
     };
 
     this.actionPlanService.createActionPlan(dto)
       .subscribe(id => {
         this.actionPlanService.addActions(this.actions, id).subscribe(() => {});
+        
+        // Supprimer le brouillon après sauvegarde réussie
+        if (this.currentDraftId) {
+          this.draftService.deleteDraft(this.currentDraftId);
+        }
+        
         this.dialogRef.close();
         this.confirmService.openConfirmDialog(
           "Création avec succès", "Aller à la consultation ?"
@@ -167,10 +269,15 @@ export class CreateActionPlanDialogComponent implements OnInit {
       !this.actionPlan.description ||
       !this.actionPlan.echeance ||
       !this.actionPlan.priority ||
-      !this.actionPlan.userInCharge ||
-      !this.actionPlan.taxonomie ||
       this.actions.length === 0 ||
       this.actions.some(a => !a.name || a.name.trim() === '')
     );
+  }
+
+  @HostListener('window:beforeunload')
+  beforeUnload(): void {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    }
   }
 }

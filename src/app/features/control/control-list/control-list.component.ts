@@ -243,10 +243,10 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   create() {
     this.dialog.open(CreateControlComponent, {
-      width: '700px !important',
-      height: '600px',
-      minWidth: '600px',
-      maxWidth: '600px'
+      width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container'
     }).afterClosed().subscribe(() => this.ngOnInit());
   }
 

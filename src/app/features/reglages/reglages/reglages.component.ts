@@ -54,8 +54,10 @@ export class ReglagesComponent implements OnInit {
 
       }
     ).afterClosed().subscribe(bu => {
+      console.log(bu)
       if (bu) {
         this.entitiesService.save(bu).subscribe(resp => {
+          console.log(resp)
         })
       }
 

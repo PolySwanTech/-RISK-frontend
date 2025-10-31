@@ -111,6 +111,7 @@ export class BuProcessAccordionComponent {
     else {
       this.entityService.loadEntitiesTree().subscribe((entitiesTree: any) => {
         this.entities = entitiesTree;
+        console.log(entitiesTree)
         this.fetchProcesses(entitiesTree);
       });
     }

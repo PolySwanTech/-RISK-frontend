@@ -639,7 +639,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: color.adjust($purple-color, $lightness: 5%);
+            background-color: color.adjust($purple-color, $blackness: 5%);
         }
     }
 

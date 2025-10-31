@@ -47,8 +47,8 @@
     </div>
     
     <app-select-entities 
-      [entiteEnfantId]="data ? data.id : ''"
-      [selectId]="BusinessUnit.parentId ? BusinessUnit.parentId : ''"
+      [entiteEnfantId]="data?.id ?? ''"
+      [selectId]="BusinessUnit.id ? BusinessUnit.id : ''"
       (entitieSelected)="entiteChange($event)">
     </app-select-entities>
   </div>

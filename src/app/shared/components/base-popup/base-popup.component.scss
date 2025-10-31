@@ -77,9 +77,8 @@
       color: white !important;
 
       &:hover {
-        background: #dc2626 !important;
+        background: darken(#ef4444, 10%) !important; // fonce de 10%
         box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        transform: translateY(-1px);
       }
     }
 

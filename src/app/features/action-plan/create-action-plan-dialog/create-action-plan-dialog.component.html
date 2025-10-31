@@ -13,15 +13,6 @@
     </div>
     
     <div class="forms-container">
-      <!-- Référence de l'incident -->
-      <mat-form-field appearance="outline" *ngIf="data" class="full-width">
-        <mat-label>Référence de l'incident</mat-label>
-        <input matInput [(ngModel)]="data.reference" name="reference" disabled required>
-        <mat-icon matPrefix>tag</mat-icon>
-        <button mat-icon-button matSuffix matTooltip="Identifiant unique lié à l'incident.">
-          <mat-icon>info</mat-icon>
-        </button>
-      </mat-form-field>
 
       <!-- Libellé -->
       <mat-form-field appearance="outline" class="full-width">
@@ -87,8 +78,8 @@
         <mat-form-field appearance="outline">
           <mat-label>Risque</mat-label>
           <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}"
-            [disabled]="data && data.incidentId">
-            <mat-option *ngFor="let risk of risks" [value]="risk">
+            [disabled]="!!data?.incidentId">
+            <mat-option *ngFor="let risk of risks" [value]="risk.id">
               {{ risk.riskReferentiel.libelle }}
             </mat-option>
           </mat-select>
@@ -121,7 +112,7 @@
       <mat-icon class="section-icon">check_circle</mat-icon>
       <h3 class="section-title">Actions à effectuer</h3>
       <div class="section-header-actions">
-        <button mat-raised-button type="button" class="btn-add-action" (click)="addAction()">
+        <button mat-raised-button type="button" class="btn-purple" (click)="addAction()">
           <mat-icon>add</mat-icon>
           Ajouter une action
         </button>
