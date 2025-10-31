@@ -178,12 +178,10 @@ export class CreateProcessComponent implements OnInit {
 
   hasFormData(): boolean {
     const name = this.processForm.get('name')?.value;
-    const bu = this.processForm.get('bu')?.value;
     const parentId = this.processForm.get('parentId')?.value;
     
     return !!(
       (name && name.trim() !== '') ||
-      bu ||
       parentId
     );
   }

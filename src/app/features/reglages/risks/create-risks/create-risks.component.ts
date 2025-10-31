@@ -153,7 +153,6 @@ export class CreateRisksComponent implements OnInit {
     return !!(
       values.libellePerso?.trim() ||
       values.description?.trim() ||
-      values.processId ||
       values.parentRisk ||
       this.risk
     );
