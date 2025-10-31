@@ -1,43 +1,88 @@
-<div class="container">
-  <h2>{{ ope }} un processus</h2>
+<app-base-popup 
+  [title]="titlePage" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
 
   <form [formGroup]="processForm" (ngSubmit)="onSubmit()">
-    <!-- Nom du Processus -->
-    <mat-form-field class="full-width">
-      <mat-label>Nom du Processus</mat-label>
-      <input matInput type="text" formControlName="name" placeholder="Entrez le nom du processus" />
-      <mat-error *ngIf="processForm.get('name')?.invalid && processForm.get('name')?.touched">
-        Le nom est requis.
-      </mat-error>
-    </mat-form-field>
+    
+    <!-- Section Informations générales -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">info</mat-icon>
+        <h3 class="section-title">Informations générales</h3>
+      </div>
 
-    <!-- Business Unit -->
-    <mat-form-field class="full-width">
-      <mat-label>Business Unit</mat-label>
-      <mat-select formControlName="bu" [disabled]="businessUnits.length === 1" (selectionChange)="onBuChange($event.value)">
-        <mat-option *ngFor="let bu of businessUnits" [value]="bu.id">
-          {{ bu.name }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="processForm.get('bu')?.invalid && processForm.get('bu')?.touched">
-        La BU est requise.
-      </mat-error>
-    </mat-form-field>
+      <div class="forms-container">
+        <!-- Nom du Processus -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nom du Processus</mat-label>
+          <input matInput type="text" formControlName="name" placeholder="Ex: Gestion des achats">
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-error *ngIf="processForm.get('name')?.hasError('required')">
+            Le nom est obligatoire
+          </mat-error>
+        </mat-form-field>
 
-    <!-- Processus Parent (optionnel) -->
-    @if (processes.length != 0) {
-    <div class="row-add">
-      <app-select-arborescence appearance="outline" placeholder="Sélectionnez un processus parent"
-        *ngIf="processes.length > 0" [id]="processForm.get('parentId')!.value"
-        (changeValue)="onSelectionProcess($event)" [list]="processes" />
+        <!-- Business Unit (seulement en mode création) -->
+        <mat-form-field appearance="outline" class="full-width" *ngIf="!isEditMode">
+          <mat-label>Équipe</mat-label>
+          <mat-select formControlName="bu" 
+                      [disabled]="businessUnits.length === 1" 
+                      (selectionChange)="onBuChange($event.value)">
+            <mat-option *ngFor="let bu of businessUnits" [value]="bu.id">
+              {{ bu.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>business</mat-icon>
+          <mat-error *ngIf="processForm.get('bu')?.hasError('required')">
+            L'équipe est obligatoire
+          </mat-error>
+        </mat-form-field>
+
+        <div class="info-box" *ngIf="businessUnits.length === 1 && !isEditMode">
+          <mat-icon>info</mat-icon>
+          <span>Une seule équipe est disponible, elle a été automatiquement sélectionnée</span>
+        </div>
+      </div>
     </div>
-    }
 
-    <!-- Bouton de soumission -->
-    <div class="actions">
-      <button mat-raised-button class="btn-primary" type="submit" [disabled]="processForm.invalid">
-        {{ ope }} le process
-      </button>
+    <!-- Section Hiérarchie (optionnelle) -->
+    <div class="section" *ngIf="processes.length > 0">
+      <div class="section-header">
+        <mat-icon class="section-icon">account_tree</mat-icon>
+        <h3 class="section-title">Hiérarchie (optionnel)</h3>
+      </div>
+
+      <div class="forms-container">
+          <app-select-arborescence 
+            appearance="outline" 
+            placeholder="Sélectionnez un processus parent"
+            [id]="selectedParentId"
+            (changeValue)="onSelectionProcess($event)" 
+            [list]="processes" />
+
+        <div class="info-box">
+          <mat-icon>info</mat-icon>
+          <span>Si vous sélectionnez un processus parent, ce nouveau processus sera créé comme sous-processus</span>
+        </div>
+      </div>
     </div>
+
+    <!-- Message si aucun processus parent disponible -->
+    <div class="section" *ngIf="processes.length === 0 && processForm.get('bu')?.value && !isEditMode">
+      <div class="section-header">
+        <mat-icon class="section-icon">account_tree</mat-icon>
+        <h3 class="section-title">Hiérarchie</h3>
+      </div>
+
+      <div class="empty-state">
+        <mat-icon>check_circle</mat-icon>
+        <p>Ce sera le premier processus de cette équipe</p>
+      </div>
+    </div>
+
   </form>
-</div>
+
+</app-base-popup>

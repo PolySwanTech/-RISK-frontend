@@ -356,11 +356,13 @@ export class ViewComponent implements OnInit {
 
   addActionPlan(incident: any) {
     this.dialog.open(CreateActionPlanDialogComponent, {
-      width: '800px !important',
-      height: '550px',
-      minWidth: '800px',
-      maxWidth: '800px',
-      data: {
+       width: '800px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+        disableClose: false,
+        autoFocus: false,
+        data: {
         incidentId: incident.id,
         reference: incident.reference
       }

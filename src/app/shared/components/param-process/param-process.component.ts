@@ -62,12 +62,19 @@ export class ProcessManagerComponent implements OnInit {
     if (this.route.snapshot.queryParams["create"]) {
       this.addProcess();
     }
-    this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
-  }
+    else{    
+      this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
+    }
+}
 
   addProcess() {
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+      disableClose: false,
+      autoFocus: false,
       data: { buId: this.buId }
     });
 
@@ -275,10 +282,13 @@ export class ProcessManagerComponent implements OnInit {
     const process = this.selectedProcess!
 
     const dialogRef = this.dialog.open(CreateRisksComponent, {
-      width: '700px',
+      width: '800px',
+      maxWidth: '95vw',
       maxHeight: '90vh',
-      data: { processId: process.id },
-      autoFocus: false
+      panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+      disableClose: false,
+      autoFocus: false,
+      data: { processId: process.id }
     });
 
     dialogRef.afterClosed().subscribe(result => {

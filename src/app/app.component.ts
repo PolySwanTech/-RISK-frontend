@@ -11,6 +11,9 @@ import { AddEntityDialogComponent } from './features/reglages/add-entity-dialog/
 import { MatDialog } from '@angular/material/dialog';
 import { DraftService } from './core/services/draft.service';
 import { CreateControlComponent } from './features/control/create-control/create-control.component';
+import { CreateAttenuationMetricsComponent } from './features/control/create-attenuation-metrics/create-attenuation-metrics.component';
+import { CreateProcessComponent } from './features/process/create-process/create-process.component';
+import { CreateRisksComponent } from './features/reglages/risks/create-risks/create-risks.component';
 
 
 @Component({
@@ -85,7 +88,43 @@ export class AppComponent {
           }
         });
         break;
-      
+
+      case 'CreateAttenuationMetricsDialog':
+        this.dialog.open(CreateAttenuationMetricsComponent, {
+          width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container',
+          data: { 
+            draftId: draft.id
+          }
+        });
+        break;
+
+      case 'CreateProcessDialog':
+        this.dialog.open(CreateProcessComponent, {
+          width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container',
+          data: { 
+            draftId: draft.id
+          }
+        });
+        break;
+        
+      case 'CreateRisksComponent':
+        this.dialog.open(CreateRisksComponent, {
+          width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container',
+          data: {
+            draftId: draft.id
+          }
+        });
+        break;
+
       default:
         console.warn('Unknown draft component:', draft.component);
     }

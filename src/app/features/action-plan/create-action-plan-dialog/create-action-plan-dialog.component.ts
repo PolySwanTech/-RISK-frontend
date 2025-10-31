@@ -241,7 +241,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
       priority: this.actionPlan.priority,
       echeance: this.actionPlan.echeance,
       userInCharge: this.actionPlan.userInCharge,
-      taxonomieId: this.actionPlan.taxonomie ?? null,
+      taxonomieId: this.actionPlan.taxonomie.id ?? null,
       incidentId
     };
 

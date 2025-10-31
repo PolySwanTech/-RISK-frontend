@@ -241,8 +241,12 @@ export class AttenuationMetricsListComponent implements OnInit {
   // Création
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(CreateAttenuationMetricsComponent, {
-      width: '700px',
-      maxHeight: '90vh'
+       width: '800px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+        disableClose: false,
+        autoFocus: false
     });
     dialogRef.afterClosed().subscribe(refresh => {
       if (refresh) this.loadMetrics();
