@@ -149,7 +149,6 @@
           </div>
         </div>
 
-
         <ng-template #emptyState>
           <div class="empty-state">
             <div class="empty-title">Aucune exécution pour le moment</div>
@@ -162,10 +161,4 @@
     </div>
   </div>
 </div>
-
-<!-- Popups -->
-<app-planifier-execution-popup *ngIf="showPopup" [controlId]="control!.id"
-  [frequence]="control!.frequency" [isEditing]="false" (close)="showPopup = false"
-  (planifier)="handlePlanification($event)" [lastPlannedAt]="controlExecutions?.[0]?.plannedAt">
-</app-planifier-execution-popup>
 }

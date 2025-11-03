@@ -1,13 +1,37 @@
-<mat-card class="audit-card">
-    <app-popup-header [title]="'Détails'" [showClose]="true" (close)="closePopUp()"></app-popup-header>
-    <div class="rv-section">
-        <div class="rv-section__label">Votre commentaire (obligatoire)</div>
-        <textarea [(ngModel)]="comments" rows="3" class="rv-textarea" placeholder="Votre avis / décision..."></textarea>
+<app-base-popup 
+  [title]="'Détails'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopUp()">
+
+  <div class="section">
+    <div class="section-header">
+      <mat-icon class="section-icon">comment</mat-icon>
+      <h3 class="section-title">Votre commentaire</h3>
     </div>
-    <div class="rv-modal__footer">
-        <ng-container>
-            <button class="btn btn-primary winter-style" (click)="confirm()">OK</button>
-            <button class="btn btn-secondary" (click)="closePopUp()">Fermer</button>
-        </ng-container>
+
+    <div class="forms-container">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Votre avis / décision</mat-label>
+        <textarea 
+          matInput 
+          [(ngModel)]="comments" 
+          rows="4" 
+          placeholder="Saisissez votre commentaire..."
+          required>
+        </textarea>
+        <mat-icon matPrefix>edit_note</mat-icon>
+        <mat-error *ngIf="!comments || comments.trim() === ''">
+          Le commentaire est obligatoire
+        </mat-error>
+      </mat-form-field>
+
+      <div class="info-box">
+        <mat-icon>info</mat-icon>
+        <span>Ce commentaire sera enregistré dans l'historique d'audit</span>
+      </div>
     </div>
-</mat-card>
+  </div>
+
+</app-base-popup>

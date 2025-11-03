@@ -200,7 +200,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
   getRisk() {
     if (this.data && this.data.incidentId) {
       this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
-        this.actionPlan.taxonomie = risk;
+        this.actionPlan.taxonomie = risk.id;
         this.risks = [risk];
       });
     } else {
@@ -241,9 +241,11 @@ export class CreateActionPlanDialogComponent implements OnInit {
       priority: this.actionPlan.priority,
       echeance: this.actionPlan.echeance,
       userInCharge: this.actionPlan.userInCharge,
-      taxonomieId: this.actionPlan.taxonomie.id ?? null,
+      taxonomieId: this.actionPlan.taxonomie ?? null,
       incidentId
     };
+
+    console.log(dto);
 
     this.actionPlanService.createActionPlan(dto)
       .subscribe(id => {

@@ -1,34 +1,68 @@
-<div class="popup-overlay">
-    <div class="popup-content">
-        <button class="popup-close" (click)="cancel()">×</button>
-        <h3>Planifier une exécution</h3>
+<app-base-popup 
+  [title]="isEditing ? 'Modifier l\'exécution' : 'Planifier une exécution'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="cancel()">
 
-        <form [formGroup]="form" (ngSubmit)="submit()">
-            <mat-form-field appearance="fill">
-                <mat-label>Réalisateur</mat-label>
-                <mat-select formControlName="evaluator">
-                    <mat-option *ngFor="let user of utilisateurs" [value]="user.id">
-                        {{ user.username }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <!-- Section Informations générales -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">info</mat-icon>
+        <h3 class="section-title">Informations générales</h3>
+      </div>
 
-            <mat-form-field appearance="fill">
-                <mat-label>Priorité</mat-label>
-                <mat-select formControlName="priority">
-                    <mat-option *ngFor="let p of priorities" [value]="p">
-                        {{ p === 'MINIMAL' ? 'Faible' : p === 'MEDIUM' ? 'Moyenne' : 'Élevée' }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+      <div class="forms-container">
+        <!-- Réalisateur -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Réalisateur</mat-label>
+          <mat-select formControlName="evaluator">
+            <mat-option *ngFor="let user of utilisateurs" [value]="user.id">
+              {{ user.username }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="form.get('evaluator')?.hasError('required')">
+            Le réalisateur est obligatoire
+          </mat-error>
+        </mat-form-field>
 
-            <label for="plannedAt">Date planifiée</label>
-            <input type="date" id="plannedAt" formControlName="plannedAt" />
+        <!-- Priorité -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Priorité</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option *ngFor="let p of priorities" [value]="p">
+              {{ p | enumLabel: 'priority' }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>flag</mat-icon>
+          <mat-error *ngIf="form.get('priority')?.hasError('required')">
+            La priorité est obligatoire
+          </mat-error>
+        </mat-form-field>
 
-            <div class="popup-actions">
-                <button type="submit" [disabled]="form.invalid">Valider</button>
-                <button type="button" (click)="cancel()">Annuler</button>
-            </div>
-        </form>
+        <!-- Date planifiée -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Date planifiée</mat-label>
+          <input matInput type="date" formControlName="plannedAt">
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-error *ngIf="form.get('plannedAt')?.hasError('required')">
+            La date planifiée est obligatoire
+          </mat-error>
+        </mat-form-field>
+
+        <div class="info-box" *ngIf="isEditing">
+          <mat-icon>info</mat-icon>
+          <span>En mode édition, la date planifiée ne peut pas être modifiée</span>
+        </div>
+
+        <div class="info-box" *ngIf="!isEditing && lastPlannedAt">
+          <mat-icon>schedule</mat-icon>
+          <span>Date calculée automatiquement en fonction de la fréquence du contrôle ({{ frequence | enumLabel: 'recurrence' }})</span>
+        </div>
+      </div>
     </div>
-</div>
+  </form>
+
+</app-base-popup>

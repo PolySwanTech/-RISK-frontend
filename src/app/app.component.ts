@@ -14,6 +14,7 @@ import { CreateControlComponent } from './features/control/create-control/create
 import { CreateAttenuationMetricsComponent } from './features/control/create-attenuation-metrics/create-attenuation-metrics.component';
 import { CreateProcessComponent } from './features/process/create-process/create-process.component';
 import { CreateRisksComponent } from './features/reglages/risks/create-risks/create-risks.component';
+import { PopupEvaluationControleComponent } from './pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 
 
 @Component({
@@ -115,6 +116,18 @@ export class AppComponent {
         
       case 'CreateRisksComponent':
         this.dialog.open(CreateRisksComponent, {
+          width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container',
+          data: {
+            draftId: draft.id
+          }
+        });
+        break;
+
+        case 'PopupEvaluationControleComponent':
+        this.dialog.open(PopupEvaluationControleComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',

@@ -1,41 +1,73 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Utilisateur } from '../../../../core/models/Utilisateur';
-import { UtilisateurService } from '../../../../core/services/utilisateur/utilisateur.service';
-import { Priority } from '../../../../core/enum/Priority';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { addDays, addMonths, addWeeks } from 'date-fns';
+
+import { Utilisateur } from '../../../../core/models/Utilisateur';
+import { UtilisateurService } from '../../../../core/services/utilisateur/utilisateur.service';
+import { Priority } from '../../../../core/enum/Priority';
 import { ControlExecution } from '../../../../core/models/ControlExecution';
+import { BasePopupComponent, PopupAction } from '../../../../shared/components/base-popup/base-popup.component';
+import { EnumLabelPipe } from '../../../../shared/pipes/enum-label.pipe';
+
+export interface PlanifierExecutionDialogData {
+  controlId: string;
+  controlVersion: Date;
+  frequence: string;
+  isEditing?: boolean;
+  executionToEdit?: ControlExecution;
+  lastPlannedAt?: string | Date | null;
+}
 
 @Component({
   standalone: true,
   selector: 'app-planifier-execution-popup',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatSelectModule,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatSelectModule,
     MatFormFieldModule,
-    MatInputModule],
+    MatInputModule,
+    MatIconModule,
+    BasePopupComponent,
+    EnumLabelPipe
+  ],
   templateUrl: './planifier-execution-popup.component.html',
   styleUrl: './planifier-execution-popup.component.scss'
 })
 export class PlanifierExecutionPopupComponent {
-  @Input() controlId!: string;
-  @Input() controlVersion!: Date;
-  @Output() close = new EventEmitter<void>();
-  @Output() planifier = new EventEmitter<any>();
-  @Input() frequence!: string;
-  @Input() isEditing = false;
-  @Input() executionToEdit?: ControlExecution;
-  @Input() lastPlannedAt?: string | Date | null;
+  
+  private utilisateurService = inject(UtilisateurService);
+  private fb = inject(FormBuilder);
+  dialogRef = inject(MatDialogRef<PlanifierExecutionPopupComponent>);
 
+  popupActions: PopupAction[] = [];
   form: FormGroup;
   utilisateurs: Utilisateur[] = [];
   priorities = Object.values(Priority);
 
-  private utilisateurService = inject(UtilisateurService);
+  // Données du dialog
+  controlId: string;
+  controlVersion: Date;
+  frequence: string;
+  isEditing: boolean;
+  executionToEdit?: ControlExecution;
+  lastPlannedAt?: string | Date | null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: PlanifierExecutionDialogData) {
+    this.controlId = data.controlId;
+    this.controlVersion = data.controlVersion;
+    this.frequence = data.frequence;
+    this.isEditing = data.isEditing || false;
+    this.executionToEdit = data.executionToEdit;
+    this.lastPlannedAt = data.lastPlannedAt;
+
     this.form = this.fb.group({
       evaluator: [null, Validators.required],
       plannedAt: [null, Validators.required],
@@ -53,20 +85,44 @@ export class PlanifierExecutionPopupComponent {
       },
       error: () => console.error('❌ Erreur lors du chargement des utilisateurs')
     });
+
+    this.initActions();
+  }
+
+  initActions(): void {
+    this.popupActions = [
+      {
+        label: 'Annuler',
+        icon: 'close',
+        color: 'red',
+        onClick: () => this.cancel()
+      },
+      {
+        label: this.isEditing ? 'Mettre à jour' : 'Planifier',
+        icon: 'check',
+        primary: true,
+        disabled: () => this.form.invalid,
+        onClick: () => this.submit()
+      }
+    ];
+  }
+
+  getDialogRef() {
+    return this.dialogRef;
   }
 
   submit(): void {
     if (this.form.invalid) return;
 
-    this.isEditing && this.executionToEdit
-      ? this.emitEditPayload()
-      : this.emitCreatePayload();
+    const payload = this.isEditing && this.executionToEdit
+      ? this.buildEditPayload()
+      : this.buildCreatePayload();
 
-    this.close.emit();
+    this.dialogRef.close(payload);
   }
 
   cancel(): void {
-    this.close.emit();
+    this.dialogRef.close(null);
   }
 
   initFormForEditing() {
@@ -93,28 +149,27 @@ export class PlanifierExecutionPopupComponent {
     this.form.patchValue({ plannedAt: defaultDate });
   }
 
-  emitEditPayload() {
+  buildEditPayload() {
     const { evaluator, priority } = this.form.getRawValue();
-    this.planifier.emit({
+    return {
       id: this.executionToEdit!.id,
       performedBy: evaluator,
       priority
-    });
+    };
   }
 
-  emitCreatePayload() {
+  buildCreatePayload() {
     const { evaluator, plannedAt, priority } = this.form.getRawValue();
     const [y, m, d] = plannedAt.split('-').map(Number);
     const safe = new Date(y, m - 1, d, 12, 0, 0);
-    this.planifier.emit({
+    return {
       controlTemplateId: this.controlId,
       controlTemplateVersion: this.controlVersion,
       evaluator,
       plannedAt: safe.toISOString(),
       priority
-    });
+    };
   }
-
 
   private calculerDatePlanifieeParDefaut(date: Date, freq: string | undefined): string {
     if (!freq) return date.toISOString().substring(0, 10);
@@ -130,5 +185,4 @@ export class PlanifierExecutionPopupComponent {
 
     return d?.toISOString().substring(0, 10) ?? date.toISOString().substring(0, 10);
   }
-
 }
