@@ -1,1 +1,23 @@
-<p>draft-banner works!</p>
+<div class="draft-banner-container" #scrollContainer>
+  <div 
+    *ngFor="let draft of (drafts$ | async)" 
+    class="draft-banner"
+    [@slideIn]
+    (click)="onRestore(draft)">
+    
+    <div class="draft-content">
+      <mat-icon class="draft-icon">edit_note</mat-icon>
+      <div class="draft-info">
+        <span class="draft-title">{{ draft.title }}</span>
+        <span class="draft-time">{{ getTimeAgo(draft.timestamp) }}</span>
+      </div>
+    </div>
+
+    <button 
+      mat-icon-button 
+      class="btn-delete"
+      (click)="onDelete(draft); $event.stopPropagation()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

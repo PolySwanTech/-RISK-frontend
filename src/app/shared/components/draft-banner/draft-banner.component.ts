@@ -10,188 +10,19 @@ import { Draft, DraftService } from '../../../core/services/draft.service';
   selector: 'app-draft-banner',
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule],
-  template: `
-    <div class="draft-banner-container" #scrollContainer>
-      <div 
-        *ngFor="let draft of (drafts$ | async)" 
-        class="draft-banner"
-        [@slideIn]>
-        <div class="draft-content">
-          <mat-icon class="draft-icon">edit_note</mat-icon>
-          <div class="draft-info">
-            <span class="draft-title">{{ draft.title }}</span>
-            <span class="draft-time">{{ getTimeAgo(draft.timestamp) }}</span>
-          </div>
-        </div>
-        <div class="draft-actions">
-          <button 
-            mat-button 
-            class="btn-restore"
-            (click)="onRestore(draft)">
-            <mat-icon>restore</mat-icon>
-            Restaurer
-          </button>
-          <button 
-            mat-icon-button 
-            class="btn-delete"
-            (click)="onDelete(draft)">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .draft-banner-container {
-    position: fixed;
-    bottom: 20px;
-    margin-left: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    max-width: 70%;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    &::-webkit-scrollbar {
-        height: 6px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: transparent;
-        border-radius: 3px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 3px;
-        
-        &:hover {
-          background: #94a3b8;
-        }
-      }
-    }
-
-    .draft-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: all 0.3s ease;
-      gap: 16px;
-
-      &:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        transform: translateY(-2px);
-      }
-    }
-
-    .draft-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .draft-icon {
-      color: var(--mat-sys-primary);
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-    }
-
-    .draft-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    .draft-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #1e293b;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .draft-time {
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    .draft-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .btn-restore {
-      background: var(--mat-sys-primary) !important;
-      color: white !important;
-      font-size: 13px;
-      font-weight: 500;
-      
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        margin-right: 4px;
-      }
-    }
-
-    .btn-delete {
-      color: #64748b;
-      
-      &:hover {
-        color: #ef4444;
-        background: #fef2f2;
-      }
-
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .draft-banner-container {
-        left: 12px;
-        right: 12px;
-        max-width: unset;
-      }
-
-      .draft-banner {
-        padding: 12px;
-      }
-
-      .btn-restore {
-        font-size: 12px;
-        padding: 6px 12px;
-      }
-    }
-  `],
+  templateUrl: './draft-banner.component.html',
+  styleUrls: ['./draft-banner.component.scss'],
   animations: [
-  trigger('slideIn', [
-    transition(':enter', [
-      style({ transform: 'translateY(100%)', opacity: 0 }),
-      animate('300ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
-    ]),
-    transition(':leave', [
-      animate('200ms ease-in', style({ transform: 'translateY(100%)', opacity: 0 }))
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ transform: 'translateX(20px)', opacity: 0 }),
+        animate('200ms ease-out', style({ transform: 'translateX(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('100ms ease-in', style({ transform: 'translateX(20px)', opacity: 0 }))
+      ])
     ])
-  ])
-]
+  ]
 })
 export class DraftBannerComponent implements OnInit {
   private draftService = inject(DraftService);
