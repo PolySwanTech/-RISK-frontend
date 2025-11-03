@@ -456,6 +456,17 @@ export class ProcessManagerComponent implements OnInit {
     return null;
   }
 
+  viewRiskDetails(risk: RiskTemplate): void {
+    // const sessionStorageKey = "object_for_carto";
+    // const obj = {
+    //   bu: this.selectedBu ? { id: this.selectedBu.id, name: this.selectedBu.name } : null,
+    //   process: this.selectedProcess,
+    //   risk: risk
+    // };
+    this.router.navigate(['reglages', 'risks', risk.id]);
+
+  }
+
   createNewEvent(): void {
     const process = this.selectedProcess!
 

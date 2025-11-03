@@ -105,7 +105,7 @@
         <div class="risk-events-section">
           <h3>Événements de risque redouté ({{ viewedRisks.length }})</h3>
           <div *ngIf="viewedRisks.length > 0; else noRisk">
-            <div *ngFor="let risk of viewedRisks" class="risk-item">
+            <div *ngFor="let risk of viewedRisks" class="risk-item" (click)="!cartoMode && viewRiskDetails(risk)">
               <div class="risk-label">
                 <strong>{{ risk.libelle }}</strong>
                 <p>{{ risk.description }}</p>
