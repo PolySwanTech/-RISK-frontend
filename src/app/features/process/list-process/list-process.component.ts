@@ -10,6 +10,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ActivatedRoute } from '@angular/router';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
+import { EvaluationFrequency } from '../../../core/enum/evaluation-frequency.enum';
+import { MatOption } from "@angular/material/core";
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-list-process',
@@ -23,8 +26,10 @@ import { RiskEvaluationService } from '../../../core/services/risk-evaluation/ri
     MatFormFieldModule,
     FormsModule,
     MatCardModule,
-    MatBadgeModule
-  ],
+    MatBadgeModule,
+    MatOption,
+    MatSelectModule
+],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'
 })
@@ -36,6 +41,9 @@ export class ListProcessComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   allRisks: any[] = [];
+  allPeriods: string[] = [];
+  selectedPeriod: string = '';
+  frequency: EvaluationFrequency | null = null;
   searchTerm: string = '';
   selectedYear: number = new Date().getFullYear();
 
@@ -46,6 +54,19 @@ export class ListProcessComponent implements OnInit {
       if (this.buId) {
         this.riskEvaluationService.getEvaluationsByBu(this.buId).subscribe(buEval => {
           this.allRisks = buEval.evaluations;
+          this.frequency = buEval.evaluationFrequency;
+        });
+        this.riskEvaluationService.getPeriodsByBu(this.buId).subscribe(periodsData => {
+          this.allPeriods = periodsData;
+          this.selectedPeriod = this.getCurrentPeriod();
+
+          // Ajouter la période actuelle si absente
+          const currentPeriod = this.getCurrentPeriod();
+          if (!this.allPeriods.includes(currentPeriod)) {
+            this.allPeriods.push(currentPeriod);
+          }
+          this.allPeriods.sort((a, b) => b.localeCompare(a)); // plus récente d'abord
+          this.selectedPeriod = currentPeriod;
         });
       } else {
         this.allRisks = []; // pas de BU sélectionnée
@@ -53,10 +74,25 @@ export class ListProcessComponent implements OnInit {
     });
   }
 
-  filteredRisks() {
-    if (!this.searchTerm) return this.allRisks;
-    return this.allRisks.filter(item =>
-      item.processName.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+  getCurrentPeriod(): string {
+    const year = new Date().getFullYear();
+    if (this.frequency === EvaluationFrequency.SEMESTER) {
+      const month = new Date().getMonth() + 1;
+      const semester = month <= 6 ? 'S1' : 'S2';
+      return `${semester} ${year}`;
+    } else {
+      return `${year}`;
+    }
   }
+
+  filteredRisks() {
+    return this.allRisks
+      .filter(item => 
+        (!this.searchTerm || item.processName.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      )
+      .filter(item => 
+        !this.selectedPeriod || item.evaluationPeriod === this.selectedPeriod
+      );
+  }
+
 }

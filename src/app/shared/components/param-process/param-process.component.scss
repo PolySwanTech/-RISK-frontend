@@ -336,3 +336,41 @@
     padding-top: 20px;
     border-top: 2px solid #e2e8f0;
 }
+
+.periods-container {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+
+  h3 {
+    font-size: 16px;
+    color: #4a5568;
+    margin-bottom: 10px;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    background: #edf2f7;
+    color: #2d3748;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #e2e8f0;
+    }
+
+    &.selected {
+      background: #4299e1;
+      color: white;
+      font-weight: 600;
+    }
+  }
+}

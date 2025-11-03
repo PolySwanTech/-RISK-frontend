@@ -177,10 +177,10 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
     const map = new Map<string, { period: string, brut?: RiskEvaluationDto, net?: RiskEvaluationDto }>();
 
     this.riskEvaluations.forEach(evalDto => {
-      const key = `${evalDto.exercicePeriod.start}_${evalDto.exercicePeriod.end}`;
+      const key = `${evalDto.evaluationPeriod}`;
       if (!map.has(key)) {
         map.set(key, {
-          period: `${evalDto.exercicePeriod.start} - ${evalDto.exercicePeriod.end}`,
+          period: `${evalDto.evaluationPeriod}`,
         });
       }
       const entry = map.get(key)!;

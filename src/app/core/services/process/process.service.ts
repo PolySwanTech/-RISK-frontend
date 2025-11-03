@@ -25,8 +25,10 @@ export class ProcessService {
   }
 
   getProcessTree(buId?: string): Observable<Process[]> {
-    const options = buId ? { params: new HttpParams().set('buId', buId) } : {};
-    return this.http.get<Process[]>(`${this.baseUrl}/tree`, options);
+    let params = new HttpParams();
+    
+    if (buId) params = params.set('buId', buId);
+    return this.http.get<Process[]>(`${this.baseUrl}/tree`, {params});
   }
 
   getProcessLeaf(buId: string): Observable<Process[]> {

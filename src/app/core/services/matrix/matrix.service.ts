@@ -3,8 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Matrix } from '../../models/Matrix';
-import { RangeType } from '../../../features/cartographie/matrix-settings/matrix-settings.component';
-import { Range } from '../../../features/cartographie/matrix-settings/matrix-settings.component';
+import { RangeType, Range } from '../../models/range';
 
 @Injectable({
   providedIn: 'root'

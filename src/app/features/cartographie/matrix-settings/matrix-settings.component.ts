@@ -3,18 +3,9 @@ import { Component, inject, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
-import { RiskLevelEnum, RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
+import { RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
-
-export interface Range {
-  id : number,
-  libelle: string;
-  riskLevel : RiskLevelEnum;
-  min: number;
-  max?: number;
-}
-
-export type RangeType = 'SEVERITY' | 'FREQUENCY';
+import { RangeType, Range } from '../../../core/models/range';
 
 @Component({
   selector: 'app-matrix-settings',

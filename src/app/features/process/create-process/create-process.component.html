@@ -24,15 +24,6 @@
       </mat-error>
     </mat-form-field>
 
-    <!-- Processus Parent (optionnel) -->
-    @if (processes.length != 0) {
-    <div class="row-add">
-      <app-select-arborescence appearance="outline" placeholder="Sélectionnez un processus parent"
-        *ngIf="processes.length > 0" [id]="processForm.get('parentId')!.value"
-        (changeValue)="onSelectionProcess($event)" [list]="processes" />
-    </div>
-    }
-
     <!-- Bouton de soumission -->
     <div class="actions">
       <button mat-raised-button class="btn-primary" type="submit" [disabled]="processForm.invalid">

@@ -1,5 +1,17 @@
 <div class="process-container">
 
+    <!-- Sélecteur de période -->
+    <div class="period-select">
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Sélectionner une période</mat-label>
+            <mat-select [(ngModel)]="selectedPeriod">
+                <mat-option *ngFor="let period of allPeriods" [value]="period">
+                    {{ period }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
     <!-- Barre de recherche par nom de process -->
     <div class="search-bar">
         <mat-form-field appearance="outline" class="w-full">
@@ -17,13 +29,16 @@
             <div class="col-process">Processus</div>
             <div class="col-risque">Exercice</div>
             <div class="col-risque">Risque</div>
-            <div class="col-risque-brut">Evaluation</div>
+            <div class="col-risque-brut">Évaluation</div>
             <div class="col-risque-brut">Type d'évaluation</div>
         </div>
 
         <div *ngFor="let item of filteredRisks()" class="table-row">
             <div class="col-process">{{ item.processName }}</div>
-            <div class="col-process">{{ item.exercicePeriod.start | date : "dd/MM/yyyy" }} - {{ item.exercicePeriod.end | date : "dd/MM/yyyy" }} </div>
+            <!-- <div class="col-process">
+                {{ item.exercicePeriod.start | date : "dd/MM/yyyy" }} -
+                {{ item.exercicePeriod.end | date : "dd/MM/yyyy" }}
+            </div> -->
             <div class="col-risque">{{ item.riskName }}</div>
             <div class="col-risque-brut">{{ item.evaluation.name }}</div>
             <div class="col-risque-brut">{{ item.brut ? 'Brute' : 'Nette' }}</div>

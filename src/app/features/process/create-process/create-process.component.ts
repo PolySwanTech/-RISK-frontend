@@ -10,7 +10,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
-import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 
@@ -18,7 +17,7 @@ import { BusinessUnit } from '../../../core/models/BusinessUnit';
   selector: 'app-create-process',
   imports: [ReactiveFormsModule, ReactiveFormsModule, CommonModule, FormsModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatStepperModule, MatButtonModule, SelectArborescenceComponent],
+    MatStepperModule, MatButtonModule],
   templateUrl: './create-process.component.html',
   styleUrl: './create-process.component.scss'
 })
@@ -43,14 +42,12 @@ export class CreateProcessComponent {
       this.ope = 'Modifier';
       this.processForm = this.fb.group({
         name: [data.process.name, Validators.required],
-        parentId: [data.process.parentId, Validators.required]
       });
     }
     else {
       this.processForm = this.fb.group({
         name: ['', Validators.required],
         bu: [this.data ? this.data.buId : null, Validators.required],
-        parentId: [null]
       });
     }
 
@@ -84,10 +81,6 @@ export class CreateProcessComponent {
     this.processService.getProcessLeaf(buId).subscribe(list => {
       this.processes = [...list];
     });
-  }
-
-  onSelectionProcess(value: any) {
-    this.processForm.get('parentId')?.setValue(value.id);
   }
 
   onSubmit() {

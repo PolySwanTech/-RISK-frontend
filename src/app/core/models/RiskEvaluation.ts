@@ -1,10 +1,6 @@
 import { RiskLevel } from "../enum/riskLevel.enum";
 import { Utilisateur } from "./Utilisateur";
-/* ----------------------------------------- */
-/*  models/RiskEvaluation.ts                 */
-/* ----------------------------------------- */
 
-/** --- objet retourné par l’API --- */
 export interface RiskEvaluation {
   id           : string;      // UUID
   evaluation      : RiskLevel;
@@ -12,9 +8,10 @@ export interface RiskEvaluation {
   probability ?: number;
   createdAt    : Date;      // ISO
   riskId : string; // UUID du risque
+  evaluationPeriod: string;
+
 }
 
-/** --- objet retourné par l’API --- */
 export interface RiskEvaluationDto {
   id           : string;      
   evaluation      : RiskLevel;
@@ -23,11 +20,19 @@ export interface RiskEvaluationDto {
   createdAt    : Date;
   riskId : string;
   commentaire : string;
-  exercicePeriod: ExercicePeriod;
   brut: boolean;
+  evaluationPeriod: string;
 }
 
-export interface ExercicePeriod {
-  start: Date;
-  end: Date;
+export interface EvaluationIndicatorDto {
+  frequenceId: number;
+  severiteId: number;
+}
+
+export interface RiskEvaluationCreateDto {
+  evaluation: string;
+  brut?: boolean;
+  commentaire?: string;
+  riskId: string;
+  indicators?: EvaluationIndicatorDto[];  
 }

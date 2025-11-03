@@ -20,13 +20,14 @@ import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
 import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
-import { Range } from '../matrix-settings/matrix-settings.component';
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 import { AttenuationMetrics } from '../../../core/models/AttenuationMetrics';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
+import { Range } from '../../../core/models/range';
+import { RiskEvaluationCreateDto } from '../../../core/models/RiskEvaluation';
 
 interface Indicator {
   frequenceId: number;
@@ -147,8 +148,17 @@ export class CreateEvaluationComponent implements OnInit {
 
   gotoSteppe3(event: any) {
     this.highestRiskLevelNet = this.highestRiskLevel;
+    console.log(this.highestRiskLevelNet);
     if (this.highestRiskLevel && this.selectedRisk) {
-      this.evaluationSrv.saveEvaluation(this.selectedRisk.id, this.highestRiskLevel, this.indicators, true)
+      const riskEvaluationCreateDto: RiskEvaluationCreateDto = {
+        riskId: this.selectedRisk.id,
+        evaluation: this.highestRiskLevel,
+        indicators: this.indicators.map(i => ({frequenceId: i.frequenceId, severiteId: i.severiteId})),
+        brut: false,
+        commentaire: "" // TODO ajouter un champ commentaire dans le formulaire
+      };
+      console.log(riskEvaluationCreateDto);
+      this.evaluationSrv.saveEvaluation(riskEvaluationCreateDto)
         .subscribe(
           {
             next: _ => {
@@ -233,10 +243,8 @@ export class CreateEvaluationComponent implements OnInit {
         };
 
         if (existingIndex !== -1) {
-          // 🔁 Replace the existing indicator
           this.indicators[existingIndex] = updatedIndicator;
         } else {
-          // ➕ Add a new indicator
           this.indicators.push(updatedIndicator);
         }
       }
@@ -283,7 +291,15 @@ export class CreateEvaluationComponent implements OnInit {
   saveEvaluation(stepper: any): void {
 
     if (this.highestRiskLevelNet && this.selectedRisk) {
-      this.evaluationSrv.saveEvaluation(this.selectedRisk.id, this.highestRiskLevelNet, [], false).subscribe(
+      const riskEvaluationCreateDto: RiskEvaluationCreateDto = {
+        riskId: this.selectedRisk.id,
+        evaluation: this.highestRiskLevelNet,
+        indicators: this.indicators.map(i => ({frequenceId: i.frequenceId, severiteId: i.severiteId})),
+        brut: false,
+        commentaire: "" // TODO ajouter un champ commentaire dans le formulaire
+      };
+      console.log(riskEvaluationCreateDto);
+      this.evaluationSrv.saveEvaluation(riskEvaluationCreateDto).subscribe(
         _ => {
           this.snackBarService.info("Evaluation sauvegardée");
           stepper.next();

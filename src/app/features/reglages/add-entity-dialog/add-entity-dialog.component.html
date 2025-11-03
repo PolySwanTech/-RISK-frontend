@@ -12,6 +12,17 @@
         <label>Ligne Métier ?</label>
         <mat-slide-toggle formControlName="lm" [checked]="formGroup.get('lm')?.value" />
       </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fréquence d'évaluation</mat-label>
+        <mat-select formControlName="evaluationFrequency" required>
+          <mat-option *ngFor="let freq of evaluationFrequencies" [value]="freq.id">
+            {{ freq.libelle }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      
     </form>
     <app-select-entities [entiteEnfantId]=" data ? data.id : ''"
       [selectId]="BusinessUnit.parentId ? BusinessUnit.parentId : ''"

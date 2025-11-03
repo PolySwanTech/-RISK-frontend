@@ -1,3 +1,5 @@
+import { EvaluationFrequency } from "../enum/evaluation-frequency.enum";
+import { EvaluationState } from "../enum/evaluation-state.enum";
 import { OperatingLossState } from "../enum/operatingLossState.enum";
 import { AttenuationMetrics } from "./AttenuationMetrics";
 import { ControlTemplate } from "./ControlTemplate";
@@ -13,55 +15,64 @@ export interface Dmr {
 
 // -------------  MODÈLE PRINCIPAL -------------
 export class RiskTemplate {
-
   id!: string;
-
   libelle!: string;
-
   reference!: string;
-
-  description?: string;
-
-  riskReferentiel!: RiskReferentiel;
-
-  declaredAt!: Date;
-
-  attachmentState!: OperatingLossState;
-
-  /** actif par défaut */
-  active = true;
-
+  buName: string = '';
   creatorName!: string;
   creatorId!: string;
-
-  buName: string = '';
-  processName: string = '';
   processId?: string;
-
+  processName: string = '';
+  active: boolean = true;
+  declaredAt!: Date;
+  description?: string | null;
+  riskReferentiel!: RiskReferentiel;
+  attachmentState: OperatingLossState = OperatingLossState.WAITING;
   riskNet?: RiskEvaluation[];
   riskBrut?: RiskEvaluation[];
-
-  /** champ dérivé côté back (@Transient) */
   dmr?: Dmr;
+  evaluationState?: EvaluationState;
 
-  // Accès pratiques (si tu veux manipuler sans repasser par dmr?.)
-  get controls(): ControlTemplate[] {
-    return this.dmr?.controls ?? [];
-  }
-  get attenuationMetrics(): AttenuationMetrics[] {
-    return this.dmr?.attenuationMetrics ?? [];
-  }
-
+  
   /** constructeur pratique pour Object.assign(new RiskTemplate(), dto) */
   constructor(init?: Partial<RiskTemplate>) {
     Object.assign(this, init);
   }
+
+  computeEvaluationState(currentPeriod: string, frequency: EvaluationFrequency): EvaluationState {
+    if (!this.isValidPeriod(currentPeriod, frequency)) {
+      throw new Error(`Période d'évaluation invalide pour la fréquence ${frequency}: ${currentPeriod}`);
+    }
+
+    const brutDone = this.riskBrut?.some(e => e.evaluationPeriod === currentPeriod) ?? false;
+    const netDone = this.riskNet?.some(e => e.evaluationPeriod === currentPeriod) ?? false;
+
+    if (!brutDone && !netDone) return EvaluationState.BRUT;
+    if (brutDone && !netDone) return EvaluationState.NET;
+    return EvaluationState.COMPLETED;
+  }
+
+  private isValidPeriod(period: string, frequency: EvaluationFrequency): boolean {
+    if (!period) return false;
+
+    switch (frequency) {
+      case EvaluationFrequency.SEMESTER:
+        return /^S[1-2] \d{4}$/.test(period);
+      case EvaluationFrequency.YEARLY:
+        return /^\d{4}$/.test(period);
+      default:
+        return false;
+    }
+  }
 }
 
 // -------------  DTO -------------
-export interface RiskTemplateCreateDto {
-  libelle: string;
+export type RiskTemplateCreateDto = Required<Pick<RiskTemplate, 'libelle' | 'processId'>> 
+& Partial<Pick<RiskTemplate, 'description'>> & {
   riskReferentielId: string;
-  processId:   string;
-  description: string | null;    
-}
+};
+
+export type RiskSimpleDto = Required<Pick<RiskTemplate, 'id' | 'libelle' | 'attachmentState'>> & {
+  riskReferentiel: RiskReferentiel;
+};
+

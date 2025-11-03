@@ -13,33 +13,40 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { MatCardModule } from '@angular/material/card';
+import { EvaluationFrequency, EvaluationFrequencyLabels } from '../../../core/enum/evaluation-frequency.enum';
+import { MatSelectModule } from "@angular/material/select";
 
 @Component({
   selector: 'app-add-entity-dialog',
   standalone: true,
   imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule, MatIconModule, PopupHeaderComponent, MatCardModule,
-    MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent, MatFormFieldModule, MatInputModule, MatButtonModule],
+    MatSlideToggleModule, ReactiveFormsModule, SelectEntitiesComponent, MatFormFieldModule, MatInputModule, MatButtonModule, MatSelectModule],
   templateUrl: './add-entity-dialog.component.html',
   styleUrls: ['./add-entity-dialog.component.scss']
 })
 export class AddEntityDialogComponent {
 
   private _formBuilder = inject(FormBuilder);
+  evaluationFrequencies = Object.entries(EvaluationFrequencyLabels).map(([key, label]) => ({
+  id: key as EvaluationFrequency,
+  libelle: label
+}));
 
   formGroup: FormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     lm: [false],
-    parent: [null]
+    parent: [null],
+    evaluationFrequency: [EvaluationFrequency.SEMESTER, Validators.required]
   });
 
-  BusinessUnit = new BusinessUnit("", '', false, [], null);
+  BusinessUnit = new BusinessUnit("", '', false, [], []);
 
   titlePage = "Création d'une entité responsable";
 
   constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService,
     @Inject(MAT_DIALOG_DATA) public data: BusinessUnit, private cdRef: ChangeDetectorRef
   ) {
-    this.BusinessUnit = data || new BusinessUnit("", '', false, [], null);
+    this.BusinessUnit = data || new BusinessUnit("", '', false, [], []);
   }
 
   ngOnInit(): void {
@@ -47,7 +54,8 @@ export class AddEntityDialogComponent {
       this.titlePage = "Modification de l'entité responsable : " + this.data.name;
       this.formGroup.get('name')?.setValue(this.data.name);
       this.formGroup.get('lm')?.setValue(this.data.lm);
-      this.formGroup.get('parent')?.setValue(this.data.parent);
+      this.formGroup.get('parent')?.setValue(this.data.parentId);
+      this.formGroup.get('evaluationFrequency')?.setValue(this.data.evaluationFrequency);
     }
     setTimeout(() => {
       this.cdRef.detectChanges(); // Force la détection des changements
@@ -62,6 +70,7 @@ export class AddEntityDialogComponent {
     this.BusinessUnit.name = this.formGroup.get('name')?.value;
     this.BusinessUnit.lm = this.formGroup.get('lm')?.value;
     this.BusinessUnit.parentId = this.formGroup.get('parent')?.value;
+    this.BusinessUnit.evaluationFrequency = this.formGroup.get('evaluationFrequency')?.value;
     this.dialogRef.close(this.BusinessUnit);
   }
 

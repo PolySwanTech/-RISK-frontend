@@ -6,6 +6,6 @@ export interface Role {
 }
 
 export interface TeamMember {
-  role: Role;
+  role: Role; // TODO remplacer role par rolename
   buId: string;
 }  

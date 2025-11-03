@@ -195,9 +195,9 @@
 
             <div *ngFor="let group of groupedEvaluations" class="incident">
               <div class="incident-date">
-                Période : {{ group.brut?.exercicePeriod?.start | date:'dd/MM/yyyy' }}
+                Période : {{ group.brut?.evaluationPeriod | date:'dd/MM/yyyy' }}
                 -
-                {{ group.brut?.exercicePeriod?.end | date:'dd/MM/yyyy' }}
+                {{ group.brut?.evaluationPeriod | date:'dd/MM/yyyy' }}
               </div>
 
               <div class="incident-title">
