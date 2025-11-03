@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { forkJoin, Subscription } from 'rxjs';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlTemplateListViewDto } from '../../../core/models/ControlTemplate';
 import { ControlExecution } from '../../../core/models/ControlExecution';
 import { Status } from '../../../core/enum/status.enum';
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -35,7 +35,7 @@ export class ControlCompletionRateComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // 1️⃣ Charger tous les contrôles
     this.sub = this.controlService.getAllTemplates().subscribe({
-      next: (templates: ControlTemplate[]) => {
+      next: (templates: ControlTemplateListViewDto[]) => {
         if (!templates.length) {
           this.isLoading = false;
           return;

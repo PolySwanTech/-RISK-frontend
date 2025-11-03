@@ -7,13 +7,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
-import { PermissionLabels, PermissionName } from '../../../core/enum/permission.enum';
+import { PermissionName } from '../../../core/enum/permission.enum';
 import { RoleService } from '../../../core/services/role/role.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateRoleDialogComponent } from '../role/create-role-dialog/create-role-dialog.component';
 import { Role } from '../../../core/models/TeamMember';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 
 @Component({
@@ -28,7 +29,8 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
-    GoBackComponent
+    GoBackComponent,
+    EnumLabelPipe
   ],
   templateUrl: './manage-permissions.component.html',
   styleUrls: ['./manage-permissions.component.scss']
@@ -58,10 +60,6 @@ export class ManagePermissionsComponent implements OnInit {
   constructor(
     private roleService: RoleService,
   ) { }
-
-  formatPermission(p: PermissionName) {
-    return PermissionLabels[p] || p;
-  }
 
   ngOnInit(): void {
     this.loadRoles();

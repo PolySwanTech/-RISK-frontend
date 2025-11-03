@@ -1,0 +1,117 @@
+.base-popup-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 90vh;
+  width: 100%;
+}
+
+.dialog-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 24px;
+
+  // Styles de la scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+.content-wrapper {
+  width: 100%;
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+  flex-shrink: 0;
+
+  button {
+    min-width: 120px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    mat-icon {
+      margin-right: 4px;
+    }
+
+    &.btn-primary {
+      background: var(--mat-sys-primary) !important;
+      color: white !important;
+
+      &:hover:not(:disabled) {
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &.btn-red {
+      background: #ef4444 !important;
+      color: white !important;
+
+      &:hover {
+        background: darken(#ef4444, 10%) !important; // fonce de 10%
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      }
+    }
+
+    &.btn-accent {
+      background: var(--mat-sys-accent) !important;
+      color: white !important;
+    }
+
+    &.btn-warn {
+      background: var(--mat-sys-warn) !important;
+      color: white !important;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .base-popup-container {
+    max-height: 100vh;
+  }
+
+  .dialog-content {
+    padding: 16px;
+  }
+
+  .dialog-footer {
+    flex-direction: column-reverse;
+    padding: 12px 16px;
+    gap: 8px;
+
+    button {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+}

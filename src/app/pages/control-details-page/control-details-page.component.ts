@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { Status, StatusLabels } from '../../core/enum/status.enum';
+import { Status } from '../../core/enum/status.enum';
 import { ControlService } from '../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../core/models/ControlTemplate';
-import { ControlExecution } from '../../core/models/ControlExecution';
+import { ControlDetailsView } from '../../core/models/ControlTemplate';
 import { ControlEvaluationView } from '../../core/models/ControlEvaluation';
 
 import { PlanifierExecutionPopupComponent } from './popup-planifier-execution/planifier-execution-popup/planifier-execution-popup.component';
@@ -19,18 +18,20 @@ import { EvaluationCardComponent } from './evaluation-card/evaluation-card.compo
 import { MatDialog } from '@angular/material/dialog';
 import { HasPermissionDirective } from "../../core/directives/has-permission.directive";
 import { AuthService } from '../../core/services/auth/auth.service';
+import { ControlExecutionDetails } from '../../core/models/ControlExecution';
+import { EnumLabelPipe } from '../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-control-details-page',
   standalone: true,
   imports: [
     CommonModule,
-    PlanifierExecutionPopupComponent,
     GoBackComponent,
     EvaluationCardComponent,
     RouterModule,
     MethodologyCardComponent,
-    HasPermissionDirective
+    HasPermissionDirective,
+    EnumLabelPipe
   ],
   templateUrl: './control-details-page.component.html',
   styleUrls: ['./control-details-page.component.scss']
@@ -43,23 +44,19 @@ export class ControlDetailsPageComponent implements OnInit {
   private dialog = inject(MatDialog);
   private authService = inject(AuthService);
 
-  control: ControlTemplate | null = null;
-  controlExecutions: ControlExecution[] | null = null;
+  control: ControlDetailsView | null = null;
+  controlExecutions: ControlExecutionDetails[] | null = null;
 
   recurrenceLabels = { ...RecurrenceLabels };
-
-  // Popups
-  showPopup = false;
 
   // Cache des vues d'évaluation
   evaluationCache: Record<string, ControlEvaluationView | null> = {};
 
   // Boutons GoBack (seulement Planifier + Historique)
-  goBackButtons: GoBackButton[] = [
-  ];
+  goBackButtons: GoBackButton[] = [];
 
   // === Carrousel (4 dernières exécutions) ===
-  slides: Array<{ exec: ControlExecution; view: ControlEvaluationView | null }> = [];
+  slides: Array<{ exec: ControlExecutionDetails; view: ControlEvaluationView | null }> = [];
   currentSlide = 0;
 
   isDragging = false;
@@ -89,7 +86,7 @@ export class ControlDetailsPageComponent implements OnInit {
         action: () => this.scheduleExecution()
       },
       {
-        label: 'Voir tout l’historique',
+        label: "Voir tout l'historique",
         icon: 'history',
         class: 'btn-primary',
         show: true,
@@ -115,7 +112,6 @@ export class ControlDetailsPageComponent implements OnInit {
       const calls = executions.map(e =>
         this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
       );
-
 
       forkJoin(calls).subscribe(views => {
         this.evaluationCache = {};
@@ -145,14 +141,16 @@ export class ControlDetailsPageComponent implements OnInit {
     }
   }
 
-  formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
-
-
   openEvaluationDetailsPopup(executionId: string, action: string): void {
     this.dialog.open(PopupEvaluationControleComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
       data: {
         action: action,
         executionId: executionId,
+        evaluationView: this.evaluationCache[executionId] || null,
         mode: action == 'eval' ? 'FORM' : 'DETAILS',
         canValidate: true
       }
@@ -163,9 +161,14 @@ export class ControlDetailsPageComponent implements OnInit {
 
   evaluateExec(executionId: string, action: string): void {
     this.dialog.open(PopupEvaluationControleComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
       data: {
         action: action,
         controlId: this.control?.id,
+        evaluationView: this.evaluationCache[executionId] || null,
         executionId: executionId,
         mode: 'FORM',
         canValidate: true
@@ -176,10 +179,17 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   handlePlanification(payload: any): void {
-    if (!this.control) return;
+    if (!this.control || !payload) return;
+
     const reload = () => this.loadControlExecutions(this.control!.id);
-    if (payload.id) this.controlService.updateExecution(payload).subscribe(reload);
-    else this.controlService.createExecution(payload).subscribe(reload);
+
+    if (payload.id) {
+      // Mode édition
+      this.controlService.updateExecution(payload).subscribe(reload);
+    } else {
+      // Mode création
+      this.controlService.createExecution(payload).subscribe(reload);
+    }
   }
 
   handleEvaluationSubmitted(): void {
@@ -188,12 +198,32 @@ export class ControlDetailsPageComponent implements OnInit {
 
   /** === ACTIONS === */
 
-  scheduleExecution(): void { this.showPopup = true; }
+  scheduleExecution(): void {
+    if (!this.control) return;
+
+    const dialogRef = this.dialog.open(PlanifierExecutionPopupComponent, {
+      width: '700px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
+      data: {
+        controlId: this.control.id,
+        frequence: this.control.frequency,
+        isEditing: false,
+        lastPlannedAt: this.controlExecutions?.[0]?.plannedAt
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(payload => {
+      if (payload) {
+        this.handlePlanification(payload);
+      }
+    });
+  }
 
   viewFullHistory(): void {
     if (this.control) this.router.navigate(['control', 'details', this.control.id, 'executions']);
   }
-
 
   /** === Carrousel === */
 
@@ -213,15 +243,16 @@ export class ControlDetailsPageComponent implements OnInit {
     if (this.hasNext()) this.currentSlide += 1;
   }
 
-  goTo(i: number): void { if (i >= 0 && i < this.slides.length) this.currentSlide = i; }
+  goTo(i: number): void {
+    if (i >= 0 && i < this.slides.length) this.currentSlide = i;
+  }
 
   /** === FIN carrousel === */
 
-  // === Calculations pour l’en-tête ===
-  get currentOrLatestExecution(): ControlExecution | null {
+  // === Calculations pour l'en-tête ===
+  get currentOrLatestExecution(): ControlExecutionDetails | null {
     return this.controlExecutions?.[0] ?? null;
   }
-
 
   onDragStart(e: PointerEvent | TouchEvent) {
     const x = (e as TouchEvent).touches?.[0]?.clientX ?? (e as PointerEvent).clientX;

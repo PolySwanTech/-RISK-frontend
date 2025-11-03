@@ -1,5 +1,7 @@
 .top-risks-card {
   background: #f9fafc;
+  height: 367px;
+  margin-bottom: 20px;
 
   mat-card-header {
     border-left: 4px solid #ef4444;
@@ -39,17 +41,18 @@
     .level {
       text-align: right;
       font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
       gap: 6px;
     }
 
     .color-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+    margin-top: 0px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    top: 1px;
     }
   }
 

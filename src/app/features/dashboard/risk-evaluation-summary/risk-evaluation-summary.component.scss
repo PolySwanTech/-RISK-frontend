@@ -1,99 +1,239 @@
 .summary-card {
-  background: #f9fafc;
-  padding: 10px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.1);
 
   mat-card-header {
     border-left: 4px solid #3b82f6;
-    padding-left: 10px;
-    margin-bottom: 10px;
+    padding-left: 16px;
+    margin-bottom: 24px;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%);
+    padding: 12px 16px;
+    border-radius: 8px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+
+      .title-icon {
+        font-size: 22px;
+      }
+    }
   }
 
   .total-container {
-    text-align: right;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #374151;
+    text-align: center;
+    margin-bottom: 24px;
 
-    .total-label {
-      font-weight: 500;
-    }
+    .total-badge {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      padding: 16px 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 
-    .total-value {
-      font-weight: 700;
-      color: #000000;
-      margin: 0 4px;
-      font-size: 15px;
-    }
+      .total-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: white;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
 
-    .total-sub {
-      color: #6b7280;
+      .total-label {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
     }
+  }
+
+  .bar-wrapper {
+    margin-bottom: 24px;
   }
 
   .bar-container {
     display: flex;
-    height: 36px;
-    border-radius: 18px;
+    height: 48px;
+    border-radius: 24px;
     overflow: hidden;
     background: #e5e7eb;
-    font-weight: 600;
-    color: white;
-    font-size: 13px;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    }
   }
 
   .segment {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: flex 0.4s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.1);
+      transform: scaleY(1.05);
+    }
+
+    .segment-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+
+      strong {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      small {
+        font-size: 11px;
+        opacity: 0.9;
+      }
+    }
   }
 
   .non-eval {
-    background: #ea3737; // rouge
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
   }
 
   .brut {
-    background: #d0c530; // jaune
-    color: #374151;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
   }
 
   .net {
-    background: #22c71c; // bleu clair
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
   }
 
   .legend {
-    margin-top: 14px;
-    display: flex;
-    gap: 18px;
-    font-size: 13px;
-    color: #374151;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(249, 250, 251, 0.5);
+    border-radius: 12px;
 
-    .item {
+    .legend-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
 
-      .color {
-        width: 14px;
-        height: 14px;
-        border-radius: 4px;
-        display: inline-block;
+      &:hover {
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       }
 
-      .red {
-        background: #ea3737;
+      .legend-marker {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+
+        &.red {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        &.yellow {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        &.green {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .marker-icon {
+          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+        }
       }
 
-      .yellow {
-        background: #d0c530;
+      .legend-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .legend-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #1e293b;
+        }
+
+        .legend-desc {
+          font-size: 12px;
+          color: #64748b;
+        }
+      }
+    }
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+
+    .stat-item {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
-      .blue {
-        background: #22c71c;
+      .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
     }
   }

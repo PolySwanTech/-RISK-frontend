@@ -40,7 +40,7 @@
             </mat-form-field>
             <div class="risk-result" *ngIf="getSeverityValue(sev.id) != 0">
               <mat-chip [ngClass]="getRiskLevelFromSeverityFrequencySelected(sev).toLowerCase()">
-                {{ getRiskLevelEnum(getRiskLevelFromSeverityFrequencySelected(sev)) }}
+                {{ getRiskLevelFromSeverityFrequencySelected(sev) | enumLabel:'riskLevel' }}
               </mat-chip>
             </div>
           </mat-card-content>
@@ -51,13 +51,13 @@
         <mat-form-field appearance="fill">
           <mat-label>Financier Indirect</mat-label>
           <mat-select [(ngModel)]="financierIndirect" (selectionChange)="updateHighestRisk()">
-            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ getRiskLevelEnum(risk) }}</mat-option>
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ risk | enumLabel:'riskLevel' }}</mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Non Financier</mat-label>
           <mat-select [(ngModel)]="financierNonFinancier" (selectionChange)="updateHighestRisk()">
-            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ getRiskLevelEnum(risk) }}</mat-option>
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ risk | enumLabel:'riskLevel' }}</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
@@ -70,7 +70,7 @@
         <mat-form-field appearance="fill">
           <mat-label>Niveau de Risque proposé</mat-label>
           <mat-select [(ngModel)]="highestRiskLevel">
-            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ getRiskLevelEnum(risk) }}</mat-option>
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ risk | enumLabel:'riskLevel' }}</mat-option>
           </mat-select>
           <div *ngIf="highestRiskLevel">
             <div style="width: 100%; height: 20px; border: 1px solid black;"
@@ -103,13 +103,12 @@
             [ngStyle]="{'border-left': '5px solid ' + ctrl.riskLevel.color}">
             <mat-card-header style="justify-content: start;">
               <mat-card-title>{{ ctrl.libelle }}</mat-card-title>
-              <mat-card-subtitle>{{ getControlTypeLabels(ctrl.controlType) }} - {{ getDegreeLabels(ctrl.controlLevel)
-                }}</mat-card-subtitle>
+              <mat-card-subtitle>{{ ctrl.controlType | enumLabel:'controlType' }} - {{ ctrl.controlLevel | enumLabel:'degree' }}</mat-card-subtitle>
             </mat-card-header>
 
             <mat-card-content>
               <p><strong>Processus:</strong> {{ ctrl.processName }}</p>
-              <p><strong>Fréquence:</strong> {{ getRecLabel(ctrl.frequency) }}</p>
+              <p><strong>Fréquence:</strong> {{ ctrl.frequency | enumLabel:'recurrence' }}</p>
               <p><strong>Prochain Exécution:</strong> {{ ctrl.nextExecution | date:'dd/MM/yyyy' }}</p>
               <p><strong>Créateur:</strong> {{ ctrl.creator }}</p>
               <mat-chip
@@ -132,7 +131,7 @@
               <p>{{ metric.description || 'Aucune description.' }}</p>
               <p><strong>Créée par :</strong> {{ metric.creatorName }}</p>
               <p><strong>Date de création :</strong> {{ metric.createdAt | date:'dd/MM/yyyy' }}</p>
-              <p><strong>Evaluation :</strong> {{ getAttenuationMetricsEvaluationLabel(metric.evaluation) }}</p>
+              <p><strong>Evaluation :</strong> {{ (metric.evaluation | enumLabel:'evaluation') || 'Aucune évaluation' }}</p>
               <mat-chip [color]="metric.actif ? 'primary' : 'warn'">
                 {{ metric.actif ? 'Active' : 'Inactif' }}
               </mat-chip>
@@ -148,7 +147,7 @@
         <mat-form-field *ngIf="highestRiskLevelNet" appearance="fill">
           <mat-label>Niveau de Risque proposé</mat-label>
           <mat-select [(ngModel)]="highestRiskLevelNet">
-            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ getRiskLevelEnum(risk) }}</mat-option>
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">{{ risk | enumLabel:'riskLevel' }}</mat-option>
           </mat-select>
           <div *ngIf="highestRiskLevelNet">
             <div style="width: 100%; height: 20px; border: 1px solid black;"

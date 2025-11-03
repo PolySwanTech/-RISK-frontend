@@ -16,11 +16,12 @@ import { forkJoin } from 'rxjs';
 
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 import { AttenuationMetrics, AttenuationMetricsTypeDto } from '../../../core/models/AttenuationMetrics';
-import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
+import { EvaluationControl } from '../../../core/enum/evaluation-controle.enum';
 import { CreateAttenuationMetricsComponent } from '../create-attenuation-metrics/create-attenuation-metrics.component';
 import { TargetType } from '../../../core/enum/targettype.enum';
 import { FileService } from '../../../core/services/file/file.service';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-attenuation-metrics-list',
@@ -41,7 +42,8 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
     MatAccordion,
     MatExpansionPanelTitle,
     MatExpansionPanelHeader,
-    MatExpansionPanel
+    MatExpansionPanel,
+    EnumLabelPipe
 ],
   templateUrl: './attenuation-metrics-list.component.html',
   styleUrls: ['./attenuation-metrics-list.component.scss']
@@ -222,10 +224,6 @@ export class AttenuationMetricsListComponent implements OnInit {
     });
   }
 
-  getEvaluationLabel(e?: string): string {
-    return e ? EvaluationControlLabels[e as keyof typeof EvaluationControlLabels] : 'Non évaluée';
-  }
-
   // Activation
   toggleActivation(metric: AttenuationMetrics, active: boolean): void {
     metric.actif = active;
@@ -243,8 +241,12 @@ export class AttenuationMetricsListComponent implements OnInit {
   // Création
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(CreateAttenuationMetricsComponent, {
-      width: '700px',
-      maxHeight: '90vh'
+       width: '800px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+        disableClose: false,
+        autoFocus: false
     });
     dialogRef.afterClosed().subscribe(refresh => {
       if (refresh) this.loadMetrics();

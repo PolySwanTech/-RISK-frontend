@@ -20,6 +20,7 @@ import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CreateRisksComponent } from '../../../features/reglages/risks/create-risks/create-risks.component';
+import { CreateProcessComponent } from '../../../features/process/create-process/create-process.component';
 
 interface ProcessNode {
   id: string;
@@ -111,6 +112,7 @@ export class BuProcessAccordionComponent {
     else {
       this.entityService.loadEntitiesTree().subscribe((entitiesTree: any) => {
         this.entities = entitiesTree;
+        console.log(entitiesTree)
         this.fetchProcesses(entitiesTree);
       });
     }
@@ -619,7 +621,16 @@ export class BuProcessAccordionComponent {
   }
 
   addProcess(buId: string) {
-    this.router.navigate(['reglages', 'process'], { queryParams: { buId, create: true } })
+     
+        this.dialog.open(CreateProcessComponent, {
+          width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+          disableClose: false,
+          autoFocus: false,
+          data: { buId: buId }
+        });
   }
 
   getTooltip(view: string): string {

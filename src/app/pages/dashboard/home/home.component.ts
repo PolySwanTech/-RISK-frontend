@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -7,7 +8,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatSelectModule } from "@angular/material/select";
 import { PermissionName } from "../../../core/enum/permission.enum";
-import { Incident } from "../../../core/models/Incident";
+import { IncidentListViewDto } from "../../../core/models/Incident";
 import { IncidentService } from "../../../core/services/incident/incident.service";
 import { BaloiseCategoryChartComponent } from "../../../features/dashboard/baloise-category-chart/baloise-category-chart.component";
 import { GoBackButton, GoBackComponent } from "../../../shared/components/go-back/go-back.component";
@@ -31,6 +32,7 @@ import { TopCriticalRisksComponent } from "../../../features/dashboard/top-criti
   selector: 'app-home',
   standalone: true,
   imports: [
+    CommonModule,
     MatCardModule,
     MatTabsModule,
     ControlCompletionRateComponent,
@@ -60,8 +62,8 @@ import { TopCriticalRisksComponent } from "../../../features/dashboard/top-criti
 })
 export class HomeComponent implements OnInit {
 
-  incidents: Incident[] = [];
-  filteredIncidents: Incident[] = [];
+  incidents: IncidentListViewDto[] = [];
+  filteredIncidents: IncidentListViewDto[] = [];
 
   startDate: Date | null = null;
   endDate: Date | null = null;
@@ -74,6 +76,9 @@ export class HomeComponent implements OnInit {
   draftIncidents = 0;
   avgResolutionTime = '';
   resolutionRate = 0;
+
+  // Etat UI
+  showFilters = false;
 
   goBackButtons: GoBackButton[] = [
     {
@@ -141,7 +146,17 @@ export class HomeComponent implements OnInit {
     this.avgResolutionTime = this.calculateAverageResolutionTime(incidents);
   }
 
-  private calculateAverageResolutionTime(incidents: Incident[]): string {
+  /** UI: toggle d'affichage des filtres avancés */
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
+  }
+
+  /** Indicateur simple: alerte si trop d'incidents en cours */
+  get hasHighOpenIncidents() {
+    return this.inProgressIncidents > Math.max(5, Math.round(this.totalIncidents * 0.25));
+  }
+
+  private calculateAverageResolutionTime(incidents: IncidentListViewDto[]): string {
     const resolved = incidents.filter(i => i.closedAt && i.declaredAt);
 
     // Calcul des durées en jours

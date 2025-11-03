@@ -8,16 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
 import { MatrixComponent } from "../matrix/matrix.component";
-import { RiskLevel, RiskLevelColor, RiskLevelEnum, RiskLevelLabels, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { RiskLevel, RiskLevelColor, RiskLevelEnum, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
-import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
-import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
-import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { ControlTemplateListViewDto } from '../../../core/models/ControlTemplate';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { BuProcessAccordionComponent } from "../../../shared/components/bu-process-accordion/bu-process-accordion.component";
 import { GoBackComponent } from '../../../shared/components/go-back/go-back.component';
@@ -28,6 +25,7 @@ import { AttenuationMetrics } from '../../../core/models/AttenuationMetrics';
 import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 import { Range } from '../../../core/models/range';
 import { RiskEvaluationCreateDto } from '../../../core/models/RiskEvaluation';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 interface Indicator {
   frequenceId: number;
@@ -47,7 +45,7 @@ interface MatrixCell {
   imports: [FormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatCardModule, MatChipsModule, FormsModule,
     ReactiveFormsModule, GoBackComponent,
     MatStepperModule,
-    MatButtonModule, BuProcessAccordionComponent, MatrixComponent],
+    MatButtonModule, BuProcessAccordionComponent, MatrixComponent, EnumLabelPipe],
   templateUrl: './create-evaluation.component.html',
   styleUrl: './create-evaluation.component.scss'
 })
@@ -79,7 +77,7 @@ export class CreateEvaluationComponent implements OnInit {
 
   indicators: Indicator[] = [];
 
-  controls: ControlTemplate[] = [];
+  controls: ControlTemplateListViewDto[] = [];
 
   selectedRisk: RiskTemplate | null = null;
   selectedBU: BusinessUnit | null = null;
@@ -126,24 +124,8 @@ export class CreateEvaluationComponent implements OnInit {
     return this.indicators.find(i => i.severiteId == sev.id)!.riskLevel.name || RiskLevelEnum.HIGH
   }
 
-  getRiskLevelEnum(riskLevel: RiskLevelEnum) {
-    return RiskLevelLabels[riskLevel];
-  }
-
   getRiskColorEnum(riskLevel: RiskLevelEnum) {
     return RiskLevelColor[riskLevel];
-  }
-
-  getRecLabel(rec: Recurrence) {
-    return RecurrenceLabels[rec];
-  }
-
-  getDegreeLabels(degree: Degree) {
-    return DegreeLabels[degree];
-  }
-
-  getControlTypeLabels(controlType: Type) {
-    return ControlTypeLabels[controlType];
   }
 
   gotoSteppe3(event: any) {
@@ -306,11 +288,6 @@ export class CreateEvaluationComponent implements OnInit {
         }
       )
     }
-  }
-
-  getAttenuationMetricsEvaluationLabel(evaluation: EvaluationControl | undefined): string {
-    if (!evaluation) return 'Aucune évaluation'; 
-    return EvaluationControlLabels[evaluation];
   }
 
   newEvaluation(): void {

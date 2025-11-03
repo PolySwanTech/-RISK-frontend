@@ -1,20 +1,9 @@
 .chart-container {
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 mat-card-header {
   margin-bottom: 5px;
-}
-
-mat-card-footer {
-  border-top: 1px solid #eee;
-  margin-top: 10px;
-  padding-top: 6px;
-  font-size: 14px;
-  color: #555;
 }
 
 .loading-container {

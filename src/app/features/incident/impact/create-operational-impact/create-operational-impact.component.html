@@ -130,7 +130,7 @@
                 </div>
                 <!-- Badge status -->
                 <span class="op-badge">
-                  {{ getStatutLabel(impact.state) }}
+                  {{ (impact.state | enumLabel: 'operatingLossState') || 'En attente' }}
                 </span>
                 <span style="margin-left:auto">{{ expandedImpacts[impact.id] ? '▼' : '▶' }}</span>
               </div>
@@ -195,7 +195,7 @@
 
                     <!-- Badge status -->
                     <span class="op-badge">
-                      {{ getReviewStatusLabel(amount.reviewStatus) }}
+                      {{ amount.reviewStatus | enumLabel:'reviewStatus' }}
                     </span>
 
                     <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
@@ -391,7 +391,7 @@
                 </div>
                 <!-- Badge status -->
                 <span class="op-badge">
-                  {{ getStatutLabel(impact.state) }}
+                  {{ (impact.state | enumLabel:'operatingLossState') || 'En attente' }}
                 </span>
                 <span style="margin-left:auto">{{ expandedImpacts[impact.id] ? '▼' : '▶' }}</span>
               </div>
@@ -436,7 +436,7 @@
 
                     <!-- Badge status -->
                     <span class="op-badge">
-                      {{ getReviewStatusLabel(amount.reviewStatus) }}
+                      {{ amount.reviewStatus | enumLabel:'reviewStatus' }}
                     </span>
 
                     <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">

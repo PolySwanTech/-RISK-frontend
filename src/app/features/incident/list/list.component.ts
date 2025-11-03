@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Incident } from '../../../core/models/Incident';
+import { Incident, IncidentListDto, IncidentListViewDto } from '../../../core/models/Incident';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -26,6 +26,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { GlobalSearchBarComponent } from "../../../shared/components/global-search-bar/global-search-bar.component";
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 
 @Component({
@@ -38,7 +39,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent, FormsModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
-  providers: [DatePipe]
+  providers: [DatePipe, EnumLabelPipe]
 })
 
 export class ListComponent implements OnInit {
@@ -47,6 +48,7 @@ export class ListComponent implements OnInit {
   private datePipe = inject(DatePipe)
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private enumLabelPipe = inject(EnumLabelPipe);
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -54,28 +56,28 @@ export class ListComponent implements OnInit {
     {
       columnDef: 'reference',
       header: 'Référence',
-      cell: (element: Incident) => `${element.reference}`,
+      cell: (element: IncidentListViewDto) => `${element.reference}`,
       filterType: 'text',
       icon: 'tag' // 🏷️
     },
     {
       columnDef: 'title',
       header: 'Libellé',
-      cell: (element: Incident) => `${element.title}`,
+      cell: (element: IncidentListViewDto) => `${element.title}`,
       filterType: 'text',
       icon: 'title' // 📝
     },
     {
       columnDef: 'declaredAt',
       header: 'Date de déclaration',
-      cell: (element: Incident) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
+      cell: (element: IncidentListViewDto) => this.datePipe.transform(element.declaredAt, 'dd/MM/yyyy') || '',
       filterType: 'date',
       icon: 'event' // 📅
     },
     {
       columnDef: 'survenueAt',
       header: 'Date de survenance',
-      cell: (element: Incident) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
+      cell: (element: IncidentListViewDto) => this.datePipe.transform(element.survenueAt, 'dd/MM/yyyy') || '',
       filterType: 'date',
       icon: 'event_note' // 🗓️
     },
@@ -84,7 +86,7 @@ export class ListComponent implements OnInit {
       header: 'Statut',
       cell: (incident: Incident) => `
           <span class="badge ${incident.state.toLowerCase()}">
-            ${this.getStateLabel(incident.state)}
+            ${this.enumLabelPipe.transform(incident.state, 'state')}
           </span>
         `, // ← label lisible
       isBadge: 'state',                                                // ← si ton template gère les badges
@@ -103,10 +105,10 @@ export class ListComponent implements OnInit {
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
   displayedColumns = ['select', ...this.columns.map(c => c.columnDef)];
-  dataSource = new MatTableDataSource<Incident>([]);
+  dataSource = new MatTableDataSource<IncidentListViewDto | IncidentListDto>([]);
   filteredByRisk = false;
-  selectedIncident: Incident | null = null;
-  incidents: Incident[] = [];
+  selectedIncident: IncidentListViewDto | IncidentListDto | null = null;
+  incidents: IncidentListViewDto[] | IncidentListDto[] = [];
 
   searchQuery: string = '';
 
@@ -182,7 +184,7 @@ export class ListComponent implements OnInit {
   }
 
   // This method will be triggered when a row is clicked
-  onRowClick(incident: Incident) {
+  onRowClick(incident: IncidentListViewDto) {
     this.router.navigate(['incident', incident.id]);
   }
 
@@ -225,7 +227,7 @@ export class ListComponent implements OnInit {
     }
   }
 
-  edit(row: Incident) {
+  edit(row: IncidentListViewDto) {
     this.router.navigate(['incident', 'create'], {
       queryParams: { id: row.id }
     })
@@ -239,7 +241,7 @@ export class ListComponent implements OnInit {
     return this.selectedIncidents.size > 0 && this.selectedIncidents.size < this.dataSource.data.length;
   }
 
-  isUpdatable(incident: Incident): boolean {
+  isUpdatable(incident: IncidentListViewDto): boolean {
     return incident!.state === State.DRAFT;
   }
 
@@ -250,7 +252,7 @@ export class ListComponent implements OnInit {
       if (value === null || value === '') continue;
 
       filtered = filtered.filter(incident => {
-        const fieldValue = incident[key as keyof Incident];
+        const fieldValue = incident[key as keyof IncidentListDto];
 
         // ✅ Cas spécial : filtre par plage de dates { start, end }
         if (value.start instanceof Date && value.end instanceof Date) {
@@ -296,7 +298,7 @@ export class ListComponent implements OnInit {
         incident.title?.toLowerCase().includes(lowerQuery) ||
         this.datePipe.transform(incident.declaredAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
         this.datePipe.transform(incident.survenueAt, 'dd/MM/yyyy')?.includes(lowerQuery) ||
-        this.getStateLabel(incident.state).toLowerCase().includes(lowerQuery) ||     // ← NEW
+        this.enumLabelPipe.transform(incident.state, 'state').toLowerCase().includes(lowerQuery) ||     // ← NEW
         (incident.closedAt ? 'clôturé' : 'en cours').includes(lowerQuery)            // compat “en cours/clôturé”
       );
     });
@@ -307,10 +309,6 @@ export class ListComponent implements OnInit {
   clearSearch(): void {
     this.searchQuery = '';
     this.dataSource.data = this.incidents;
-  }
-
-  getStateLabel(s: State): string {
-    return StateLabels?.[s] ?? String(s);
   }
 
   exportExcel(filename: string = 'incidents.xlsx') {

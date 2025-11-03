@@ -1,11 +1,12 @@
+
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { ControlTemplate, ControlTemplateCreateDto } from '../../../models/ControlTemplate';
+import { ControlDetailsView, ControlTemplateCreateDto, ControlTemplateListViewDto } from '../../../models/ControlTemplate';
 import { ControlExecution } from '../../../models/ControlExecution';
 import { ControlEvaluation } from '../../../models/ControlEvaluation';
 import { Observable } from 'rxjs';
-import { ControlMethodology, ControlMethodologyCreateDto } from '../../../models/ControlMethodology';
+import { ControlMethodologyCreateDto, ControlMethodologyViewDto } from '../../../models/ControlMethodology';
 import { map } from 'rxjs/operators';
 
 @Injectable({
@@ -25,7 +26,7 @@ export class ControlService {
   }
 
   getControl(id: string) {
-    return this.http.get<ControlTemplate>(`${this.baseUrlTemp}/${id}`);
+    return this.http.get<ControlDetailsView>(`${this.baseUrlTemp}/${id}`);
   }
 
   getAllTemplates(
@@ -36,7 +37,7 @@ export class ControlService {
     if (processId && riskId) {
       params = params.set('riskId', riskId).set('processId', processId);
     }
-    return this.http.get<ControlTemplate[]>(`${this.baseUrlTemp}`, { params: params });
+    return this.http.get<ControlTemplateListViewDto[]>(`${this.baseUrlTemp}`, { params: params });
   }
 
   getAllExecutions(controlId?: string, isHistory: boolean = false) {
@@ -75,8 +76,8 @@ export class ControlService {
     });
   }
 
-  reviewEvaluationReexam(evaluationId: string, comment: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrlEval}/${evaluationId}/review`, {
+  reviewEvaluationReexam(evaluationId: string, comment: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrlEval}/${evaluationId}/review`, {
       decision: 'REEXAM',
       comment
     });
@@ -84,7 +85,7 @@ export class ControlService {
 
   getMethodology(controlId: string) {
     return this.http.get(`${this.baseUrlMeth}/${controlId}`, { observe: 'response' })
-      .pipe(map(res => res.status === 204 ? null : (res.body as ControlMethodology)));
+      .pipe(map(res => res.status === 204 ? null : (res.body as ControlMethodologyViewDto)));
   }
 
   createMethodology(data: ControlMethodologyCreateDto) {

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Incident } from '../../models/Incident';
+import { Incident, IncidentCreateDto, IncidentListDto, IncidentListViewDto } from '../../models/Incident';
 import { environment } from '../../../environments/environment';
 import { saveAs } from 'file-saver';
 
@@ -13,12 +13,12 @@ export class IncidentService {
   private baseUrl = environment.apiUrl + '/incidents'
   private http = inject(HttpClient);
 
-  loadIncidents(): Observable<Incident[]> {
-    return this.http.get<Incident[]>(this.baseUrl);
+  loadIncidents(): Observable<IncidentListViewDto[]> {
+    return this.http.get<IncidentListViewDto[]>(this.baseUrl);
   }
 
-  loadIncidentsFull(): Observable<Incident[]> {
-    return this.http.get<Incident[]>(`${this.baseUrl}?completeDto=true`);
+  loadIncidentsFull(): Observable<IncidentListViewDto[]> {
+    return this.http.get<IncidentListViewDto[]>(`${this.baseUrl}?completeDto=true`);
   }
 
   deleteIncident(id: string) {
@@ -33,7 +33,7 @@ export class IncidentService {
     return this.http.get<Incident>(this.baseUrl + '/' + id);
   }
 
-  saveIncident(incident: any): Observable<any> {
+  saveIncident(incident: IncidentCreateDto): Observable<any> {
     return this.http.post(this.baseUrl, incident,
       { headers: new HttpHeaders({ 'X-Show-Loader': 'true' }) }
     );
@@ -45,10 +45,10 @@ export class IncidentService {
     );
   }
 
-  getIncidentByProcessAndRisk(riskId: string): Observable<Incident[]> {
+  getIncidentByProcessAndRisk(riskId: string): Observable<IncidentListDto[]> {
     const params = new HttpParams()
       .set('riskId', riskId);
-    return this.http.get<Incident[]>(this.baseUrl + '/search', { params });
+    return this.http.get<IncidentListDto[]>(this.baseUrl + '/search', { params });
   }
 
   close(id: string) {

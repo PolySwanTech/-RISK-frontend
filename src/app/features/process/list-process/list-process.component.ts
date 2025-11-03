@@ -53,6 +53,7 @@ export class ListProcessComponent implements OnInit {
 
       if (this.buId) {
         this.riskEvaluationService.getEvaluationsByBu(this.buId).subscribe(buEval => {
+          console.log(buEval) 
           this.allRisks = buEval.evaluations;
           this.frequency = buEval.evaluationFrequency;
         });
@@ -69,7 +70,8 @@ export class ListProcessComponent implements OnInit {
           this.selectedPeriod = currentPeriod;
         });
       } else {
-        this.allRisks = []; // pas de BU sélectionnée
+        this.allRisks = [];
+        this.groupedRisks = [];
       }
     });
   }

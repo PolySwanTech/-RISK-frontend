@@ -1,3 +1,4 @@
+import { EnumLabelPipe } from './../../shared/pipes/enum-label.pipe';
 import { ActionPlanService } from './../../core/services/action-plan/action-plan.service';
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,8 +20,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfirmService } from "../../core/services/confirm/confirm.service";
 import { ActionPlan } from "../../core/models/ActionPlan";
 import { CreateActionPlanDialogComponent } from "../../features/action-plan/create-action-plan-dialog/create-action-plan-dialog.component";
-import { Priority, PriorityLabels } from '../../core/enum/Priority';
-import { Status, StatusLabels } from '../../core/enum/status.enum';
+import { Priority } from '../../core/enum/Priority';
+import { Status } from '../../core/enum/status.enum';
 import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
 import { Filter } from '../../core/enum/filter.enum';
 import { FilterTableComponent } from "../../shared/components/filter-table/filter-table.component";
@@ -35,8 +36,9 @@ import { SnackBarService } from '../../core/services/snack-bar/snack-bar.service
   imports: [MatButtonModule, MatTableModule, MatSortModule, MatDatepickerModule, MatSelectModule, CommonModule,
     MatCardModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, FormsModule, GoBackComponent,
     ReactiveFormsModule, MatNativeDateModule, MatIconModule, MatTooltipModule, MatMenuModule,
-    MatSelectModule, MatFormFieldModule, MatButtonModule, FilterTableComponent, MatButtonToggleModule, GlobalSearchBarComponent],
-  providers: [DatePipe],
+    MatSelectModule, MatFormFieldModule, MatButtonModule, FilterTableComponent, MatButtonToggleModule, 
+    GlobalSearchBarComponent],
+  providers: [DatePipe, EnumLabelPipe],
   templateUrl: './plan-action-page.component.html',
   styleUrl: './plan-action-page.component.scss'
 })
@@ -47,6 +49,8 @@ export class PlanActionPageComponent implements OnInit {
   private confirmService = inject(ConfirmService)
   private actionPlanService = inject(ActionPlanService);
   private snackBarService = inject(SnackBarService);
+
+  enumLabelPipe = inject(EnumLabelPipe);
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -103,14 +107,14 @@ export class PlanActionPageComponent implements OnInit {
       header: 'Statut',
       cell: (element: ActionPlan) => `
       <span class="badge ${element.status.toLowerCase()}">
-        ${this.getReadableStatut(element.status)}
+        ${this.enumLabelPipe.transform(element.status, 'status') || 'N/R'}
       </span>
     `,
       filterType: 'select',
       icon: 'flag', // 🚩
       options: Object.values(Status).map(status => ({
         value: status,
-        label: this.getReadableStatut(status)
+        label: this.enumLabelPipe.transform(status, 'status')
       }))
     }
   ];
@@ -149,7 +153,7 @@ export class PlanActionPageComponent implements OnInit {
         case 'priority':
           return item.priority;
         case 'statut':
-          return this.getReadableStatut(item.status);
+          return this.enumLabelPipe.transform(item.status, 'status');
         case 'dateEcheance':
           return new Date(item.echeance);
         case 'id':
@@ -198,10 +202,6 @@ export class PlanActionPageComponent implements OnInit {
       this.snackBarService.info("Plan d'action supprimé");
       this.ngOnInit();
     })
-  }
-
-  formatPriority(p: Priority): string {
-    return PriorityLabels[p] || p;
   }
 
   getPriorityBadge(priority: string) {
@@ -350,10 +350,6 @@ export class PlanActionPageComponent implements OnInit {
     });
   }
 
-  getReadableStatut(status: Status): string {
-    return StatusLabels[status] || status;
-  }
-
   export(){
     console.error("Fonctionnalité non-implémentée")
   }
@@ -361,10 +357,12 @@ export class PlanActionPageComponent implements OnInit {
 
   add() {
     this.dialog.open(CreateActionPlanDialogComponent, {
-      width: '800px !important',
-      height: '550px',
-      minWidth: '800px',
-      maxWidth: '800px',
+        width: '800px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+        disableClose: false,
+        autoFocus: false
     });
   }
 

@@ -1,9 +1,9 @@
-import { Component, Inject, inject, OnInit } from '@angular/core';
+import { Component, Inject, inject, OnInit, HostListener } from '@angular/core';
 import { Action, ActionPlan, ActionPlanCreateDto } from '../../../core/models/ActionPlan';
 import { MatFormFieldModule, MatSuffix } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
-import { Priority, PriorityLabels } from '../../../core/enum/Priority';
+import { Priority } from '../../../core/enum/Priority';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -19,12 +19,21 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
-import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
+import { DraftService } from '../../../core/services/draft.service';
+
+export interface ActionPlanDialogData {
+  incidentId?: string;
+  reference?: string;
+  draftId?: string; // ID du brouillon à restaurer
+}
 
 @Component({
   selector: 'app-create-action-plan-dialog',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -34,13 +43,20 @@ import { BusinessUnit } from '../../../core/models/BusinessUnit';
     MatDatepickerModule,
     MatNativeDateModule,
     MatCardModule,
-    PopupHeaderComponent,
-    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, MatSuffix, MatTooltipModule
+    MatButtonModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatSuffix,
+    MatTooltipModule,
+    EnumLabelPipe,
+    BasePopupComponent
   ],
   templateUrl: './create-action-plan-dialog.component.html',
   styleUrl: './create-action-plan-dialog.component.scss'
 })
 export class CreateActionPlanDialogComponent implements OnInit {
+
+  private readonly COMPONENT_NAME = 'CreateActionPlanDialog';
 
   private actionPlanService = inject(ActionPlanService);
   dialogRef = inject(MatDialogRef<CreateActionPlanDialogComponent>);
@@ -48,46 +64,151 @@ export class CreateActionPlanDialogComponent implements OnInit {
   private entitiesService = inject(EntitiesService);
   private riskService = inject(RiskService);
   private router = inject(Router);
+  private draftService = inject(DraftService);
+  
   priorities = Object.values(Priority);
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { incidentId: string, reference: string }
-  ) { }
-
+  popupActions: PopupAction[] = [];
   listTeams: BusinessUnit[] = [];
-
   risks: RiskTemplate[] = [];
+  actions: Action[] = [];
+  
+  // Stocke l'ID du brouillon en cours d'édition (si applicable)
+  private currentDraftId: string | null = null;
 
-  actionPlan: ActionPlan = new ActionPlan(
+  actionPlan: any = new ActionPlan(
     '', '', '', '', Status.NOT_STARTED, Priority.MAXIMUM,
-    '', '', '', null, '', new Date(), true);
+    '', '', '', null, '', new Date(), true
+  );
 
-  actions: Action[] = []
+  constructor(@Inject(MAT_DIALOG_DATA) public data: ActionPlanDialogData | null) { }
 
   ngOnInit(): void {
     this.fetchTeams();
     this.getRisk();
+    
+    // Charger le brouillon si un draftId est fourni
+    if (this.data?.draftId) {
+      this.loadDraft(this.data.draftId);
+      this.currentDraftId = this.data.draftId;
+      // Cacher ce brouillon pendant l'édition
+      this.draftService.hideDraft(this.data.draftId);
+    }
+
+    this.dialogRef.backdropClick().subscribe(() => {
+      if (this.hasFormData()) {
+        this.saveDraft();
+      } else if (this.currentDraftId) {
+        this.draftService.showDraft(this.currentDraftId);
+      }
+    });
+    
+    this.initActions();
+  }
+
+  loadDraft(draftId: string): void {
+    const draft = this.draftService.getDraftById(draftId);
+    if (draft) {
+      this.actionPlan = { ...this.actionPlan, ...draft.data.actionPlan };
+      this.actions = draft.data.actions || [];
+      console.log('Brouillon de plan d\'action restauré:', draft);
+    }
+  }
+
+  initActions(): void {
+    this.popupActions = [
+      {
+        label: 'Annuler',
+        icon: 'close',
+        color: 'red',
+        onClick: () => this.closePopup()
+      },
+      {
+        label: 'Créer le Plan d\'Action',
+        icon: 'check',
+        primary: true,
+        disabled: () => this.isFormInvalid(),
+        onClick: () => this.submitActionPlan()
+      }
+    ];
+  }
+
+  getDialogRef() {
+    return this.dialogRef;
+  }
+
+  hasFormData(): boolean {
+    return !!(
+      this.actionPlan.libelle ||
+      this.actionPlan.description ||
+      this.actions.length > 0
+    );
+  }
+
+  saveDraft(): void {
+    if (!this.hasFormData()) {
+      return;
+    }
+
+    const draftData = {
+      actionPlan: {
+        libelle: this.actionPlan.libelle,
+        description: this.actionPlan.description,
+        priority: this.actionPlan.priority,
+        echeance: this.actionPlan.echeance,
+        userInCharge: this.actionPlan.userInCharge,
+        taxonomie: this.actionPlan.taxonomie
+      },
+      actions: this.actions,
+      incidentData: this.data ? {
+        incidentId: this.data.incidentId,
+        reference: this.data.reference
+      } : null
+    };
+
+    const title = `${this.actionPlan.libelle || 'Nouveau plan d\'action'}`;
+
+    // Si on édite un brouillon existant, on le met à jour
+    if (this.currentDraftId) {
+      this.draftService.updateDraft(
+        this.currentDraftId,
+        title,
+        draftData,
+        true // visible = true
+      );
+    } else {
+      // Sinon on crée un nouveau brouillon
+      this.currentDraftId = this.draftService.createDraft(
+        this.COMPONENT_NAME,
+        title,
+        draftData,
+        true // visible = true
+      );
+    }
   }
 
   closePopup() {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    } else if (this.currentDraftId) {
+      // Si on ferme sans données mais qu'on avait un brouillon, le réafficher
+      this.draftService.showDraft(this.currentDraftId);
+    }
+    
     this.dialogRef.close();
   }
 
   getRisk() {
-  if (this.data && this.data.incidentId) {
-    // Récupère le risque de l'incident
-    this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
-      this.actionPlan.taxonomie = risk;
-      // Ici, on met à jour la liste des risques pour afficher l'élément de l'incident
-      this.risks = [risk]; // Si tu veux que la liste contienne uniquement ce risque
-    });
-  } else {
-    // Si pas d'incident, récupère tous les risques
-    this.riskService.getAll().subscribe(data => {
-      this.risks = data;
-    });
+    if (this.data && this.data.incidentId) {
+      this.riskService.getRiskOfIncident(this.data.incidentId).subscribe(risk => {
+        this.actionPlan.taxonomie = risk.id;
+        this.risks = [risk];
+      });
+    } else {
+      this.riskService.getAll().subscribe(data => {
+        this.risks = data;
+      });
+    }
   }
-}
-
 
   fetchTeams(): void {
     this.entitiesService.loadEntities().subscribe({
@@ -100,29 +221,18 @@ export class CreateActionPlanDialogComponent implements OnInit {
     });
   }
 
-
-  formatPriority(p: Priority): string {
-    return PriorityLabels[p] || p;
-  }
-
-  // Ajouter une action à la liste
   addAction() {
     this.actions.push(new Action('', '', new Date(), '', '', ''));
   }
 
-  updateAction(index: number, action: Action) {
-    // Mettre à jour l'action à l'index spécifié
-    this.actions[index] = action;
-  }
-
-  // Supprimer une action de la liste
   removeAction(index: number) {
     this.actions.splice(index, 1);
   }
 
-  // Soumettre le plan d'action
   submitActionPlan() {
-    const incidentId = this.data?.incidentId ?? undefined;
+    if (this.isFormInvalid()) return;
+
+    const incidentId: string | null = this.data?.incidentId ?? null;
 
     const dto: ActionPlanCreateDto = {
       libelle: this.actionPlan.libelle,
@@ -131,19 +241,45 @@ export class CreateActionPlanDialogComponent implements OnInit {
       priority: this.actionPlan.priority,
       echeance: this.actionPlan.echeance,
       userInCharge: this.actionPlan.userInCharge,
-      taxonomieId: this.actionPlan.taxonomie?.id ?? null,
-      incidentId               // undefined si pas d’incident
+      taxonomieId: this.actionPlan.taxonomie ?? null,
+      incidentId
     };
+
+    console.log(dto);
 
     this.actionPlanService.createActionPlan(dto)
       .subscribe(id => {
-        this.actionPlanService.addActions(this.actions, id).subscribe(() => {
-        });
+        this.actionPlanService.addActions(this.actions, id).subscribe(() => {});
+        
+        // Supprimer le brouillon après sauvegarde réussie
+        if (this.currentDraftId) {
+          this.draftService.deleteDraft(this.currentDraftId);
+        }
+        
         this.dialogRef.close();
         this.confirmService.openConfirmDialog(
-          "Création avec succès", "Aller à la consultation ?").subscribe((value) => {
-            value ? this.router.navigate(['/action-plan', id]) : this.ngOnInit();
-          })
+          "Création avec succès", "Aller à la consultation ?"
+        ).subscribe((value) => {
+          value ? this.router.navigate(['/action-plan', id]) : this.ngOnInit();
+        });
       });
+  }
+
+  isFormInvalid(): boolean {
+    return (
+      !this.actionPlan.libelle ||
+      !this.actionPlan.description ||
+      !this.actionPlan.echeance ||
+      !this.actionPlan.priority ||
+      this.actions.length === 0 ||
+      this.actions.some(a => !a.name || a.name.trim() === '')
+    );
+  }
+
+  @HostListener('window:beforeunload')
+  beforeUnload(): void {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    }
   }
 }

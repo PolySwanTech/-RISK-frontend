@@ -7,10 +7,11 @@ import { MatInputModule } from '@angular/material/input';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { map, Observable, startWith } from 'rxjs';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-select-entities',
-  imports: [CommonModule, MatAutocompleteModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule],
+  imports: [CommonModule, MatAutocompleteModule, MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatIconModule],
   templateUrl: './select-entities.component.html',
   styleUrl: './select-entities.component.scss'
 })

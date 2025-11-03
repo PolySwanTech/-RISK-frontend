@@ -1,19 +1,21 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { Subscription, forkJoin } from 'rxjs';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlTemplate } from '../../../core/models/ControlTemplate';
+import { ControlTemplateListViewDto } from '../../../core/models/ControlTemplate';
 import { ControlExecution } from '../../../core/models/ControlExecution';
-import { Status, StatusLabels } from '../../../core/enum/status.enum';
+import { Status } from '../../../core/enum/status.enum';
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-control-status-chart',
   standalone: true,
   imports: [NgChartsModule, MatCardModule, CommonModule, MatProgressSpinner],
+  providers: [EnumLabelPipe],
   templateUrl: './control-status-chart.component.html',
   styleUrls: ['./control-status-chart.component.scss']
 })
@@ -30,12 +32,13 @@ export class ControlStatusChartComponent implements OnInit, OnDestroy {
   isLoading = true;
   private sub!: Subscription;
 
-  constructor(private controlService: ControlService) {}
+  private controlService = inject(ControlService);
+  private enumLabelPipe = inject(EnumLabelPipe);
 
   ngOnInit() {
     // Étape 1️⃣ — Récupérer tous les contrôles
     this.sub = this.controlService.getAllTemplates().subscribe({
-      next: (templates: ControlTemplate[]) => {
+      next: (templates: ControlTemplateListViewDto[]) => {
         if (!templates.length) {
           this.isLoading = false;
           return;
@@ -83,7 +86,7 @@ export class ControlStatusChartComponent implements OnInit, OnDestroy {
     };
 
     this.data = {
-      labels: labels.map(l => this.getStatusLabel(l)),
+      labels: labels.map(l => this.enumLabelPipe.transform(l, 'status')),
       datasets: [
         {
           label: 'Nombre de contrôles',
@@ -92,9 +95,5 @@ export class ControlStatusChartComponent implements OnInit, OnDestroy {
         }
       ]
     };
-  }
-
-  getStatusLabel(status: Status): string {
-    return StatusLabels[status] || status;
   }
 }

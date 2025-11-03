@@ -269,7 +269,7 @@ button {
     }
 }
 
-tr:last-child {
+tr.mat-mdc-row:last-child {
     border-bottom: 1px solid dimgrey;
 }
 
@@ -282,7 +282,8 @@ tr:last-child {
     background: #edf2f7;
     color: #2d3748;
 
-    &.type, &.pending {
+    &.type,
+    &.pending {
         background: #e9d8fd;
         color: #553c9a;
     }
@@ -292,7 +293,7 @@ tr:last-child {
     &.ferme,
     &.en_cours,
     &.ouvert,
-    &.submit { 
+    &.submit {
         background: #bee3f8;
         color: #2b6cb0;
     }
@@ -302,7 +303,8 @@ tr:last-child {
     &.draft,
     &.in_progress,
     &.medium,
-    &.brouillon, &.partiel { 
+    &.brouillon,
+    &.partiel {
         background: #faf089;
         color: #b7791f;
     }
@@ -315,7 +317,7 @@ tr:last-child {
     &.minimal,
     &.level,
     &.new,
-    &.cloturé { 
+    &.cloturé {
         background: #c6f6d5;
         color: #2f855a;
     }
@@ -533,7 +535,10 @@ mat-paginator {
 
 .chart-container {
 
-    height: 460px;
+    height: 430px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     border-radius: 12px;
     padding: 1rem;
 
@@ -561,6 +566,14 @@ mat-paginator {
     input[type="file"] {
         margin-bottom: 20px;
         display: block;
+    }
+
+    mat-card-footer {
+        border-top: 1px solid #eee;
+        margin-top: 10px;
+        padding-top: 12px;
+        font-size: 14px;
+        color: #555;
     }
 
     canvas {
@@ -626,7 +639,7 @@ button[mat-raised-button] {
         color: var(--mat-sys-on-primary);
 
         &:hover {
-            background-color: color.adjust($purple-color, $lightness: 5%);
+            background-color: color.adjust($purple-color, $blackness: 5%);
         }
     }
 
@@ -985,4 +998,36 @@ mat-calendar {
         gap: 8px;
         font-style: italic;
     }
+}
+
+.custom-dialog-container {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: 16px;
+    
+    .mat-mdc-dialog-surface {
+      padding: 0 !important;
+      overflow: hidden !important;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+  }
+}
+
+// Style général pour tous les dialogs personnalisés
+.mat-mdc-dialog-container {
+  &:has(app-base-popup) {
+    padding: 0 !important;
+    overflow: hidden !important;
+    
+    .mat-mdc-dialog-surface {
+      padding: 0 !important;
+      overflow: hidden !important;
+      display: flex;
+      flex-direction: column;
+    }
+  }
 }

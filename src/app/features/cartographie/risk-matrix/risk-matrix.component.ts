@@ -3,14 +3,15 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RiskLevelLabels, RiskLevel } from '../../../core/enum/riskLevel.enum';
 import { Process } from '../../../core/models/Process';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-risk-matrix',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, EnumLabelPipe],
+  providers: [],
   templateUrl: './risk-matrix.component.html',
   styleUrls: ['./risk-matrix.component.scss']
 })
@@ -30,7 +31,7 @@ export class RiskMatrixComponent {
 
   /* ----------- helpers d’affichage ----------- */
   /** Dernière évaluation brute */
-  private get lastEvalBrute() {
+  get lastEvalBrute() {
     return this.riskData?.riskBrut?.at(-1) ?? null;
   }
 
@@ -38,11 +39,7 @@ export class RiskMatrixComponent {
     return this.riskData?.riskNet?.at(-1) ?? null;
   }
 
-  /** Libellé lisible du niveau (High, Low, …) */
-  get riskBrut(): string {
-    const level = this.lastEvalBrute?.evaluation as RiskLevel | undefined;
-    return level ? RiskLevelLabels[level.name] ?? 'Unknown' : 'N/R';
-  }
+
 
   get buName(): string {
     return this.riskData?.buName ?? 'Inconnu';

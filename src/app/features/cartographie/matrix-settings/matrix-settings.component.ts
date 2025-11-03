@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
 import { RiskLevelLabels } from '../../../core/enum/riskLevel.enum';
+import { RiskLevelEnum } from '../../../core/enum/riskLevel.enum';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { RangeType, Range } from '../../../core/models/range';
 
@@ -17,9 +18,6 @@ export class MatrixSettingsComponent {
 
   @Input() list!: Range[];
   @Input() type!: RangeType;
-
-
-  riskLevels = RiskLevelLabels;
 
   private settingSrv = inject(MatrixService);
   private snackBarService = inject(SnackBarService);

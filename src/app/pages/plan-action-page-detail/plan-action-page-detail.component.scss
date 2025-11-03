@@ -203,8 +203,36 @@ mat-card-content {
 
   .incident {
     display: flex;
+    align-items: center;
     gap: 20px;
     flex-direction: row;
+  }
+}
+
+.info-block.clickable {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .incident {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .badge.status {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .suffix-icon {
+        color: unset;
+      }
+    }
+  }
+  &:hover {
+    background-color: #f0f0f0;
+    transition: background-color 0.2s;
   }
 }
 

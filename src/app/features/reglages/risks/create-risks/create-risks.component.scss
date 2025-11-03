@@ -1,9 +1,1 @@
-mat-form-field{
-    width: 100%;
-  }
-  
-  section{
-    display: block !important;
-    height: auto !important;
-    width: auto !important;
-  }
+@use '../../../../../styles/popup-common' as popup;

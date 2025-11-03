@@ -1,51 +1,96 @@
-<mat-card class="summary-card mat-elevation-z3">
+<mat-card class="summary-card mat-elevation-z4">
   <mat-card-header>
-    <mat-card-title>Vue Globale de l'Évaluation</mat-card-title>
+    <mat-card-title>
+      <span class="title-icon">📊</span>
+      Vue Globale de l'Évaluation
+    </mat-card-title>
   </mat-card-header>
 
   <mat-card-content>
-    <!-- Total affiché -->
+    <!-- Total affiché avec design amélioré -->
     <div class="total-container" *ngIf="total > 0">
-      <span class="total-label">Total :</span>
-      <span class="total-value">{{ total }}</span>
-      <span class="total-sub">risques</span>
-    </div>
-
-    <!-- Barre principale -->
-    <div class="bar-container" *ngIf="total > 0">
-      <div
-        class="segment non-eval"
-        [style.flex]="nonEvalPct"
-        *ngIf="nonEvaluated > 0"
-      >
-        {{ nonEvaluated }} ({{ nonEvalPct }}%)
-      </div>
-      <div
-        class="segment brut"
-        [style.flex]="brutPct"
-        *ngIf="brutOnly > 0"
-      >
-        {{ brutOnly }} ({{ brutPct }}%)
-      </div>
-      <div
-        class="segment net"
-        [style.flex]="brutNetPct"
-        *ngIf="brutAndNet > 0"
-      >
-        {{ brutAndNet }} ({{ brutNetPct }}%)
+      <div class="total-badge">
+        <span class="total-value">{{ total }}</span>
+        <span class="total-label">risques identifiés</span>
       </div>
     </div>
 
-    <!-- Légende -->
+    <!-- Barre principale avec animations -->
+    <div class="bar-wrapper" *ngIf="total > 0">
+      <div class="bar-container">
+        <div
+          class="segment non-eval"
+          [style.flex]="nonEvalPct"
+          *ngIf="nonEvaluated > 0"
+        >
+          <span class="segment-content">
+            <strong>{{ nonEvaluated }}</strong>
+            <small>{{ nonEvalPct }}%</small>
+          </span>
+        </div>
+        <div
+          class="segment brut"
+          [style.flex]="brutPct"
+          *ngIf="brutOnly > 0"
+        >
+          <span class="segment-content">
+            <strong>{{ brutOnly }}</strong>
+            <small>{{ brutPct }}%</small>
+          </span>
+        </div>
+        <div
+          class="segment net"
+          [style.flex]="brutNetPct"
+          *ngIf="brutAndNet > 0"
+        >
+          <span class="segment-content">
+            <strong>{{ brutAndNet }}</strong>
+            <small>{{ brutNetPct }}%</small>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Légende améliorée -->
     <div class="legend">
-      <div class="item">
-        <span class="color red"></span> Non évalués
+      <div class="legend-item">
+        <div class="legend-marker red">
+          <span class="marker-icon">⚠️</span>
+        </div>
+        <div class="legend-text">
+          <div class="legend-title">Non évalués</div>
+          <div class="legend-desc">Risques sans évaluation</div>
+        </div>
       </div>
-      <div class="item">
-        <span class="color yellow"></span> Évaluation brut uniquement
+      <div class="legend-item">
+        <div class="legend-marker yellow">
+          <span class="marker-icon">⚡</span>
+        </div>
+        <div class="legend-text">
+          <div class="legend-title">Évaluation brute</div>
+          <div class="legend-desc">Brut uniquement</div>
+        </div>
       </div>
-      <div class="item">
-        <span class="color blue"></span> Évaluation complète (Brut + Net)
+      <div class="legend-item">
+        <div class="legend-marker green">
+          <span class="marker-icon">✓</span>
+        </div>
+        <div class="legend-text">
+          <div class="legend-title">Évaluation complète</div>
+          <div class="legend-desc">Brut + Net</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats supplémentaires -->
+    <div class="stats-grid" *ngIf="total > 0">
+      <div class="stat-item">
+        <div class="stat-value">{{ brutNetPct }}%</div>
+        <div class="stat-label">Complétude</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ nonEvalPct + brutPct }}%</div>
+        <div class="stat-label">À traiter</div>
       </div>
     </div>
   </mat-card-content>

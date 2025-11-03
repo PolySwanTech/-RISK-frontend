@@ -1,5 +1,5 @@
 import { SnackBarService } from './../../../core/services/snack-bar/snack-bar.service';
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -14,19 +14,26 @@ import { RiskService } from '../../../core/services/risk/risk.service';
 import { UtilisateurService } from '../../../core/services/utilisateur/utilisateur.service';
 import { ControlTemplateCreateDto } from '../../../core/models/ControlTemplate';
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { Degree, DegreeLabels } from '../../../core/enum/degree.enum';
-import { Priority, PriorityLabels } from '../../../core/enum/Priority';
-import { Recurrence, RecurrenceLabels } from '../../../core/enum/recurrence.enum';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Degree } from '../../../core/enum/degree.enum';
+import { Priority } from '../../../core/enum/Priority';
+import { Recurrence } from '../../../core/enum/recurrence.enum';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { ControlTypeLabels, Type } from '../../../core/enum/controltype.enum';
+import { Type } from '../../../core/enum/controltype.enum';
 import { MatIconModule } from '@angular/material/icon';
-import { PopupHeaderComponent } from '../../../shared/components/popup-header/popup-header.component';
 import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { MatChipListbox, MatChip } from "@angular/material/chips";
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
+import { DraftService } from '../../../core/services/draft.service';
+
+export interface CreateControlDialogData {
+  draftId?: string;
+}
 
 @Component({
   selector: 'app-create-control',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -35,16 +42,20 @@ import { MatChipListbox, MatChip } from "@angular/material/chips";
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FormsModule, MatButtonModule, ReactiveFormsModule, 
-    MatIconModule, PopupHeaderComponent,
-    FormsModule, MatButtonModule, ReactiveFormsModule, MatIconModule, PopupHeaderComponent,
+    MatButtonModule,
+    ReactiveFormsModule,
+    MatIconModule,
     MatChipListbox,
-    MatChip
-],
+    MatChip,
+    EnumLabelPipe,
+    BasePopupComponent
+  ],
   templateUrl: './create-control.component.html',
   styleUrl: './create-control.component.scss'
 })
 export class CreateControlComponent {
+
+  private readonly COMPONENT_NAME = 'CreateControlDialog';
 
   riskService = inject(RiskService);
   buService = inject(EntitiesService);
@@ -53,9 +64,13 @@ export class CreateControlComponent {
   controlService = inject(ControlService);
   dialogRef = inject(MatDialogRef<CreateControlComponent>);
   confirmService = inject(ConfirmService);
-  snackBarService = inject(SnackBarService)
+  snackBarService = inject(SnackBarService);
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
+  private draftService = inject(DraftService);
+
+  popupActions: PopupAction[] = [];
+  private currentDraftId: string | null = null;
 
   form: FormGroup = this.fb.group({
     libelle: ['', Validators.required],
@@ -69,7 +84,6 @@ export class CreateControlComponent {
     buId: ['', Validators.required],
   });
 
-
   listProcess: any[] = [];
   listRisks: any[] = [];
   listEntities: any[] = [];
@@ -77,6 +91,7 @@ export class CreateControlComponent {
   priorities = Object.values(Priority);
   types = Object.values(Type);
   levels = Object.values(Degree);
+  recurences = Object.values(Recurrence);
 
   selectedBPR: any;
 
@@ -86,29 +101,107 @@ export class CreateControlComponent {
 
   responsables$ = this.userService.getUsers();
 
-  recurences = Object.values(Recurrence);
+  constructor(@Inject(MAT_DIALOG_DATA) public data: CreateControlDialogData | null) { }
 
   ngOnInit() {
+    // Charger le brouillon si un draftId est fourni
+    if (this.data?.draftId) {
+      this.loadDraft(this.data.draftId);
+      this.currentDraftId = this.data.draftId;
+      this.draftService.hideDraft(this.data.draftId);
+    }
+
+    this.dialogRef.backdropClick().subscribe(() => {
+      if (this.hasFormData()) {
+        this.saveDraft();
+      } else if (this.currentDraftId) {
+        this.draftService.showDraft(this.currentDraftId);
+      }
+    });
+
+    this.initActions();
   }
 
-  getTypeLabel(type: Type): string {
-    return ControlTypeLabels[type];
+  loadDraft(draftId: string): void {
+    const draft = this.draftService.getDraftById(draftId);
+    if (draft) {
+      this.form.patchValue(draft.data.form);
+      this.selectedBPR = draft.data.selectedBPR;
+      console.log('Brouillon de contrôle restauré:', draft);
+    }
   }
 
-  getPriorityLabel(priority: Priority): string {
-    return PriorityLabels[priority];
+  initActions(): void {
+    this.popupActions = [
+      {
+        label: 'Annuler',
+        icon: 'close',
+        color: 'red',
+        onClick: () => this.closePopup()
+      },
+      {
+        label: 'Créer le Contrôle',
+        icon: 'check',
+        primary: true,
+        disabled: () => this.form.invalid,
+        onClick: () => this.onSubmit()
+      }
+    ];
   }
 
-  getDegresLabel(d: Degree): string {
-    return DegreeLabels[d];
+  getDialogRef() {
+    return this.dialogRef;
   }
 
-  getRecurrenceLabel(recurrence: Recurrence): string {
-    return RecurrenceLabels[recurrence];
+  hasFormData(): boolean {
+  // Vérifie si au moins un champ du formulaire est rempli
+  const formValue = this.form.value;
+  const hasFormFields = Object.values(formValue).some(value => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === 'string') return value.trim() !== '';
+    return true; // si c’est un objet ou une valeur numérique
+  });
+
+  // Vérifie aussi si un BPR a été sélectionné
+  const hasSelectedBPR = !!this.selectedBPR;
+
+  return hasFormFields || hasSelectedBPR;
+}
+
+  saveDraft(): void {
+    if (!this.hasFormData()) {
+      return;
+    }
+
+    const draftData = {
+      form: this.form.value,
+      selectedBPR: this.selectedBPR
+    };
+
+    const title = `${this.form.get('libelle')?.value || 'Nouveau contrôle'}`;
+
+    if (this.currentDraftId) {
+      this.draftService.updateDraft(
+        this.currentDraftId,
+        title,
+        draftData,
+        true
+      );
+    } else {
+      this.currentDraftId = this.draftService.createDraft(
+        this.COMPONENT_NAME,
+        title,
+        draftData,
+        true
+      );
+    }
   }
 
   onSubmit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     const payload: ControlTemplateCreateDto = {
       libelle: this.form.value.libelle,
@@ -123,8 +216,13 @@ export class CreateControlComponent {
 
     this.controlService.createControl(payload).subscribe({
       next: () => {
+        // Supprimer le brouillon après sauvegarde réussie
+        if (this.currentDraftId) {
+          this.draftService.deleteDraft(this.currentDraftId);
+        }
+
         this.snackBarService.success("Le contrôle a bien été ajouté");
-        this.closePopup();
+        this.dialogRef.close();
       },
       error: err => {
         this.snackBarService.error(err.message);
@@ -133,6 +231,12 @@ export class CreateControlComponent {
   }
 
   closePopup() {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    } else if (this.currentDraftId) {
+      this.draftService.showDraft(this.currentDraftId);
+    }
+
     this.dialogRef.close();
   }
 
@@ -140,9 +244,9 @@ export class CreateControlComponent {
 
   selectBPR(event: any) {
     this.selectedBPR = event;
-    this.form.get('buId')?.setValue(event.bu.id)
-    this.form.get('processId')?.setValue(event.process.id)
-    this.form.get('riskId')?.setValue(event.risk.id)
+    this.form.get('buId')?.setValue(event.bu.id);
+    this.form.get('processId')?.setValue(event.process.id);
+    this.form.get('riskId')?.setValue(event.risk.id);
   }
 
   create() {
@@ -153,8 +257,16 @@ export class CreateControlComponent {
     });
 
     dialogRef.afterClosed().subscribe(event => {
-      this.selectBPR(event);
+      if (event) {
+        this.selectBPR(event);
+      }
     });
   }
 
+  @HostListener('window:beforeunload')
+  beforeUnload(): void {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    }
+  }
 }

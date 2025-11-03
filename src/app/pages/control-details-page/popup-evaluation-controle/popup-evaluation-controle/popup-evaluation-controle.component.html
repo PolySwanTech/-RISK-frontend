@@ -1,94 +1,228 @@
-<mat-card>
-    <div class="popup-overlay" *ngIf="!showAsCard" (click)="cancel()">
-        <div class="rv-modal" [ngClass]="{
-            'rv-modal--form': mode === 'FORM',
-            'rv-modal--blockers': mode === 'BLOCKERS',
-            'rv-modal--details': mode === 'DETAILS'
-        }" (click)="$event.stopPropagation()">
-            <app-popup-header [title]="
-                    mode === 'DETAILS' 
-                        ? (actionTaken === 'valid' ? 'Détail de l’évaluation' : 'Détail du réexamen') 
-                        : (mode === 'FORM' ? 'Évaluer le contrôle' : 'Évaluations en attente')
-                    " [showClose]="true" (close)="cancel()"></app-popup-header>
+<app-base-popup 
+  [title]="getTitlePage()" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="cancel()">
 
-            <div class="rv-modal__body">
-                <ng-container [ngSwitch]="mode">
-
-                    <div *ngSwitchCase="'BLOCKERS'">
-                        <p>Vous devez d’abord évaluer les exécutions précédentes :</p>
-
-                        <div class="list">
-                            <div class="item" *ngFor="let b of blockers">
-                                <div class="left">
-                                    <div class="date">Planifiée le {{ b.plannedAt | date: 'dd/MM/yyyy' }}</div>
-                                    <div class="who">Attribuée à {{ b.performedBy }}</div>
-                                    <span class="badge small" [ngClass]="{
-                      'status-realise': b.status === 'ACHIEVED',
-                      'status-en-cours': b.status === 'IN_PROGRESS',
-                    }">
-                                        {{ b.status }}
-                                    </span>
-                                </div>
-                                <div class="right">
-                                    <button class="btn btn-primary" (click)="startEvaluationFor(b.id)">Évaluer
-                                        maintenant</button>
-                                    <button class="btn btn-outline" (click)="openDetails(b.id)">Détails</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <form *ngSwitchCase="'FORM'" (ngSubmit)="submit()" #form="ngForm">
-                        <div class="form-group">
-                            <label for="evaluation">Évaluation</label>
-                            <select [(ngModel)]="evaluationData.evaluation" name="evaluation" required>
-                                <option *ngFor="let option of evaluationOptions" [value]="option">
-                                    {{ labels[option] }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="resume">Résumé</label>
-                            <textarea [(ngModel)]="evaluationData.resume" name="resume" required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="comments">Commentaires</label>
-                            <textarea [(ngModel)]="evaluationData.comments" name="comments"></textarea>
-                        </div>
-                    </form>
-
-                    <div *ngSwitchCase="'DETAILS'">
-                        <ng-container *ngIf="evalDetails; else noEvalYet">
-                            <div class="rv-section" *ngIf="canValidate && evalDetails.reviewStatus === 'PENDING'">
-                                <div class="rv-section__label">Votre retour (obligatoire)</div>
-                                <textarea [(ngModel)]="reviewComment" rows="3" class="rv-textarea"
-                                    placeholder="Votre avis / décision..."></textarea>
-                            </div>
-                        </ng-container>
-
-                        <ng-template #noEvalYet>
-                            <p>Pas d’évaluation soumise pour cette exécution.</p>
-                        </ng-template>
-                    </div>
-
-                </ng-container>
-            </div>
-
-            <ng-container>
-                <button mat-raised-button class="btn-primary" (click)="viewFiles()">
-                    <mat-icon>upload</mat-icon>
-                    Déposer un justificatif
-                </button>
-            </ng-container>
-
-            <div class="rv-modal__footer">
-                <ng-container>
-                    <button class="btn btn-primary winter-style" (click)="handleAction()">OK</button>
-                    <button class="btn btn-secondary" (click)="cancel()">Fermer</button>
-                </ng-container>
-            </div>
-        </div>
+  <!-- MODE: BLOCKERS - Évaluations en attente -->
+  <div class="section" *ngIf="mode === 'BLOCKERS'">
+    <div class="section-header">
+      <mat-icon class="section-icon">warning</mat-icon>
+      <h3 class="section-title">Évaluations précédentes à compléter</h3>
     </div>
-</mat-card>
+
+    <div class="info-box">
+      <mat-icon>info</mat-icon>
+      <span>Vous devez d'abord évaluer les exécutions précédentes avant de continuer</span>
+    </div>
+
+    <div class="blockers-list">
+      <div class="blocker-item" *ngFor="let b of blockers">
+        <div class="blocker-info">
+          <div class="blocker-header">
+            <mat-icon>schedule</mat-icon>
+            <span class="blocker-date">Planifiée le {{ b.plannedAt | date: 'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="blocker-assignee">
+            <mat-icon>person</mat-icon>
+            <span>Attribuée à {{ b.performedBy }}</span>
+          </div>
+          <span class="badge" [ngClass]="{
+            'status-realise': b.status === 'ACHIEVED',
+            'status-en-cours': b.status === 'IN_PROGRESS'
+          }">
+            {{ b.status }}
+          </span>
+        </div>
+        <div class="blocker-actions">
+          <button mat-raised-button class="btn-primary" (click)="startEvaluationFor(b.id)">
+            <mat-icon>edit</mat-icon>
+            Évaluer maintenant
+          </button>
+          <button mat-stroked-button (click)="openDetails(b.id)">
+            <mat-icon>visibility</mat-icon>
+            Détails
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE: FORM - Formulaire d'évaluation -->
+  <form [formGroup]="evaluationForm" (ngSubmit)="submit()" *ngIf="mode === 'FORM'">
+    
+    <!-- Section Évaluation -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">rate_review</mat-icon>
+        <h3 class="section-title">Votre évaluation</h3>
+      </div>
+
+      <div class="forms-container">
+        <!-- Niveau d'évaluation -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Évaluation</mat-label>
+          <mat-select formControlName="evaluation">
+            <mat-option *ngFor="let option of evaluationOptions" [value]="option">
+              {{ labels[option] }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>assessment</mat-icon>
+          <mat-error *ngIf="evaluationForm.get('evaluation')?.hasError('required')">
+            L'évaluation est obligatoire
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Résumé -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Résumé</mat-label>
+          <textarea matInput formControlName="resume" rows="4" 
+                    placeholder="Résumez votre évaluation"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+          <mat-error *ngIf="evaluationForm.get('resume')?.hasError('required')">
+            Le résumé est obligatoire
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Commentaires -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Commentaires (optionnel)</mat-label>
+          <textarea matInput formControlName="comments" rows="3" 
+                    placeholder="Ajoutez des commentaires supplémentaires"></textarea>
+          <mat-icon matPrefix>comment</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Section Justificatifs -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">attach_file</mat-icon>
+        <h3 class="section-title">Justificatifs</h3>
+        <div class="section-header-actions">
+          <button mat-raised-button type="button" class="btn-add-action" (click)="viewFiles()">
+            <mat-icon>upload</mat-icon>
+            Déposer un justificatif
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- MODE: DETAILS - Détails de l'évaluation -->
+  <div *ngIf="mode === 'DETAILS'">
+    
+    <ng-container *ngIf="evalDetails; else noEvalYet">
+      
+      <!-- Section Évaluation existante -->
+      <div class="section">
+        <div class="section-header">
+          <mat-icon class="section-icon">info</mat-icon>
+          <h3 class="section-title">Informations de l'évaluation</h3>
+        </div>
+
+        <div class="details-content">
+          <div class="detail-row">
+            <span class="detail-label">
+              <mat-icon>assessment</mat-icon>
+              Évaluation
+            </span>
+            <span class="pill" [ngClass]="evalClass">{{ evalLabel }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">
+              <mat-icon>description</mat-icon>
+              Résumé
+            </span>
+            <span class="detail-value">{{ evalDetails.resume }}</span>
+          </div>
+
+          <div class="detail-row" *ngIf="evalDetails.comments">
+            <span class="detail-label">
+              <mat-icon>comment</mat-icon>
+              Commentaires
+            </span>
+            <span class="detail-value">{{ evalDetails.comments }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Validation/Réexamen -->
+      <div class="section" *ngIf="canValidate && evalDetails.reviewStatus === 'PENDING'">
+        <div class="section-header">
+          <mat-icon class="section-icon">fact_check</mat-icon>
+          <h3 class="section-title">Votre retour</h3>
+        </div>
+
+        <form [formGroup]="reviewForm" class="forms-container">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Votre avis / décision</mat-label>
+            <textarea matInput formControlName="reviewComment" rows="4" 
+                      placeholder="Commentez votre décision"></textarea>
+            <mat-icon matPrefix>edit_note</mat-icon>
+            <mat-error *ngIf="reviewForm.get('reviewComment')?.hasError('required')">
+              Un commentaire est obligatoire
+            </mat-error>
+          </mat-form-field>
+        </form>
+      </div>
+
+      <!-- Section Statut de validation -->
+      <div class="section" *ngIf="hasValidation">
+        <div class="section-header">
+          <mat-icon class="section-icon">verified</mat-icon>
+          <h3 class="section-title">Statut de validation</h3>
+        </div>
+
+        <div class="details-content">
+          <div class="detail-row">
+            <span class="detail-label">
+              <mat-icon>label</mat-icon>
+              Statut
+            </span>
+            <span class="pill" [ngClass]="reviewBadgeClass">{{ evalDetails.reviewStatus }}</span>
+          </div>
+
+          <div class="detail-row" *ngIf="evalDetails.reviewedBy">
+            <span class="detail-label">
+              <mat-icon>person</mat-icon>
+              Validé par
+            </span>
+            <span class="detail-value">{{ evalDetails.reviewedBy }}</span>
+          </div>
+
+          <div class="detail-row" *ngIf="evalDetails.reviewedAt">
+            <span class="detail-label">
+              <mat-icon>event</mat-icon>
+              Date
+            </span>
+            <span class="detail-value">{{ evalDetails.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <div class="detail-row" *ngIf="evalDetails.reviewComment">
+            <span class="detail-label">
+              <mat-icon>comment</mat-icon>
+              Commentaire
+            </span>
+            <span class="detail-value">{{ evalDetails.reviewComment }}</span>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <ng-template #noEvalYet>
+      <div class="section">
+        <div class="empty-state">
+          <mat-icon>info</mat-icon>
+          <p>Pas d'évaluation soumise pour cette exécution.</p>
+        </div>
+      </div>
+    </ng-template>
+
+  </div>
+
+</app-base-popup>

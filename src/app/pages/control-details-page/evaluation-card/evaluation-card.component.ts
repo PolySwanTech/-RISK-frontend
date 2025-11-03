@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
+import { EvaluationControl } from '../../../core/enum/evaluation-controle.enum';
 import { Evaluation } from '../../../core/enum/evaluation.enum';
 import { ControlEvaluationView, ControlEvaluation } from '../../../core/models/ControlEvaluation';
 import { ControlExecution } from '../../../core/models/ControlExecution';
@@ -11,15 +11,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 import { TargetType } from '../../../core/enum/targettype.enum';
 import { FileService } from '../../../core/services/file/file.service';
-import { ReviewStatus, ReviewStatusLabels } from '../../../core/enum/reviewStatus.enum';
+import { ReviewStatus } from '../../../core/enum/reviewStatus.enum';
 import { HasPermissionDirective } from "../../../core/directives/has-permission.directive";
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 type PopupMode = 'FORM' | 'BLOCKERS' | 'DETAILS';
 
 @Component({
   selector: 'app-evaluation-card',
-  imports: [CommonModule, FormsModule, MatIconModule, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, MatIconModule, HasPermissionDirective, EnumLabelPipe],
   templateUrl: './evaluation-card.component.html',
   styleUrl: './evaluation-card.component.scss'
 })
@@ -130,15 +131,6 @@ export class EvaluationCardComponent {
       .afterClosed().subscribe();
   }
 
-  get evalLabel(): string {
-    if (this.evaluationView) {
-      return EvaluationControlLabels[this.evaluationView.evaluation]
-    }
-    else {
-      return '—';
-    }
-  }
-
   get evalClass(): string {
     if (this.evaluationView) {
       switch (this.evaluationView.evaluation) {
@@ -164,9 +156,5 @@ export class EvaluationCardComponent {
     }
     return '';
   }
-  
-  get reviewBadgeLabel(): string {
-    const s = this.evaluationView?.reviewStatus;
-    return s ? ReviewStatusLabels[s] : '—';
-  }
+
 }

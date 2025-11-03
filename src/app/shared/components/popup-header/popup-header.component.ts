@@ -11,14 +11,13 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class PopupHeaderComponent {
 
-  @Input() title: string | null = null;  // Default value if not passed
-  @Input() showClose: boolean = true; // Default to true if not provided
+  @Input() title: string | null = null;
+  @Input() showClose: boolean = true;
   @Output() close = new EventEmitter<void>();
 
   ngOnInit() {
-    // If 'title' is not set, throw an error
     if (!this.title || this.title.trim() === '') {
-      throw new Error('The "title" input is required for the ExampleComponent!');
+      throw new Error('The "title" input is required for the PopupHeaderComponent!');
     }
   }
 

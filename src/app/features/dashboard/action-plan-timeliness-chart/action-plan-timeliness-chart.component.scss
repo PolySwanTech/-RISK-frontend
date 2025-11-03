@@ -8,6 +8,7 @@
 .chart-container {
   height: 280px;
   position: relative;
+  overflow: visible; /* éviter le découpage au hover */
 }
 
 .loading {

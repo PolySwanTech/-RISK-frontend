@@ -11,7 +11,7 @@
           <td class="rank">{{ i + 1 }}</td>
           <td class="name">{{ risk.name }}</td>
           <td class="level">
-            <span class="color-dot" [style.background]="risk.color"></span>
+            <span class="color-dot" [style.background]="risk.color"  [style.border]="risk.label === 'Faible' ? '1px solid black' : 'none'"></span>
             {{ risk.label }}
           </td>
         </tr>

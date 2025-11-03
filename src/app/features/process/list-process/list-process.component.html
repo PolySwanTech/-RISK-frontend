@@ -16,7 +16,7 @@
     <div class="search-bar">
         <mat-form-field appearance="outline" class="w-full">
             <mat-label>Rechercher un risque par process</mat-label>
-            <input matInput [(ngModel)]="searchTerm" placeholder="Nom du process...">
+            <input matInput [(ngModel)]="searchTerm" placeholder="Nom du process ou du risque...">
             <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm=''">
                 <mat-icon>close</mat-icon>
             </button>

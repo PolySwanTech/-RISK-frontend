@@ -6,14 +6,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 
 import { ControlService } from '../../../core/services/dmr/control/control.service';
-import { ControlMethodology, ControlMethodologyCreateDto } from '../../../core/models/ControlMethodology';
-import { ControlNature, ControlNatureLabels } from '../../../core/enum/ControlNature.enum';
-import { ExecutionMode, ExecutionModeLabels } from '../../../core/enum/exceutionmode.enum';
+import { ControlMethodologyCreateDto, ControlMethodologyViewDto } from '../../../core/models/ControlMethodology';
+import { ControlNature } from '../../../core/enum/ControlNature.enum';
+import { ExecutionMode } from '../../../core/enum/exceutionmode.enum';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 
 @Component({
   selector: 'app-methodology-card',
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatInputModule],
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, EnumLabelPipe],
   templateUrl: './methodology-card.component.html',
   styleUrl: './methodology-card.component.scss'
 })
@@ -23,7 +24,7 @@ export class MethodologyCardComponent implements OnInit {
 
   loading = true;
   submitting = false;
-  methodology: ControlMethodology | null = null;
+  methodology: ControlMethodologyViewDto | null = null;
 
   form: FormGroup;
 
@@ -74,14 +75,6 @@ export class MethodologyCardComponent implements OnInit {
       },
       error: () => { this.submitting = false; }
     });
-  }
-
-  getControlNature(n: ControlNature): string {
-    return ControlNatureLabels[n]
-  }
-
-  getExecutionMode(m: ExecutionMode): string {
-    return ExecutionModeLabels[m]
   }
 
   controlTypeLabel(t?: string): string {

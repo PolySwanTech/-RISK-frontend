@@ -8,91 +8,96 @@
     <!-- Onglet Incidents -->
     <mat-tab label="Incidents">
 
-  <!-- 1️⃣ Graphe de tendances -->
+  <!-- Toolbar -->
+  <div class="dashboard-toolbar">
+    <div class="toolbar-left">
+      <button mat-stroked-button color="primary" (click)="toggleFilters()">
+        <mat-icon>tune</mat-icon>
+        Filtres
+      </button>
+      <div class="filter-actions" *ngIf="showFilters">
+        <button mat-stroked-button color="warn" (click)="clearDateFilter()">
+          <mat-icon>restart_alt</mat-icon>
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+    <div *ngIf="showFilters" class="toolbar-right">
+      <mat-form-field class="range-field" appearance="outline">
+        <mat-label>Période</mat-label>
+        <mat-date-range-input [rangePicker]="pickerRange">
+          <input matStartDate [(ngModel)]="startDate" (dateChange)="applyDateFilter()" placeholder="Début">
+          <input matEndDate [(ngModel)]="endDate" (dateChange)="applyDateFilter()" placeholder="Fin">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="pickerRange"></mat-datepicker-toggle>
+        <mat-date-range-picker #pickerRange></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </div>
+  <!-- Bandeau KPI -->
+  <div class="kpi-grid">
+    <mat-card class="kpi-card kpi-primary">
+      <div class="kpi-header">
+        <mat-icon>insights</mat-icon>
+        <span>Total d’incidents</span>
+      </div>
+      <div class="kpi-value">{{ totalIncidents }}</div>
+      <div class="kpi-sub">Durée moyenne: {{ avgResolutionTime }}</div>
+    </mat-card>
+
+    <mat-card class="kpi-card kpi-warn">
+      <div class="kpi-header">
+        <mat-icon>schedule</mat-icon>
+        <span>En cours</span>
+      </div>
+      <div class="kpi-value">{{ inProgressIncidents }}</div>
+      <div class="kpi-sub">{{ draftIncidents }} en brouillon</div>
+    </mat-card>
+
+    <mat-card class="kpi-card kpi-success">
+      <div class="kpi-header">
+        <mat-icon>check_circle</mat-icon>
+        <span>Résolus</span>
+      </div>
+      <div class="kpi-value">{{ resolvedIncidents }}</div>
+      <div class="kpi-sub">Taux de résolution: {{ resolutionRate }}%</div>
+    </mat-card>
+  </div>
+
+  <div class="section-title">Tendance</div>
+
+  <!-- Graphe de tendances -->
   <div class="trend-container">
     <app-incidents-trend-chart [incidents]="filteredIncidents"></app-incidents-trend-chart>
   </div>
 
-  <!-- 2️⃣ Filtre par période personnalisée -->
-  <div class="filter-container">
-    <mat-form-field appearance="outline">
-      <mat-label>Date de début</mat-label>
-      <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" placeholder="Choisir une date" />
-      <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
-      <mat-datepicker #pickerStart></mat-datepicker>
-    </mat-form-field>
+  
 
-    <mat-form-field appearance="outline">
-      <mat-label>Date de fin</mat-label>
-      <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" placeholder="Choisir une date" />
-      <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-      <mat-datepicker #pickerEnd></mat-datepicker>
-    </mat-form-field>
+  <div class="section-title">Analyse</div>
 
-    <button mat-raised-button color="primary" (click)="applyDateFilter()">Appliquer</button>
-    <button mat-stroked-button color="warn" (click)="clearDateFilter()">Réinitialiser</button>
-  </div>
-
-
-<!-- 🔺 Pyramide des incidents -->
-<div class="incident-pyramid">
-
-  <!-- Sommet : Total -->
-  <div class="pyramid-top">
-    <mat-card class="total">
-      <mat-card-title>Total d’incidents</mat-card-title>
-      <mat-card-content>{{ totalIncidents }}</mat-card-content>
-      <p class="resolution-rate">Durée moyenne de résolution: {{ avgResolutionTime }}</p>
-    </mat-card>
-  </div>
-
-  <!-- Niveau intermédiaire : En cours / Résolus -->
-  <div class="pyramid-middle">
-    <mat-card class="in-progress">
-      <mat-card-title>En cours</mat-card-title>
-      <mat-card-content>{{ inProgressIncidents }}</mat-card-content>
-      <p class="resolution-rate">{{ draftIncidents }} en brouillon</p>
-    </mat-card>
-
-    <mat-card class="resolved">
-      <mat-card-title>Résolus</mat-card-title>
-      <mat-card-content>{{ resolvedIncidents }}</mat-card-content>
-      <p class="resolution-rate"><strong>{{ resolutionRate }}%</strong> taux de résolution</p>
-    </mat-card>
-  </div>
-</div>
-
-
-  <!-- 4️⃣ Autres graphiques -->
+  <!-- Autres graphiques -->
   <div class="graphs-container">
     <app-baloise-category-chart [incidents]="filteredIncidents"></app-baloise-category-chart>
   </div>
 
-</mat-tab>
+  </mat-tab>
 
 
     <!-- Onglet Contrôles -->
     <mat-tab label="Contrôles">
-      <div class="controls-dashboard">
-        
-        <!-- Ligne 1 -->
-        <div class="controls-row">
-          <app-control-completion-rate></app-control-completion-rate>
-          <app-control-status-chart></app-control-status-chart>
-        </div>
-
-        <!-- Ligne 2 -->
-        <div class="controls-row">
-          <app-control-result-chart></app-control-result-chart>
-        </div>
-
+      <div class="section-title">Vue d’ensemble</div>
+      <div class="controls-grid">
+        <app-control-completion-rate></app-control-completion-rate>
+        <app-control-status-chart></app-control-status-chart>
+        <app-control-result-chart></app-control-result-chart>
       </div>
     </mat-tab>
 
 
     <!-- Onglet Plans d’action -->
     <mat-tab label="Plans d’action">
-      <div class="graphs-container">
+      <div class="section-title">Suivi et performance</div>
+      <div class="controls-grid">
         <app-action-plan-timeliness-chart></app-action-plan-timeliness-chart>
         <app-priority-distribution-chart></app-priority-distribution-chart>
         <app-average-implementation-delay></app-average-implementation-delay>
@@ -101,7 +106,8 @@
 
        <!-- Onglet Carto -->
     <mat-tab label="Cartographie">
-      <div class="graphs-container">
+      <div class="section-title">Synthèse des risques</div>
+      <div class="risks-grid">
           <app-risk-evaluation-summary></app-risk-evaluation-summary>
           <app-risk-criticality-chart></app-risk-criticality-chart>
           <app-top-critical-risks></app-top-critical-risks>

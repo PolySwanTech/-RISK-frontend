@@ -1,16 +1,53 @@
+@use '../../../../styles/popup-common' as popup;
 
+  .toggle-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
 
-mat-dialog-content {
-    overflow: hidden;
-}
+    &:hover {
+      border-color: var(--mat-sys-primary) !important;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
 
-.toggle-container {
-    margin-left: 4%;
-}
+    .toggle-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
 
+      .toggle-icon {
+        color: #64748b;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
 
+      .toggle-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
 
+        .toggle-label {
+          font-size: 14px;
+          font-weight: 600;
+          color: #1e293b;
+          margin: 0;
+        }
 
-mat-slide-toggle{
-    margin-top: 5px;
-}
+        .toggle-description {
+          font-size: 12px;
+          color: #64748b;
+        }
+      }
+    }
+
+    mat-slide-toggle {
+      flex-shrink: 0;
+    }
+  }

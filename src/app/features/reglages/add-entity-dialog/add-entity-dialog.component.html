@@ -1,16 +1,40 @@
-<mat-card>
-  <app-popup-header [title]="titlePage" [showClose]="dialogRef != null" (close)="goBack()"></app-popup-header>
-  <mat-dialog-content>
-    <form [formGroup]="formGroup">
+<app-base-popup 
+  [title]="titlePage" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="goBack()">
   
-      <mat-form-field class="full-width">
-        <mat-label>Nom</mat-label>
-        <input matInput formControlName="name" placeholder="Nom" required>
+  <!-- Section Informations -->
+  <div class="section">
+    <div class="section-header">
+      <mat-icon class="section-icon">info</mat-icon>
+      <h3 class="section-title">Informations générales</h3>
+    </div>
+    
+    <form [formGroup]="formGroup" class="forms-container">
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Nom de l'entité</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: Direction Financière" required>
+        <mat-icon matPrefix>business</mat-icon>
+        <mat-error *ngIf="formGroup.get('name')?.hasError('required')">
+          Le nom est obligatoire
+        </mat-error>
       </mat-form-field>
-  
-      <div class="form-group">
-        <label>Ligne Métier ?</label>
-        <mat-slide-toggle formControlName="lm" [checked]="formGroup.get('lm')?.value" />
+
+      <div class="toggle-field">
+        <div class="toggle-info">
+          <mat-icon class="toggle-icon">domain</mat-icon>
+          <div class="toggle-text">
+            <label class="toggle-label">Ligne Métier</label>
+            <span class="toggle-description">Cette entité est-elle une ligne métier ?</span>
+          </div>
+        </div>
+        <mat-slide-toggle 
+          formControlName="lm" 
+          [checked]="formGroup.get('lm')?.value"
+          color="primary">
+        </mat-slide-toggle>
       </div>
 
       <mat-form-field appearance="outline" class="full-width">
@@ -24,12 +48,20 @@
 
       
     </form>
-    <app-select-entities [entiteEnfantId]=" data ? data.id : ''"
-      [selectId]="BusinessUnit.parentId ? BusinessUnit.parentId : ''"
-      (entitieSelected)="entiteChange($event)"></app-select-entities>
-    <div class="actions">
-      <button mat-raised-button class="btn-red" (click)="goBack()">Retour</button>
-      <button mat-raised-button class="btn-primary" [disabled]="formGroup.invalid" (click)="onSave()">Enregitrer</button>
+  </div>
+
+  <!-- Section Hiérarchie -->
+  <div class="section">
+    <div class="section-header">
+      <mat-icon class="section-icon">account_tree</mat-icon>
+      <h3 class="section-title">Hiérarchie organisationnelle</h3>
     </div>
-  </mat-dialog-content>
-</mat-card>
+    
+    <app-select-entities 
+      [entiteEnfantId]="data?.id ?? ''"
+      [selectId]="BusinessUnit.id ? BusinessUnit.id : ''"
+      (entitieSelected)="entiteChange($event)">
+    </app-select-entities>
+  </div>
+
+</app-base-popup>

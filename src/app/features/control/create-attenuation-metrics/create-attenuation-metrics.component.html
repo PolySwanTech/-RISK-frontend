@@ -1,52 +1,122 @@
-<app-popup-header [title]="'Créer une mesure d’atténuation'" [showClose]="true" (close)="closePopup()"></app-popup-header>
+<app-base-popup 
+  [title]="'Créer une mesure d\'atténuation'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Section Informations générales -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">info</mat-icon>
+        <h3 class="section-title">Informations générales</h3>
+      </div>
 
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Libellé</mat-label>
-      <input matInput formControlName="libelle" />
-    </mat-form-field>
-  </div>
+      <div class="forms-container">
+        <!-- Libellé -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Libellé</mat-label>
+          <input matInput formControlName="libelle" placeholder="Ex: Mise en place d'un pare-feu">
+          <mat-icon matPrefix>label</mat-icon>
+          <mat-error *ngIf="form.get('libelle')?.hasError('required')">
+            Le libellé est obligatoire
+          </mat-error>
+        </mat-form-field>
 
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description"></textarea>
-    </mat-form-field>
-  </div>
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="4" 
+                    placeholder="Décrivez la mesure d'atténuation en détail"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+          <mat-error *ngIf="form.get('description')?.hasError('required')">
+            La description est obligatoire
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
 
-  <!-- Sélecteur de catégorie parent -->
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Catégorie principale</mat-label>
-      <mat-select formControlName="parentType" (selectionChange)="onParentChange($event.value)">
-        <mat-option *ngFor="let t of parentTypes" [value]="t.code">{{ t.label }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <!-- Section Catégorisation -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">category</mat-icon>
+        <h3 class="section-title">Catégorisation</h3>
+      </div>
 
-    <!-- Sélecteur de sous-catégorie (enfants) -->
-    <mat-form-field appearance="outline">
-      <mat-label>Sous-catégorie</mat-label>
-      <mat-select formControlName="type">
-        <mat-option *ngFor="let c of childTypes" [value]="c.code">{{ c.label }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+      <div class="forms-container">
+        <div class="row-fields">
+          <!-- Catégorie principale -->
+          <mat-form-field appearance="outline">
+            <mat-label>Catégorie principale</mat-label>
+            <mat-select formControlName="parentType" (selectionChange)="onParentChange($event.value)">
+              <mat-option *ngFor="let t of parentTypes" [value]="t.code">
+                {{ t.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>folder</mat-icon>
+            <mat-error *ngIf="form.get('parentType')?.hasError('required')">
+              La catégorie principale est obligatoire
+            </mat-error>
+          </mat-form-field>
 
-  <button style="margin-bottom: 10px;" mat-stroked-button (click)="create()" type="button">
-    <mat-icon>add</mat-icon>
-    Associer BU / Processus / Risque *
-  </button>
+          <!-- Sous-catégorie -->
+          <mat-form-field appearance="outline">
+            <mat-label>Sous-catégorie</mat-label>
+            <mat-select formControlName="type" [disabled]="childTypes.length === 0">
+              <mat-option *ngFor="let c of childTypes" [value]="c.code">
+                {{ c.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>subdirectory_arrow_right</mat-icon>
+            <mat-error *ngIf="form.get('type')?.hasError('required')">
+              La sous-catégorie est obligatoire
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-  <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
-    <mat-chip> Équipe : {{ selectedBPR.bu.name }}</mat-chip>
-    <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
-    <mat-chip> Risque : {{ selectedBPR.risk.name }}</mat-chip>
-  </mat-chip-listbox>
+        <div class="info-box" *ngIf="form.get('parentType')?.value && childTypes.length === 0">
+          <mat-icon>info</mat-icon>
+          <span>Sélectionnez d'abord une catégorie principale pour voir les sous-catégories disponibles</span>
+        </div>
+      </div>
+    </div>
 
-  <button mat-raised-button color="primary" type="submit">
-    <mat-icon>save</mat-icon> Créer
-  </button>
+    <!-- Section Association -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">link</mat-icon>
+        <h3 class="section-title">Association BU / Processus / Risque</h3>
+        <div class="section-header-actions">
+          <button mat-raised-button type="button" class="btn-purple" (click)="create()">
+            <mat-icon>add</mat-icon>
+            Associer
+          </button>
+        </div>
+      </div>
 
-</form>
+      <div class="association-content">
+        <mat-chip-listbox *ngIf="selectedBPR" class="chip-list">
+          <mat-chip class="custom-chip">
+            <mat-icon>business</mat-icon>
+            Équipe : {{ selectedBPR.bu.name }}
+          </mat-chip>
+          <mat-chip class="custom-chip">
+            <mat-icon>account_tree</mat-icon>
+            Processus : {{ selectedBPR.process.name }}
+          </mat-chip>
+          <mat-chip class="custom-chip">
+            <mat-icon>warning</mat-icon>
+            Risque : {{ selectedBPR.risk.name }}
+          </mat-chip>
+        </mat-chip-listbox>
+
+        <div class="empty-state" *ngIf="!selectedBPR">
+          <mat-icon>link_off</mat-icon>
+          <p>Aucune association définie. Cliquez sur "Associer" pour lier une équipe, un processus et un risque.</p>
+        </div>
+      </div>
+    </div>
+  </form>
+
+</app-base-popup>

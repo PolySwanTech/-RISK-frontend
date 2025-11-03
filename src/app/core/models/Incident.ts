@@ -4,9 +4,9 @@ import { OperatingLoss } from "./OperatingLoss";
 import { BaloiseCategoryDto } from "./RiskReferentiel";
 
 
-export class Incident {
+export interface Incident {
     id: string;
-    reference: string = ""
+    reference: string
 
     title: string;
     location: string;
@@ -18,7 +18,7 @@ export class Incident {
     closedAt: Date | null ;
 
     risk: string;
-    riskName : string = "";
+    riskName : string;
     categoryBaloise : BaloiseCategoryDto;
     cause : Cause;
     process: string ;
@@ -35,51 +35,40 @@ export class Incident {
     creatorId?: string | null;
     creatorName?: string | null;
 
+}
 
+export type IncidentListViewDto = Pick<
+  Incident,
+  | 'id'
+  | 'reference'
+  | 'title'
+  | 'declaredAt'
+  | 'survenueAt'
+  | 'state'
+  | 'processName'
+  | 'riskName'
+  | 'creatorName'
+  | 'closedAt'
+  | 'categoryBaloise'
+>;
 
-    constructor(
-        id: string,
-        title: string,
-        location: string,
-        commentaire: string,
-        declaredAt: Date,
-        survenueAt: Date,
-        detectedAt: Date,
-        closedAt: Date | null,
-        risk: string,
-        categoryBaloise: BaloiseCategoryDto,
-        cause: Cause,
-        process: string,
-        teamId?: string,
-        impacts: OperatingLoss[] = [],
-        state: State = State.DRAFT,
-        consequences: string[] = [],
-        intervenantId?: string | null,
-        intervenantName?: string,
-        creatorId?: string | null,
-        creatorName?: string,
-    ){
-        this.id = id;
-        this.title = title;
-        this.location = location;
-        this.commentaire = commentaire;
-        this.declaredAt = declaredAt;
-        this.survenueAt = survenueAt;
-        this.detectedAt = detectedAt;
-        this.closedAt = closedAt;
-        this.risk = risk;
-        this.categoryBaloise = categoryBaloise;
-        this.cause = cause;
-        this.process = process;
-        this.teamId = teamId;
-        this.impacts = impacts;
-        this.state = state;
-        this.consequences = consequences;
-        this.intervenantId = intervenantId || null;
-        this.intervenantName = intervenantName || null;
-        this.creatorId = creatorId || null;
-        this.creatorName = creatorName || null;
-    }
+export type IncidentListDto = Pick<
+  Incident,
+  'id' | 'reference' | 'title' | 'state' | 'declaredAt' | 'survenueAt' | 'closedAt'
+>;
 
-
+export interface IncidentCreateDto {
+  reference: string;
+  title: string | null;
+  location: string | null;
+  commentaire: string | null;
+  declaredAt: Date;
+  survenueAt: Date | null;
+  detectedAt: Date | null;
+  teamId: string | null;
+  riskId: string | null;
+  processId: string | null;
+  cause: Cause | null;
+  intervenant: string | null;
+  state?: State | '';
 }

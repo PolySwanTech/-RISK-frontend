@@ -20,11 +20,12 @@ import { GlobalSearchBarComponent } from '../../shared/components/global-search-
 import { MatPaginator } from '@angular/material/paginator';
 import { Filter } from '../../core/enum/filter.enum';
 import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
-import { ControlExecution } from '../../core/models/ControlExecution';
-import { Status, StatusLabels } from '../../core/enum/status.enum';
+import { ControlExecution, ControlExecutionTableView } from '../../core/models/ControlExecution';
+import { Status } from '../../core/enum/status.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../core/enum/evaluation-controle.enum';
 import { PopUpDetailExecutionComponent } from '../../features/control/pop-up-detail-execution/pop-up-detail-execution.component';
 import { Priority } from '../../core/enum/Priority';
+import { EnumLabelPipe } from '../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-executions-list',
@@ -32,7 +33,7 @@ import { Priority } from '../../core/enum/Priority';
     MatGridListModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, MatTooltipModule, CommonModule, GoBackComponent, MatTableModule, MatButtonToggleModule,
     FilterTableComponent, GlobalSearchBarComponent, MatPaginator],
-  providers: [DatePipe, CurrencyPipe],
+  providers: [DatePipe, CurrencyPipe, EnumLabelPipe],
   templateUrl: './executions-list.component.html',
   styleUrl: './executions-list.component.scss'
 })
@@ -43,11 +44,12 @@ export class ExecutionsListComponent {
   private controlService = inject(ControlService);
   private dialog = inject(MatDialog);
   private datePipe = inject(DatePipe);
+  private enumLabelPipe = inject(EnumLabelPipe);
   expandedId: string | null = null;
 
   executionId: string = this.route.snapshot.paramMap.get('id') || '';
 
-  executions: ControlExecution[] = [];
+  executions: ControlExecutionTableView[] = [];
 
   goBackButtons: GoBackButton[] = [];
 
@@ -59,13 +61,13 @@ export class ExecutionsListComponent {
       header: 'Statut',
       cell: (execution: ControlExecution) =>
         `<span class="badge ${this.getStatusClass(execution.status)}">
-       ${this.formatStatus(execution.status)}
+       ${this.enumLabelPipe.transform(execution.status, 'status')}
      </span>`,
       filterType: 'select',
       icon: 'check_circle',
       options: [
-        { value: Status.ACHIEVED, label: this.formatStatus(Status.ACHIEVED) },
-        { value: Status.IN_PROGRESS, label: this.formatStatus(Status.IN_PROGRESS) },
+        { value: Status.ACHIEVED, label: this.enumLabelPipe.transform(Status.ACHIEVED, 'status') },
+        { value: Status.IN_PROGRESS, label: this.enumLabelPipe.transform(Status.IN_PROGRESS, 'status') },
       ]
     },
     {
@@ -119,7 +121,7 @@ export class ExecutionsListComponent {
 
   filtersConfig: Filter[] = this.columns.map(col => buildFilterFromColumn(col));
 
-  dataSource = new MatTableDataSource<ControlExecution>([]);
+  dataSource = new MatTableDataSource<ControlExecutionTableView>([]);
 
   @Input() closed: boolean = false;
 
@@ -199,13 +201,8 @@ export class ExecutionsListComponent {
     `;
   }
 
-  getEvaluationLabel(v?: EvaluationControl | null): string {
-    return v ? EvaluationControlLabels[v] : '';
-  }
-
   formatPriority(p?: string) { return p === 'MINIMAL' ? 'Faible' : p === 'MEDIUM' ? 'Moyenne' : 'Élevée'; }
 
-  formatStatus(s?: Status) { return s ? StatusLabels[s] : '—'; }
 
   handleFiltersChanged(filters: any) {
     let filtered = [...this.executions];
@@ -268,7 +265,7 @@ export class ExecutionsListComponent {
 
         // 🔹 Status (cherche sur le label affiché)
         if (key === 'status') {
-          const label = this.formatStatus(value as Status);
+          const label = this.enumLabelPipe.transform(value as Status, 'status');
           return label.toLowerCase().includes(lowerQuery);
         }
 

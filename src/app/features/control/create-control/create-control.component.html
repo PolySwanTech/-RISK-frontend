@@ -1,69 +1,149 @@
-<app-popup-header [title]="'Créer un contrôle'" [showClose]="true" (close)="closePopup()"></app-popup-header>
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<app-base-popup [title]="'Créer un contrôle'" [showClose]="true" [actions]="popupActions" [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
 
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Libellé</mat-label>
-      <input matInput formControlName="libelle" />
-    </mat-form-field>
-  </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- Section Informations générales -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">info</mat-icon>
+        <h3 class="section-title">Informations générales</h3>
+      </div>
 
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description"></textarea>
-    </mat-form-field>
-  </div>
+      <div class="forms-container">
+        <!-- Libellé -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Libellé</mat-label>
+          <input matInput formControlName="libelle" placeholder="Ex: Contrôle mensuel des accès">
+          <mat-icon matPrefix>label</mat-icon>
+          <mat-error *ngIf="form.get('libelle')?.hasError('required')">
+            Le libellé est obligatoire
+          </mat-error>
+        </mat-form-field>
 
-  <div class="row-add">
-    <mat-form-field appearance="outline">
-      <mat-label>Récurrence</mat-label>
-      <mat-select formControlName="frequency">
-        @for (rec of recurences; track rec) {
-        <mat-option [value]="rec">{{ getRecurrenceLabel(rec) }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="4"
+            placeholder="Décrivez le contrôle en détail"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+          <mat-error *ngIf="form.get('description')?.hasError('required')">
+            La description est obligatoire
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Degré du niveau</mat-label>
-      <mat-select formControlName="level">
-        @for (lev of levels; track lev) {
-        <mat-option [value]="lev">{{ getDegresLabel(lev) }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  </div>
+    <!-- Section Configuration -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">settings</mat-icon>
+        <h3 class="section-title">Configuration du contrôle</h3>
+      </div>
 
-  <div class="row-add">
+      <div class="forms-container">
+        <div class="row-fields">
+          <!-- Récurrence -->
+          <mat-form-field appearance="outline">
+            <mat-label>Récurrence</mat-label>
+            <mat-select formControlName="frequency">
+              <mat-option *ngFor="let rec of recurences" [value]="rec">
+                {{ rec | enumLabel: 'recurrence' }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>schedule</mat-icon>
+            <mat-error *ngIf="form.get('frequency')?.hasError('required')">
+              La récurrence est obligatoire
+            </mat-error>
+          </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Type de contrôle</mat-label>
-      <mat-select formControlName="type">
-        @for (t of types; track t) {
-        <mat-option [value]="t">{{ getTypeLabel(t) }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+          <!-- Degré du niveau -->
+          <mat-form-field appearance="outline">
+            <mat-label>Degré du niveau</mat-label>
+            <mat-select formControlName="level">
+              <mat-option *ngFor="let lev of levels" [value]="lev">
+                {{ lev | enumLabel: 'degree' }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>trending_up</mat-icon>
+            <mat-error *ngIf="form.get('level')?.hasError('required')">
+              Le niveau est obligatoire
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Priorité</mat-label>
-      <mat-select formControlName="priority">
-        @for (t of priorities; track t) {
-        <mat-option [value]="t">{{ getPriorityLabel(t) }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  </div>
+        <div class="row-fields">
+          <!-- Type de contrôle -->
+          <mat-form-field appearance="outline">
+            <mat-label>Type de contrôle</mat-label>
+            <mat-select formControlName="type">
+              <mat-option *ngFor="let t of types" [value]="t">
+                {{ t | enumLabel: 'controlType' }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>category</mat-icon>
+            <mat-error *ngIf="form.get('type')?.hasError('required')">
+              Le type est obligatoire
+            </mat-error>
+          </mat-form-field>
 
-  <button style="margin-bottom: 10px;" mat-stroked-button (click)="create()">
-    <mat-icon>add</mat-icon>
-    Associer BU / Processus / Risque *
-  </button>
-  <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="selectedBPR">
-    <mat-chip> Equipe : {{ selectedBPR.bu.name }}</mat-chip>
-    <mat-chip> Processus : {{ selectedBPR.process.name }}</mat-chip>
-    <mat-chip>Risque : {{ selectedBPR.risk.name }}</mat-chip>
-  </mat-chip-listbox>
-  <button mat-raised-button class="btn-primary" type="submit">Créer</button>
-</form>
+          <!-- Priorité -->
+          <mat-form-field appearance="outline">
+            <mat-label>Priorité</mat-label>
+            <mat-select formControlName="priority">
+              <mat-option *ngFor="let t of priorities" [value]="t">
+                {{ t | enumLabel: 'priority' }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>flag</mat-icon>
+            <mat-error *ngIf="form.get('priority')?.hasError('required')">
+              La priorité est obligatoire
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Association -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">link</mat-icon>
+        <h3 class="section-title">Association BU / Processus / Risque</h3>
+        <div class="section-header-actions">
+          <button mat-raised-button type="button" class="btn-purple" (click)="create()">
+            <mat-icon>add</mat-icon>
+            Associer
+          </button>
+        </div>
+      </div>
+
+      <div class="association-content">
+        <mat-chip-listbox *ngIf="selectedBPR" class="chip-list">
+          <mat-chip class="custom-chip">
+            <div>
+              <mat-icon>business</mat-icon>
+              Équipe : {{ selectedBPR.bu.name }}
+            </div>
+          </mat-chip>
+          <mat-chip class="custom-chip">
+            <div>
+              <mat-icon>account_tree</mat-icon>
+              Processus : {{ selectedBPR.process.name }}
+            </div>
+          </mat-chip>
+          <mat-chip class="custom-chip">
+            <div>
+              <mat-icon>warning</mat-icon>
+              Risque : {{ selectedBPR.risk.name }}
+            </div>
+          </mat-chip>
+        </mat-chip-listbox>
+
+        <div class="empty-state" *ngIf="!selectedBPR">
+          <mat-icon>link_off</mat-icon>
+          <p>Aucune association définie. Cliquez sur "Associer" pour lier une équipe, un processus et un risque.</p>
+        </div>
+      </div>
+    </div>
+  </form>
+
+</app-base-popup>
