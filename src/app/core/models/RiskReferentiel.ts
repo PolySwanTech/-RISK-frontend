@@ -14,11 +14,9 @@ export class RiskReferentiel {
 }
 
 // -------------  DTO -------------
-export interface RiskReferentielCreateDto {
-  libelle:        string;
-  category: string;
-  description: string;
-}
+export type RiskReferentielCreateDto = Required<Pick<RiskReferentiel, 'libelle'>> & Partial<Pick<RiskReferentiel, 'description'>> & {
+    category: string;
+};
 
 export interface BaloiseCategoryDto {
   libelle: string;

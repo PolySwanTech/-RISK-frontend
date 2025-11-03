@@ -17,7 +17,7 @@ interface FileEntity {
   contentType: string | null;
   size: number | null;
   etag: string | null;
-  uploadedAt: string | null; // Instant côté back → string ISO
+  uploadedAt: string | null;
   uploadedBy: string | null;
   description?: string | null;
 }

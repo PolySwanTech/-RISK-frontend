@@ -14,18 +14,29 @@ import { PermissionName } from '../../../core/enum/permission.enum';
 import { CreateProcessComponent } from '../../../features/process/create-process/create-process.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
+import { EvaluationFrequency } from '../../../core/enum/evaluation-frequency.enum';
 
 @Component({
   selector: 'app-process-manager',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoBackComponent, MatIconModule],
+  imports: [CommonModule, FormsModule, GoBackComponent, MatIconModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
 })
 export class ProcessManagerComponent implements OnInit {
 
+  businessUnits: BusinessUnit[] = [];
   processes: Process[] = [];
+  periods: string[] = [];
+  selectedBu: BusinessUnit | null = null;
   selectedProcess: Process | null = null;
+  selectedPeriod: string | null = null;
   showDispatchModal = false;
   newSubprocesses: Array<{ name: string }> = [];
   riskDispatch: { [riskId: string]: number } = {};
@@ -43,22 +54,31 @@ export class ProcessManagerComponent implements OnInit {
 
   private processService = inject(ProcessService);
   private riskService = inject(RiskService);
+  private entitiesService = inject(EntitiesService);
+  private riskEvaluationService = inject(RiskEvaluationService);
+  private risksCache = new Map<string, RiskTemplate[]>();
+
 
   goBackButtons: GoBackButton[] = [
     {
-      label: "Ajouter un processus",
+      label: "Ajouter une entité",
       icon: "add",
-      action: () => this.addProcess(),
+      action: () => this.addBu(),
       permission: PermissionName.MANAGE_PROCESS,
       show: true
     }
   ]
 
   ngOnInit() {
-    this.buId = this.route.snapshot.queryParams["buId"] || ""
-    this.processService.getProcessTree(this.buId).subscribe(list => {
-      this.processes = list
+    this.entitiesService.loadEntities().subscribe({
+      next: (bus) => {
+        this.businessUnits = bus;
+      },
+      error: (err) => console.error("Erreur lors du chargement des BU :", err)
     });
+
+    this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto'] || 'false');
+
     if (this.route.snapshot.queryParams["create"]) {
       this.addProcess();
     }
@@ -66,6 +86,27 @@ export class ProcessManagerComponent implements OnInit {
       this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
     }
 }
+
+  onBuChange(): void {
+    if (!this.selectedBu) {
+      this.processes = [];
+      this.selectedProcess = null;
+      return;
+    }
+    this.processes =this.selectedBu.process;
+  }
+
+  addBu() {
+      this.dialog.open(AddEntityDialogComponent,
+        {
+          width: '800px'
+        }
+      ).afterClosed().subscribe(bu => {
+        if (!bu) return;
+        this.entitiesService.save(bu).subscribe(resp => {
+        })
+      })
+    }
 
   addProcess() {
     const dialogRef = this.dialog.open(CreateProcessComponent, {
@@ -92,6 +133,17 @@ export class ProcessManagerComponent implements OnInit {
     });
   }
 
+  selectBu(bu: BusinessUnit) {
+    this.selectedBu = bu;
+    this.selectedProcess = null;
+    this.showDispatchModal = false;
+    this.viewedRisks = this.collectRisksFromBu(bu);
+    console.log(this.viewedRisks)
+
+    if (this.cartoMode && bu.id) {
+      this.loadPeriodsForBu(bu.id);
+    }
+  }
 
   selectProcess(process: Process) {
     this.selectedProcess = process;
@@ -101,41 +153,73 @@ export class ProcessManagerComponent implements OnInit {
     this.viewedRisks = this.getAllRisksRecursive(process);
   }
 
+
   chooseRiskForCarto(risk: RiskTemplate) {
-    const sessionStorageKey = "object_for_carto"
-    const obj =
-    {
-      bu: {
-        id: this.buId,
-        name: this.selectedProcess?.buName
-      },
-      process: this.selectedProcess,
-      risk: risk
+    // 🔍 Trouver le process qui contient ce risque
+    const foundProcess = this.findProcessByRiskId(risk.id);
+    if (!foundProcess) {
+      console.warn("Aucun process trouvé pour ce risque :", risk);
+      return;
     }
 
-    sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
+    // 🔍 Trouver la BU parente
+    const foundBu = this.findBuByProcess(foundProcess);
+    if (!foundBu) {
+      console.warn("Aucune BU trouvée pour le process :", foundProcess);
+      return;
+    }
 
+    // ✅ Mettre à jour le contexte sélectionné
+    this.selectedBu = foundBu;
+    this.selectedProcess = foundProcess;
+
+    // 🧩 Enregistrer dans le sessionStorage pour la carto
+    const sessionStorageKey = "object_for_carto";
+    const obj = {
+      bu: { id: foundBu.id, name: foundBu.name },
+      process: foundProcess,
+      risk: risk
+    };
+
+    sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
+    console.log("➡️ Contexte cartographie enregistré :", obj);
+
+    // 🚀 Redirection si on est en mode cartographie
     if (this.cartoMode) {
-      this.router.navigate(['cartographie', 'create'], { queryParams: { data: true, key: sessionStorageKey } })
+      this.router.navigate(['cartographie', 'create'], {
+        queryParams: { data: true, key: sessionStorageKey }
+      });
     }
   }
 
-  // Méthode récursive pour collecter tous les risques
-  private getAllRisksRecursive(process: Process): RiskTemplate[] {
-    const risks: RiskTemplate[] = [...process.risks];
 
-    if (process.enfants && process.enfants.length > 0) {
-      process.enfants.forEach(child => {
-        risks.push(...this.getAllRisksRecursive(child));
-      });
+  // Méthode récursive pour collecter tous les risques
+  private getAllRisksRecursive(process: Process, currentPeriod?: string): RiskTemplate[] {
+    const risks: RiskTemplate[] = process.risks?.map(risk => {
+      const frequency = process.bu?.evaluationFrequency;
+      if (currentPeriod && frequency) {
+        try {
+          risk.evaluationState = risk.computeEvaluationState(currentPeriod, frequency);
+        } catch (e) {
+          console.warn(`Période invalide pour le risque "${risk.libelle}" (${process.name})`, e);
+        }
+      }
+      return risk;
+    }) ?? [];
+
+    if (Array.isArray(process.enfants) && process.enfants.length > 0) {
+      for (const child of process.enfants) {
+        risks.push(...this.getAllRisksRecursive(child, currentPeriod));
+      }
     }
 
+    console.debug(`${process.name}: ${risks.length} risques collectés`);
     return risks;
   }
 
-  toggleExpand(process: Process, event: Event) {
+  toggleExpand(item: any, event: Event) {
     event.stopPropagation();
-    process.expanded = !process.expanded;
+    item.expanded = !item.expanded;
   }
 
   getLevelLabel(level: number | undefined): string {
@@ -178,6 +262,31 @@ export class ProcessManagerComponent implements OnInit {
       });
     }
   }
+
+  
+
+  private collectRisksFromBu(bu: BusinessUnit): RiskTemplate[] {
+    if (this.risksCache.has(bu.id)) {
+      return this.risksCache.get(bu.id)!;
+    }
+
+    const risks = new Map<string, RiskTemplate>();
+    const collectRecursive = (unit: BusinessUnit) => {
+      unit.process?.forEach(proc => {
+        this.getAllRisksRecursive(proc).forEach(risk => {
+          if (!risks.has(risk.id)) risks.set(risk.id, risk);
+        });
+      });
+      unit.children?.forEach(collectRecursive);
+    };
+
+    collectRecursive(bu);
+
+    const result = Array.from(risks.values());
+    this.risksCache.set(bu.id, result);
+    return result;
+  }
+
 
   canConfirmDispatch(): boolean {
     if (this.newSubprocesses.length < 2) return false;
@@ -272,10 +381,98 @@ export class ProcessManagerComponent implements OnInit {
     });
   }
 
+  getRootProcesses(bu: BusinessUnit): Process[] {
+    return bu.process.filter(p => !p.parentId);
+  }
+
+  loadPeriodsForBu(buId: string) {
+  this.riskEvaluationService.getPeriodsByBu(buId).subscribe({
+    next: (periodsFromDb: string[]) => {
+      const current = this.getCurrentPeriod();
+      const uniquePeriods = new Set([...periodsFromDb, current]);
+      this.periods = Array.from(uniquePeriods).sort().reverse();
+      this.selectedPeriod = current;
+    },
+    error: (err) => console.error("Erreur lors du chargement des périodes :", err)
+  });
+}
+
+  getCurrentPeriod(): string {
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+
+    const semester = month <= 6 ? 'S1' : 'S2';
+    if (!this.selectedBu && this.selectedBu!.evaluationFrequency === EvaluationFrequency.SEMESTER) {
+      return `${semester} ${year}`;
+    }
+    return `${year}`;
+  }
+
   cancelDispatch() {
     this.showDispatchModal = false;
     this.newSubprocesses = [];
     this.riskDispatch = {};
+  }
+
+  private findProcessByRiskId(riskId: string): Process | null {
+    for (const bu of this.businessUnits) {
+      const found = this.findProcessRecursive(bu.process, riskId);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  private findProcessRecursive(processes: Process[], riskId: string): Process | null {
+    for (const process of processes) {
+      if (process.risks?.some(r => r.id === riskId)) {
+        return process;
+      }
+      if (process.enfants?.length) {
+        const childFound = this.findProcessRecursive(process.enfants, riskId);
+        if (childFound) return childFound;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Recherche de la BU associée à un Process donné.
+   */
+  private findBuByProcess(targetProcess: Process): BusinessUnit | null {
+    for (const bu of this.businessUnits) {
+      if (bu.process?.some(p => p.id === targetProcess.id)) {
+        return bu;
+      }
+      if (bu.children?.length) {
+        const found = this.findBuByProcessRecursive(bu.children, targetProcess);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  private findBuByProcessRecursive(buList: BusinessUnit[], targetProcess: Process): BusinessUnit | null {
+    for (const bu of buList) {
+      if (bu.process?.some(p => p.id === targetProcess.id)) {
+        return bu;
+      }
+      if (bu.children?.length) {
+        const found = this.findBuByProcessRecursive(bu.children, targetProcess);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  viewRiskDetails(risk: RiskTemplate): void {
+    // const sessionStorageKey = "object_for_carto";
+    // const obj = {
+    //   bu: this.selectedBu ? { id: this.selectedBu.id, name: this.selectedBu.name } : null,
+    //   process: this.selectedProcess,
+    //   risk: risk
+    // };
+    this.router.navigate(['reglages', 'risks', risk.id]);
+
   }
 
   createNewEvent(): void {

@@ -10,16 +10,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ActivatedRoute } from '@angular/router';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
-import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
-
-interface GroupedRisk {
-  processName: string;
-  riskName: string;
-  category: string;
-  exercicePeriod: { start: string; end: string };
-  brutEvaluation: { color: string; name: string } | null;
-  netEvaluation: { color: string; name: string } | null;
-}
+import { EvaluationFrequency } from '../../../core/enum/evaluation-frequency.enum';
+import { MatOption } from "@angular/material/core";
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-list-process',
@@ -34,8 +27,9 @@ interface GroupedRisk {
     FormsModule,
     MatCardModule,
     MatBadgeModule,
-    EnumLabelPipe
-  ],
+    MatOption,
+    MatSelectModule
+],
   templateUrl: './list-process.component.html',
   styleUrl: './list-process.component.scss'
 })
@@ -47,7 +41,9 @@ export class ListProcessComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   allRisks: any[] = [];
-  groupedRisks: GroupedRisk[] = [];
+  allPeriods: string[] = [];
+  selectedPeriod: string = '';
+  frequency: EvaluationFrequency | null = null;
   searchTerm: string = '';
   selectedYear: number = new Date().getFullYear();
 
@@ -59,7 +55,19 @@ export class ListProcessComponent implements OnInit {
         this.riskEvaluationService.getEvaluationsByBu(this.buId).subscribe(buEval => {
           console.log(buEval) 
           this.allRisks = buEval.evaluations;
-          this.groupRisks();
+          this.frequency = buEval.evaluationFrequency;
+        });
+        this.riskEvaluationService.getPeriodsByBu(this.buId).subscribe(periodsData => {
+          this.allPeriods = periodsData;
+          this.selectedPeriod = this.getCurrentPeriod();
+
+          // Ajouter la période actuelle si absente
+          const currentPeriod = this.getCurrentPeriod();
+          if (!this.allPeriods.includes(currentPeriod)) {
+            this.allPeriods.push(currentPeriod);
+          }
+          this.allPeriods.sort((a, b) => b.localeCompare(a)); // plus récente d'abord
+          this.selectedPeriod = currentPeriod;
         });
       } else {
         this.allRisks = [];
@@ -68,39 +76,25 @@ export class ListProcessComponent implements OnInit {
     });
   }
 
-  groupRisks(): void {
-    const grouped = new Map<string, GroupedRisk>();
-
-    this.allRisks.forEach(item => {
-      const key = `${item.processName}-${item.riskName}-${item.exercicePeriod.start}-${item.exercicePeriod.end}`;
-      
-      if (!grouped.has(key)) {
-        grouped.set(key, {
-          processName: item.processName,
-          riskName: item.riskName,
-          category: item.category,
-          exercicePeriod: item.exercicePeriod,
-          brutEvaluation: null,
-          netEvaluation: null
-        });
-      }
-
-      const risk = grouped.get(key)!;
-      if (item.brut) {
-        risk.brutEvaluation = item.evaluation;
-      } else {
-        risk.netEvaluation = item.evaluation;
-      }
-    });
-
-    this.groupedRisks = Array.from(grouped.values());
+  getCurrentPeriod(): string {
+    const year = new Date().getFullYear();
+    if (this.frequency === EvaluationFrequency.SEMESTER) {
+      const month = new Date().getMonth() + 1;
+      const semester = month <= 6 ? 'S1' : 'S2';
+      return `${semester} ${year}`;
+    } else {
+      return `${year}`;
+    }
   }
 
-  filteredRisks(): GroupedRisk[] {
-    if (!this.searchTerm) return this.groupedRisks;
-    return this.groupedRisks.filter(item =>
-      item.processName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      item.riskName.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+  filteredRisks() {
+    return this.allRisks
+      .filter(item => 
+        (!this.searchTerm || item.processName.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      )
+      .filter(item => 
+        !this.selectedPeriod || item.evaluationPeriod === this.selectedPeriod
+      );
   }
+
 }

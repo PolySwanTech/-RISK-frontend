@@ -7,9 +7,9 @@ import { RiskLevelScores } from '../../../core/enum/riskLevel.enum';
 import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
-import { Range } from '../matrix-settings/matrix-settings.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
+import { Range } from '../../../core/models/range';
 
 @Component({
   selector: 'app-matrix',

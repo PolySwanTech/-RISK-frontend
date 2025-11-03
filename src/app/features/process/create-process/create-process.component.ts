@@ -10,7 +10,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
-import { SelectArborescenceComponent } from "../../../shared/components/select-arborescence/select-arborescence.component";
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';

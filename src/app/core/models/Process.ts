@@ -1,5 +1,5 @@
 import { BusinessUnit } from "./BusinessUnit"
-import { RiskTemplate } from "./RiskTemplate"
+import { RiskTemplate } from "./RiskTemplate";
 
 export class Process {
     
@@ -11,6 +11,7 @@ export class Process {
     risks: RiskTemplate[] = []
 
     buName : string = '';
+    buId : string = '';
     niveau?: number;
     sum = 0;
 

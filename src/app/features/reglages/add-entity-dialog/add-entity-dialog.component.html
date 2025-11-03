@@ -36,6 +36,17 @@
           color="primary">
         </mat-slide-toggle>
       </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fréquence d'évaluation</mat-label>
+        <mat-select formControlName="evaluationFrequency" required>
+          <mat-option *ngFor="let freq of evaluationFrequencies" [value]="freq.id">
+            {{ freq.libelle }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      
     </form>
   </div>
 

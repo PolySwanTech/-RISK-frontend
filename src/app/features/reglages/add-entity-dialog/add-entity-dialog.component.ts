@@ -10,6 +10,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { EvaluationFrequency, EvaluationFrequencyLabels } from '../../../core/enum/evaluation-frequency.enum';
+import { MatSelectModule } from "@angular/material/select";
 import { BasePopupComponent, PopupAction } from "../../../shared/components/base-popup/base-popup.component";
 import { DraftService } from '../../../core/services/draft.service';
 
@@ -33,13 +35,21 @@ export interface EntityDialogData {
     SelectEntitiesComponent,
     MatInputModule,
     MatButtonModule,
-    BasePopupComponent
+    BasePopupComponent,
+    MatSelectModule
   ],
   templateUrl: './add-entity-dialog.component.html',
   styleUrls: ['./add-entity-dialog.component.scss']
 })
 export class AddEntityDialogComponent implements OnInit {
 
+  private _formBuilder = inject(FormBuilder);
+  evaluationFrequencies = Object.entries(EvaluationFrequencyLabels).map(([key, label]) => ({
+  id: key as EvaluationFrequency,
+  libelle: label
+}));
+
+  BusinessUnit = new BusinessUnit("", '', false, [], []);
   private readonly COMPONENT_NAME = 'AddEntityDialog';
 
   titlePage: string = 'Créer une entité';
@@ -54,7 +64,11 @@ export class AddEntityDialogComponent implements OnInit {
   // Stocke l'ID du brouillon en cours d'édition (si applicable)
   private currentDraftId: string | null = null;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: EntityDialogData | any) { }
+  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService,
+    @Inject(MAT_DIALOG_DATA) public data: EntityDialogData | any, private cdRef: ChangeDetectorRef
+  ) {
+    this.BusinessUnit = data || new BusinessUnit("", '', false, [], []);
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -90,10 +104,19 @@ export class AddEntityDialogComponent implements OnInit {
   initForm(): void {
     this.formGroup = this.fb.group({
       name: ['', Validators.required],
-      lm: [false]
+      lm: [false],
+      parent: [null],
+    evaluationFrequency: [EvaluationFrequency.SEMESTER, Validators.required]
     });
   }
 
+  onSave(): void {
+    this.BusinessUnit.name = this.formGroup.get('name')?.value;
+    this.BusinessUnit.lm = this.formGroup.get('lm')?.value;
+    this.BusinessUnit.parentId = this.formGroup.get('parent')?.value;
+    this.BusinessUnit.evaluationFrequency = this.formGroup.get('evaluationFrequency')?.value;
+    this.dialogRef.close(this.BusinessUnit);
+}
   loadDraft(draftId: string): void {
     const draft = this.draftService.getDraftById(draftId);
     if (draft) {

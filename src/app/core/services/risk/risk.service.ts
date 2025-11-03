@@ -32,6 +32,7 @@ export class RiskService {
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params });
   }
 
+// TODO remplacer any par un type adéquat
   getRisksTree(processId?: string) {
     let params = new HttpParams();
     const option = processId ? { params: params.set('processId', processId) } : {};
