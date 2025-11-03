@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateUserComponent } from '../../create/create-user/create-user.component';
 import { MatButtonModule } from '@angular/material/button';
-import { Utilisateur, UtilisateurProfil } from '../../../../core/models/Utilisateur';
+import { Utilisateur } from '../../../../core/models/Utilisateur';
 import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { MatCardModule } from '@angular/material/card';
 
@@ -29,7 +29,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   private userService = inject(UtilisateurService);
   private dialog = inject(MatDialog);
 
-  dataSource = new MatTableDataSource<UtilisateurProfil>();
+  dataSource = new MatTableDataSource<Utilisateur>();
   displayedColumns = ['username', 'email', 'actions'];
 
   goBackButtons: GoBackButton[] = [];
@@ -52,7 +52,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   }
 
   loadUsers(): void {
-    this.userService.getUserProfiles().subscribe(users => {
+    this.userService.getUsers().subscribe(users => {
       this.dataSource.data = users;
     });
   }

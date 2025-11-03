@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment'
-import { Utilisateur, UtilisateurProfil } from '../../models/Utilisateur';
+import { Utilisateur } from '../../models/Utilisateur';
 import { TeamMember } from '../../models/TeamMember';
 
 @Injectable({
@@ -15,10 +15,6 @@ export class UtilisateurService {
 
   getUsers(): Observable<Utilisateur[]> {
     return this.http.get<Utilisateur[]>(this.baseUrl);
-  }
-
-  getUserProfiles(): Observable<UtilisateurProfil[]> {
-    return this.http.get<UtilisateurProfil[]>(this.baseUrl);
   }
 
   updateUser(userId: string, payload: any) {

@@ -6,5 +6,13 @@
     "pathRewrite": {
       "^/api": ""
     }
+  }, 
+  "/auth-service" : {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/auth-service": ""
+    }
   }
 }

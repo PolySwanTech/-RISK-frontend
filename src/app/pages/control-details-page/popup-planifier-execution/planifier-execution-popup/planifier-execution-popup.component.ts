@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { addDays, addMonths, addWeeks } from 'date-fns';
 import { ControlExecution } from '../../../../core/models/dmr/ControlExecution';
-import { Range } from '../../../../core/models/range';
+import { Recurrence } from '../../../../core/enum/recurrence.enum';
 
 @Component({
   standalone: true,
@@ -25,7 +25,7 @@ export class PlanifierExecutionPopupComponent {
   @Input() controlVersion!: Date;
   @Output() close = new EventEmitter<void>();
   @Output() planifier = new EventEmitter<any>();
-  @Input() frequence!: Range;
+  @Input() frequence!: Recurrence;
   @Input() isEditing = false;
   @Input() executionToEdit?: ControlExecution;
   @Input() lastPlannedAt?: string | Date | null;
@@ -117,19 +117,36 @@ export class PlanifierExecutionPopupComponent {
   }
 
 
-  private calculerDatePlanifieeParDefaut(date: Date, freq: Range): string {
-    if (!freq) return date.toISOString().substring(0, 10);
+  private calculerDatePlanifieeParDefaut(date: Date, freq: Recurrence): string {
+    if (!freq) {
+      return date.toISOString().substring(0, 10);
+    }
 
-    const d = {
-      DAILY: addDays(date, 0),
-      WEEKLY: addWeeks(date, 1),
-      MONTHLY: addMonths(date, 1),
-      QUARTERLY: addMonths(date, 3),
-      SEMESTERLY: addMonths(date, 6),
-      YEARLY: addMonths(date, 12),
-    }[freq.id];
+    let d: Date;
 
-    return d?.toISOString().substring(0, 10) ?? date.toISOString().substring(0, 10);
+    switch (freq) {
+      case Recurrence.DAILY:
+        d = addDays(date, 0);
+        break;
+      case Recurrence.WEEKLY:
+        d = addWeeks(date, 1);
+        break;
+      case Recurrence.MONTHLY:
+        d = addMonths(date, 1);
+        break;
+      case Recurrence.QUARTERLY:
+        d = addMonths(date, 3);
+        break;
+      case Recurrence.SEMESTERLY:
+        d = addMonths(date, 6);
+        break;
+      case Recurrence.YEARLY:
+        d = addMonths(date, 12);
+        break;
+      default:
+        d = date;
+    }
+
+    return d.toISOString().substring(0, 10);
   }
-
 }

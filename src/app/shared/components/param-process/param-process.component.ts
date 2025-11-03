@@ -130,8 +130,10 @@ export class ProcessManagerComponent implements OnInit {
 
   toggleExpand(process: Process, event: Event) {
     event.stopPropagation();
+
     // récupère la valeur actuelle ou false si undefined
     const current = this.processToggled.get(process.id) ?? false;
+
     // met la valeur inverse dans la map
     this.processToggled.set(process.id, !current);
   }

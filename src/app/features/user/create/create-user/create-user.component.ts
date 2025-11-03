@@ -71,7 +71,7 @@ export class CreateUserComponent implements OnInit {
       teamRoleList: event
     });
   }
-  
+
   onSubmit() {
     this.organigrammeComponent.getRoles();
     if (this.userForm.valid) {
@@ -93,14 +93,10 @@ export class CreateUserComponent implements OnInit {
         });
       }
       else {
-        this.authService.register(this.userForm.value).subscribe({
+        this.authService.register(this.userForm.value, this.userForm.value.teamRoleList).subscribe({
           next: user => {
-            this.userService.updateUserRoles(user.id, this.userForm.value.teamRoleList).subscribe({
-              next: () => {
-                this.snackBarService.success("✅ Utilisateur créé avec succès");
-                this.dialogRef.close(true);
-              }
-            });
+            this.snackBarService.success("✅ Utilisateur créé avec succès");
+            this.dialogRef.close(true);
           },
           error: () => {
             this.snackBarService.error("❌ Une erreur est survenue");
