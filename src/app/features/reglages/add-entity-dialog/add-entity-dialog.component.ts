@@ -14,10 +14,15 @@ import { EvaluationFrequency, EvaluationFrequencyLabels } from '../../../core/en
 import { MatSelectModule } from "@angular/material/select";
 import { BasePopupComponent, PopupAction } from "../../../shared/components/base-popup/base-popup.component";
 import { DraftService } from '../../../core/services/draft.service';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
 
 export interface EntityDialogData {
   id?: string;
-  draftId?: string; // ID du brouillon à restaurer
+  name?: string;
+  lm?: boolean;
+  parentId?: string;
+  evaluationFrequency?: EvaluationFrequency;
+  draftId?: string;
 }
 
 @Component({
@@ -43,13 +48,6 @@ export interface EntityDialogData {
 })
 export class AddEntityDialogComponent implements OnInit {
 
-  private _formBuilder = inject(FormBuilder);
-  evaluationFrequencies = Object.entries(EvaluationFrequencyLabels).map(([key, label]) => ({
-  id: key as EvaluationFrequency,
-  libelle: label
-}));
-
-  BusinessUnit = new BusinessUnit("", '', false, [], []);
   private readonly COMPONENT_NAME = 'AddEntityDialog';
 
   titlePage: string = 'Créer une entité';
@@ -57,36 +55,41 @@ export class AddEntityDialogComponent implements OnInit {
   popupActions: PopupAction[] = [];
   BusinessUnit: any = {};
 
+  evaluationFrequencies = Object.entries(EvaluationFrequencyLabels).map(([key, label]) => ({
+    id: key as EvaluationFrequency,
+    libelle: label
+  }));
+
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<AddEntityDialogComponent>);
   private draftService = inject(DraftService);
+  public entitiesService = inject(EntitiesService);
 
-  // Stocke l'ID du brouillon en cours d'édition (si applicable)
   private currentDraftId: string | null = null;
 
-  constructor(public dialogRef: MatDialogRef<AddEntityDialogComponent>, public entitiesService : EntitiesService,
-    @Inject(MAT_DIALOG_DATA) public data: EntityDialogData | any, private cdRef: ChangeDetectorRef
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: EntityDialogData | null
   ) {
-    this.BusinessUnit = data || new BusinessUnit("", '', false, [], []);
+    this.BusinessUnit = data ? { id: data.parentId || null } : {};
   }
 
   ngOnInit(): void {
     this.initForm();
 
     if (this.data?.id) {
-    this.titlePage = 'Modifier une entité';
-    this.formGroup.patchValue({
-      name: this.data.name || '',
-      lm: this.data.lm || false
-    });
-    this.BusinessUnit = { id: this.data.parentId || null };
-  }
+      this.titlePage = 'Modifier une entité';
+      this.formGroup.patchValue({
+        name: this.data.name || '',
+        lm: this.data.lm || false,
+        evaluationFrequency: this.data.evaluationFrequency || EvaluationFrequency.SEMESTER
+      });
+      this.BusinessUnit = { id: this.data.parentId || null };
+    }
 
     // Charger le brouillon si un draftId est fourni
     if (this.data?.draftId) {
       this.loadDraft(this.data.draftId);
       this.currentDraftId = this.data.draftId;
-      // Cacher ce brouillon pendant l'édition
       this.draftService.hideDraft(this.data.draftId);
     }
 
@@ -106,23 +109,15 @@ export class AddEntityDialogComponent implements OnInit {
       name: ['', Validators.required],
       lm: [false],
       parent: [null],
-    evaluationFrequency: [EvaluationFrequency.SEMESTER, Validators.required]
+      evaluationFrequency: [EvaluationFrequency.SEMESTER, Validators.required]
     });
   }
 
-  onSave(): void {
-    this.BusinessUnit.name = this.formGroup.get('name')?.value;
-    this.BusinessUnit.lm = this.formGroup.get('lm')?.value;
-    this.BusinessUnit.parentId = this.formGroup.get('parent')?.value;
-    this.BusinessUnit.evaluationFrequency = this.formGroup.get('evaluationFrequency')?.value;
-    this.dialogRef.close(this.BusinessUnit);
-}
   loadDraft(draftId: string): void {
     const draft = this.draftService.getDraftById(draftId);
     if (draft) {
       this.formGroup.patchValue(draft.data.formData);
       Object.assign(this.BusinessUnit, draft.data.businessUnit || {});
-      console.log(this.BusinessUnit)
       this.titlePage = 'Reprendre le brouillon';
       console.log('Brouillon restauré:', draft);
     }
@@ -152,7 +147,7 @@ export class AddEntityDialogComponent implements OnInit {
 
   hasFormData(): boolean {
     const formData = this.formGroup.value;
-    return !!(formData.name || formData.lm || this.BusinessUnit.parentId);
+    return !!(formData.name || formData.lm || this.BusinessUnit.id);
   }
 
   saveDraft(): void {
@@ -167,21 +162,19 @@ export class AddEntityDialogComponent implements OnInit {
 
     const title = `${this.formGroup.value.name || 'Nouvelle entité'}`;
 
-    // Si on édite un brouillon existant, on le met à jour
     if (this.currentDraftId) {
       this.draftService.updateDraft(
         this.currentDraftId,
         title,
         draftData,
-        true // visible = true
+        true
       );
     } else {
-      // Sinon on crée un nouveau brouillon
       this.currentDraftId = this.draftService.createDraft(
         this.COMPONENT_NAME,
         title,
         draftData,
-        true // visible = true
+        true
       );
     }
   }
@@ -190,40 +183,37 @@ export class AddEntityDialogComponent implements OnInit {
     if (this.hasFormData()) {
       this.saveDraft();
     } else if (this.currentDraftId) {
-      // Si on ferme sans données mais qu'on avait un brouillon, le réafficher
       this.draftService.showDraft(this.currentDraftId);
     }
 
-    if (this.dialogRef) {
-      this.dialogRef.close();
-    }
+    this.dialogRef.close();
   }
 
   onSave(): void {
-  if (this.formGroup.valid) {
-    const { name, lm } = this.formGroup.value;
+    if (this.formGroup.valid) {
+      const { name, lm, evaluationFrequency } = this.formGroup.value;
 
-    const businessUnitCreateDto: any = {
-      name,
-      lm,
-      parentId: this.BusinessUnit.id || null
-    };
+      const businessUnitCreateDto: any = {
+        name,
+        lm,
+        parentId: this.BusinessUnit.id || null,
+        evaluationFrequency
+      };
 
-    // 👉 Ajout de l'ID si c’est une modification
-    if (this.data?.id) {
-      businessUnitCreateDto.id = this.data.id;
+      if (this.data?.id) {
+        businessUnitCreateDto.id = this.data.id;
+      }
+
+      console.log('Saving DTO:', businessUnitCreateDto);
+
+      // Supprimer le brouillon après sauvegarde réussie
+      if (this.currentDraftId) {
+        this.draftService.deleteDraft(this.currentDraftId);
+      }
+
+      this.dialogRef.close(businessUnitCreateDto);
     }
-
-    console.log('Saving DTO:', businessUnitCreateDto);
-
-    // Supprimer le brouillon après sauvegarde réussie
-    if (this.currentDraftId) {
-      this.draftService.deleteDraft(this.currentDraftId);
-    }
-
-    this.dialogRef.close(businessUnitCreateDto);
   }
-}
 
   entiteChange(event: any): void {
     console.log('Entity changed:', event);

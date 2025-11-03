@@ -71,7 +71,6 @@ export class ListProcessComponent implements OnInit {
         });
       } else {
         this.allRisks = [];
-        this.groupedRisks = [];
       }
     });
   }

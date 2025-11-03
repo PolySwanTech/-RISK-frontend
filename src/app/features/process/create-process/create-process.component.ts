@@ -14,6 +14,7 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
 import { DraftService } from '../../../core/services/draft.service';
+import { SelectArborescenceComponent } from '../../../shared/components/select-arborescence/select-arborescence.component';
 
 export interface CreateProcessDialogData {
   process?: Process;

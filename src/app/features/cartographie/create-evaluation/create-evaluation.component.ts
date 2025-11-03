@@ -22,7 +22,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 import { AttenuationMetrics } from '../../../core/models/AttenuationMetrics';
-import { EvaluationControl, EvaluationControlLabels } from '../../../core/enum/evaluation-controle.enum';
 import { Range } from '../../../core/models/range';
 import { RiskEvaluationCreateDto } from '../../../core/models/RiskEvaluation';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';

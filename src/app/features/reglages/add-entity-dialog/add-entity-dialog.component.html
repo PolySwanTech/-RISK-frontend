@@ -1,17 +1,13 @@
-<app-base-popup 
-  [title]="titlePage" 
-  [showClose]="true"
-  [actions]="popupActions"
-  [dialogRef]="getDialogRef()"
+<app-base-popup [title]="titlePage" [showClose]="true" [actions]="popupActions" [dialogRef]="getDialogRef()"
   (close)="goBack()">
-  
+
   <!-- Section Informations -->
   <div class="section">
     <div class="section-header">
       <mat-icon class="section-icon">info</mat-icon>
       <h3 class="section-title">Informations générales</h3>
     </div>
-    
+
     <form [formGroup]="formGroup" class="forms-container">
       <mat-form-field class="full-width" appearance="outline">
         <mat-label>Nom de l'entité</mat-label>
@@ -30,23 +26,23 @@
             <span class="toggle-description">Cette entité est-elle une ligne métier ?</span>
           </div>
         </div>
-        <mat-slide-toggle 
-          formControlName="lm" 
-          [checked]="formGroup.get('lm')?.value"
-          color="primary">
+        <mat-slide-toggle formControlName="lm" [checked]="formGroup.get('lm')?.value" color="primary">
         </mat-slide-toggle>
       </div>
 
-      <mat-form-field appearance="outline" class="full-width">
+      <mat-form-field class="full-width" appearance="outline">
         <mat-label>Fréquence d'évaluation</mat-label>
+        <mat-icon matPrefix>schedule</mat-icon>
         <mat-select formControlName="evaluationFrequency" required>
           <mat-option *ngFor="let freq of evaluationFrequencies" [value]="freq.id">
             {{ freq.libelle }}
           </mat-option>
         </mat-select>
+        <mat-error *ngIf="formGroup.get('evaluationFrequency')?.hasError('required')">
+          La fréquence d'évaluation est obligatoire
+        </mat-error>
       </mat-form-field>
 
-      
     </form>
   </div>
 
@@ -56,10 +52,8 @@
       <mat-icon class="section-icon">account_tree</mat-icon>
       <h3 class="section-title">Hiérarchie organisationnelle</h3>
     </div>
-    
-    <app-select-entities 
-      [entiteEnfantId]="data?.id ?? ''"
-      [selectId]="BusinessUnit.id ? BusinessUnit.id : ''"
+
+    <app-select-entities [entiteEnfantId]="data?.id ?? ''" [selectId]="BusinessUnit.id ? BusinessUnit.id : ''"
       (entitieSelected)="entiteChange($event)">
     </app-select-entities>
   </div>
