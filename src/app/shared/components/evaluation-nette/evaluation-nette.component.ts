@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,6 +18,8 @@ import { AttenuationMetricsService } from '../../../core/services/dmr/attenuatio
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
 import { RiskEvaluationCreateDto } from '../../../core/models/RiskEvaluation';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { GoBackComponent } from '../go-back/go-back.component';
 
 @Component({
   selector: 'app-evaluation-nette',
@@ -30,7 +32,8 @@ import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.serv
     MatCardModule,
     MatChipsModule,
     MatButtonModule,
-    EnumLabelPipe
+    EnumLabelPipe,
+    GoBackComponent
   ],
   templateUrl: './evaluation-nette.component.html',
   styleUrl: './evaluation-nette.component.scss'
@@ -40,15 +43,14 @@ export class EvaluationNetteComponent implements OnInit {
   private attenuationSrv = inject(AttenuationMetricsService);
   private evaluationSrv = inject(RiskEvaluationService);
   private snackBarService = inject(SnackBarService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  @Input() selectedRisk!: RiskTemplate;
-  @Input() selectedBU!: BusinessUnit;
-  @Input() selectedProcess!: Process;
-  @Input() initialRiskLevel!: RiskLevelEnum;
-  @Input() bruteIndicators!: Array<{frequenceId: number, severiteId: number}>;
-
-  @Output() onSave = new EventEmitter<void>();
-  @Output() onPrevious = new EventEmitter<void>();
+  selectedRisk: RiskTemplate | null = null;
+  selectedBU: BusinessUnit | null = null;
+  selectedProcess: Process | null = null;
+  initialRiskLevel: RiskLevelEnum | null = null;
+  bruteIndicators: Array<{frequenceId: number, severiteId: number}> = [];
 
   // Données chargées en interne
   controls: ControlTemplateListViewDto[] = [];
@@ -58,11 +60,45 @@ export class EvaluationNetteComponent implements OnInit {
   riskLevels = Object.values(RiskLevelEnum);
 
   ngOnInit(): void {
-    this.highestRiskLevelNet = this.initialRiskLevel;
-    this.loadData();
+    this.loadDataFromSessionStorage();
+    
+    if (this.selectedRisk && this.selectedBU && this.selectedProcess) {
+      this.loadEvaluationData();
+    } else {
+      this.snackBarService.info("Données manquantes pour l'évaluation");
+      this.router.navigate(['/cartographie']);
+    }
   }
 
-  private loadData(): void {
+  private loadDataFromSessionStorage(): void {
+    const dataIsInSessionStorage = this.route.snapshot.queryParams['data'] || false;
+    const sessionStorageKey = this.route.snapshot.queryParams['key'] || 'object_for_carto';
+
+    if (dataIsInSessionStorage && sessionStorageKey) {
+      const obj = JSON.parse(sessionStorage.getItem(sessionStorageKey) || "{}");
+      
+      if (obj) {
+        this.selectedBU = obj.bu;
+        this.selectedProcess = obj.process;
+        this.selectedRisk = obj.risk;
+        
+        // Récupérer l'évaluation brute existante
+        if (this.selectedRisk?.riskBrut && this.selectedRisk.riskBrut.length > 0) {
+          const brutEval = this.selectedRisk.riskBrut[0];
+          this.initialRiskLevel = brutEval.evaluation?.name || null;
+          
+          // Si on a les indicateurs dans l'évaluation, les utiliser
+          // Sinon, on devra les récupérer autrement ou demander de refaire l'éval brute
+          console.log(brutEval)
+          // if (brutEval.indicators) {
+          //   this.bruteIndicators = brutEval.indicators;
+          // }
+        }
+      }
+    }
+  }
+
+  private loadEvaluationData(): void {
     if (!this.selectedProcess || !this.selectedRisk) return;
 
     // Charger les contrôles
@@ -76,6 +112,9 @@ export class EvaluationNetteComponent implements OnInit {
       next: metrics => this.attenuationMetrics = metrics,
       error: err => console.error('Erreur chargement atténuations', err)
     });
+
+    // Initialiser le niveau de risque net avec le brut
+    this.highestRiskLevelNet = this.initialRiskLevel;
   }
 
   getRiskColorEnum(riskLevel: RiskLevelEnum): string {
@@ -93,8 +132,8 @@ export class EvaluationNetteComponent implements OnInit {
     return yiq >= 128 ? '#000' : '#fff';
   }
 
-  handlePrevious(): void {
-    this.onPrevious.emit();
+  handleCancel(): void {
+    this.router.navigate(['/cartographie']);
   }
 
   handleSave(): void {
@@ -109,8 +148,8 @@ export class EvaluationNetteComponent implements OnInit {
       
       this.evaluationSrv.saveEvaluation(riskEvaluationCreateDto).subscribe({
         next: _ => {
-          this.snackBarService.info("Évaluation nette sauvegardée");
-          this.onSave.emit();
+          this.snackBarService.info("Évaluation nette sauvegardée avec succès");
+          this.router.navigate(['/reglages/risks', this.selectedRisk!.id]);
         },
         error: err => {
           this.snackBarService.info("Erreur lors de la sauvegarde");

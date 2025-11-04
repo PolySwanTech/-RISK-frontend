@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoBackButton, GoBackComponent } from '../go-back/go-back.component';
@@ -23,30 +23,39 @@ import { RiskEvaluationService } from '../../../core/services/risk-evaluation/ri
 import { EvaluationFrequency } from '../../../core/enum/evaluation-frequency.enum';
 import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from "@angular/material/card";
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { EnumLabelPipe } from '../../pipes/enum-label.pipe';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatMenuModule } from '@angular/material/menu';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { MatButton } from "@angular/material/button";
 
 @Component({
   selector: 'app-process-manager',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    GoBackComponent, 
-    MatIconModule, 
-    MatFormFieldModule, 
-    MatSelectModule, 
-    MatPaginatorModule, 
-    MatCardModule, 
+    CommonModule,
+    FormsModule,
+    GoBackComponent,
+    MatIconModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatPaginatorModule,
+    MatCardModule,
     MatTableModule,
+    MatChipsModule,
+    MatTooltipModule,
+    EnumLabelPipe,
     MatSortModule,
-    MatChipsModule
-  ],
+    MatMenuModule,
+    MatButton
+],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
 })
-export class ProcessManagerComponent implements OnInit {
+export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
   businessUnits: BusinessUnit[] = [];
   processes: Process[] = [];
@@ -60,19 +69,18 @@ export class ProcessManagerComponent implements OnInit {
 
   riskDisplayedColumns: string[] = ['libelle', 'description', 'riskBrut', 'riskNet'];
   riskDataSource = new MatTableDataSource<RiskTemplate>([]);
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   viewedRisks: RiskTemplate[] = []
 
   buId: string = ''
 
-  cartoMode: boolean = false
+  @Input() cartoMode: boolean = true
 
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private confirmService = inject(ConfirmService);
 
   private processService = inject(ProcessService);
   private riskService = inject(RiskService);
@@ -90,42 +98,38 @@ export class ProcessManagerComponent implements OnInit {
     }
   ]
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  ngAfterViewInit() {
+    if (this.paginator && this.sort) {
+      this.riskDataSource.paginator = this.paginator;
+      this.riskDataSource.sort = this.sort;
+      this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+    }
+  }
+
   ngOnInit() {
     this.entitiesService.loadEntities().subscribe({
       next: (bus) => {
         this.businessUnits = bus;
+        console.log(bus)
       },
       error: (err) => console.error("Erreur lors du chargement des BU :", err)
     });
 
-    this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto'] || 'false');
-    
+    if (this.route.snapshot.queryParams['carto']) {
+      this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
+    }
+
     // Adapter les colonnes selon le mode
     this.riskDisplayedColumns = this.cartoMode
-      ? ['libelle', 'description', 'riskBrut', 'riskNet', 'action']
-      : ['libelle', 'description', 'riskBrut', 'riskNet'];
+      ? ['reference','libelle', 'description', 'riskBrut', 'riskNet']
+      : ['reference', 'libelle', 'description', 'riskBrut', 'riskNet'];
 
     if (this.route.snapshot.queryParams["create"]) {
-      this.addProcess();
+      this.addProcess('');
     }
-  }
-
-  ngAfterViewInit() {
-    if (this.paginator) {
-      this.riskDataSource.paginator = this.paginator;
-    }
-    if (this.sort) {
-      this.riskDataSource.sort = this.sort;
-    }
-  }
-
-  onBuChange(): void {
-    if (!this.selectedBu) {
-      this.processes = [];
-      this.selectedProcess = null;
-      return;
-    }
-    this.processes = this.selectedBu.process;
   }
 
   addBu() {
@@ -139,7 +143,7 @@ export class ProcessManagerComponent implements OnInit {
     })
   }
 
-  addProcess() {
+  addProcess(buId: string) {
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '800px',
       maxWidth: '95vw',
@@ -147,7 +151,7 @@ export class ProcessManagerComponent implements OnInit {
       panelClass: 'custom-dialog-container',
       disableClose: false,
       autoFocus: false,
-      data: { buId: this.buId }
+      data: { buId: buId }
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -168,11 +172,23 @@ export class ProcessManagerComponent implements OnInit {
     this.viewedRisks = this.collectRisksFromBu(bu);
 
     if (this.cartoMode && bu.id) {
-      this.riskDataSource.data = this.viewedRisks;
       this.loadPeriodsForBu(bu.id);
-    } else {
-      this.riskDataSource.data = this.viewedRisks;
     }
+
+    // CORRECTION : Mise à jour immédiate du dataSource
+    this.riskDataSource.data = this.viewedRisks;
+
+    setTimeout(() => {
+      if (this.paginator && !this.riskDataSource.paginator) {
+        this.riskDataSource.paginator = this.paginator;
+      }
+      if (this.sort && !this.riskDataSource.sort) {
+        this.riskDataSource.sort = this.sort;
+      }
+      if (this.paginator) {
+        this.paginator.firstPage();
+      }
+    });
   }
 
   selectProcess(process: Process) {
@@ -181,7 +197,10 @@ export class ProcessManagerComponent implements OnInit {
     this.newSubprocesses = [];
     this.riskDispatch = {};
     this.viewedRisks = this.getAllRisksRecursive(process);
+
     this.riskDataSource.data = this.viewedRisks;
+
+    if (this.paginator) this.paginator.firstPage();
   }
 
   chooseRiskForCarto(risk: RiskTemplate) {
@@ -500,6 +519,13 @@ export class ProcessManagerComponent implements OnInit {
       return;
     }
 
+    // Si on n'est pas en mode carto, aller directement aux détails
+    if (!this.cartoMode) {
+      this.viewRiskDetails(risk);
+      return;
+    }
+
+    // Logique pour le mode carto
     const hasRiskBrut = risk.riskBrut && risk.riskBrut.length > 0;
     const hasRiskNet = risk.riskNet && risk.riskNet.length > 0;
 
@@ -522,38 +548,21 @@ export class ProcessManagerComponent implements OnInit {
 
     if (!hasRiskBrut) {
       // Pas d'évaluation brute → créer évaluation brute
-      this.router.navigate(['cartographie', 'create'], {
+      this.router.navigate(['cartographie', 'evaluation-brute'], {
         queryParams: { data: true, key: sessionStorageKey }
       });
     } else if (!hasRiskNet) {
-      // A évaluation brute mais pas nette → aller directement à l'étape nette
-      // Pour cela, on pourrait passer un param supplémentaire ou gérer dans le composant
-      this.router.navigate(['cartographie', 'create'], {
-        queryParams: { 
-          data: true, 
-          key: sessionStorageKey,
-          skipToBrute: false // On commence par l'évaluation brute normalement
+      // A évaluation brute mais pas nette → aller à l'évaluation nette
+      this.router.navigate(['cartographie', 'evaluation-nette'], {
+        queryParams: {
+          data: true,
+          key: sessionStorageKey
         }
       });
     } else {
       // A les deux évaluations → voir les détails
       this.viewRiskDetails(risk);
     }
-  }
-
-  // Méthodes helper pour le template
-  getRiskBrutEvaluation(risk: RiskTemplate): string {
-    if (!risk.riskBrut || risk.riskBrut.length === 0) {
-      return 'NON_EVALUATED';
-    }
-    return risk.riskBrut[0].evaluation?.name || 'UNKNOWN';
-  }
-
-  getRiskNetEvaluation(risk: RiskTemplate): string {
-    if (!risk.riskNet || risk.riskNet.length === 0) {
-      return 'NON_EVALUATED';
-    }
-    return risk.riskNet[0].evaluation?.name || 'UNKNOWN';
   }
 
   getRiskBrutColor(risk: RiskTemplate): string {
@@ -568,5 +577,75 @@ export class ProcessManagerComponent implements OnInit {
       return '#cbd5e1';
     }
     return risk.riskNet[0].evaluation?.color || '#cbd5e1';
+  }
+
+  getRiskTooltip(risk: RiskTemplate): string {
+    if (!this.cartoMode) {
+      return 'Cliquez pour voir les détails du risque';
+    }
+
+    const hasRiskBrut = risk.riskBrut && risk.riskBrut.length > 0;
+    const hasRiskNet = risk.riskNet && risk.riskNet.length > 0;
+
+    if (!hasRiskBrut) {
+      return 'Cliquez pour créer l\'évaluation brute';
+    } else if (!hasRiskNet) {
+      return 'Cliquez pour créer l\'évaluation nette';
+    } else {
+      return 'Cliquez pour voir les détails et gérer les évaluations';
+    }
+  }
+
+  // ============================================
+  // NOUVELLES MÉTHODES POUR LE MENU CONTEXTUEL
+  // ============================================
+
+  deleteBu(id: string) {
+    this.confirmService.openConfirmDialog(
+      "Confirmer la suppression", 
+      "Êtes-vous sûr de vouloir supprimer cette Business Unit ? Cette action est irréversible."
+    ).subscribe(confirm => {
+      if (confirm) {
+        this.entitiesService.delete(id).subscribe({
+          next: () => {
+            this.snackBarService.info("Business Unit supprimée avec succès !");
+            this.selectedBu = null;
+            this.ngOnInit();
+          },
+          error: (err) => {
+            this.snackBarService.error("Erreur lors de la suppression : " + err.message);
+          }
+        });
+      }
+    });
+  }
+
+  openEntityDialog(entite?: any, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.dialog.open(AddEntityDialogComponent, {
+      width: '500px',
+      data: entite || null
+    }).afterClosed().subscribe(bu => {
+      if (bu) {
+        if (bu.id) {
+          this.entitiesService.update(bu).subscribe(_ => {
+            this.ngOnInit();
+            this.snackBarService.info("Entité modifiée avec succès !");
+          });
+        }
+        else {
+          this.entitiesService.save(bu).subscribe(_ => {
+            this.ngOnInit();
+            this.snackBarService.info("Entité ajoutée avec succès !");
+          });
+        }
+      }
+    });
+  }
+
+  goToMatrixPage(buId: any) {
+    this.router.navigate(['risk', buId]);
   }
 }

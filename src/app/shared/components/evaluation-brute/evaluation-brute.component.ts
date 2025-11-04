@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -17,6 +17,8 @@ import { RiskEvaluationService } from '../../../core/services/risk-evaluation/ri
 import { RiskEvaluationCreateDto } from '../../../core/models/RiskEvaluation';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { MatrixComponent } from '../../../features/cartographie/matrix/matrix.component';
+import { GoBackComponent } from '../go-back/go-back.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 interface Indicator {
   frequenceId: number;
@@ -33,7 +35,7 @@ interface MatrixCell {
 @Component({
   selector: 'app-evaluation-brute',
   standalone: true,
-  imports: [
+   imports: [
     CommonModule,
     FormsModule,
     MatFormFieldModule,
@@ -42,7 +44,8 @@ interface MatrixCell {
     MatChipsModule,
     MatButtonModule,
     MatrixComponent,
-    EnumLabelPipe
+    EnumLabelPipe,
+    GoBackComponent
   ],
   templateUrl: './evaluation-brute.component.html',
   styleUrl: './evaluation-brute.component.scss'
@@ -51,16 +54,12 @@ export class EvaluationBruteComponent implements OnInit {
   private matrixService = inject(MatrixService);
   private evaluationSrv = inject(RiskEvaluationService);
   private snackBarService = inject(SnackBarService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  @Input() selectedRisk!: RiskTemplate;
-  @Input() selectedBU!: BusinessUnit;
-  @Input() selectedProcess!: Process;
-
-  @Output() onNext = new EventEmitter<{
-    riskLevel: RiskLevelEnum,
-    indicators: Array<{frequenceId: number, severiteId: number}>
-  }>();
-  @Output() onPrevious = new EventEmitter<void>();
+  selectedRisk: RiskTemplate | null = null;
+  selectedBU: BusinessUnit | null = null;
+  selectedProcess: Process | null = null;
 
   // Données chargées en interne
   frequencyList: Range[] = [];
@@ -76,7 +75,29 @@ export class EvaluationBruteComponent implements OnInit {
   severitiesMap: Map<number, number> = new Map();
 
   ngOnInit(): void {
-    this.loadData();
+    this.loadDataFromSessionStorage();
+    
+    if (this.selectedRisk && this.selectedBU && this.selectedProcess) {
+      this.loadData();
+    } else {
+      this.snackBarService.info("Données manquantes pour l'évaluation");
+      this.router.navigate(['/cartographie']);
+    }
+  }
+
+  private loadDataFromSessionStorage(): void {
+    const dataIsInSessionStorage = this.route.snapshot.queryParams['data'] || false;
+    const sessionStorageKey = this.route.snapshot.queryParams['key'] || 'object_for_carto';
+
+    if (dataIsInSessionStorage && sessionStorageKey) {
+      const obj = JSON.parse(sessionStorage.getItem(sessionStorageKey) || "{}");
+      
+      if (obj) {
+        this.selectedBU = obj.bu;
+        this.selectedProcess = obj.process;
+        this.selectedRisk = obj.risk;
+      }
+    }
   }
 
   private loadData(): void {
@@ -181,8 +202,8 @@ export class EvaluationBruteComponent implements OnInit {
     );
   }
 
-  handlePrevious(): void {
-    this.onPrevious.emit();
+  handleCancel(): void {
+    this.router.navigate(['/cartographie']);
   }
 
   handleNext(): void {
@@ -203,9 +224,11 @@ export class EvaluationBruteComponent implements OnInit {
       this.evaluationSrv.saveEvaluation(riskEvaluationCreateDto).subscribe({
         next: _ => {
           this.snackBarService.info("Évaluation brute sauvegardée");
-          this.onNext.emit({
-            riskLevel: this.highestRiskLevel!,
-            indicators: indicators
+          
+          // Rediriger vers l'évaluation nette
+          const sessionStorageKey = this.route.snapshot.queryParams['key'] || 'object_for_carto';
+          this.router.navigate(['/cartographie/evaluation-nette'], {
+            queryParams: { data: true, key: sessionStorageKey }
           });
         },
         error: err => {
