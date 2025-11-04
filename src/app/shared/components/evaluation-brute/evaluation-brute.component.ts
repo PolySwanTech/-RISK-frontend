@@ -1,0 +1,218 @@
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonModule } from '@angular/material/button';
+import { RiskTemplate } from '../../../core/models/RiskTemplate';
+import { Process } from '../../../core/models/Process';
+import { BusinessUnit } from '../../../core/models/BusinessUnit';
+import { RiskLevel, RiskLevelColor, RiskLevelEnum, RiskLevelScores } from '../../../core/enum/riskLevel.enum';
+import { Range } from '../../../core/models/range';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+import { MatrixService } from '../../../core/services/matrix/matrix.service';
+import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
+import { RiskEvaluationCreateDto } from '../../../core/models/RiskEvaluation';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { MatrixComponent } from '../../../features/cartographie/matrix/matrix.component';
+
+interface Indicator {
+  frequenceId: number;
+  severiteId: number;
+  riskLevel: RiskLevel;
+}
+
+interface MatrixCell {
+  severite: { id: number };
+  frequence: { id: number };
+  riskLevel: RiskLevel;
+}
+
+@Component({
+  selector: 'app-evaluation-brute',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatCardModule,
+    MatChipsModule,
+    MatButtonModule,
+    MatrixComponent,
+    EnumLabelPipe
+  ],
+  templateUrl: './evaluation-brute.component.html',
+  styleUrl: './evaluation-brute.component.scss'
+})
+export class EvaluationBruteComponent implements OnInit {
+  private matrixService = inject(MatrixService);
+  private evaluationSrv = inject(RiskEvaluationService);
+  private snackBarService = inject(SnackBarService);
+
+  @Input() selectedRisk!: RiskTemplate;
+  @Input() selectedBU!: BusinessUnit;
+  @Input() selectedProcess!: Process;
+
+  @Output() onNext = new EventEmitter<{
+    riskLevel: RiskLevelEnum,
+    indicators: Array<{frequenceId: number, severiteId: number}>
+  }>();
+  @Output() onPrevious = new EventEmitter<void>();
+
+  // Données chargées en interne
+  frequencyList: Range[] = [];
+  severityList: Range[] = [];
+  matrixData: any = null;
+
+  financierIndirect: RiskLevelEnum | null = null;
+  financierNonFinancier: RiskLevelEnum | null = null;
+  highestRiskLevel: RiskLevelEnum | null = null;
+  riskLevels = Object.values(RiskLevelEnum);
+  
+  indicators: Indicator[] = [];
+  severitiesMap: Map<number, number> = new Map();
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  private loadData(): void {
+    if (!this.selectedBU) return;
+
+    // Charger la matrice
+    this.matrixService.getDefaultMatrix(this.selectedBU.id).subscribe({
+      next: resp => this.matrixData = resp,
+      error: err => console.error('Erreur chargement matrice', err)
+    });
+
+    // Charger les fréquences
+    this.matrixService.getFrequenciesByBu(this.selectedBU.id).subscribe({
+      next: resp => this.frequencyList = resp,
+      error: err => console.error('Erreur chargement fréquences', err)
+    });
+
+    // Charger les sévérités
+    this.matrixService.getSeveritiesByBu(this.selectedBU.id).subscribe({
+      next: resp => {
+        this.severityList = resp;
+        this.severityList.forEach(s => this.severitiesMap.set(s.id, 0));
+      },
+      error: err => console.error('Erreur chargement sévérités', err)
+    });
+  }
+
+  getRiskLevelFromSeverityFrequencySelected(sev: Range): RiskLevelEnum {
+    return this.indicators.find(i => i.severiteId === sev.id)?.riskLevel.name || RiskLevelEnum.HIGH;
+  }
+
+  getRiskColorEnum(riskLevel: RiskLevelEnum): string {
+    return RiskLevelColor[riskLevel];
+  }
+
+  getClassByIndex(index: number): string {
+    const classes = [
+      'impact-faible',
+      'impact-modere',
+      'impact-significatif',
+      'impact-eleve',
+      'impact-critique'
+    ];
+    return classes[index] || '';
+  }
+
+  getSeverityValue(id: number): number {
+    return this.severitiesMap.get(id) ?? 0;
+  }
+
+  setSeverityValue(id: number, value: number): void {
+    this.severitiesMap.set(id, value);
+  }
+
+  updateRisk(severity: Range): void {
+    const frequency = this.severitiesMap.get(severity.id) || -1;
+
+    if (frequency !== -1) {
+      const cell: MatrixCell | undefined = this.matrixData.cells.find(
+        (c: MatrixCell) => c.severite.id === severity.id && c.frequence.id === frequency
+      );
+
+      if (cell) {
+        const existingIndex = this.indicators.findIndex(ind => ind.severiteId === severity.id);
+        const updatedIndicator: Indicator = {
+          severiteId: severity.id,
+          frequenceId: frequency,
+          riskLevel: cell.riskLevel
+        };
+
+        if (existingIndex !== -1) {
+          this.indicators[existingIndex] = updatedIndicator;
+        } else {
+          this.indicators.push(updatedIndicator);
+        }
+      }
+
+      this.updateHighestRisk();
+    }
+  }
+
+  updateHighestRisk(): void {
+    const selectedRisks: RiskLevelEnum[] = [];
+
+    this.indicators.forEach(s => selectedRisks.push(s.riskLevel.name));
+
+    if (this.financierIndirect) {
+      selectedRisks.push(this.financierIndirect);
+    }
+    if (this.financierNonFinancier) {
+      selectedRisks.push(this.financierNonFinancier);
+    }
+
+    if (!selectedRisks.length) {
+      this.highestRiskLevel = null;
+      return;
+    }
+
+    this.highestRiskLevel = selectedRisks.reduce(
+      (max: RiskLevelEnum, current: RiskLevelEnum) =>
+        RiskLevelScores[current] > RiskLevelScores[max] ? current : max
+    );
+  }
+
+  handlePrevious(): void {
+    this.onPrevious.emit();
+  }
+
+  handleNext(): void {
+    if (this.highestRiskLevel && this.selectedRisk) {
+      const indicators = this.indicators.map(i => ({
+        frequenceId: i.frequenceId,
+        severiteId: i.severiteId
+      }));
+
+      const riskEvaluationCreateDto: RiskEvaluationCreateDto = {
+        riskId: this.selectedRisk.id,
+        evaluation: this.highestRiskLevel,
+        indicators: indicators,
+        brut: true,
+        commentaire: ""
+      };
+      
+      this.evaluationSrv.saveEvaluation(riskEvaluationCreateDto).subscribe({
+        next: _ => {
+          this.snackBarService.info("Évaluation brute sauvegardée");
+          this.onNext.emit({
+            riskLevel: this.highestRiskLevel!,
+            indicators: indicators
+          });
+        },
+        error: err => {
+          this.snackBarService.info("Une évaluation de cet évènement de risque existe déjà");
+          console.error(err);
+        }
+      });
+    }
+  }
+}

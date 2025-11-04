@@ -1,0 +1,137 @@
+<div class="evaluation-container">
+  <div class="evaluation-header">
+    <h2>⚖️ Évaluation Nette des Impacts</h2>
+    <mat-chip-listbox class="context-chips">
+      <mat-chip>{{ selectedBU.name || "N/R" }}</mat-chip>
+      <mat-chip>{{ selectedProcess.name || "N/R" }}</mat-chip>
+      <mat-chip highlighted>{{ selectedRisk.libelle }}</mat-chip>
+    </mat-chip-listbox>
+  </div>
+
+  <section class="controls-section" *ngIf="controls.length > 0">
+    <h3>🎯 Contrôles Existants</h3>
+    <div class="controls-grid">
+      <mat-card *ngFor="let ctrl of controls" class="control-card"
+        [ngStyle]="{'border-left': '5px solid ' + ctrl.riskLevel.color}">
+        <mat-card-header>
+          <div class="control-header-content">
+            <mat-card-title>{{ ctrl.libelle }}</mat-card-title>
+            <mat-chip 
+              class="risk-chip"
+              [ngStyle]="{'background-color': ctrl.riskLevel.color, 'color': getContrastColor(ctrl.riskLevel.color)}">
+              {{ ctrl.riskLevel.name }}
+            </mat-chip>
+          </div>
+          <mat-card-subtitle>
+            <span class="badge">{{ ctrl.controlType | enumLabel:'controlType' }}</span>
+            <span class="badge">{{ ctrl.controlLevel | enumLabel:'degree' }}</span>
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="control-detail">
+            <span class="detail-label">Processus:</span>
+            <span class="detail-value">{{ ctrl.processName }}</span>
+          </div>
+          <div class="control-detail">
+            <span class="detail-label">Fréquence:</span>
+            <span class="detail-value">{{ ctrl.frequency | enumLabel:'recurrence' }}</span>
+          </div>
+          <div class="control-detail">
+            <span class="detail-label">Prochaine Exécution:</span>
+            <span class="detail-value">{{ ctrl.nextExecution | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="control-detail">
+            <span class="detail-label">Créateur:</span>
+            <span class="detail-value">{{ ctrl.creator }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <section class="attenuation-section">
+    <h3>🛡️ Mesures d'Atténuation</h3>
+    
+    <div class="attenuation-grid" *ngIf="attenuationMetrics.length > 0; else noMetrics">
+      <mat-card *ngFor="let metric of attenuationMetrics" class="attenuation-card">
+        <mat-card-header>
+          <div class="attenuation-header-content">
+            <mat-card-title>{{ metric.libelle }}</mat-card-title>
+            <mat-chip [ngClass]="metric.actif ? 'status-active' : 'status-inactive'">
+              {{ metric.actif ? '✓ Active' : '✗ Inactive' }}
+            </mat-chip>
+          </div>
+          <mat-card-subtitle>
+            <span class="type-badge">{{ metric.type.label || 'Type inconnu' }}</span>
+          </mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <p class="description">{{ metric.description || 'Aucune description disponible.' }}</p>
+          
+          <div class="metric-details">
+            <div class="metric-detail">
+              <span class="detail-icon">👤</span>
+              <span class="detail-text">{{ metric.creatorName }}</span>
+            </div>
+            <div class="metric-detail">
+              <span class="detail-icon">📅</span>
+              <span class="detail-text">{{ metric.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="metric-detail" *ngIf="metric.evaluation">
+              <span class="detail-icon">⭐</span>
+              <span class="detail-text">{{ metric.evaluation | enumLabel:'evaluation' }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <ng-template #noMetrics>
+      <div class="no-data">
+        <div class="no-data-icon">🛡️</div>
+        <p>Aucune mesure d'atténuation associée à ce risque</p>
+      </div>
+    </ng-template>
+  </section>
+
+  <section class="summary-section">
+    <h3>📊 Évaluation du Risque Net</h3>
+    <div class="summary-card">
+      <div class="summary-info">
+        <p class="summary-label">Après application des contrôles et mesures d'atténuation</p>
+      </div>
+      
+      <div class="risk-selection">
+        <mat-form-field appearance="outline" class="risk-level-select">
+          <mat-label>Niveau de Risque Net Proposé</mat-label>
+          <mat-select [(ngModel)]="highestRiskLevelNet">
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">
+              {{ risk | enumLabel:'riskLevel' }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <div class="risk-indicator" 
+          *ngIf="highestRiskLevelNet"
+          [style.backgroundColor]="getRiskColorEnum(highestRiskLevelNet)">
+          {{ highestRiskLevelNet | enumLabel:'riskLevel' }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button mat-raised-button class="btn-secondary" (click)="handlePrevious()">
+      ← Retour
+    </button>
+    <button 
+      mat-raised-button 
+      class="btn-primary" 
+      (click)="handleSave()"
+      [disabled]="!highestRiskLevelNet">
+      💾 Terminer l'évaluation
+    </button>
+  </div>
+</div>

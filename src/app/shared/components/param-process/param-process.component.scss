@@ -375,3 +375,55 @@
     }
   }
 }
+
+
+.risk-events-section h3 {
+    font-size: 16px;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.mat-elevation-z8 {
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+    background-color: #f7fafc !important;
+}
+
+.action-cell {
+    text-align: right;
+    width: 200px;
+}
+
+.action-cell button {
+    margin: 0;
+}
+
+.no-data-row {
+    height: 200px;
+}
+
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #a0aec0;
+    font-style: italic;
+}
+
+mat-paginator {
+    border-top: 1px solid #e2e8f0;
+}

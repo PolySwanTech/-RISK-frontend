@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoBackButton, GoBackComponent } from '../go-back/go-back.component';
@@ -21,11 +21,28 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
 import { EvaluationFrequency } from '../../../core/enum/evaluation-frequency.enum';
+import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatCardModule } from "@angular/material/card";
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-process-manager',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoBackComponent, MatIconModule, MatFormFieldModule, MatSelectModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    GoBackComponent, 
+    MatIconModule, 
+    MatFormFieldModule, 
+    MatSelectModule, 
+    MatPaginatorModule, 
+    MatCardModule, 
+    MatTableModule,
+    MatSortModule,
+    MatChipsModule
+  ],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
 })
@@ -40,6 +57,11 @@ export class ProcessManagerComponent implements OnInit {
   showDispatchModal = false;
   newSubprocesses: Array<{ name: string }> = [];
   riskDispatch: { [riskId: string]: number } = {};
+
+  riskDisplayedColumns: string[] = ['libelle', 'description', 'riskBrut', 'riskNet'];
+  riskDataSource = new MatTableDataSource<RiskTemplate>([]);
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   viewedRisks: RiskTemplate[] = []
 
@@ -57,7 +79,6 @@ export class ProcessManagerComponent implements OnInit {
   private entitiesService = inject(EntitiesService);
   private riskEvaluationService = inject(RiskEvaluationService);
   private risksCache = new Map<string, RiskTemplate[]>();
-
 
   goBackButtons: GoBackButton[] = [
     {
@@ -78,14 +99,25 @@ export class ProcessManagerComponent implements OnInit {
     });
 
     this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto'] || 'false');
+    
+    // Adapter les colonnes selon le mode
+    this.riskDisplayedColumns = this.cartoMode
+      ? ['libelle', 'description', 'riskBrut', 'riskNet', 'action']
+      : ['libelle', 'description', 'riskBrut', 'riskNet'];
 
     if (this.route.snapshot.queryParams["create"]) {
       this.addProcess();
     }
-    else{    
-      this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
+  }
+
+  ngAfterViewInit() {
+    if (this.paginator) {
+      this.riskDataSource.paginator = this.paginator;
     }
-}
+    if (this.sort) {
+      this.riskDataSource.sort = this.sort;
+    }
+  }
 
   onBuChange(): void {
     if (!this.selectedBu) {
@@ -93,42 +125,38 @@ export class ProcessManagerComponent implements OnInit {
       this.selectedProcess = null;
       return;
     }
-    this.processes =this.selectedBu.process;
+    this.processes = this.selectedBu.process;
   }
 
   addBu() {
-      this.dialog.open(AddEntityDialogComponent,
-        {
-          width: '800px'
-        }
-      ).afterClosed().subscribe(bu => {
-        if (!bu) return;
-        this.entitiesService.save(bu).subscribe(resp => {
-        })
+    this.dialog.open(AddEntityDialogComponent, {
+      width: '800px'
+    }).afterClosed().subscribe(bu => {
+      if (!bu) return;
+      this.entitiesService.save(bu).subscribe(resp => {
+        this.ngOnInit();
       })
-    }
+    })
+  }
 
   addProcess() {
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '800px',
       maxWidth: '95vw',
       maxHeight: '90vh',
-      panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+      panelClass: 'custom-dialog-container',
       disableClose: false,
       autoFocus: false,
       data: { buId: this.buId }
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      // Recharger les données
       this.ngOnInit();
-
-      // Supprimer le queryParam `create`
       this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: { create: null }, // 👈 Supprime 'create'
-        queryParamsHandling: 'merge',  // 👈 Garde les autres queryParams (comme buId)
-        replaceUrl: true               // 👈 Évite d’ajouter une nouvelle entrée dans l’historique du navigateur
+        queryParams: { create: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
       });
     });
   }
@@ -138,10 +166,12 @@ export class ProcessManagerComponent implements OnInit {
     this.selectedProcess = null;
     this.showDispatchModal = false;
     this.viewedRisks = this.collectRisksFromBu(bu);
-    console.log(this.viewedRisks)
 
     if (this.cartoMode && bu.id) {
+      this.riskDataSource.data = this.viewedRisks;
       this.loadPeriodsForBu(bu.id);
+    } else {
+      this.riskDataSource.data = this.viewedRisks;
     }
   }
 
@@ -151,29 +181,25 @@ export class ProcessManagerComponent implements OnInit {
     this.newSubprocesses = [];
     this.riskDispatch = {};
     this.viewedRisks = this.getAllRisksRecursive(process);
+    this.riskDataSource.data = this.viewedRisks;
   }
 
-
   chooseRiskForCarto(risk: RiskTemplate) {
-    // 🔍 Trouver le process qui contient ce risque
     const foundProcess = this.findProcessByRiskId(risk.id);
     if (!foundProcess) {
       console.warn("Aucun process trouvé pour ce risque :", risk);
       return;
     }
 
-    // 🔍 Trouver la BU parente
     const foundBu = this.findBuByProcess(foundProcess);
     if (!foundBu) {
       console.warn("Aucune BU trouvée pour le process :", foundProcess);
       return;
     }
 
-    // ✅ Mettre à jour le contexte sélectionné
     this.selectedBu = foundBu;
     this.selectedProcess = foundProcess;
 
-    // 🧩 Enregistrer dans le sessionStorage pour la carto
     const sessionStorageKey = "object_for_carto";
     const obj = {
       bu: { id: foundBu.id, name: foundBu.name },
@@ -182,9 +208,7 @@ export class ProcessManagerComponent implements OnInit {
     };
 
     sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
-    console.log("➡️ Contexte cartographie enregistré :", obj);
 
-    // 🚀 Redirection si on est en mode cartographie
     if (this.cartoMode) {
       this.router.navigate(['cartographie', 'create'], {
         queryParams: { data: true, key: sessionStorageKey }
@@ -192,8 +216,6 @@ export class ProcessManagerComponent implements OnInit {
     }
   }
 
-
-  // Méthode récursive pour collecter tous les risques
   private getAllRisksRecursive(process: Process, currentPeriod?: string): RiskTemplate[] {
     const risks: RiskTemplate[] = process.risks?.map(risk => {
       const frequency = process.bu?.evaluationFrequency;
@@ -213,7 +235,6 @@ export class ProcessManagerComponent implements OnInit {
       }
     }
 
-    console.debug(`${process.name}: ${risks.length} risques collectés`);
     return risks;
   }
 
@@ -263,8 +284,6 @@ export class ProcessManagerComponent implements OnInit {
     }
   }
 
-  
-
   private collectRisksFromBu(bu: BusinessUnit): RiskTemplate[] {
     if (this.risksCache.has(bu.id)) {
       return this.risksCache.get(bu.id)!;
@@ -286,7 +305,6 @@ export class ProcessManagerComponent implements OnInit {
     this.risksCache.set(bu.id, result);
     return result;
   }
-
 
   canConfirmDispatch(): boolean {
     if (this.newSubprocesses.length < 2) return false;
@@ -313,12 +331,10 @@ export class ProcessManagerComponent implements OnInit {
       return child;
     });
 
-    // Dispatcher les risques avant de créer les processus
     const risksByChild: Map<number, RiskTemplate[]> = new Map();
     this.selectedProcess.risks.forEach(risk => {
       const targetIndex = this.riskDispatch[risk.id];
       if (targetIndex !== undefined) {
-        // Convertir en number si c'est une string
         const indexAsNumber = typeof targetIndex === 'string' ? parseInt(targetIndex, 10) : targetIndex;
 
         if (!risksByChild.has(indexAsNumber)) {
@@ -328,7 +344,6 @@ export class ProcessManagerComponent implements OnInit {
       }
     });
 
-    // Créer chaque sous-processus via le service
     const createRequests = newChildren.map((child, index) => {
       return this.processService.createProcess({
         name: child.name,
@@ -336,10 +351,7 @@ export class ProcessManagerComponent implements OnInit {
         parentId: child.parentId
       }).pipe(
         switchMap(createdProcess => {
-          // Mettre à jour les risques avec l'ID réel du processus créé
           const risksToUpdate = risksByChild.get(index) || [];
-
-          // Créer les requêtes de réassignation pour chaque risque
           const reassignRequests = risksToUpdate.map(risk =>
             this.riskService.reasign(risk.id, createdProcess.id).pipe(
               tap(() => {
@@ -349,7 +361,6 @@ export class ProcessManagerComponent implements OnInit {
             )
           );
 
-          // Attendre que toutes les réassignations soient terminées
           return (reassignRequests.length > 0 ? forkJoin(reassignRequests) : of([])).pipe(
             map(() => {
               createdProcess.risks = risksToUpdate;
@@ -358,25 +369,20 @@ export class ProcessManagerComponent implements OnInit {
           );
         }),
         tap(createdProcess => {
-          // Ajouter le processus créé aux enfants
           this.selectedProcess!.enfants.push(createdProcess);
         })
       );
     });
 
-    // Exécuter toutes les requêtes en parallèle
     forkJoin(createRequests).subscribe({
       next: () => {
-        // Vider les risques du processus parent
         this.selectedProcess!.risks = [];
-
         this.showDispatchModal = false;
         this.newSubprocesses = [];
         this.riskDispatch = {};
       },
       error: (error) => {
         console.error('Erreur lors de la création des sous-processus ou réassignation:', error);
-        // Optionnel : afficher un message d'erreur à l'utilisateur
       }
     });
   }
@@ -386,23 +392,23 @@ export class ProcessManagerComponent implements OnInit {
   }
 
   loadPeriodsForBu(buId: string) {
-  this.riskEvaluationService.getPeriodsByBu(buId).subscribe({
-    next: (periodsFromDb: string[]) => {
-      const current = this.getCurrentPeriod();
-      const uniquePeriods = new Set([...periodsFromDb, current]);
-      this.periods = Array.from(uniquePeriods).sort().reverse();
-      this.selectedPeriod = current;
-    },
-    error: (err) => console.error("Erreur lors du chargement des périodes :", err)
-  });
-}
+    this.riskEvaluationService.getPeriodsByBu(buId).subscribe({
+      next: (periodsFromDb: string[]) => {
+        const current = this.getCurrentPeriod();
+        const uniquePeriods = new Set([...periodsFromDb, current]);
+        this.periods = Array.from(uniquePeriods).sort().reverse();
+        this.selectedPeriod = current;
+      },
+      error: (err) => console.error("Erreur lors du chargement des périodes :", err)
+    });
+  }
 
   getCurrentPeriod(): string {
     const year = new Date().getFullYear();
     const month = new Date().getMonth() + 1;
 
     const semester = month <= 6 ? 'S1' : 'S2';
-    if (!this.selectedBu && this.selectedBu!.evaluationFrequency === EvaluationFrequency.SEMESTER) {
+    if (this.selectedBu && this.selectedBu.evaluationFrequency === EvaluationFrequency.SEMESTER) {
       return `${semester} ${year}`;
     }
     return `${year}`;
@@ -435,9 +441,6 @@ export class ProcessManagerComponent implements OnInit {
     return null;
   }
 
-  /**
-   * Recherche de la BU associée à un Process donné.
-   */
   private findBuByProcess(targetProcess: Process): BusinessUnit | null {
     for (const bu of this.businessUnits) {
       if (bu.process?.some(p => p.id === targetProcess.id)) {
@@ -465,14 +468,7 @@ export class ProcessManagerComponent implements OnInit {
   }
 
   viewRiskDetails(risk: RiskTemplate): void {
-    // const sessionStorageKey = "object_for_carto";
-    // const obj = {
-    //   bu: this.selectedBu ? { id: this.selectedBu.id, name: this.selectedBu.name } : null,
-    //   process: this.selectedProcess,
-    //   risk: risk
-    // };
     this.router.navigate(['reglages', 'risks', risk.id]);
-
   }
 
   createNewEvent(): void {
@@ -482,7 +478,7 @@ export class ProcessManagerComponent implements OnInit {
       width: '800px',
       maxWidth: '95vw',
       maxHeight: '90vh',
-      panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+      panelClass: 'custom-dialog-container',
       disableClose: false,
       autoFocus: false,
       data: { processId: process.id }
@@ -492,9 +488,85 @@ export class ProcessManagerComponent implements OnInit {
       if (result) {
         this.snackBarService.info("Evènement de risque crée avec succès");
         this.ngOnInit();
-        this.selectedProcess = process
-        // reload les risques
+        this.selectedProcess = process;
       }
     });
+  }
+
+  onRiskRowClick(risk: RiskTemplate, event: Event): void {
+    // Éviter de déclencher si on clique sur le bouton d'action
+    const target = event.target as HTMLElement;
+    if (target.closest('.action-cell button')) {
+      return;
+    }
+
+    const hasRiskBrut = risk.riskBrut && risk.riskBrut.length > 0;
+    const hasRiskNet = risk.riskNet && risk.riskNet.length > 0;
+
+    // Trouver le process et la BU associés
+    const foundProcess = this.findProcessByRiskId(risk.id);
+    const foundBu = foundProcess ? this.findBuByProcess(foundProcess) : null;
+
+    if (!foundProcess || !foundBu) {
+      console.warn("Impossible de trouver le contexte pour ce risque");
+      return;
+    }
+
+    const sessionStorageKey = "object_for_carto";
+    const obj = {
+      bu: { id: foundBu.id, name: foundBu.name },
+      process: foundProcess,
+      risk: risk
+    };
+    sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
+
+    if (!hasRiskBrut) {
+      // Pas d'évaluation brute → créer évaluation brute
+      this.router.navigate(['cartographie', 'create'], {
+        queryParams: { data: true, key: sessionStorageKey }
+      });
+    } else if (!hasRiskNet) {
+      // A évaluation brute mais pas nette → aller directement à l'étape nette
+      // Pour cela, on pourrait passer un param supplémentaire ou gérer dans le composant
+      this.router.navigate(['cartographie', 'create'], {
+        queryParams: { 
+          data: true, 
+          key: sessionStorageKey,
+          skipToBrute: false // On commence par l'évaluation brute normalement
+        }
+      });
+    } else {
+      // A les deux évaluations → voir les détails
+      this.viewRiskDetails(risk);
+    }
+  }
+
+  // Méthodes helper pour le template
+  getRiskBrutEvaluation(risk: RiskTemplate): string {
+    if (!risk.riskBrut || risk.riskBrut.length === 0) {
+      return 'NON_EVALUATED';
+    }
+    return risk.riskBrut[0].evaluation?.name || 'UNKNOWN';
+  }
+
+  getRiskNetEvaluation(risk: RiskTemplate): string {
+    if (!risk.riskNet || risk.riskNet.length === 0) {
+      return 'NON_EVALUATED';
+    }
+    return risk.riskNet[0].evaluation?.name || 'UNKNOWN';
+  }
+
+  getRiskBrutColor(risk: RiskTemplate): string {
+    if (!risk.riskBrut || risk.riskBrut.length === 0) {
+      return '#cbd5e1';
+    }
+    return risk.riskBrut[0].evaluation?.color || '#cbd5e1';
+  }
+
+  getRiskNetColor(risk: RiskTemplate): string {
+    if (!risk.riskNet || risk.riskNet.length === 0) {
+      return '#cbd5e1';
+    }
+    return risk.riskNet[0].evaluation?.color || '#cbd5e1';
   }
 }
