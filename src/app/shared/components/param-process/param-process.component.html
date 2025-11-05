@@ -157,8 +157,9 @@
               </button>
             </div>
           </div>
-          <button class="btn btn-secondary" (click)="addSubprocess()">
-            + Ajouter un autre sous-processus
+          <button mat-raised-button class="btn-primary" (click)="addSubprocess()">
+            <mat-icon>add</mat-icon>
+            Ajouter un autre sous-processus
           </button>
         </div>
 
@@ -178,10 +179,10 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="cancelDispatch()">
+          <button mat-raised-button class="btn-red" (click)="cancelDispatch()">
             Annuler
           </button>
-          <button class="btn btn-primary" [disabled]="!canConfirmDispatch()" (click)="confirmDispatch()">
+          <button mat-raised-button class="btn-primary" [disabled]="!canConfirmDispatch()" (click)="confirmDispatch()">
             Confirmer
           </button>
         </div>
@@ -218,7 +219,7 @@
             <ng-container matColumnDef="libelle">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Libellé</th>
               <td mat-cell *matCellDef="let risk">
-                <strong>{{ risk.libelle }}</strong>
+                {{ risk.libelle }}
               </td>
             </ng-container>
 

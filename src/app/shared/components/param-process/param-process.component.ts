@@ -177,17 +177,13 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
     // CORRECTION : Mise à jour immédiate du dataSource
     this.riskDataSource.data = this.viewedRisks;
+    console.log(this.riskDataSource.data);
 
     setTimeout(() => {
-      if (this.paginator && !this.riskDataSource.paginator) {
         this.riskDataSource.paginator = this.paginator;
-      }
-      if (this.sort && !this.riskDataSource.sort) {
         this.riskDataSource.sort = this.sort;
-      }
-      if (this.paginator) {
         this.paginator.firstPage();
-      }
+
     });
   }
 
@@ -197,10 +193,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     this.newSubprocesses = [];
     this.riskDispatch = {};
     this.viewedRisks = this.getAllRisksRecursive(process);
-
+   
     this.riskDataSource.data = this.viewedRisks;
-
-    if (this.paginator) this.paginator.firstPage();
   }
 
   chooseRiskForCarto(risk: RiskTemplate) {
@@ -236,6 +230,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   }
 
   private getAllRisksRecursive(process: Process, currentPeriod?: string): RiskTemplate[] {
+    this.riskDataSource.data = [];
     const risks: RiskTemplate[] = process.risks?.map(risk => {
       const frequency = process.bu?.evaluationFrequency;
       if (currentPeriod && frequency) {
@@ -304,6 +299,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   }
 
   private collectRisksFromBu(bu: BusinessUnit): RiskTemplate[] {
+    this.riskDataSource.data = [];
     if (this.risksCache.has(bu.id)) {
       return this.risksCache.get(bu.id)!;
     }
