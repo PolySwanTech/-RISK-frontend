@@ -1,153 +1,233 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, inject, Inject, OnInit, HostListener } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
-
-import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
-import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
-import { ProcessService } from '../../../../core/services/process/process.service';
-
-import { RiskLevelEnum } from '../../../../core/enum/riskLevel.enum';
-import { RiskImpactType, RiskImpactTypeLabels } from '../../../../core/enum/riskImpactType.enum';
-
-import { Process } from '../../../../core/models/Process';
-import { BaloiseCategoryDto, RiskReferentiel, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
-import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
-import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
-import { MatDialog } from '@angular/material/dialog';
 import { MatChipsModule, MatChipListbox } from '@angular/material/chips';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
-import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { BaloiseCategoryDto, RiskReferentielCreateDto } from '../../../../core/models/RiskReferentiel';
+import { BasePopupComponent, PopupAction } from '../../../../shared/components/base-popup/base-popup.component';
+import { RiskReferentielService } from '../../../../core/services/risk/risk-referentiel.service';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
+import { DraftService } from '../../../../core/services/draft.service';
+import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
 import { RiskSelectionMode } from '../../../../core/enum/risk-enum';
+
+export interface CreateRiskReferentielDialogData {
+  riskId?: string;
+  draftId?: string;
+  baloisPreselected?: BaloiseCategoryDto;
+}
+
 @Component({
-  selector: 'app-create-risks-referentiel',
+  selector: 'app-create-risks-referentiel-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatStepperModule, MatButtonModule, GoBackComponent,
-    MatRadioModule,
-    GoBackComponent,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     NgIf,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatChipListbox,
     MatIconModule,
     MatTooltipModule,
-    MatDatepickerModule,
-    MatChipsModule,
-    MatChipListbox],
+    BasePopupComponent
+  ],
   templateUrl: './create-risks-referentiel.component.html',
   styleUrl: './create-risks-referentiel.component.scss'
 })
-export class CreateRisksReferentielComponent {
-  /* ---------------- services ---------------- */
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly fb = inject(FormBuilder);
-  private dialog = inject(MatDialog)
+export class CreateRisksReferentielComponent implements OnInit {
 
+  private readonly COMPONENT_NAME = 'CreateRiskReferentielDialog';
 
-  private riskReferentielSrv = inject(RiskReferentielService)
-  private readonly confirm = inject(ConfirmService);
-  private readonly procSrv = inject(ProcessService);
-
-
-  /* ---------------- données ----------------- */
-  listProcess: Process[] = [];
+  private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject(MatDialogRef<CreateRisksReferentielComponent>);
+  private riskReferentielSrv = inject(RiskReferentielService);
+  private snackBarService = inject(SnackBarService);
+  private draftService = inject(DraftService);
 
   balois: BaloiseCategoryDto | null = null;
-
-  pageTitle = 'Création d\'un risque référentiel';
-  dialogLabel = { title: 'Création', message: 'création' };
-
-  riskLevels = Object.values(RiskLevelEnum);
-  impactTypes = Object.values(RiskImpactType);
-  impactLabels = RiskImpactTypeLabels;
-
   isBaloisPreselected = false;
+  popupActions: PopupAction[] = [];
 
-  /** instance courante (vide ou chargée) */
-  risk: RiskReferentiel = new RiskReferentiel();
+  private currentDraftId: string | null = null;
 
-  /* -------------   reactive forms ------------- */
   infoForm = this.fb.group({
-    libellePerso: this.fb.nonNullable.control<string>(''),
+    libellePerso: this.fb.nonNullable.control<string>('', Validators.required),
     balois: this.fb.nonNullable.control<BaloiseCategoryDto | null>(null, Validators.required),
     description: this.fb.nonNullable.control<string>(''),
   });
 
+  constructor(@Inject(MAT_DIALOG_DATA) public data: CreateRiskReferentielDialogData) { }
+
   ngOnInit(): void {
-    const buId = this.route.snapshot.queryParams["buId"];
-    const id = this.route.snapshot.paramMap.get('id');
-
-    const balois = JSON.parse(localStorage.getItem('balois') || "")
-
-    if (balois) {
-
-      this.balois = {
-        libelle: balois.libelle,
-        label: balois.label,
-        definition: null,
-        parent: balois.parent
-      }
-
-      this.infoForm.get('balois')?.setValue(balois);
-      this.isBaloisPreselected = true
+    // Charger le brouillon si un draftId est fourni
+    if (this.data?.draftId) {
+      this.loadDraft(this.data.draftId);
+      this.currentDraftId = this.data.draftId;
+      this.draftService.hideDraft(this.data.draftId);
     }
 
-    this.procSrv.getProcessTree(buId).subscribe(list => {
-      this.listProcess = list
+    // Charger la catégorie Bâloise présélectionnée
+    if (this.data?.baloisPreselected) {
+      this.balois = this.data.baloisPreselected;
+      this.infoForm.get('balois')?.setValue(this.balois);
+      this.isBaloisPreselected = true;
+    }
+
+    // Charger le risque existant pour modification
+    if (this.data?.riskId) {
+      this.loadRiskById(this.data.riskId);
+    }
+
+    this.dialogRef.backdropClick().subscribe(() => {
+      if (this.hasFormData()) {
+        this.saveDraft();
+      } else if (this.currentDraftId) {
+        this.draftService.showDraft(this.currentDraftId);
+      }
     });
 
-    if (id && id !== 'create') {
-      this.loadRiskById(id);
+    this.initActions();
+  }
+
+  loadDraft(draftId: string): void {
+    const draft = this.draftService.getDraftById(draftId);
+    if (draft) {
+      const data = draft.data;
+      this.infoForm.patchValue({
+        libellePerso: data.libellePerso || '',
+        balois: data.balois || null,
+        description: data.description || ''
+      });
+      if (data.balois) {
+        this.balois = data.balois;
+      }
+      console.log('Brouillon de risque référentiel restauré:', draft);
     }
   }
 
   private loadRiskById(id: string): void {
-    this.riskReferentielSrv.getById(id).subscribe(r => {
-      this.risk = r;
-      this.pageTitle = `Mise à jour du risque : ${this.risk.libelle}`;
-      this.dialogLabel = { title: 'Mise à jour', message: 'mise à jour' };
-
+    this.riskReferentielSrv.getById(id).subscribe(risk => {
       this.infoForm.patchValue({
-        balois: this.risk.category ?? null,
-        description: this.risk.description,
+        libellePerso: risk.libelle,
+        balois: risk.category ?? null,
+        description: risk.description,
       });
+      if (risk.category) {
+        this.balois = risk.category;
+      }
     });
+  }
+
+  initActions(): void {
+    this.popupActions = [
+      {
+        label: 'Annuler',
+        icon: 'close',
+        color: 'red',
+        onClick: () => this.closePopup()
+      },
+      {
+        label: this.data?.riskId ? 'Mettre à jour' : 'Soumettre',
+        icon: 'check',
+        primary: true,
+        disabled: () => this.infoForm.invalid,
+        onClick: () => this.submit()
+      }
+    ];
+  }
+
+  getDialogRef() {
+    return this.dialogRef;
+  }
+
+  hasFormData(): boolean {
+    const values = this.infoForm.value;
+    return !!(
+      values.libellePerso?.trim() ||
+      values.balois ||
+      values.description?.trim()
+    );
+  }
+
+  saveDraft(): void {
+    if (!this.hasFormData()) {
+      return;
+    }
+
+    const draftData = {
+      libellePerso: this.infoForm.get('libellePerso')?.value || '',
+      balois: this.balois,
+      description: this.infoForm.get('description')?.value || ''
+    };
+
+    const title = draftData.libellePerso
+      ? `Risque: ${draftData.libellePerso}`
+      : 'Nouveau risque référentiel';
+
+    if (this.currentDraftId) {
+      this.draftService.updateDraft(
+        this.currentDraftId,
+        title,
+        draftData,
+        true
+      );
+    } else {
+      this.currentDraftId = this.draftService.createDraft(
+        this.COMPONENT_NAME,
+        title,
+        draftData,
+        true
+      );
+    }
+  }
+
+  closePopup() {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    } else if (this.currentDraftId) {
+      this.draftService.showDraft(this.currentDraftId);
+    }
+
+    this.dialogRef.close();
   }
 
   openSubCategorySelector(): void {
     const dialogRef = this.dialog.open(SelectRiskEventComponent, {
-      minWidth: '700px',
-      height: '550px',
-      data: { mode: RiskSelectionMode.CategoryLevel2 }
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
+      data: { mode: RiskSelectionMode.CategoryLevel2, hideNavigationToggle: true }
     });
 
     dialogRef.afterClosed().subscribe(subcategory => {
       if (subcategory) {
         this.balois = subcategory;
-        this.infoForm.get('balois')?.setValue(subcategory.libelle);
+        this.infoForm.get('balois')?.setValue(subcategory);
       }
     });
   }
 
   submit(): void {
     if (this.infoForm.invalid) {
-      console.error('Formulaire invalide:', this.infoForm.errors);
+      this.snackBarService.error('Formulaire invalide');
       return;
     }
 
     const category = this.infoForm.get('balois')?.value;
-    
 
     if (!category) {
-      console.error('Catégorie obligatoire !');
+      this.snackBarService.error('Catégorie Bâloise obligatoire');
       return;
     }
 
@@ -157,16 +237,27 @@ export class CreateRisksReferentielComponent {
       description: this.infoForm.get('description')!.value!,
     };
 
-    this.riskReferentielSrv.create(payload).subscribe(risk => {
-      this.confirm.openConfirmDialog(
-        this.dialogLabel.title,
-        `La ${this.dialogLabel.message} du risque a été réalisée avec succès`,
-        false
-      );
-      const next = this.route.snapshot.queryParams['next']
-      if(next){
-        this.router.navigateByUrl(next);
+    this.riskReferentielSrv.create(payload).subscribe({
+      next: (risk) => {
+        this.snackBarService.info('Risque référentiel créé avec succès');
+
+        if (this.currentDraftId) {
+          this.draftService.deleteDraft(this.currentDraftId);
+        }
+
+        this.dialogRef.close(risk);
+      },
+      error: (err) => {
+        this.snackBarService.error('Erreur lors de la création du risque');
+        console.error(err);
       }
     });
+  }
+
+  @HostListener('window:beforeunload')
+  beforeUnload(): void {
+    if (this.hasFormData()) {
+      this.saveDraft();
+    }
   }
 }

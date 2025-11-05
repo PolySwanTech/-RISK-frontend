@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSelectModule } from '@angular/material/select';
@@ -17,6 +17,7 @@ import { RiskReferentielService } from '../../../core/services/risk/risk-referen
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { BaloiseCategoryDto } from '../../../core/models/RiskReferentiel';
 import { RiskSelectionMode, Level } from '../../../core/enum/risk-enum';
+import { CreateRisksReferentielComponent } from '../../../features/reglages/risks/create-risks-referentiel/create-risks-referentiel.component';
 
 export enum NavigationMode {
   Hierarchical = 'hierarchical',
@@ -45,6 +46,7 @@ export enum NavigationMode {
 export class SelectRiskEventComponent implements OnInit {
 
   @Input() mode: RiskSelectionMode = RiskSelectionMode.Event;
+  @Input() hideNavigationToggle = false;
   @Output() selected = new EventEmitter<any>();
 
   // --- Navigation Mode ---
@@ -84,6 +86,7 @@ export class SelectRiskEventComponent implements OnInit {
 
   // --- Injections ---
   private dialogRef = inject(MatDialogRef<SelectRiskEventComponent>, { optional: true });
+  private dialog = inject(MatDialog);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private categoryService = inject(RiskCategoryService);
@@ -93,6 +96,8 @@ export class SelectRiskEventComponent implements OnInit {
 
   ngOnInit(): void {
     this.mode = this.data?.mode ?? this.mode;
+    this.hideNavigationToggle = this.data?.hideNavigationToggle ?? this.hideNavigationToggle;
+    console.log(this.data)
     this.processId = this.data?.processId;
 
     const cat1 = this.route.snapshot.queryParams["cat1"];
@@ -356,13 +361,32 @@ export class SelectRiskEventComponent implements OnInit {
   }
 
   addReferentiel() {
-    localStorage.setItem("balois", JSON.stringify(this.selections.subcategory))
-    this.router.navigate(['reglages', 'risks', 'create-referentiel'],
-      {
-        queryParams: {
-          next: `reglages?label=Taxonmie&cat1=${this.selections.category?.libelle}&cat2=${this.selections.subcategory?.libelle}`
-        }
-      })
+    const dialogRef = this.dialog.open(CreateRisksReferentielComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
+      data: {
+        baloisPreselected: this.selections.subcategory
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Recharger les référentiels pour afficher le nouveau
+        this.referentielService.getAll().subscribe({
+          next: (refs) => {
+            this.allReferentiels = refs;
+            // Réappliquer les filtres ou recharger la vue actuelle
+            if (this.navigationMode === NavigationMode.Direct) {
+              this.applyFilters();
+            } else if (this.selections.subcategory) {
+              this.selectSubCategory(this.selections.subcategory);
+            }
+          }
+        });
+      }
+    });
   }
 
   selectEvent(event: any): void {

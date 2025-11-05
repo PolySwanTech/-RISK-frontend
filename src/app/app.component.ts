@@ -15,6 +15,8 @@ import { CreateAttenuationMetricsComponent } from './features/control/create-att
 import { CreateProcessComponent } from './features/process/create-process/create-process.component';
 import { CreateRisksComponent } from './features/reglages/risks/create-risks/create-risks.component';
 import { PopupEvaluationControleComponent } from './pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
+import { AddActionDialogComponent } from './features/action-plan/add-action-dialog/add-action-dialog.component';
+import { CreateRisksReferentielComponent } from './features/reglages/risks/create-risks-referentiel/create-risks-referentiel.component';
 
 
 @Component({
@@ -78,6 +80,18 @@ export class AppComponent {
         });
         break;
 
+      case 'AddActionDialog':
+        this.dialog.open(AddActionDialogComponent, {
+          width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container',
+          data: { 
+            draftId: draft.id
+          }
+        });
+        break;
+
       case 'CreateControlDialog':
         this.dialog.open(CreateControlComponent, {
           width: '800px',
@@ -128,6 +142,18 @@ export class AppComponent {
 
         case 'PopupEvaluationControleComponent':
         this.dialog.open(PopupEvaluationControleComponent, {
+          width: '800px',
+          maxWidth: '95vw',
+          maxHeight: '90vh',
+          panelClass: 'custom-dialog-container',
+          data: {
+            draftId: draft.id
+          }
+        });
+        break;
+
+        case 'CreateRiskReferentielDialog':
+        this.dialog.open(CreateRisksReferentielComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',

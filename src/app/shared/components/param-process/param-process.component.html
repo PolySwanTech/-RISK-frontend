@@ -129,7 +129,8 @@
         <div class="actions">
           <button mat-raised-button *ngIf="selectedProcess && selectedProcess.niveau && selectedProcess.niveau < 3"
             class="btn-primary" (click)="initiateAddChild()">
-            + Ajouter un sous-processus
+            <mat-icon>add</mat-icon>
+            Ajouter un sous-processus
           </button>
         </div>
 
@@ -200,8 +201,9 @@
 
     <!-- Bouton d'ajout d'événement (seulement pour les processus sans enfants) -->
     <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button
-      style="margin-bottom: 10px;" class="btn btn-primary" (click)="createNewEvent()">
-      + Ajouter évènement redouté
+      style="margin-bottom: 10px;" class="btn-primary" (click)="createNewEvent()">
+      <mat-icon>add</mat-icon>
+      Ajouter évènement redouté
     </button>
 
     <div *ngIf="riskDataSource.data.length > 0; else noRisk">

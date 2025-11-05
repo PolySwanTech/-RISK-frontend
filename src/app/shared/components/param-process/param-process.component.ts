@@ -76,6 +76,12 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
   @Input() cartoMode: boolean = true
 
+  // Propriétés pour sauvegarder l'état de l'arborescence
+  private expandedBuIds = new Set<string>();
+  private expandedProcessIds = new Set<string>();
+  private selectedBuId: string | null = null;
+  private selectedProcessId: string | null = null;
+
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService);
   private route = inject(ActivatedRoute);
@@ -94,7 +100,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       icon: "add",
       action: () => this.addBu(),
       permission: PermissionName.MANAGE_PROCESS,
-      show: true
+      show: !this.cartoMode
     }
   ]
 
@@ -113,7 +119,12 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     this.entitiesService.loadEntities().subscribe({
       next: (bus) => {
         this.businessUnits = bus;
-        console.log(bus)
+        
+        // Restaurer l'état d'expansion après le chargement
+        this.restoreExpansionState();
+        
+        // Restaurer la sélection
+        this.restoreSelection();
       },
       error: (err) => console.error("Erreur lors du chargement des BU :", err)
     });
@@ -132,7 +143,135 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // ============================================
+  // MÉTHODES DE SAUVEGARDE/RESTAURATION DE L'ÉTAT
+  // ============================================
+
+  private saveExpansionState(): void {
+    this.expandedBuIds.clear();
+    this.expandedProcessIds.clear();
+
+    const saveBuState = (bu: BusinessUnit) => {
+      if (bu.expanded) {
+        this.expandedBuIds.add(bu.id);
+      }
+      
+      // Sauvegarder l'état des processus
+      bu.process?.forEach(proc => this.saveProcessState(proc));
+      
+      // Récursif pour les sous-BU
+      bu.children?.forEach(saveBuState);
+    };
+
+    this.businessUnits.forEach(saveBuState);
+    
+    // Sauvegarder les sélections
+    this.selectedBuId = this.selectedBu?.id || null;
+    this.selectedProcessId = this.selectedProcess?.id || null;
+  }
+
+  private saveProcessState(process: Process): void {
+    if (process.expanded) {
+      this.expandedProcessIds.add(process.id);
+    }
+    process.enfants?.forEach(child => this.saveProcessState(child));
+  }
+
+  private restoreExpansionState(): void {
+    const restoreBuState = (bu: BusinessUnit) => {
+      if (this.expandedBuIds.has(bu.id)) {
+        bu.expanded = true;
+      }
+      
+      // Restaurer l'état des processus
+      bu.process?.forEach(proc => this.restoreProcessState(proc));
+      
+      // Récursif pour les sous-BU
+      bu.children?.forEach(restoreBuState);
+    };
+
+    this.businessUnits.forEach(restoreBuState);
+  }
+
+  private restoreProcessState(process: Process): void {
+    if (this.expandedProcessIds.has(process.id)) {
+      process.expanded = true;
+    }
+    process.enfants?.forEach(child => this.restoreProcessState(child));
+  }
+
+  private restoreSelection(): void {
+    if (this.selectedBuId) {
+      const bu = this.findBuById(this.selectedBuId);
+      if (bu) {
+        this.selectBu(bu);
+      }
+    }
+    
+    if (this.selectedProcessId) {
+      const process = this.findProcessById(this.selectedProcessId);
+      if (process) {
+        this.selectProcess(process);
+      }
+    }
+  }
+
+  private findBuById(id: string): BusinessUnit | null {
+    const findRecursive = (buList: BusinessUnit[]): BusinessUnit | null => {
+      for (const bu of buList) {
+        if (bu.id === id) return bu;
+        if (bu.children?.length) {
+          const found = findRecursive(bu.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    return findRecursive(this.businessUnits);
+  }
+
+  private findProcessById(id: string): Process | null {
+    const findInProcessList = (processes: Process[]): Process | null => {
+      for (const proc of processes) {
+        if (proc.id === id) return proc;
+        if (proc.enfants?.length) {
+          const found = findInProcessList(proc.enfants);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    for (const bu of this.businessUnits) {
+      const found = findInProcessList(bu.process || []);
+      if (found) return found;
+      
+      if (bu.children?.length) {
+        const findInBuChildren = (buList: BusinessUnit[]): Process | null => {
+          for (const childBu of buList) {
+            const proc = findInProcessList(childBu.process || []);
+            if (proc) return proc;
+            if (childBu.children?.length) {
+              const found = findInBuChildren(childBu.children);
+              if (found) return found;
+            }
+          }
+          return null;
+        };
+        const found = findInBuChildren(bu.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  // ============================================
+  // MÉTHODES ORIGINALES (MODIFIÉES)
+  // ============================================
+
   addBu() {
+    this.saveExpansionState();
+    
     this.dialog.open(AddEntityDialogComponent, {
       width: '800px'
     }).afterClosed().subscribe(bu => {
@@ -144,6 +283,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   }
 
   addProcess(buId: string) {
+    this.saveExpansionState();
+    
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '800px',
       maxWidth: '95vw',
@@ -175,15 +316,12 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       this.loadPeriodsForBu(bu.id);
     }
 
-    // CORRECTION : Mise à jour immédiate du dataSource
     this.riskDataSource.data = this.viewedRisks;
-    console.log(this.riskDataSource.data);
 
     setTimeout(() => {
       this.riskDataSource.paginator = this.paginator;
       this.riskDataSource.sort = this.sort;
       this.paginator.firstPage();
-
     });
   }
 
@@ -337,6 +475,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   confirmDispatch() {
     if (!this.selectedProcess || !this.canConfirmDispatch()) return;
 
+    this.saveExpansionState();
+
     const newChildren: any[] = this.newSubprocesses.map((sp, index) => {
       const child = {
         name: sp.name,
@@ -345,8 +485,6 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       };
       return child;
     });
-
-    console.log(this.selectedProcess)
 
     const risksByChild: Map<number, RiskTemplate[]> = new Map();
     this.selectedProcess.risks.forEach(risk => {
@@ -397,6 +535,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
         this.showDispatchModal = false;
         this.newSubprocesses = [];
         this.riskDispatch = {};
+        this.ngOnInit();
       },
       error: (error) => {
         console.error('Erreur lors de la création des sous-processus ou réassignation:', error);
@@ -491,6 +630,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   createNewEvent(): void {
     const process = this.selectedProcess!
 
+    this.saveExpansionState();
+
     const dialogRef = this.dialog.open(CreateRisksComponent, {
       width: '800px',
       maxWidth: '95vw',
@@ -503,31 +644,26 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.snackBarService.info("Evènement de risque crée avec succès");
+        this.snackBarService.info("Evènement de risque créé avec succès");
         this.ngOnInit();
-        this.selectedProcess = process;
       }
     });
   }
 
   onRiskRowClick(risk: RiskTemplate, event: Event): void {
-    // Éviter de déclencher si on clique sur le bouton d'action
     const target = event.target as HTMLElement;
     if (target.closest('.action-cell button')) {
       return;
     }
 
-    // Si on n'est pas en mode carto, aller directement aux détails
     if (!this.cartoMode) {
       this.viewRiskDetails(risk);
       return;
     }
 
-    // Logique pour le mode carto
     const hasRiskBrut = risk.riskBrut && risk.riskBrut.length > 0;
     const hasRiskNet = risk.riskNet && risk.riskNet.length > 0;
 
-    // Trouver le process et la BU associés
     const foundProcess = this.findProcessByRiskId(risk.id);
     const foundBu = foundProcess ? this.findBuByProcess(foundProcess) : null;
 
@@ -545,12 +681,10 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
 
     if (!hasRiskBrut) {
-      // Pas d'évaluation brute → créer évaluation brute
       this.router.navigate(['cartographie', 'evaluation-brute'], {
         queryParams: { data: true, key: sessionStorageKey }
       });
     } else if (!hasRiskNet) {
-      // A évaluation brute mais pas nette → aller à l'évaluation nette
       this.router.navigate(['cartographie', 'evaluation-nette'], {
         queryParams: {
           data: true,
@@ -558,7 +692,6 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
         }
       });
     } else {
-      // A les deux évaluations → voir les détails
       this.viewRiskDetails(risk);
     }
   }
@@ -594,20 +727,19 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // ============================================
-  // NOUVELLES MÉTHODES POUR LE MENU CONTEXTUEL
-  // ============================================
-
   deleteBu(id: string) {
     this.confirmService.openConfirmDialog(
       "Confirmer la suppression",
       "Êtes-vous sûr de vouloir supprimer cette Business Unit ? Cette action est irréversible."
     ).subscribe(confirm => {
       if (confirm) {
+        this.saveExpansionState();
+        
         this.entitiesService.delete(id).subscribe({
           next: () => {
             this.snackBarService.info("Business Unit supprimée avec succès !");
             this.selectedBu = null;
+            this.selectedBuId = null;
             this.ngOnInit();
           },
           error: (err) => {
@@ -622,6 +754,9 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     if (event) {
       event.stopPropagation();
     }
+    
+    this.saveExpansionState();
+    
     this.dialog.open(AddEntityDialogComponent, {
       width: '800px',
       maxWidth: '95vw',

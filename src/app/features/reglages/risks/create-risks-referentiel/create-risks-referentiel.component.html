@@ -1,46 +1,55 @@
-<div class="body-container">
-  <app-go-back [title]="'Création d\'un risque référentiel'" />
+<app-base-popup 
+  [title]="data.riskId ? 'Modifier le risque référentiel' : 'Créer un risque référentiel'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
+  
+  <form [formGroup]="infoForm">
+    <!-- Section Informations principales -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">info</mat-icon>
+        <h3 class="section-title">Informations du risque</h3>
+      </div>
+      <div class="section-content">
+        <!-- Titre -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Titre du risque</mat-label>
+          <input matInput formControlName="libellePerso" placeholder="Entrez le titre du risque" />
+          <mat-icon matPrefix>title</mat-icon>
+        </mat-form-field>
 
-  <section>
-    <div class="form-container">
-      <h2>{{ pageTitle }}</h2>
-
-      <!-- le stepper n’est affiché que lorsque l’objet risk est prêt -->
-      @if (risk) {
-      <form [formGroup]="infoForm">
-            <!-- Titre --------------------------------------------------------- -->
-            <mat-form-field class="full-width">
-              <mat-label>Titre du risque</mat-label>
-              <input matInput formControlName="libellePerso" placeholder="Entrez le titre du risque" />
-            </mat-form-field>
-
-            <!-- Catégorie L1 -------------------------------------------------- -->
-            <button *ngIf="!isBaloisPreselected" style="margin-bottom: 20px;" mat-stroked-button (click)="openSubCategorySelector()">
-              <mat-icon>add</mat-icon>
-              Associer un Risque Bâlois*
-            </button>
-            <mat-chip-listbox style="margin-bottom: 20px;" *ngIf="balois">
-              <mat-chip> Catégorie Bâloise : {{ balois.label }}</mat-chip>
-            </mat-chip-listbox>
-
-            <!-- Description --------------------------------------------------- -->
-            <mat-form-field class="full-width">
-              <mat-label>Description du risque</mat-label>
-              <textarea matInput formControlName="description" placeholder="Entrez la description"></textarea>
-            </mat-form-field>
-
-            <div class="actions">
-
-              <button mat-raised-button class="btn-red" matStepperPrevious *ngIf="risk.id">
-                Annuler
-              </button>
-
-              <button mat-raised-button class="btn-primary" (click)="submit()" [disabled]="infoForm.invalid">
-                Soumettre
-              </button>
-            </div>
-          </form>
-      }
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description du risque</mat-label>
+          <textarea matInput formControlName="description" placeholder="Entrez la description" rows="4"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+        </mat-form-field>
+      </div>
     </div>
-  </section>
-</div>
+
+    <!-- Section Catégorie Bâloise -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">category</mat-icon>
+        <h3 class="section-title">Catégorie Bâloise*</h3>
+        <div class="section-header-actions" *ngIf="!isBaloisPreselected">
+          <button mat-raised-button type="button" class="btn-purple" (click)="openSubCategorySelector()">
+            <mat-icon>add</mat-icon>
+            Associer un Risque Bâlois
+          </button>
+        </div>
+      </div>
+      <div class="association-content">
+        <mat-chip-listbox *ngIf="balois">
+          <mat-chip>{{ balois.label }}</mat-chip>
+        </mat-chip-listbox>
+        <div class="empty-state" *ngIf="!balois">
+          <mat-icon>category</mat-icon>
+          <p>Aucune catégorie Bâloise sélectionnée. Cliquez sur "Associer un Risque Bâlois" pour commencer.</p>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-base-popup>
