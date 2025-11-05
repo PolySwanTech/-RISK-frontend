@@ -224,6 +224,7 @@ mat-drawer-content {
 
 .actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
 }
 

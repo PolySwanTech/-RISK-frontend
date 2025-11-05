@@ -51,7 +51,7 @@ import { MatButton } from "@angular/material/button";
     MatSortModule,
     MatMenuModule,
     MatButton
-],
+  ],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
 })
@@ -124,7 +124,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
     // Adapter les colonnes selon le mode
     this.riskDisplayedColumns = this.cartoMode
-      ? ['reference','libelle', 'description', 'riskBrut', 'riskNet']
+      ? ['reference', 'libelle', 'description', 'riskBrut', 'riskNet']
       : ['reference', 'libelle', 'description', 'riskBrut', 'riskNet'];
 
     if (this.route.snapshot.queryParams["create"]) {
@@ -180,9 +180,9 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     console.log(this.riskDataSource.data);
 
     setTimeout(() => {
-        this.riskDataSource.paginator = this.paginator;
-        this.riskDataSource.sort = this.sort;
-        this.paginator.firstPage();
+      this.riskDataSource.paginator = this.paginator;
+      this.riskDataSource.sort = this.sort;
+      this.paginator.firstPage();
 
     });
   }
@@ -193,7 +193,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     this.newSubprocesses = [];
     this.riskDispatch = {};
     this.viewedRisks = this.getAllRisksRecursive(process);
-   
+
     this.riskDataSource.data = this.viewedRisks;
   }
 
@@ -598,7 +598,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
   deleteBu(id: string) {
     this.confirmService.openConfirmDialog(
-      "Confirmer la suppression", 
+      "Confirmer la suppression",
       "Êtes-vous sûr de vouloir supprimer cette Business Unit ? Cette action est irréversible."
     ).subscribe(confirm => {
       if (confirm) {
@@ -621,8 +621,13 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       event.stopPropagation();
     }
     this.dialog.open(AddEntityDialogComponent, {
-      width: '500px',
-      data: entite || null
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
+      data: { ...entite,
+        enableDraft: false
+       }
     }).afterClosed().subscribe(bu => {
       if (bu) {
         if (bu.id) {
