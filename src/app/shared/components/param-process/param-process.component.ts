@@ -30,7 +30,7 @@ import { EnumLabelPipe } from '../../pipes/enum-label.pipe';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
-import { MatButton } from "@angular/material/button";
+import { MatButtonModule } from "@angular/material/button";
 
 @Component({
   selector: 'app-process-manager',
@@ -50,7 +50,7 @@ import { MatButton } from "@angular/material/button";
     EnumLabelPipe,
     MatSortModule,
     MatMenuModule,
-    MatButton
+    MatButtonModule
   ],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
@@ -337,14 +337,16 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   confirmDispatch() {
     if (!this.selectedProcess || !this.canConfirmDispatch()) return;
 
-    const newChildren: Process[] = this.newSubprocesses.map((sp, index) => {
-      const child = new Process(
-        sp.name,
-        this.selectedProcess!.bu,
-        this.selectedProcess!.id
-      );
+    const newChildren: any[] = this.newSubprocesses.map((sp, index) => {
+      const child = {
+        name: sp.name,
+        buId: this.selectedProcess!.buId,
+        parentId: this.selectedProcess!.id
+      };
       return child;
     });
+
+    console.log(this.selectedProcess)
 
     const risksByChild: Map<number, RiskTemplate[]> = new Map();
     this.selectedProcess.risks.forEach(risk => {
@@ -362,7 +364,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     const createRequests = newChildren.map((child, index) => {
       return this.processService.createProcess({
         name: child.name,
-        bu: this.buId,
+        bu: child.buId,
         parentId: child.parentId
       }).pipe(
         switchMap(createdProcess => {
@@ -625,9 +627,10 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       maxWidth: '95vw',
       maxHeight: '90vh',
       panelClass: 'custom-dialog-container',
-      data: { ...entite,
+      data: {
+        ...entite,
         enableDraft: false
-       }
+      }
     }).afterClosed().subscribe(bu => {
       if (bu) {
         if (bu.id) {

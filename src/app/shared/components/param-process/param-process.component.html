@@ -152,8 +152,8 @@
             <div class="form-row">
               <label>Sous-processus {{ i + 1 }}</label>
               <input type="text" [(ngModel)]="sp.name" placeholder="Nom du sous-processus" class="form-control">
-              <button *ngIf="newSubprocesses.length > 2" class="btn-icon btn-danger" (click)="removeSubprocess(i)">
-                ✕
+              <button mat-icon-button *ngIf="newSubprocesses.length > 2" (click)="removeSubprocess(i)">
+                <mat-icon>close</mat-icon>
               </button>
             </div>
           </div>
