@@ -1,26 +1,35 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToDoService } from '../../core/services/to-do/to-do.service';
 import { ToDoLabels, ToDoType } from '../../core/enum/to-do.enum';
 import { ToDo } from '../../core/models/ToDo';
-import { Router } from '@angular/router';
-import { MatTooltipModule } from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-todo',
-  imports: [CommonModule, DatePipe, MatTooltipModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    DatePipe,
+    MatCardModule,
+    MatChipsModule,
+    MatButtonToggleModule,
+    MatTooltipModule
+  ],
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss'
 })
 export class TodoComponent implements OnInit {
-
   private toDoService = inject(ToDoService);
   private router = inject(Router);
 
   toDoItems: ToDo[] = [];
-
   currentView: 'grouped' | 'unified' = 'grouped';
-  currentTypeFilter : { value: ToDoType | null, label: string } = { value: null, label: 'Tous' };
+  currentTypeFilter: { value: ToDoType | null, label: string } = { value: null, label: 'Tous' };
 
   collapsedGroups = {
     [ToDoType.ACTION_PLAN]: false,
@@ -35,7 +44,6 @@ export class TodoComponent implements OnInit {
     { value: ToDoType.CONTROL, label: ToDoLabels[ToDoType.CONTROL] }
   ];
 
-
   todoLabels = ToDoLabels;
   todoEnum = ToDoType;
 
@@ -45,36 +53,38 @@ export class TodoComponent implements OnInit {
     });
   }
 
-  setView(view: 'grouped' | 'unified') {
-    this.currentView = view;
-  }
-
-  setTypeFilter(filter: { value: ToDoType | null, label: string }) {
-    this.currentTypeFilter = filter;
+  setTypeFilter(filter: { value: ToDoType | null, label: string } | { value: ToDoType | null, label: string }[]) {
+    // Handle both single filter and array (from mat-chip-listbox change event)
+    if (Array.isArray(filter)) {
+      this.currentTypeFilter = filter[0] || this.typeFilters[0];
+    } else {
+      this.currentTypeFilter = filter;
+    }
   }
 
   toggleGroup(groupType: ToDoType) {
     this.collapsedGroups[groupType] = !this.collapsedGroups[groupType];
   }
 
-  getItemCount(type : ToDoType): number {
+  getItemCount(type: ToDoType): number {
     return this.getFilteredItems(type).length || 0;
   }
 
-  getFilteredItems(type : ToDoType) {
+  getFilteredItems(type: ToDoType) {
     return this.toDoItems.filter(item => item.type == type);
   }
 
   getAllFilteredItems() {
-    return this.currentTypeFilter.value == null ? this.toDoItems : this.getFilteredItems(this.currentTypeFilter.value);
+    return this.currentTypeFilter.value == null 
+      ? this.toDoItems 
+      : this.getFilteredItems(this.currentTypeFilter.value);
   }
 
-
-  getFilteredGroupCount(type : ToDoType): number {
+  getFilteredGroupCount(type: ToDoType): number {
     return this.getFilteredItems(type).length;
   }
 
-  shouldShowGroup(type : ToDoType): boolean {
+  shouldShowGroup(type: ToDoType): boolean {
     return this.currentTypeFilter.value == null || this.currentTypeFilter.value === type;
   }
 
@@ -84,27 +94,19 @@ export class TodoComponent implements OnInit {
 
   getTypeLabel(type: string): string {
     switch (type) {
-      case ToDoType.ACTION_PLAN:
-        return 'plans';
-      case ToDoType.INCIDENT:
-        return 'incidents';
-      case ToDoType.CONTROL:
-        return 'controls';
-      default:
-        return type;
+      case ToDoType.ACTION_PLAN: return 'plans';
+      case ToDoType.INCIDENT: return 'incidents';
+      case ToDoType.CONTROL: return 'controls';
+      default: return type;
     }
   }
 
   getDateLabel(item: ToDo): string {
     switch (item.type) {
-      case ToDoType.ACTION_PLAN:
-        return 'Échéance';
-      case ToDoType.INCIDENT:
-        return 'Créé';
-      case ToDoType.CONTROL:
-        return 'Planifié';
-      default:
-        return 'Date';
+      case ToDoType.ACTION_PLAN: return 'Échéance';
+      case ToDoType.INCIDENT: return 'Créé';
+      case ToDoType.CONTROL: return 'Planifié';
+      default: return 'Date';
     }
   }
 

@@ -59,6 +59,10 @@
     margin-bottom: 4px;
 }
 
+.actions {
+    flex-wrap: wrap;
+}
+
 .process-item:hover {
     background: #f7fafc;
 }

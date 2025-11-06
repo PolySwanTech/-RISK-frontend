@@ -1,50 +1,53 @@
 <div class="container">
-  <!-- Header -->
-  <div class="header">
-    <h1>À faire</h1>
-    <p class="subtitle">Tous vos éléments en attente de traitement</p>
+  <!-- Header Card -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>À faire</mat-card-title>
+      <mat-card-subtitle>Tous vos éléments en attente de traitement</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="stats">
+        <mat-chip-set>
+          <mat-chip class="stat-chip plans">
+            {{ getItemCount(todoEnum.ACTION_PLAN) }} Plans d'action
+          </mat-chip>
+          <mat-chip class="stat-chip incidents">
+            {{ getItemCount(todoEnum.INCIDENT) }} Incidents
+          </mat-chip>
+          <mat-chip class="stat-chip controls">
+            {{ getItemCount(todoEnum.CONTROL) }} Contrôles
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-    <div class="stats">
-      <div class="stat plans">
-        <span class="dot">●</span>
-        <span>{{ getItemCount(todoEnum.ACTION_PLAN) }} Plans d'action</span>
-      </div>
-      <div class="stat incidents">
-        <span class="dot">●</span>
-        <span>{{ getItemCount(todoEnum.INCIDENT) }} Incidents</span>
-      </div>
-      <div class="stat controls">
-        <span class="dot">●</span>
-        <span>{{ getItemCount(todoEnum.CONTROL) }} Contrôles</span>
-      </div>
-    </div>
-  </div>
+  <!-- Filters Card -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filter-row">
+        <!-- View Toggle -->
+        <mat-button-toggle-group [(value)]="currentView" class="view-toggle">
+          <mat-button-toggle value="grouped">Vue groupée</mat-button-toggle>
+          <mat-button-toggle value="unified">Vue unifiée</mat-button-toggle>
+        </mat-button-toggle-group>
 
-  <!-- Filters -->
-  <div class="filters">
-    <div class="filter-row">
-      <!-- View Toggle -->
-      <div class="view-toggle">
-        <button class="view-btn" [class.active]="currentView === 'grouped'" (click)="setView('grouped')">
-          Vue groupée
-        </button>
-        <button class="view-btn" [class.active]="currentView === 'unified'" (click)="setView('unified')">
-          Vue unifiée
-        </button>
+        <!-- Type Filter -->
+        <div class="filter-groups">
+          <span class="filter-label">Filtrer :</span>
+          <mat-chip-listbox [value]="currentTypeFilter" 
+                            (change)="setTypeFilter($event.value)" 
+                            class="filter-chips">
+            <mat-chip-option *ngFor="let filter of typeFilters" [value]="filter">
+              {{ filter.label }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
       </div>
+    </mat-card-content>
+  </mat-card>
 
-      <!-- Type Filter -->
-      <div class="filter-group">
-        <span class="filter-label">Filtrer :</span>
-        <button *ngFor="let filter of typeFilters" class="filter-btn"
-          [class.active]="currentTypeFilter.value === filter.value" (click)="setTypeFilter(filter)">
-          {{ filter.label }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Content -->
+  <!-- Content (Version originale) -->
   <div class="content" [class.unified-view]="currentView === 'unified'">
 
     <!-- Grouped View -->
