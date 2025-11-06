@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { SelectRiskEventComponent } from "../../../shared/components/select-risk-event/select-risk-event.component";
@@ -7,10 +6,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
 import { ActivatedRoute } from '@angular/router';
+import { ProcessManagerComponent } from "../../../shared/components/param-process/param-process.component";
 
 @Component({
   selector: 'app-reglages',
-  imports: [BuProcessAccordionComponent, GoBackComponent, MatTabsModule, SelectRiskEventComponent],
+  imports: [GoBackComponent, MatTabsModule, SelectRiskEventComponent, ProcessManagerComponent],
   templateUrl: './reglages.component.html',
   styleUrl: './reglages.component.scss'
 })

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoBackButton, GoBackComponent } from '../go-back/go-back.component';
@@ -21,15 +21,41 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { AddEntityDialogComponent } from '../../../features/reglages/add-entity-dialog/add-entity-dialog.component';
 import { RiskEvaluationService } from '../../../core/services/risk-evaluation/risk-evaluation.service';
 import { EvaluationFrequency } from '../../../core/enum/evaluation-frequency.enum';
+import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatCardModule } from "@angular/material/card";
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { EnumLabelPipe } from '../../pipes/enum-label.pipe';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatMenuModule } from '@angular/material/menu';
+import { ConfirmService } from '../../../core/services/confirm/confirm.service';
+import { MatButtonModule } from "@angular/material/button";
 
 @Component({
   selector: 'app-process-manager',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoBackComponent, MatIconModule, MatFormFieldModule, MatSelectModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    GoBackComponent,
+    MatIconModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatPaginatorModule,
+    MatCardModule,
+    MatTableModule,
+    MatChipsModule,
+    MatTooltipModule,
+    EnumLabelPipe,
+    MatSortModule,
+    MatMenuModule,
+    MatButtonModule
+  ],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
 })
-export class ProcessManagerComponent implements OnInit {
+export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
   businessUnits: BusinessUnit[] = [];
   processes: Process[] = [];
@@ -41,16 +67,26 @@ export class ProcessManagerComponent implements OnInit {
   newSubprocesses: Array<{ name: string }> = [];
   riskDispatch: { [riskId: string]: number } = {};
 
+  riskDisplayedColumns: string[] = ['libelle', 'description', 'riskBrut', 'riskNet'];
+  riskDataSource = new MatTableDataSource<RiskTemplate>([]);
+
   viewedRisks: RiskTemplate[] = []
 
   buId: string = ''
 
-  cartoMode: boolean = false
+  @Input() cartoMode: boolean = true
+
+  // Propriétés pour sauvegarder l'état de l'arborescence
+  private expandedBuIds = new Set<string>();
+  private expandedProcessIds = new Set<string>();
+  private selectedBuId: string | null = null;
+  private selectedProcessId: string | null = null;
 
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private confirmService = inject(ConfirmService);
 
   private processService = inject(ProcessService);
   private riskService = inject(RiskService);
@@ -58,77 +94,214 @@ export class ProcessManagerComponent implements OnInit {
   private riskEvaluationService = inject(RiskEvaluationService);
   private risksCache = new Map<string, RiskTemplate[]>();
 
-
   goBackButtons: GoBackButton[] = [
     {
       label: "Ajouter une entité",
       icon: "add",
       action: () => this.addBu(),
       permission: PermissionName.MANAGE_PROCESS,
-      show: true
+      show: !this.cartoMode
     }
   ]
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  ngAfterViewInit() {
+    if (this.paginator && this.sort) {
+      this.riskDataSource.paginator = this.paginator;
+      this.riskDataSource.sort = this.sort;
+      this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+    }
+  }
 
   ngOnInit() {
     this.entitiesService.loadEntities().subscribe({
       next: (bus) => {
         this.businessUnits = bus;
+        
+        // Restaurer l'état d'expansion après le chargement
+        this.restoreExpansionState();
+        
+        // Restaurer la sélection
+        this.restoreSelection();
       },
       error: (err) => console.error("Erreur lors du chargement des BU :", err)
     });
 
-    this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto'] || 'false');
-
-    if (this.route.snapshot.queryParams["create"]) {
-      this.addProcess();
-    }
-    else{    
+    if (this.route.snapshot.queryParams['carto']) {
       this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
     }
-}
 
-  onBuChange(): void {
-    if (!this.selectedBu) {
-      this.processes = [];
-      this.selectedProcess = null;
-      return;
+    // Adapter les colonnes selon le mode
+    this.riskDisplayedColumns = this.cartoMode
+      ? ['reference', 'libelle', 'description', 'riskBrut', 'riskNet']
+      : ['reference', 'libelle', 'description', 'riskBrut', 'riskNet'];
+
+    if (this.route.snapshot.queryParams["create"]) {
+      this.addProcess('');
     }
-    this.processes =this.selectedBu.process;
   }
 
-  addBu() {
-      this.dialog.open(AddEntityDialogComponent,
-        {
-          width: '800px'
-        }
-      ).afterClosed().subscribe(bu => {
-        if (!bu) return;
-        this.entitiesService.save(bu).subscribe(resp => {
-        })
-      })
-    }
+  // ============================================
+  // MÉTHODES DE SAUVEGARDE/RESTAURATION DE L'ÉTAT
+  // ============================================
 
-  addProcess() {
+  private saveExpansionState(): void {
+    this.expandedBuIds.clear();
+    this.expandedProcessIds.clear();
+
+    const saveBuState = (bu: BusinessUnit) => {
+      if (bu.expanded) {
+        this.expandedBuIds.add(bu.id);
+      }
+      
+      // Sauvegarder l'état des processus
+      bu.process?.forEach(proc => this.saveProcessState(proc));
+      
+      // Récursif pour les sous-BU
+      bu.children?.forEach(saveBuState);
+    };
+
+    this.businessUnits.forEach(saveBuState);
+    
+    // Sauvegarder les sélections
+    this.selectedBuId = this.selectedBu?.id || null;
+    this.selectedProcessId = this.selectedProcess?.id || null;
+  }
+
+  private saveProcessState(process: Process): void {
+    if (process.expanded) {
+      this.expandedProcessIds.add(process.id);
+    }
+    process.enfants?.forEach(child => this.saveProcessState(child));
+  }
+
+  private restoreExpansionState(): void {
+    const restoreBuState = (bu: BusinessUnit) => {
+      if (this.expandedBuIds.has(bu.id)) {
+        bu.expanded = true;
+      }
+      
+      // Restaurer l'état des processus
+      bu.process?.forEach(proc => this.restoreProcessState(proc));
+      
+      // Récursif pour les sous-BU
+      bu.children?.forEach(restoreBuState);
+    };
+
+    this.businessUnits.forEach(restoreBuState);
+  }
+
+  private restoreProcessState(process: Process): void {
+    if (this.expandedProcessIds.has(process.id)) {
+      process.expanded = true;
+    }
+    process.enfants?.forEach(child => this.restoreProcessState(child));
+  }
+
+  private restoreSelection(): void {
+    if (this.selectedBuId) {
+      const bu = this.findBuById(this.selectedBuId);
+      if (bu) {
+        this.selectBu(bu);
+      }
+    }
+    
+    if (this.selectedProcessId) {
+      const process = this.findProcessById(this.selectedProcessId);
+      if (process) {
+        this.selectProcess(process);
+      }
+    }
+  }
+
+  private findBuById(id: string): BusinessUnit | null {
+    const findRecursive = (buList: BusinessUnit[]): BusinessUnit | null => {
+      for (const bu of buList) {
+        if (bu.id === id) return bu;
+        if (bu.children?.length) {
+          const found = findRecursive(bu.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    return findRecursive(this.businessUnits);
+  }
+
+  private findProcessById(id: string): Process | null {
+    const findInProcessList = (processes: Process[]): Process | null => {
+      for (const proc of processes) {
+        if (proc.id === id) return proc;
+        if (proc.enfants?.length) {
+          const found = findInProcessList(proc.enfants);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    for (const bu of this.businessUnits) {
+      const found = findInProcessList(bu.process || []);
+      if (found) return found;
+      
+      if (bu.children?.length) {
+        const findInBuChildren = (buList: BusinessUnit[]): Process | null => {
+          for (const childBu of buList) {
+            const proc = findInProcessList(childBu.process || []);
+            if (proc) return proc;
+            if (childBu.children?.length) {
+              const found = findInBuChildren(childBu.children);
+              if (found) return found;
+            }
+          }
+          return null;
+        };
+        const found = findInBuChildren(bu.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  // ============================================
+  // MÉTHODES ORIGINALES (MODIFIÉES)
+  // ============================================
+
+  addBu() {
+    this.saveExpansionState();
+    
+    this.dialog.open(AddEntityDialogComponent, {
+      width: '800px'
+    }).afterClosed().subscribe(bu => {
+      if (!bu) return;
+      this.entitiesService.save(bu).subscribe(resp => {
+        this.ngOnInit();
+      })
+    })
+  }
+
+  addProcess(buId: string) {
+    this.saveExpansionState();
+    
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '800px',
       maxWidth: '95vw',
       maxHeight: '90vh',
-      panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+      panelClass: 'custom-dialog-container',
       disableClose: false,
       autoFocus: false,
-      data: { buId: this.buId }
+      data: { buId: buId }
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      // Recharger les données
       this.ngOnInit();
-
-      // Supprimer le queryParam `create`
       this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: { create: null }, // 👈 Supprime 'create'
-        queryParamsHandling: 'merge',  // 👈 Garde les autres queryParams (comme buId)
-        replaceUrl: true               // 👈 Évite d’ajouter une nouvelle entrée dans l’historique du navigateur
+        queryParams: { create: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
       });
     });
   }
@@ -138,11 +311,18 @@ export class ProcessManagerComponent implements OnInit {
     this.selectedProcess = null;
     this.showDispatchModal = false;
     this.viewedRisks = this.collectRisksFromBu(bu);
-    console.log(this.viewedRisks)
 
     if (this.cartoMode && bu.id) {
       this.loadPeriodsForBu(bu.id);
     }
+
+    this.riskDataSource.data = this.viewedRisks;
+
+    setTimeout(() => {
+      this.riskDataSource.paginator = this.paginator;
+      this.riskDataSource.sort = this.sort;
+      this.paginator.firstPage();
+    });
   }
 
   selectProcess(process: Process) {
@@ -151,29 +331,26 @@ export class ProcessManagerComponent implements OnInit {
     this.newSubprocesses = [];
     this.riskDispatch = {};
     this.viewedRisks = this.getAllRisksRecursive(process);
+
+    this.riskDataSource.data = this.viewedRisks;
   }
 
-
   chooseRiskForCarto(risk: RiskTemplate) {
-    // 🔍 Trouver le process qui contient ce risque
     const foundProcess = this.findProcessByRiskId(risk.id);
     if (!foundProcess) {
       console.warn("Aucun process trouvé pour ce risque :", risk);
       return;
     }
 
-    // 🔍 Trouver la BU parente
     const foundBu = this.findBuByProcess(foundProcess);
     if (!foundBu) {
       console.warn("Aucune BU trouvée pour le process :", foundProcess);
       return;
     }
 
-    // ✅ Mettre à jour le contexte sélectionné
     this.selectedBu = foundBu;
     this.selectedProcess = foundProcess;
 
-    // 🧩 Enregistrer dans le sessionStorage pour la carto
     const sessionStorageKey = "object_for_carto";
     const obj = {
       bu: { id: foundBu.id, name: foundBu.name },
@@ -182,9 +359,7 @@ export class ProcessManagerComponent implements OnInit {
     };
 
     sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
-    console.log("➡️ Contexte cartographie enregistré :", obj);
 
-    // 🚀 Redirection si on est en mode cartographie
     if (this.cartoMode) {
       this.router.navigate(['cartographie', 'create'], {
         queryParams: { data: true, key: sessionStorageKey }
@@ -192,9 +367,8 @@ export class ProcessManagerComponent implements OnInit {
     }
   }
 
-
-  // Méthode récursive pour collecter tous les risques
   private getAllRisksRecursive(process: Process, currentPeriod?: string): RiskTemplate[] {
+    this.riskDataSource.data = [];
     const risks: RiskTemplate[] = process.risks?.map(risk => {
       const frequency = process.bu?.evaluationFrequency;
       if (currentPeriod && frequency) {
@@ -213,7 +387,6 @@ export class ProcessManagerComponent implements OnInit {
       }
     }
 
-    console.debug(`${process.name}: ${risks.length} risques collectés`);
     return risks;
   }
 
@@ -263,9 +436,8 @@ export class ProcessManagerComponent implements OnInit {
     }
   }
 
-  
-
   private collectRisksFromBu(bu: BusinessUnit): RiskTemplate[] {
+    this.riskDataSource.data = [];
     if (this.risksCache.has(bu.id)) {
       return this.risksCache.get(bu.id)!;
     }
@@ -287,7 +459,6 @@ export class ProcessManagerComponent implements OnInit {
     return result;
   }
 
-
   canConfirmDispatch(): boolean {
     if (this.newSubprocesses.length < 2) return false;
 
@@ -304,21 +475,21 @@ export class ProcessManagerComponent implements OnInit {
   confirmDispatch() {
     if (!this.selectedProcess || !this.canConfirmDispatch()) return;
 
-    const newChildren: Process[] = this.newSubprocesses.map((sp, index) => {
-      const child = new Process(
-        sp.name,
-        this.selectedProcess!.bu,
-        this.selectedProcess!.id
-      );
+    this.saveExpansionState();
+
+    const newChildren: any[] = this.newSubprocesses.map((sp, index) => {
+      const child = {
+        name: sp.name,
+        buId: this.selectedProcess!.buId,
+        parentId: this.selectedProcess!.id
+      };
       return child;
     });
 
-    // Dispatcher les risques avant de créer les processus
     const risksByChild: Map<number, RiskTemplate[]> = new Map();
     this.selectedProcess.risks.forEach(risk => {
       const targetIndex = this.riskDispatch[risk.id];
       if (targetIndex !== undefined) {
-        // Convertir en number si c'est une string
         const indexAsNumber = typeof targetIndex === 'string' ? parseInt(targetIndex, 10) : targetIndex;
 
         if (!risksByChild.has(indexAsNumber)) {
@@ -328,18 +499,14 @@ export class ProcessManagerComponent implements OnInit {
       }
     });
 
-    // Créer chaque sous-processus via le service
     const createRequests = newChildren.map((child, index) => {
       return this.processService.createProcess({
         name: child.name,
-        bu: this.buId,
+        bu: child.buId,
         parentId: child.parentId
       }).pipe(
         switchMap(createdProcess => {
-          // Mettre à jour les risques avec l'ID réel du processus créé
           const risksToUpdate = risksByChild.get(index) || [];
-
-          // Créer les requêtes de réassignation pour chaque risque
           const reassignRequests = risksToUpdate.map(risk =>
             this.riskService.reasign(risk.id, createdProcess.id).pipe(
               tap(() => {
@@ -349,7 +516,6 @@ export class ProcessManagerComponent implements OnInit {
             )
           );
 
-          // Attendre que toutes les réassignations soient terminées
           return (reassignRequests.length > 0 ? forkJoin(reassignRequests) : of([])).pipe(
             map(() => {
               createdProcess.risks = risksToUpdate;
@@ -358,25 +524,21 @@ export class ProcessManagerComponent implements OnInit {
           );
         }),
         tap(createdProcess => {
-          // Ajouter le processus créé aux enfants
           this.selectedProcess!.enfants.push(createdProcess);
         })
       );
     });
 
-    // Exécuter toutes les requêtes en parallèle
     forkJoin(createRequests).subscribe({
       next: () => {
-        // Vider les risques du processus parent
         this.selectedProcess!.risks = [];
-
         this.showDispatchModal = false;
         this.newSubprocesses = [];
         this.riskDispatch = {};
+        this.ngOnInit();
       },
       error: (error) => {
         console.error('Erreur lors de la création des sous-processus ou réassignation:', error);
-        // Optionnel : afficher un message d'erreur à l'utilisateur
       }
     });
   }
@@ -386,23 +548,23 @@ export class ProcessManagerComponent implements OnInit {
   }
 
   loadPeriodsForBu(buId: string) {
-  this.riskEvaluationService.getPeriodsByBu(buId).subscribe({
-    next: (periodsFromDb: string[]) => {
-      const current = this.getCurrentPeriod();
-      const uniquePeriods = new Set([...periodsFromDb, current]);
-      this.periods = Array.from(uniquePeriods).sort().reverse();
-      this.selectedPeriod = current;
-    },
-    error: (err) => console.error("Erreur lors du chargement des périodes :", err)
-  });
-}
+    this.riskEvaluationService.getPeriodsByBu(buId).subscribe({
+      next: (periodsFromDb: string[]) => {
+        const current = this.getCurrentPeriod();
+        const uniquePeriods = new Set([...periodsFromDb, current]);
+        this.periods = Array.from(uniquePeriods).sort().reverse();
+        this.selectedPeriod = current;
+      },
+      error: (err) => console.error("Erreur lors du chargement des périodes :", err)
+    });
+  }
 
   getCurrentPeriod(): string {
     const year = new Date().getFullYear();
     const month = new Date().getMonth() + 1;
 
     const semester = month <= 6 ? 'S1' : 'S2';
-    if (!this.selectedBu && this.selectedBu!.evaluationFrequency === EvaluationFrequency.SEMESTER) {
+    if (this.selectedBu && this.selectedBu.evaluationFrequency === EvaluationFrequency.SEMESTER) {
       return `${semester} ${year}`;
     }
     return `${year}`;
@@ -435,9 +597,6 @@ export class ProcessManagerComponent implements OnInit {
     return null;
   }
 
-  /**
-   * Recherche de la BU associée à un Process donné.
-   */
   private findBuByProcess(targetProcess: Process): BusinessUnit | null {
     for (const bu of this.businessUnits) {
       if (bu.process?.some(p => p.id === targetProcess.id)) {
@@ -465,24 +624,19 @@ export class ProcessManagerComponent implements OnInit {
   }
 
   viewRiskDetails(risk: RiskTemplate): void {
-    // const sessionStorageKey = "object_for_carto";
-    // const obj = {
-    //   bu: this.selectedBu ? { id: this.selectedBu.id, name: this.selectedBu.name } : null,
-    //   process: this.selectedProcess,
-    //   risk: risk
-    // };
     this.router.navigate(['reglages', 'risks', risk.id]);
-
   }
 
   createNewEvent(): void {
     const process = this.selectedProcess!
 
+    this.saveExpansionState();
+
     const dialogRef = this.dialog.open(CreateRisksComponent, {
       width: '800px',
       maxWidth: '95vw',
       maxHeight: '90vh',
-      panelClass: 'custom-dialog-container', // Classe CSS personnalisée
+      panelClass: 'custom-dialog-container',
       disableClose: false,
       autoFocus: false,
       data: { processId: process.id }
@@ -490,11 +644,147 @@ export class ProcessManagerComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.snackBarService.info("Evènement de risque crée avec succès");
+        this.snackBarService.info("Evènement de risque créé avec succès");
         this.ngOnInit();
-        this.selectedProcess = process
-        // reload les risques
       }
     });
+  }
+
+  onRiskRowClick(risk: RiskTemplate, event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target.closest('.action-cell button')) {
+      return;
+    }
+
+    if (!this.cartoMode) {
+      this.viewRiskDetails(risk);
+      return;
+    }
+
+    const hasRiskBrut = risk.riskBrut && risk.riskBrut.length > 0;
+    const hasRiskNet = risk.riskNet && risk.riskNet.length > 0;
+
+    const foundProcess = this.findProcessByRiskId(risk.id);
+    const foundBu = foundProcess ? this.findBuByProcess(foundProcess) : null;
+
+    if (!foundProcess || !foundBu) {
+      console.warn("Impossible de trouver le contexte pour ce risque");
+      return;
+    }
+
+    const sessionStorageKey = "object_for_carto";
+    const obj = {
+      bu: { id: foundBu.id, name: foundBu.name },
+      process: foundProcess,
+      risk: risk
+    };
+    sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
+
+    if (!hasRiskBrut) {
+      this.router.navigate(['cartographie', 'evaluation-brute'], {
+        queryParams: { data: true, key: sessionStorageKey }
+      });
+    } else if (!hasRiskNet) {
+      this.router.navigate(['cartographie', 'evaluation-nette'], {
+        queryParams: {
+          data: true,
+          key: sessionStorageKey
+        }
+      });
+    } else {
+      this.viewRiskDetails(risk);
+    }
+  }
+
+  getRiskBrutColor(risk: RiskTemplate): string {
+    if (!risk.riskBrut || risk.riskBrut.length === 0) {
+      return '#cbd5e1';
+    }
+    return risk.riskBrut[0].evaluation?.color || '#cbd5e1';
+  }
+
+  getRiskNetColor(risk: RiskTemplate): string {
+    if (!risk.riskNet || risk.riskNet.length === 0) {
+      return '#cbd5e1';
+    }
+    return risk.riskNet[0].evaluation?.color || '#cbd5e1';
+  }
+
+  getRiskTooltip(risk: RiskTemplate): string {
+    if (!this.cartoMode) {
+      return 'Cliquez pour voir les détails du risque';
+    }
+
+    const hasRiskBrut = risk.riskBrut && risk.riskBrut.length > 0;
+    const hasRiskNet = risk.riskNet && risk.riskNet.length > 0;
+
+    if (!hasRiskBrut) {
+      return 'Cliquez pour créer l\'évaluation brute';
+    } else if (!hasRiskNet) {
+      return 'Cliquez pour créer l\'évaluation nette';
+    } else {
+      return 'Cliquez pour voir les détails et gérer les évaluations';
+    }
+  }
+
+  deleteBu(id: string) {
+    this.confirmService.openConfirmDialog(
+      "Confirmer la suppression",
+      "Êtes-vous sûr de vouloir supprimer cette Business Unit ? Cette action est irréversible."
+    ).subscribe(confirm => {
+      if (confirm) {
+        this.saveExpansionState();
+        
+        this.entitiesService.delete(id).subscribe({
+          next: () => {
+            this.snackBarService.info("Business Unit supprimée avec succès !");
+            this.selectedBu = null;
+            this.selectedBuId = null;
+            this.ngOnInit();
+          },
+          error: (err) => {
+            this.snackBarService.error("Erreur lors de la suppression : " + err.message);
+          }
+        });
+      }
+    });
+  }
+
+  openEntityDialog(entite?: any, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    this.saveExpansionState();
+    
+    this.dialog.open(AddEntityDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
+      data: {
+        ...entite,
+        enableDraft: false
+      }
+    }).afterClosed().subscribe(bu => {
+      if (bu) {
+        if (bu.id) {
+          this.entitiesService.update(bu).subscribe(_ => {
+            this.ngOnInit();
+            this.snackBarService.info("Entité modifiée avec succès !");
+          });
+        }
+        else {
+          this.entitiesService.save(bu).subscribe(_ => {
+            this.ngOnInit();
+            this.snackBarService.info("Entité ajoutée avec succès !");
+          });
+        }
+      }
+    });
+  }
+
+  goToMatrixPage(buId: any) {
+    this.router.navigate(['risk', buId]);
   }
 }

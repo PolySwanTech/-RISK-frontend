@@ -616,9 +616,7 @@ export class BuProcessAccordionComponent {
     this.router.navigate(['risk', buId]);
   }
 
-  navToRisk(id: string) {
-    this.router.navigate(['reglages', 'risks', id]);
-  }
+  
 
   addProcess(buId: string) {
      
@@ -631,6 +629,10 @@ export class BuProcessAccordionComponent {
           autoFocus: false,
           data: { buId: buId }
         });
+  }
+
+  navToRisk(id: string) {
+    this.router.navigate(['reglages', 'risks', id]);
   }
 
   getTooltip(view: string): string {

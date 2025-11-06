@@ -233,7 +233,7 @@ button {
     color: var(--mat-sys-surface-container-lowest);
     transition: background-color 0.3s ease, color 0.3s ease !important;
 
-    &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger, .mat-mdc-icon-button, .mdc-switch) {
+    &:hover:not([mat-list-item], .mat-mdc-tooltip-trigger, .mat-mdc-icon-button, .mdc-switch, .mat-mdc-chip-action) {
         background-color: var(--btn-background-hover);
         color: var(--mat-sys-primary-container);
     }

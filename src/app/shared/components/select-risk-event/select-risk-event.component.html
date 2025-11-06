@@ -1,7 +1,7 @@
 <div class="wrapper">
 
   <!-- ====== TOGGLE MODE NAVIGATION ====== -->
-  <div class="navigation-mode-toggle">
+  <div class="navigation-mode-toggle" *ngIf="!hideNavigationToggle">
     <mat-button-toggle-group [value]="navigationMode" (change)="onNavigationModeChange($event.value)">
       <mat-button-toggle [value]="NavigationMode.Hierarchical">
         <mat-icon>account_tree</mat-icon>
@@ -100,6 +100,10 @@
       <div class="results-count" *ngIf="navigationMode === NavigationMode.Direct && currentLevel === 'referentiels'">
         {{ currentItems.length }} taxonomie(s)
       </div>
+      <button style="margin-block: 20px;" *ngIf="currentLevel === 'referentiels'" mat-raised-button class="btn-primary"
+        (click)="addReferentiel()">
+        <mat-icon>add</mat-icon> Nouvelle taxonomie
+      </button>
     </div>
 
     <!-- Contenu -->
@@ -130,8 +134,7 @@
 
       <!-- NIVEAU 3 : Référentiels avec badges Baloise -->
       <ng-container *ngIf="currentLevel === 'referentiels'">
-        <button mat-raised-button class="btn btn-secondary" (click)="addReferentiel()">Ajouter une nouvelle
-          taxonomie</button>
+
         <mat-list-item *ngFor="let ref of currentItems" (click)="selectReferentiel(ref)">
           <mat-icon matListIcon>account_tree</mat-icon>
           <div matLine class="referentiel-content">

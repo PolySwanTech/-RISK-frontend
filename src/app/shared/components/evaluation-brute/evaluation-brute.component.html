@@ -1,0 +1,112 @@
+<app-go-back [title]="'Évaluation Brute du Risque'"></app-go-back>
+
+<div class="standalone-container">
+  <div class="evaluation-container" *ngIf="selectedRisk && selectedBU && selectedProcess; else noData">
+    <div class="evaluation-header">
+      <h2>⚖️ Évaluation Brute des Impacts</h2>
+      <mat-chip-listbox class="context-chips">
+        <mat-chip>{{ selectedBU.name || "N/R" }}</mat-chip>
+        <mat-chip>{{ selectedProcess.name || "N/R" }}</mat-chip>
+        <mat-chip highlighted>{{ selectedRisk.libelle }}</mat-chip>
+      </mat-chip-listbox>
+    </div>
+
+    <div class="impacts-section">
+      <h3>💰 Financier Direct</h3>
+      <div class="impacts-grid">
+        <mat-card *ngFor="let sev of severityList; let i = index" class="impact-card">
+          <mat-card-header [ngClass]="getClassByIndex(i)">
+            <mat-card-title>{{ sev.libelle }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Fréquence</mat-label>
+              <mat-select 
+                [ngModel]="getSeverityValue(sev.id)" 
+                (ngModelChange)="setSeverityValue(sev.id, $event)"
+                (selectionChange)="updateRisk(sev)">
+                <mat-option *ngFor="let freq of frequencyList" [value]="freq.id">
+                  {{ freq.libelle }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div class="risk-result" *ngIf="getSeverityValue(sev.id) !== 0">
+              <mat-chip [ngClass]="getRiskLevelFromSeverityFrequencySelected(sev).toLowerCase()">
+                {{ getRiskLevelFromSeverityFrequencySelected(sev) | enumLabel:'riskLevel' }}
+              </mat-chip>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="additional-impacts">
+      <h3>📊 Autres Impacts</h3>
+      <div class="impacts-row">
+        <mat-form-field appearance="outline">
+          <mat-label>💸 Financier Indirect</mat-label>
+          <mat-select [(ngModel)]="financierIndirect" (selectionChange)="updateHighestRisk()">
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">
+              {{ risk | enumLabel:'riskLevel' }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>📈 Non Financier</mat-label>
+          <mat-select [(ngModel)]="financierNonFinancier" (selectionChange)="updateHighestRisk()">
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">
+              {{ risk | enumLabel:'riskLevel' }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="summary-section" *ngIf="highestRiskLevel">
+      <h3>📋 Résumé de l'Évaluation Brute</h3>
+      <div class="summary-card">
+        <mat-form-field appearance="outline" class="risk-level-select">
+          <mat-label>Niveau de Risque Proposé</mat-label>
+          <mat-select [(ngModel)]="highestRiskLevel">
+            <mat-option *ngFor="let risk of riskLevels" [value]="risk">
+              {{ risk | enumLabel:'riskLevel' }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="risk-indicator" [style.backgroundColor]="getRiskColorEnum(highestRiskLevel)">
+          {{ highestRiskLevel | enumLabel:'riskLevel' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="matrix-section" *ngIf="matrixData">
+      <h3>🎯 Matrice de Risques</h3>
+      <app-matrix [matrixData]="matrixData" [modifPlan]="false"></app-matrix>
+    </div>
+
+    <div class="actions">
+      <button mat-raised-button class="btn-secondary" (click)="handleCancel()">
+        ✕ Annuler
+      </button>
+      <button 
+        mat-raised-button 
+        class="btn-primary" 
+        (click)="handleNext()"
+        [disabled]="!highestRiskLevel">
+        Suivant →
+      </button>
+    </div>
+  </div>
+
+  <ng-template #noData>
+    <div class="no-data-container">
+      <div class="no-data-icon">⚠️</div>
+      <h2>Données manquantes</h2>
+      <p>Impossible de charger les données nécessaires pour l'évaluation.</p>
+      <button mat-raised-button class="btn-primary" (click)="handleCancel()">
+        Retour
+      </button>
+    </div>
+  </ng-template>
+</div>

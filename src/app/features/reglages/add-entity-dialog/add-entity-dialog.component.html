@@ -18,18 +18,6 @@
         </mat-error>
       </mat-form-field>
 
-      <div class="toggle-field">
-        <div class="toggle-info">
-          <mat-icon class="toggle-icon">domain</mat-icon>
-          <div class="toggle-text">
-            <label class="toggle-label">Ligne Métier</label>
-            <span class="toggle-description">Cette entité est-elle une ligne métier ?</span>
-          </div>
-        </div>
-        <mat-slide-toggle formControlName="lm" [checked]="formGroup.get('lm')?.value" color="primary">
-        </mat-slide-toggle>
-      </div>
-
       <mat-form-field class="full-width" appearance="outline">
         <mat-label>Fréquence d'évaluation</mat-label>
         <mat-icon matPrefix>schedule</mat-icon>
@@ -42,6 +30,20 @@
           La fréquence d'évaluation est obligatoire
         </mat-error>
       </mat-form-field>
+
+      <div class="toggle-field">
+        <div class="toggle-info">
+          <mat-icon class="toggle-icon">domain</mat-icon>
+          <div class="toggle-text">
+            <label class="toggle-label">Ligne Métier</label>
+            <span class="toggle-description">Cette entité est-elle une ligne métier ?</span>
+          </div>
+        </div>
+        <mat-slide-toggle formControlName="lm" [checked]="formGroup.get('lm')?.value" color="primary">
+        </mat-slide-toggle>
+      </div>
+
+      
 
     </form>
   </div>

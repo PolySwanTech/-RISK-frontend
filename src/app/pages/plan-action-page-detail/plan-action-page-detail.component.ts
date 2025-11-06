@@ -137,7 +137,10 @@ export class PlanActionPageDetailComponent implements OnInit {
   openAddActionDialog() {
     this.dialog.open(AddActionDialogComponent,
       {
-        width: '400px',
+        width: '800px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        panelClass: 'custom-dialog-container',
         data: {
           actionPlanId: this.actionPlan?.id
         }

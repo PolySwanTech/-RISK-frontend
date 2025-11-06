@@ -1,46 +1,41 @@
-<!-- Actions -->
+<app-base-popup 
+  [title]="'Ajouter des actions'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
 
-    <app-popup-header [title]="'Actions à effectuer'" [showClose]="true" (close)="closePopup()"></app-popup-header>
-    <div class="container">
-    <div class="actions-container">
-        <div class="add-action">
-            <button mat-raised-button type="button" class="btn-green" (click)="addAction()">
-                <mat-icon>add</mat-icon>
-                Ajouter
-            </button>
-        </div>
+  <!-- Section Actions -->
+  <div class="section">
+    <div class="section-header">
+      <mat-icon class="section-icon">check_circle</mat-icon>
+      <h3 class="section-title">Actions à effectuer</h3>
+      <div class="section-header-actions">
+        <button mat-raised-button type="button" class="btn-purple" (click)="addAction()">
+          <mat-icon>add</mat-icon>
+          Ajouter une action
+        </button>
+      </div>
     </div>
 
-    <div class="actions-list">
-  <div *ngFor="let action of actions; let i = index" class="action-item">
-    <mat-form-field appearance="outline" class="action-field">
-      <input
-        matInput
-        [(ngModel)]="action.name"
-        [ngModelOptions]="{standalone: true}"
-        placeholder="Entrez une action"
-      />
-      <button
-        mat-icon-button
-        matSuffix
-        color="warn"
-        type="button"
-        (click)="removeAction(i)"
-        aria-label="Supprimer cette action"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
+    <div class="association-content">
+      <div class="action-item" *ngFor="let action of actions; let i = index">
+        <mat-form-field appearance="outline" class="action-field">
+          <mat-label>Action {{ i + 1 }}</mat-label>
+          <input matInput [(ngModel)]="action.name" [ngModelOptions]="{standalone: true}"
+            placeholder="Ex: Réviser la documentation">
+          <mat-icon matPrefix>task_alt</mat-icon>
+          <button mat-icon-button matSuffix matTooltip="Supprimer cette action" type="button" (click)="removeAction(i)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <div class="empty-state" *ngIf="actions.length === 0">
+        <mat-icon>playlist_add</mat-icon>
+        <p>Aucune action ajoutée. Cliquez sur "Ajouter une action" pour commencer.</p>
+      </div>
+    </div>
   </div>
-</div>
 
-    <!-- Buttons -->
-    <div class="dialog-buttons">
-        <button mat-raised-button mat-dialog-close type="button" (click)="closePopup()" class="btn-cancel">
-            Annuler
-        </button>
-        <button mat-raised-button class="btn-primary" type="button" (click)="save()" [disabled]="actions.length === 0">
-            Enregistrer
-        </button>
-    </div>
-</div>
+</app-base-popup>

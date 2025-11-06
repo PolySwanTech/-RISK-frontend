@@ -309,3 +309,9 @@ button[mat-stroked-button][color="primary"] {
 .referentiel-content{
   display: contents;
 }
+
+button[mat-raised-button]{
+mat-icon{
+  color: white !important;
+}
+}

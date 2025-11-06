@@ -17,6 +17,7 @@ export class ProcessService {
   }
 
   createProcess(process: { name: string; bu: string, parentId?: string }) {
+    console.log(process)
     return this.http.post<Process>(this.baseUrl, process)
   }
 

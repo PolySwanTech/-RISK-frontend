@@ -1,0 +1,272 @@
+.evaluation-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.evaluation-header {
+  margin-bottom: 2.5rem;
+  
+  h2 {
+    font-size: 1.875rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+  }
+  
+  .context-chips {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    
+    mat-chip {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 500;
+      
+      &[highlighted] {
+        background-color: #dbeafe;
+        color: #1e40af;
+      }
+    }
+  }
+}
+
+.impacts-section {
+  margin-bottom: 2.5rem;
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.impacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.impact-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  mat-card-header {
+    padding: 1rem;
+    color: white;
+    
+    mat-card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+  
+  mat-card-content {
+    padding: 1.25rem;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .risk-result {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    
+    mat-chip {
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+    }
+  }
+}
+
+.impact-faible {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.impact-modere {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.impact-significatif {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.impact-eleve {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.impact-critique {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+.additional-impacts {
+  margin-bottom: 2.5rem;
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.impacts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.summary-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  border: 1px solid #e2e8f0;
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.summary-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+  
+  .risk-level-select {
+    width: 100%;
+  }
+  
+  .risk-indicator {
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: white;
+    text-align: center;
+    min-width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.matrix-section {
+  margin-bottom: 2.5rem;
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e2e8f0;
+  
+  button {
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  .btn-secondary {
+    background-color: #f1f5f9;
+    color: #475569;
+    
+    &:hover {
+      background-color: #e2e8f0;
+    }
+  }
+}
+
+mat-chip {
+  &.low {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &.medium {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  &.high {
+    background-color: #fed7aa;
+    color: #9a3412;
+  }
+
+  &.very_high {
+    background-color: #fecaca;
+    color: #991b1b;
+  }
+}
+
+@media (max-width: 768px) {
+  .evaluation-container {
+    padding: 1rem;
+  }
+  
+  .impacts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .impacts-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-card {
+    grid-template-columns: 1fr;
+    
+    .risk-indicator {
+      width: 100%;
+    }
+  }
+  
+  .actions {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

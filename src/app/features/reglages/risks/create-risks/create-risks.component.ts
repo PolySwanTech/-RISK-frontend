@@ -184,7 +184,7 @@ export class CreateRisksComponent implements OnInit {
       height: '550px',
       data: {
         mode: RiskSelectionMode.Taxonomie,
-        processId: this.form.get('processId')?.value
+        processId: this.form.get('processId')?.value,
       }
     });
 

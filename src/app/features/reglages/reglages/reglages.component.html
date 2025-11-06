@@ -1,7 +1,7 @@
 <app-go-back [title]="'Paramétrage des processus'" [buttons]="goBackButtons"></app-go-back>
 <mat-tab-group class="group" [selectedIndex]="selectedTabIndex">
     <mat-tab label="Business Units">
-        <app-bu-process-accordion consultationMode="admin"></app-bu-process-accordion>
+        <app-process-manager [cartoMode]="false"></app-process-manager>
     </mat-tab>
     <mat-tab label="Taxonomie">
         <app-select-risk-event></app-select-risk-event>

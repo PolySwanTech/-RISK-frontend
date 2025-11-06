@@ -51,11 +51,16 @@
     display: flex;
     align-items: center;
     padding: 10px 12px;
+    flex-wrap: wrap;
     cursor: pointer;
     border-radius: 6px;
     transition: all 0.2s;
     gap: 8px;
     margin-bottom: 4px;
+}
+
+.actions {
+    flex-wrap: wrap;
 }
 
 .process-item:hover {
@@ -185,54 +190,6 @@
     margin-top: 25px;
 }
 
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 14px;
-}
-
-.btn-primary {
-    background: #4299e1;
-    color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: #3182ce;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
-}
-
-.btn-primary:disabled {
-    background: #cbd5e0;
-    cursor: not-allowed;
-}
-
-.btn-secondary {
-    background: #e2e8f0;
-    color: #4a5568;
-}
-
-.btn-secondary:hover {
-    background: #cbd5e0;
-}
-
-.btn-icon {
-    padding: 4px 8px;
-    font-size: 16px;
-}
-
-.btn-danger {
-    background: #fc8181;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #f56565;
-}
 
 .dispatch-modal {
     animation: slideIn 0.3s ease;
@@ -375,3 +332,69 @@
     }
   }
 }
+
+
+.risk-events-section h3 {
+    font-size: 16px;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.mat-elevation-z8 {
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+    background-color: #f7fafc !important;
+}
+
+.action-cell {
+    text-align: right;
+    width: 200px;
+}
+
+.action-cell button {
+    margin: 0;
+}
+
+.no-data-row {
+    height: 200px;
+}
+
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #a0aec0;
+    font-style: italic;
+}
+
+mat-paginator {
+    border-top: 1px solid #e2e8f0;
+}
+
+.evaluation-chip {
+  ::ng-deep .mdc-evolution-chip__text-label {
+    color: #000 !important;
+  }
+  
+  &.chip-white-text {
+    ::ng-deep .mdc-evolution-chip__text-label {
+      color: #fff !important;
+    }
+  }
+}
+
+

@@ -23,6 +23,7 @@ export interface EntityDialogData {
   parentId?: string;
   evaluationFrequency?: EvaluationFrequency;
   draftId?: string;
+  enableDraft?: boolean; // Nouvelle propriété pour activer/désactiver les brouillons
 }
 
 @Component({
@@ -54,6 +55,7 @@ export class AddEntityDialogComponent implements OnInit {
   formGroup!: FormGroup;
   popupActions: PopupAction[] = [];
   BusinessUnit: any = {};
+  enableDraft: boolean = true; // Par défaut, les brouillons sont activés
 
   evaluationFrequencies = Object.entries(EvaluationFrequencyLabels).map(([key, label]) => ({
     id: key as EvaluationFrequency,
@@ -71,6 +73,8 @@ export class AddEntityDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: EntityDialogData | null
   ) {
     this.BusinessUnit = data ? { id: data.parentId || null } : {};
+    // Désactiver les brouillons si enableDraft est false ou si on est en mode édition sans enableDraft explicite
+    this.enableDraft = data?.enableDraft ?? !data?.id;
   }
 
   ngOnInit(): void {
@@ -86,17 +90,17 @@ export class AddEntityDialogComponent implements OnInit {
       this.BusinessUnit = { id: this.data.parentId || null };
     }
 
-    // Charger le brouillon si un draftId est fourni
-    if (this.data?.draftId) {
+    // Charger le brouillon si un draftId est fourni et que les brouillons sont activés
+    if (this.enableDraft && this.data?.draftId) {
       this.loadDraft(this.data.draftId);
       this.currentDraftId = this.data.draftId;
       this.draftService.hideDraft(this.data.draftId);
     }
 
     this.dialogRef.backdropClick().subscribe(() => {
-      if (this.hasFormData()) {
+      if (this.enableDraft && this.hasFormData()) {
         this.saveDraft();
-      } else if (this.currentDraftId) {
+      } else if (this.enableDraft && this.currentDraftId) {
         this.draftService.showDraft(this.currentDraftId);
       }
     });
@@ -151,7 +155,7 @@ export class AddEntityDialogComponent implements OnInit {
   }
 
   saveDraft(): void {
-    if (!this.hasFormData()) {
+    if (!this.enableDraft || !this.hasFormData()) {
       return;
     }
 
@@ -180,9 +184,9 @@ export class AddEntityDialogComponent implements OnInit {
   }
 
   goBack(): void {
-    if (this.hasFormData()) {
+    if (this.enableDraft && this.hasFormData()) {
       this.saveDraft();
-    } else if (this.currentDraftId) {
+    } else if (this.enableDraft && this.currentDraftId) {
       this.draftService.showDraft(this.currentDraftId);
     }
 
@@ -206,8 +210,8 @@ export class AddEntityDialogComponent implements OnInit {
 
       console.log('Saving DTO:', businessUnitCreateDto);
 
-      // Supprimer le brouillon après sauvegarde réussie
-      if (this.currentDraftId) {
+      // Supprimer le brouillon après sauvegarde réussie (seulement si les brouillons sont activés)
+      if (this.enableDraft && this.currentDraftId) {
         this.draftService.deleteDraft(this.currentDraftId);
       }
 
@@ -224,9 +228,9 @@ export class AddEntityDialogComponent implements OnInit {
       this.BusinessUnit = event;
     }
 
-    @HostListener('window:beforeunload')
-    beforeUnload(): void {
-      if(this.hasFormData()) {
+  @HostListener('window:beforeunload')
+  beforeUnload(): void {
+    if (this.enableDraft && this.hasFormData()) {
       this.saveDraft();
     }
   }
