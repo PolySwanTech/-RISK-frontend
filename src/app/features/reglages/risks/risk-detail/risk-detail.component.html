@@ -3,16 +3,19 @@
   <div class="container body-container">
     <app-go-back
       [title]="'Détails du risque'"
-      [subtitle]="risk.riskReferentiel.reference | uppercase"
+      [subtitle]="risk.reference| uppercase"
       [buttons]="goBackButtons">
     </app-go-back>
 
     <!-- ---------------- HEADER ------------------- -->
     <div class="header">
-      <div class="risk-id">{{ risk.riskReferentiel.reference | uppercase }}</div>
-      <h1 class="risk-title">{{ risk.riskReferentiel.libelle }}</h1>
+      <div class="risk-id">{{ risk.reference | uppercase }}</div>
+      <h1 class="risk-title">{{ risk.libelle }}</h1>
       <div class="risk-category">
         Catégorie baloise: {{ risk.riskReferentiel.category.parent ? risk.riskReferentiel.category.parent + ' > ' + (risk.riskReferentiel.category.label || '') : (risk.riskReferentiel.category.label || '') }}
+      </div>
+      <div class="risk-category">
+        Risque référentiel: {{ risk.riskReferentiel.reference | uppercase }} - {{ risk.riskReferentiel.libelle }}
       </div>
     </div>
 
@@ -21,7 +24,7 @@
       <div class="grid">
         <!-- ----- DESCRIPTION CARD ------------- -->
         <div class="card">
-          <h2 class="card-title">Description du Risque</h2>
+          <h2 class="card-title">Informations du Risque</h2>
           <p class="risk-description">
             {{ risk.riskReferentiel.description || '—' }}
           </p>

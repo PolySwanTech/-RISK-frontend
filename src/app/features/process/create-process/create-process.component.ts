@@ -14,7 +14,6 @@ import { EntitiesService } from '../../../core/services/entities/entities.servic
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
 import { DraftService } from '../../../core/services/draft.service';
-import { SelectArborescenceComponent } from '../../../shared/components/select-arborescence/select-arborescence.component';
 
 export interface CreateProcessDialogData {
   process?: Process;
@@ -34,9 +33,8 @@ export interface CreateProcessDialogData {
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    SelectArborescenceComponent,
     BasePopupComponent
-  ],
+],
   templateUrl: './create-process.component.html',
   styleUrl: './create-process.component.scss'
 })
@@ -68,14 +66,12 @@ export class CreateProcessComponent implements OnInit {
     if (this.isEditMode && data?.process) {
       this.processForm = this.fb.group({
         name: [data.process.name, Validators.required],
-        parentId: [data.process.parentId]
       });
       this.selectedParentId = data.process.parentId || null;
     } else {
       this.processForm = this.fb.group({
         name: ['', Validators.required],
         bu: [data?.buId || null, Validators.required],
-        parentId: [null]
       });
     }
   }
@@ -178,11 +174,9 @@ export class CreateProcessComponent implements OnInit {
 
   hasFormData(): boolean {
     const name = this.processForm.get('name')?.value;
-    const parentId = this.processForm.get('parentId')?.value;
     
     return !!(
-      (name && name.trim() !== '') ||
-      parentId
+      (name && name.trim() !== '')
     );
   }
 
@@ -224,11 +218,6 @@ export class CreateProcessComponent implements OnInit {
     });
   }
 
-  onSelectionProcess(value: any) {
-    this.selectedParentId = value.id;
-    this.processForm.get('parentId')?.setValue(value.id);
-  }
-
   onSubmit() {
     if (this.processForm.invalid) {
       this.processForm.markAllAsTouched();
@@ -249,8 +238,8 @@ export class CreateProcessComponent implements OnInit {
         }
       });
     } else {
-      const { name, bu, parentId } = this.processForm.value;
-      const dto = { name, bu, parentId: parentId || null };
+      const { name, bu } = this.processForm.value;
+      const dto = { name, bu };
       
       this.processService.createProcess(dto).subscribe({
         next: () => {

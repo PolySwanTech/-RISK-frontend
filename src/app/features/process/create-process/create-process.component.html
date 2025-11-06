@@ -47,42 +47,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Section Hiérarchie (optionnelle) -->
-    <div class="section" *ngIf="processes.length > 0">
-      <div class="section-header">
-        <mat-icon class="section-icon">account_tree</mat-icon>
-        <h3 class="section-title">Hiérarchie (optionnel)</h3>
-      </div>
-
-      <div class="forms-container">
-          <app-select-arborescence 
-            appearance="outline" 
-            placeholder="Sélectionnez un processus parent"
-            [id]="selectedParentId"
-            (changeValue)="onSelectionProcess($event)" 
-            [list]="processes" />
-
-        <div class="info-box">
-          <mat-icon>info</mat-icon>
-          <span>Si vous sélectionnez un processus parent, ce nouveau processus sera créé comme sous-processus</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Message si aucun processus parent disponible -->
-    <div class="section" *ngIf="processes.length === 0 && processForm.get('bu')?.value && !isEditMode">
-      <div class="section-header">
-        <mat-icon class="section-icon">account_tree</mat-icon>
-        <h3 class="section-title">Hiérarchie</h3>
-      </div>
-
-      <div class="empty-state">
-        <mat-icon>check_circle</mat-icon>
-        <p>Ce sera le premier processus de cette équipe</p>
-      </div>
-    </div>
-
   </form>
 
 </app-base-popup>

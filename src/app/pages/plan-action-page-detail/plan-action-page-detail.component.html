@@ -59,8 +59,8 @@
                         </div>
                     </div>
 
-                    @if(actionPlan.riskName){
-                    <div class="info-block">
+                    @if(actionPlan.riskId){
+                    <div class="info-block" (click)="goToRisk()">
                         <mat-icon>check_circle</mat-icon>
                         <div class="info-text">
                             <label>Risque</label>

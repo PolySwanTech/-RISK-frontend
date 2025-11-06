@@ -290,6 +290,10 @@ export class PlanActionPageDetailComponent implements OnInit {
     this.router.navigate([`/incident/${this.actionPlan?.incidentId}`]);
   }
 
+  goToRisk() {
+    this.router.navigate(['reglages', 'risks', this.actionPlan?.riskId]);
+  }
+
   openAuditPanel() {
     if (this.auditDrawer.opened) {
       this.auditDrawer.close();

@@ -80,7 +80,7 @@
           <mat-select [(ngModel)]="actionPlan.taxonomie" name="risk" [ngModelOptions]="{standalone: true}"
             [disabled]="!!data?.incidentId">
             <mat-option *ngFor="let risk of risks" [value]="risk.id">
-              {{ risk.riskReferentiel.libelle }}
+              {{ risk.libelle }}
             </mat-option>
           </mat-select>
           <mat-icon matPrefix>warning</mat-icon>

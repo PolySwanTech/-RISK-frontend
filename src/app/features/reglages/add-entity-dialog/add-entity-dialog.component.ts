@@ -211,18 +211,22 @@ export class AddEntityDialogComponent implements OnInit {
         this.draftService.deleteDraft(this.currentDraftId);
       }
 
-      this.dialogRef.close(businessUnitCreateDto);
+      this.entitiesService.save(businessUnitCreateDto).subscribe({
+        next: _ => {
+          this.dialogRef.close(businessUnitCreateDto);
+        }
+      });
     }
   }
 
-  entiteChange(event: any): void {
-    console.log('Entity changed:', event);
-    this.BusinessUnit = event;
-  }
+    entiteChange(event: any): void {
+      console.log('Entity changed:', event);
+      this.BusinessUnit = event;
+    }
 
-  @HostListener('window:beforeunload')
-  beforeUnload(): void {
-    if (this.hasFormData()) {
+    @HostListener('window:beforeunload')
+    beforeUnload(): void {
+      if(this.hasFormData()) {
       this.saveDraft();
     }
   }
