@@ -43,4 +43,4 @@ jobs:
             cd /home/debian/Documents/appli
             docker rm -f frontend || true
             docker rmi ghcr.io/polyswantech/frontend:latest || true
-            docker compose up frontend -d 
+            docker compose up -d frontend
