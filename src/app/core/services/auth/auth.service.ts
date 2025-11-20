@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { SnackBarService } from '../snack-bar/snack-bar.service';
 // import { SnackBarService } from '../snack-bar/snack-bar.service';
 
 @Injectable({
@@ -20,7 +21,7 @@ export class AuthService {
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 
   private permissions: { [teamId: string]: string[] } = {};
-  // private snackBarService = inject(SnackBarService);
+  private snackBarService = inject(SnackBarService);
 
   constructor() { }
 
@@ -46,13 +47,13 @@ export class AuthService {
     return this.http.post<any>(this.authBase + '/auth/login', { mail: username, password: mdp })
       .subscribe({
         next: res => {
+          console.log("Token created successfully");
           sessionStorage.setItem('token', res.token);
           this.refreshToken()
         },
         error: err => {
           console.error('Login error:', err);
-          alert("")
-          // this.snackBarService.error("Nom ou mot de passe incorrect")
+          this.snackBarService.error("Nom ou mot de passe incorrect")
         }
       });;
   }
@@ -61,6 +62,7 @@ export class AuthService {
     return this.http.get<any>(this.base + '/users/refresh-token')
       .subscribe({
         next: _ => {
+          console.log("Token refreshed successfully");
           this.isLogin$.next(true)
           this.router.navigate(['dashboard']);
         },
