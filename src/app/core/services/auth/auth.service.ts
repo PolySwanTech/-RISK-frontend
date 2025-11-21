@@ -47,7 +47,6 @@ export class AuthService {
     return this.http.post<any>(this.authBase + '/auth/login', { mail: username, password: mdp })
       .subscribe({
         next: res => {
-          sessionStorage.setItem('token', res.token);
           this.refreshToken()
         },
         error: err => {
@@ -61,7 +60,6 @@ export class AuthService {
     return this.http.get<any>(this.base + '/users/refresh-token')
       .subscribe({
         next: _ => {
-          console.log("Token refreshed successfully");
           this.isLogin$.next(true)
           this.router.navigate(['dashboard']);
         },
