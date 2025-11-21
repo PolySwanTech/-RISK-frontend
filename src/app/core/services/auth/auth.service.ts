@@ -62,8 +62,8 @@ export class AuthService {
       .subscribe({
         next: _ => {
           console.log("Token refreshed successfully");
-          // this.isLogin$.next(true)
-          // this.router.navigate(['dashboard']);
+          this.isLogin$.next(true)
+          this.router.navigate(['dashboard']);
         },
         error: err => {
           console.error('Refresh token error:', err);
