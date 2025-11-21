@@ -47,6 +47,7 @@ export class AuthService {
     return this.http.post<any>(this.authBase + '/auth/login', { mail: username, password: mdp })
       .subscribe({
         next: res => {
+          sessionStorage.setItem('token', res.token);
           this.refreshToken()
         },
         error: err => {
