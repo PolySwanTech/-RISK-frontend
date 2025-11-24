@@ -34,7 +34,7 @@ export interface CreateProcessDialogData {
     MatButtonModule,
     MatIconModule,
     BasePopupComponent
-],
+  ],
   templateUrl: './create-process.component.html',
   styleUrl: './create-process.component.scss'
 })
@@ -106,15 +106,15 @@ export class CreateProcessComponent implements OnInit {
     if (draft) {
       // Sauvegarder le parentId avant de patcher le formulaire
       const savedParentId = draft.data.form.parentId;
-      
+
       this.processForm.patchValue(draft.data.form);
-      
+
       // Recharger les processus si une BU était sélectionnée
       const buId = draft.data.form.bu || draft.data.buId;
       if (buId) {
         this.processService.getProcessLeaf(buId).subscribe(list => {
           this.processes = [...list];
-          
+
           // Une fois les processus chargés, restaurer le parentId
           if (savedParentId) {
             this.selectedParentId = savedParentId;
@@ -122,8 +122,6 @@ export class CreateProcessComponent implements OnInit {
           }
         });
       }
-      
-      console.log('Brouillon de processus restauré:', draft);
     }
   }
 
@@ -174,7 +172,7 @@ export class CreateProcessComponent implements OnInit {
 
   hasFormData(): boolean {
     const name = this.processForm.get('name')?.value;
-    
+
     return !!(
       (name && name.trim() !== '')
     );
@@ -227,7 +225,7 @@ export class CreateProcessComponent implements OnInit {
     if (this.isEditMode && this.data?.process) {
       const { name, parentId } = this.processForm.value;
       const dto = { name, parentId: parentId || null };
-      
+
       this.processService.updateProcess(this.data.process.id, dto).subscribe({
         next: () => {
           this.snackBarService.success("Le processus a bien été modifié ✅");
@@ -240,7 +238,7 @@ export class CreateProcessComponent implements OnInit {
     } else {
       const { name, bu } = this.processForm.value;
       const dto = { name, bu };
-      
+
       this.processService.createProcess(dto).subscribe({
         next: () => {
           // Supprimer le brouillon après sauvegarde réussie

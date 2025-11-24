@@ -112,7 +112,6 @@ export class BuProcessAccordionComponent {
     else {
       this.entityService.loadEntitiesTree().subscribe((entitiesTree: any) => {
         this.entities = entitiesTree;
-        console.log(entitiesTree)
         this.fetchProcesses(entitiesTree);
       });
     }
@@ -409,7 +408,6 @@ export class BuProcessAccordionComponent {
   private viewRisks(process: ProcessNode) {
     this.riskService.getRisksTreeByProcessId(process.id).subscribe({
       next: (risks) => {
-        console.log(risks)
         const riskNodes = risks.map(r => ({
           id: r.id,
           name: r.libelle,

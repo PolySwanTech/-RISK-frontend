@@ -3,10 +3,10 @@ import { GoBackButton, GoBackComponent } from '../../../shared/components/go-bac
 import { MatTabsModule } from '@angular/material/tabs';
 import { SelectRiskEventComponent } from "../../../shared/components/select-risk-event/select-risk-event.component";
 import { MatDialog } from '@angular/material/dialog';
-import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { ProcessManagerComponent } from "../../../shared/components/param-process/param-process.component";
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-reglages',
@@ -20,8 +20,9 @@ export class ReglagesComponent implements OnInit {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
 
-  private entitiesService = inject(EntitiesService)
-
+  private snakBarService = inject(SnackBarService);
+  // private authService = inject(AuthService);
+  
   selectedTabIndex = 0;
 
   goBackButtons: GoBackButton[] = [
@@ -54,13 +55,9 @@ export class ReglagesComponent implements OnInit {
 
       }
     ).afterClosed().subscribe(bu => {
-      console.log(bu)
       if (bu) {
-        this.entitiesService.save(bu).subscribe(resp => {
-          console.log(resp)
-        })
+        this.snakBarService.info("L'entité a été créée avec succès")
       }
-
     })
   }
 }

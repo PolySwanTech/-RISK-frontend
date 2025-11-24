@@ -97,7 +97,6 @@ export class SelectRiskEventComponent implements OnInit {
   ngOnInit(): void {
     this.mode = this.data?.mode ?? this.mode;
     this.hideNavigationToggle = this.data?.hideNavigationToggle ?? this.hideNavigationToggle;
-    console.log(this.data)
     this.processId = this.data?.processId;
 
     const cat1 = this.route.snapshot.queryParams["cat1"];

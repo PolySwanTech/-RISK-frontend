@@ -53,7 +53,6 @@ export class ListProcessComponent implements OnInit {
 
       if (this.buId) {
         this.riskEvaluationService.getEvaluationsByBu(this.buId).subscribe(buEval => {
-          console.log(buEval) 
           this.allRisks = buEval.evaluations;
           this.frequency = buEval.evaluationFrequency;
         });

@@ -110,7 +110,6 @@ export class CreateAttenuationMetricsComponent implements OnInit {
         });
       }
       
-      console.log('Brouillon de mesure d\'atténuation restauré:', draft);
     }
   }
 

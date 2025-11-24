@@ -123,7 +123,6 @@ export class AddEntityDialogComponent implements OnInit {
       this.formGroup.patchValue(draft.data.formData);
       Object.assign(this.BusinessUnit, draft.data.businessUnit || {});
       this.titlePage = 'Reprendre le brouillon';
-      console.log('Brouillon restauré:', draft);
     }
   }
 
@@ -208,8 +207,6 @@ export class AddEntityDialogComponent implements OnInit {
         businessUnitCreateDto.id = this.data.id;
       }
 
-      console.log('Saving DTO:', businessUnitCreateDto);
-
       // Supprimer le brouillon après sauvegarde réussie (seulement si les brouillons sont activés)
       if (this.enableDraft && this.currentDraftId) {
         this.draftService.deleteDraft(this.currentDraftId);
@@ -223,10 +220,9 @@ export class AddEntityDialogComponent implements OnInit {
     }
   }
 
-    entiteChange(event: any): void {
-      console.log('Entity changed:', event);
-      this.BusinessUnit = event;
-    }
+  entiteChange(event: any): void {
+    this.BusinessUnit = event;
+  }
 
   @HostListener('window:beforeunload')
   beforeUnload(): void {

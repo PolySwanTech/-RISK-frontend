@@ -16,7 +16,6 @@ export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
   return next(modifiedReq).pipe(
     tap({
       next: (event: any) => {
-        console.log('HTTP event:', event);
         // Vérifie si un nouveau token est renvoyé dans le header X-New-Access-Token
         const newToken = event?.headers?.get?.('X-New-Access-Token');
         if (newToken) {
@@ -24,7 +23,6 @@ export const authenticatedInterceptor: HttpInterceptorFn = (req, next) => {
         }
       },
       error: (error) => {
-        console.log('HTTP event:', error);
         if (error.status === 401) {
           sessionStorage.clear();
           window.location.href = '/auth/login';

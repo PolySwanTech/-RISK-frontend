@@ -89,7 +89,6 @@ export class EvaluationNetteComponent implements OnInit {
           
           // Si on a les indicateurs dans l'évaluation, les utiliser
           // Sinon, on devra les récupérer autrement ou demander de refaire l'éval brute
-          console.log(brutEval)
           // if (brutEval.indicators) {
           //   this.bruteIndicators = brutEval.indicators;
           // }

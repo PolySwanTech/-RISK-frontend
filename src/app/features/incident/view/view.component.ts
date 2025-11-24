@@ -148,7 +148,6 @@ export class ViewComponent implements OnInit {
     this.actionPlanService.getActionPlanByIncident(id).pipe(
       map(actionPlan => actionPlan?.id ?? ''),
       catchError(() => {
-        console.log("Aucun plan d'action");
         return of(''); // fallback si erreur
       })
     ).subscribe(planActionId => this.planActionId = planActionId);

@@ -146,7 +146,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
       if (draft.data.mode) {
         this.mode = draft.data.mode;
       }
-      console.log('Brouillon d\'évaluation restauré:', draft);
     }
   }
 
@@ -202,7 +201,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   hasFormData(): boolean {
     const evalData = this.evaluationForm.value;
     const reviewData = this.reviewForm.value;
-    console.log(evalData, reviewData);
     return !!(
       (evalData.resume && evalData.resume.trim() !== '') ||
       (evalData.comments && evalData.comments.trim() !== '') ||
@@ -375,7 +373,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   async viewFiles() {
     const target = TargetType.CONTROL;
-    console.log(this.executionId)
     const files = await firstValueFrom(this.fileService.getFiles(target, this.executionId));
     this.fileService.openFiles(files, target, this.executionId).afterClosed().subscribe();
   }
@@ -398,7 +395,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   // Getters pour l'affichage
   get evalLabel(): string {
-    console.log(this.evaluationView);
     const v = (this.evaluationView?.evaluation || '').toUpperCase();
     if (v.includes('PARTIEL')) return 'Partiellement conforme';
     if (v.includes('NON')) return 'Non conforme';

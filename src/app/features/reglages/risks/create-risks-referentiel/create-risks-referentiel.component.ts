@@ -111,7 +111,6 @@ export class CreateRisksReferentielComponent implements OnInit {
       if (data.balois) {
         this.balois = data.balois;
       }
-      console.log('Brouillon de risque référentiel restauré:', draft);
     }
   }
 

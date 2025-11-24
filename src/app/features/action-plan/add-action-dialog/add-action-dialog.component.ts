@@ -74,7 +74,6 @@ export class AddActionDialogComponent implements OnInit {
     const draft = this.draftService.getDraftById(draftId);
     if (draft) {
       this.actions = draft.data.actions || [];
-      console.log('Brouillon d\'actions restauré:', draft);
     }
   }
 
