@@ -48,6 +48,7 @@ export class AuthService {
       .subscribe({
         next: res => {
           sessionStorage.setItem('token', res.token);
+          console.log(res.token)
           this.refreshToken()
         },
         error: err => {
