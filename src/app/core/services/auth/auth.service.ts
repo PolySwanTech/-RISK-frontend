@@ -95,15 +95,10 @@ export class AuthService {
   }
 
   hasPermission(permission: string): boolean {
-    const permsByTeam = this.getPermissions();
+    const perms = this.getPermissions();
 
-    for (const teamId in permsByTeam) {
-      if (permsByTeam[teamId].includes(permission)) {
-        return true;
-      }
-    }
-
-    return false;
+    // Vérifier si la permission existe comme clé
+    return !!perms[permission] && perms[permission].length > 0;
   }
 
   getPermissionsByTeam(teamId: string): string[] {

@@ -57,6 +57,7 @@ export class ReglagesComponent implements OnInit {
     ).afterClosed().subscribe(bu => {
       if (bu) {
         this.snakBarService.info("L'entité a été créée avec succès")
+        window.location.reload();
       }
     })
   }
