@@ -1,0 +1,174 @@
+@use '../../../styles/popup-common' as popup;
+
+// ========================================
+// Classes spécifiques à ce popup
+// ========================================
+
+// Bandeau méta en haut
+.meta-banner {
+  padding: 16px 20px;
+  margin: -24px -24px 24px -24px;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 2px solid #cbd5e1;
+  
+  &.status-completed {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-bottom-color: #10b981;
+  }
+  
+  &.status-pending {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-bottom-color: #f59e0b;
+  }
+  
+  &.status-overdue {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-bottom-color: #ef4444;
+  }
+
+  .meta-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .meta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .meta-date {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .meta-sub {
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
+
+// En-tête d'évaluation
+.eval-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  .eval-left,
+  .eval-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .meta-text {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// Blocs de contenu
+.content-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  .block-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .block-text {
+    font-size: 14px;
+    color: #1e293b;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+}
+
+// Grille de validation
+.validation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  .validation-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .validation-value {
+      font-size: 14px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+  }
+}
+
+
+
+// Responsive
+@media (max-width: 768px) {
+  .meta-banner {
+    margin: -16px -16px 16px -16px;
+    padding: 12px 16px;
+
+    .meta-line {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+
+  .validation-grid {
+    grid-template-columns: 1fr;
+  }
+}

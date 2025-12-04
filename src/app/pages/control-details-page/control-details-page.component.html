@@ -1,163 +1,156 @@
 @if(!control) {
-<div class="loading-spinner">
-  <i class="icon-spinner"></i>
-  Chargement des détails du contrôle...
+<div class="spinner-container">
+  <mat-spinner></mat-spinner>
+  <p>Chargement des détails du contrôle...</p>
 </div>
 }
 @else {
-<div class="control-details-page">
+<div class="body-container">
   <app-go-back [title]="'Détails du contrôle'" [subtitle]="control.reference" [buttons]="goBackButtons"></app-go-back>
 
-  <div class="main-content">
-    <div class="content-grid">
-      <div class="main-column">
-        <div class="hero-section">
-          <!-- === Carte héro (inchangée) === -->
-          <div class="card is-purple card-overview hero control-hero">
-            <div class="card-content">
+  <div class="details-grid">
 
-              <div class="hero-head">
-                <h2 class="hero-title">
-                  <span class="hero-emoji">📊</span>
-                  Informations générales
-                </h2>
-              </div>
+    <div class="left-column">
 
-              <div class="hero-grid">
-                <div class="field">
-                  <label>Nom du contrôle</label>
-                  <div class="value">{{ control.libelle || '—' }}</div>
-                </div>
+      <mat-card class="general-info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>info</mat-icon> Informations générales
+          </mat-card-title>
+        </mat-card-header>
 
-                <div class="field">
-                  <label>Processus concerné</label>
-                  <div class="value">{{ control.processName || '—' }}</div>
-                </div>
+        <mat-card-content class="info-content">
+          <div class="info-grid">
 
-                <div class="field">
-                  <label>Risque couvert</label>
-                  <div class="value">{{ control.riskName || '—' }}</div>
-                </div>
-
-                <div class="field">
-                  <label>Responsable du contrôle</label>
-                  <div class="value">{{ control.responsable || control.creator || '—' }}</div>
-                </div>
-
-                <div class="field">
-                  <label>Périodicité</label>
-                  <div class="value">{{ control.frequency | enumLabel: 'recurrence' }}</div>
-                </div>
-
-                <div class="field">
-                  <label>Date planifiée</label>
-                  <div class="value">
-                    {{ currentOrLatestExecution?.plannedAt ? (currentOrLatestExecution?.plannedAt | date:'dd/MM/yyyy') :
-                    '—' }}
-                  </div>
-                </div>
-
-                <div class="field">
-                  <label>Date de réalisation</label>
-                  <div class="value">
-                    {{ currentOrLatestExecution?.achievedAt ? (currentOrLatestExecution?.achievedAt | date:'dd/MM/yyyy')
-                    :
-                    '—' }}
-                  </div>
-                </div>
-
-                <div class="field">
-                  <label>Statut</label>
-                  <div [ngClass]="'badge ' + getStatusClass(currentOrLatestExecution?.status)">
-                    {{ currentOrLatestExecution?.status ? (currentOrLatestExecution!.status | enumLabel:'status') : '—' }}
-                  </div>
-                </div>
-
-                <div class="field full-width">
-                  <label>Objectif du contrôle</label>
-                  <div class="value">{{ control.description || '—' }}</div>
-                </div>
+            <div class="info-block">
+              <mat-icon>label</mat-icon>
+              <div class="info-text">
+                <label>Nom du contrôle</label>
+                <div class="value">{{ control.libelle || '—' }}</div>
               </div>
             </div>
-          </div>
 
-          <div class="methodology-wrapper">
-            <app-methodology-card *ngIf="control" [controlId]="control.id" >
-            </app-methodology-card>
-          </div>
-        </div>
-
-        <!-- === Carrousel des exécutions récentes (remplace l'historique + actions rapides) === -->
-        <div class="carousel" *ngIf="slides.length; else emptyState">
-          <div class="carousel-header">
-            <h3 class="carousel-title">🕒 Exécutions récentes</h3>
-
-            <!-- Dots minimalistes (nav secondaire) -->
-            <div class="dots">
-              <button class="dot" *ngFor="let s of slides; let i = index" [class.active]="i === currentSlide"
-                (click)="goTo(i)" [attr.aria-label]="'Aller à la slide ' + (i + 1)"></button>
+            <div class="info-block">
+              <mat-icon>settings</mat-icon>
+              <div class="info-text">
+                <label>Processus</label>
+                <div class="value">{{ control.processName || '—' }}</div>
+              </div>
             </div>
-          </div>
-          <div class="carousel-body">
-            <!-- Viewport + drag souris/doigt -->
-            <div class="carousel-viewport" tabindex="0" (keydown)="onKeydown($event)"
-              (pointerdown)="onDragStart($event)" (pointermove)="onDragMove($event)" (pointerup)="onDragEnd($event)"
-              (pointerleave)="onDragEnd($event)" (touchstart)="onDragStart($event)" (touchmove)="onDragMove($event)"
-              (touchend)="onDragEnd($event)" [class.is-dragging]="isDragging">
 
-              <div class="carousel-track"
-                [style.transform]="'translateX(calc(' + (-currentSlide*100) + '% + ' + dragOffsetPx + 'px))'">
-                <div class="carousel-slide" *ngFor="let s of slides">
-                  <!-- Bandeau méta -->
-                  <div class="meta-card card" [ngClass]="computeMetaStripe(s)">
-                    <div class="card-content meta">
-                      <div class="meta-left">
-                        <div class="meta-line">
-                          <span class="badge" [ngClass]="getStatusClass(s.exec.status)">{{ s.exec.status | enumLabel:'status' }}</span>
-                          <span class="meta-date">Planifiée le {{ s.exec.plannedAt | date:'dd/MM/yyyy' }}</span>
-                          <span class="meta-date" *ngIf="s.view?.evaluatedAt">• Évaluée le {{ s.view?.evaluatedAt |
-                            date:'dd/MM/yyyy' }}</span>
-                          <span class="meta-date" *ngIf="s.view?.reviewedAt">• Validée le {{ s.view?.reviewedAt |
-                            date:'dd/MM/yyyy' }}</span>
-                        </div>
-                        <div class="meta-sub">Attribuée à {{ s.exec.evaluator || '—' }}</div>
-                      </div>
-                      <div class="meta-right">
-                        @if((!s.view || s.view.reviewStatus === 'REEXAM_REQUESTED') && sameEvaluator(s.exec.evaluator)){
-                          <button class="btn btn-evaluer"
-                                *appHasPermission="'UPDATE_CONTROLE'"
-                                (click)="evaluateExec(s.exec.id, 'eval');">
-                          {{ s.view?.reviewStatus === 'REEXAM_REQUESTED' ? 'Réévaluer' : 'Évaluer' }}
-                        </button>
-                        }
-                      </div>
-                    </div>
-                  </div>
+            <div class="info-block">
+              <mat-icon>warning</mat-icon>
+              <div class="info-text">
+                <label>Risque couvert</label>
+                <div class="value">{{ control.riskName || '—' }}</div>
+              </div>
+            </div>
 
-                  <!-- Cartes visibles seulement quand il y a des données -->
-                  <ng-container *ngIf="s.view">
-                    <app-evaluation-card [showAsCard]="true" [evaluationView]="s.view" [canValidate]="true" [executionId]="s.exec.id"
-                      (openDetailsRequested)="openEvaluationDetailsPopup(s.exec.id, $event)">
-                    </app-evaluation-card>
-                  </ng-container>
+            <div class="info-block">
+              <mat-icon>person</mat-icon>
+              <div class="info-text">
+                <label>Responsable</label>
+                <div class="value">{{ control.responsable || control.creator || '—' }}</div>
+              </div>
+            </div>
+
+            <div class="info-block">
+              <mat-icon>update</mat-icon>
+              <div class="info-text">
+                <label>Périodicité</label>
+                <span class="badge freq">{{ control.frequency | enumLabel: 'recurrence' }}</span>
+              </div>
+            </div>
+
+            <div class="info-block">
+              <mat-icon>event</mat-icon>
+              <div class="info-text">
+                <label>Prochaine date</label>
+                <div class="value">
+                  {{ currentOrLatestExecution?.plannedAt ? (currentOrLatestExecution?.plannedAt | date:'dd/MM/yyyy') :
+                  '—' }}
                 </div>
               </div>
             </div>
 
-            <button class="car-fab prev" title="Plus ancien" (click)="prevSlide()" [disabled]="!hasPrev()">‹</button>
-            <button class="car-fab next" title="Plus récent" (click)="nextSlide()" [disabled]="!hasNext()">›</button>
-          </div>
-        </div>
+            <div class="info-block full-width">
+              <mat-icon>description</mat-icon>
+              <div class="info-text">
+                <label>Objectif</label>
+                <div class="value description">{{ control.description || '—' }}</div>
+              </div>
+            </div>
 
-        <ng-template #emptyState>
-          <div class="empty-state">
-            <div class="empty-title">Aucune exécution pour le moment</div>
-            <div class="empty-sub">Planifiez une première exécution pour démarrer le cycle.</div>
-            <!-- Le bouton principal est déjà en haut dans goBackButtons -->
           </div>
-        </ng-template>
+        </mat-card-content>
+      </mat-card>
 
+      <div class="methodology-wrapper">
+        <app-methodology-card *ngIf="control" [controlId]="control.id"></app-methodology-card>
       </div>
+
+    </div>
+
+    <div class="right-column">
+      <mat-card class="executions-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>history</mat-icon> Dernières exécutions
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content class="scrollable-content">
+          @if(slides.length > 0) {
+          <div class="execution-list">
+            @for(s of slides; track s.exec.id) {
+            <div class="execution-item compact">
+
+              <div class="item-header">
+                <div class="date-info">
+                  <mat-icon>event</mat-icon>
+                  <span>{{ s.exec.plannedAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <span class="badge" [ngClass]="getStatusClass(s.exec.status)">
+                  {{ s.exec.status | enumLabel:'status' }}
+                </span>
+              </div>
+
+              <div class="item-body">
+                <div class="meta-info">
+                  <span class="label">Responsable :</span>
+                  <span class="value">{{ s.exec.evaluator || '—' }}</span>
+                </div>
+                <div class="meta-info" *ngIf="s.view?.evaluatedAt">
+                  <span class="label">Fait le :</span>
+                  <span class="value">{{ s.view?.evaluatedAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+
+              <div class="item-actions">
+                <button mat-flat-button color="primary" class="action-btn" (click)="openProcessDialog(s.exec)">
+                  <mat-icon>visibility</mat-icon> Voir le détail
+                </button>
+              </div>
+
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="empty-state">
+            <mat-icon>event_busy</mat-icon>
+            <p>Aucune exécution</p>
+          </div>
+          }
+        </mat-card-content>
+
+        @if(allSlides.length > slides.length) {
+        <mat-card-actions align="end" class="card-footer-actions">
+          <button mat-button color="primary" (click)="viewFullHistory()">
+            Voir tout l'historique ({{ allSlides.length }})
+          </button>
+        </mat-card-actions>
+        }
+      </mat-card>
     </div>
   </div>
 </div>

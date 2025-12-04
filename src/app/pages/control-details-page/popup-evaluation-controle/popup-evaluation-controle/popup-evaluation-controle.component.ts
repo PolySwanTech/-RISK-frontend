@@ -1,3 +1,4 @@
+import { EnumLabelPipe } from './../../../../shared/pipes/enum-label.pipe';
 import { Component, OnInit, OnDestroy, inject, Inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -36,6 +37,7 @@ export interface EvaluationDialogData {
 @Component({
   selector: 'app-popup-evaluation-controle',
   standalone: true,
+  providers: [EnumLabelPipe],
   imports: [
     CommonModule,
     FormsModule,
@@ -61,6 +63,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   private fileService = inject(FileService);
   private fb = inject(FormBuilder);
   private draftService = inject(DraftService);
+  enumLabelPipe = inject(EnumLabelPipe);
   dialogRef = inject(MatDialogRef<PopupEvaluationControleComponent>);
 
   popupActions: PopupAction[] = [];
@@ -398,8 +401,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   // Getters pour l'affichage
   get evalLabel(): string {
-    console.log(this.evaluationView);
-    const v = (this.evaluationView?.evaluation || '').toUpperCase();
+    const v = (this.evalDetails?.evaluation || '').toUpperCase();
     if (v.includes('PARTIEL')) return 'Partiellement conforme';
     if (v.includes('NON')) return 'Non conforme';
     if (v.includes('CONF')) return 'Conforme';
@@ -407,7 +409,7 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   }
 
   get evalClass(): string {
-    const v = (this.evaluationView?.evaluation || '').toUpperCase();
+    const v = (this.evalDetails?.evaluation || '').toUpperCase();
     if (v.includes('PARTIEL')) return 'pill-warning';
     if (v.includes('NON')) return 'pill-danger';
     if (v.includes('CONF')) return 'pill-success';

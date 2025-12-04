@@ -12,7 +12,7 @@ export interface PopupAction {
   onClick: () => void;
   disabled?: boolean | (() => boolean);
   primary?: boolean;
-  color?: 'primary' | 'accent' | 'warn' | 'red';
+  color?: 'primary' | 'accent' | 'warn' | 'red' | 'purple';
 }
 
 @Component({
@@ -39,7 +39,6 @@ export interface PopupAction {
           <ng-content></ng-content>
         </div>
       </div>
-
       <div class="dialog-footer" *ngIf="actions && actions.length > 0">
         <button 
   *ngFor="let action of actions"
@@ -89,6 +88,9 @@ export class BasePopupComponent {
     }
     if (action.color === 'warn') {
       return 'btn-warn';
+    }
+    if (action.color === 'purple') {
+      return 'btn-purple';
     }
     return '';
   }
