@@ -243,10 +243,6 @@ export class ViewComponent implements OnInit {
     });
   }
 
-  async extractTokenInfo() {
-    this.permissions = await this.authService.getPermissionsByTeam(this.incident?.teamId ?? '');
-  }
-
   canClose() {
     return this.incident?.state != State.DRAFT && this.incident?.closedAt == null;
   }

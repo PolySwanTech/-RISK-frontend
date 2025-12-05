@@ -20,7 +20,7 @@ export class AuthService {
 
   isLogin$ = new BehaviorSubject<boolean>(false); // Observable for login status
 
-  private permissions: { [teamId: string]: string[] } = {};
+  private permissions: string[] = [];
   private snackBarService = inject(SnackBarService);
 
   constructor() { }
@@ -87,7 +87,7 @@ export class AuthService {
     return token?.username || null;
   }
 
-  getPermissions(): { [teamId: string]: string[] } {
+  getPermissions(): string[] {
     if (Object.keys(this.permissions).length > 0) return this.permissions;
 
     const token: any = this.decryptToken();
@@ -98,12 +98,7 @@ export class AuthService {
     const perms = this.getPermissions();
 
     // Vérifier si la permission existe comme clé
-    return !!perms[permission] && perms[permission].length > 0;
-  }
-
-  getPermissionsByTeam(teamId: string): string[] {
-    const permsByTeam = this.getPermissions();
-    return permsByTeam[teamId] ?? [];
+    return perms.includes(permission);
   }
 
   sameUser(userId: string): boolean {

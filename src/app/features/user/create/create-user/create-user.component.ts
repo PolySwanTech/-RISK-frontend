@@ -71,26 +71,28 @@ export class CreateUserComponent implements OnInit {
       teamRoleList: event
     });
   }
-  
+
   onSubmit() {
     this.organigrammeComponent.getRoles();
     if (this.userForm.valid) {
+      console.log("ici")
       if (this.update) {
-        let payload =
-        {
-          username: this.userForm.value.username,
-          email: this.userForm.value.email,
-        }
-        this.userService.updateUser(this.data.user.id, payload).subscribe({
-          next: user => {
+        this.userService.updateUserRoles(this.data.user.id, this.userForm.value.teamRoleList).subscribe({
+          next: () => {
             this.dialogRef.close(true);
-            this.userService.updateUserRoles(user.id, this.userForm.value.teamRoleList).subscribe({
-              next: () => {
-                this.dialogRef.close(true);
-              }
-            });
           }
         });
+        // TODO : Remettre cette partie pour modifier un utilisateur (nom et email) 
+        // let payload =
+        // {
+        //   username: this.userForm.value.username,
+        //   email: this.userForm.value.email,
+        // }
+        // this.userService.updateUser(this.data.user.id, payload).subscribe({
+        //   next: user => {
+        //     this.dialogRef.close(true);
+        //   }
+        // });
       }
       else {
         this.authService.register(this.userForm.value).subscribe({
