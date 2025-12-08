@@ -15,7 +15,7 @@ import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 @Component({
   selector: 'app-pop-up-detail-execution',
   imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
-    MatSlideToggleModule, ReactiveFormsModule, MatFormFieldModule, 
+    MatSlideToggleModule, ReactiveFormsModule, MatFormFieldModule,
     MatInputModule, MatButtonModule, EvaluationCardComponent, EnumLabelPipe],
   templateUrl: './pop-up-detail-execution.component.html',
   styleUrl: './pop-up-detail-execution.component.scss'
@@ -25,25 +25,25 @@ export class PopUpDetailExecutionComponent {
   private controlService = inject(ControlService);
   private dialog = inject(MatDialog);
 
-  s : any = { exec: null, view: null };
+  s: any = { exec: null, view: null };
 
   constructor(public dialogRef: MatDialogRef<PopUpDetailExecutionComponent>,
-      @Inject(MAT_DIALOG_DATA) public data: any
-    ) {
-    }
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+  }
 
-    ngOnInit(): void {  
-      this.getExecution();
-    }
+  ngOnInit(): void {
+    this.getExecution();
+  }
 
-    getExecution(){
-      this.controlService.getEvaluationByExecution(this.data.id).subscribe((data) => {
-        this.s.exec = this.data;
-        this.s.view = data;
-      });
-    }
+  getExecution() {
+    this.controlService.getEvaluationByExecution(this.data.id).subscribe((data) => {
+      this.s.exec = this.data;
+      this.s.view = data;
+    });
+  }
 
-    computeMetaStripe(s: any): string {
+  computeMetaStripe(s: any): string {
     if (s?.view?.reexamen === true || s?.view?.needsReexamination === true || s?.view?.status === 'REEXAMINATION') {
       return 'stripe--danger';
     }
@@ -64,27 +64,29 @@ export class PopUpDetailExecutionComponent {
   }
 
   getStatusClass(status?: Status): string {
-      if (!status) return 'status-default';
-      switch (status) {
-        case Status.ACHIEVED: return 'status-realise';
-        case Status.IN_PROGRESS: return 'status-en-cours';
-        default: return 'status-default';
-      }
+    if (!status) return 'status-default';
+    switch (status) {
+      case Status.ACHIEVED: return 'status-realise';
+      case Status.IN_PROGRESS: return 'status-en-cours';
+      default: return 'status-default';
     }
+  }
 
-    evaluateExec(executionId: string, action: string): void {
-        this.dialog.open(PopupEvaluationControleComponent, {
-          data: {
-            action: action,
-            executionId: executionId,
-            mode: 'FORM',
-            canValidate: true
-          }
-        })
-      }
-    
-      openEvaluationDetailsPopup(executionId: string, action: string): void {
+  evaluateExec(executionId: string, action: string): void {
     this.dialog.open(PopupEvaluationControleComponent, {
+      width: '800px',
+      data: {
+        action: action,
+        executionId: executionId,
+        mode: 'FORM',
+        canValidate: true
+      }
+    })
+  }
+
+  openEvaluationDetailsPopup(executionId: string, action: string): void {
+    this.dialog.open(PopupEvaluationControleComponent, {
+      width: '800px',
       data: {
         action: action,
         executionId: executionId,

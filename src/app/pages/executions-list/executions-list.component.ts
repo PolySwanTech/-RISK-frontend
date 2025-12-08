@@ -23,9 +23,9 @@ import { buildFilterFromColumn } from '../../shared/utils/filter-builder.util';
 import { ControlExecution, ControlExecutionTableView } from '../../core/models/ControlExecution';
 import { Status } from '../../core/enum/status.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../core/enum/evaluation-controle.enum';
-import { PopUpDetailExecutionComponent } from '../../features/control/pop-up-detail-execution/pop-up-detail-execution.component';
 import { Priority } from '../../core/enum/Priority';
 import { EnumLabelPipe } from '../../shared/pipes/enum-label.pipe';
+import { ExecutionDetailDialogComponent } from '../../features/execution-detail-dialog/execution-detail-dialog.component';
 
 @Component({
   selector: 'app-executions-list',
@@ -288,8 +288,8 @@ export class ExecutionsListComponent {
   }
 
   openProcessDialog(row?: any) {
-    this.dialog.open(PopUpDetailExecutionComponent, {
-      width: '600px !important',
+    this.dialog.open(ExecutionDetailDialogComponent, {
+      width: '1000px',
       data: row
     }).afterClosed().subscribe(_ => {
       this.ngOnInit();
@@ -301,5 +301,3 @@ export class ExecutionsListComponent {
     this.dataSource.data = this.executions;
   }
 }
-
-

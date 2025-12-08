@@ -1,10 +1,7 @@
 <ng-container *ngIf="!loading && risk; else spinner">
   <!-- =============== CONTAINER =================== -->
   <div class="container body-container">
-    <app-go-back
-      [title]="'Détails du risque'"
-      [subtitle]="risk.reference| uppercase"
-      [buttons]="goBackButtons">
+    <app-go-back [title]="'Détails du risque'" [subtitle]="risk.reference| uppercase" [buttons]="goBackButtons">
     </app-go-back>
 
     <!-- ---------------- HEADER ------------------- -->
@@ -12,7 +9,8 @@
       <div class="risk-id">{{ risk.reference | uppercase }}</div>
       <h1 class="risk-title">{{ risk.libelle }}</h1>
       <div class="risk-category">
-        Catégorie baloise: {{ risk.riskReferentiel.category.parent ? risk.riskReferentiel.category.parent + ' > ' + (risk.riskReferentiel.category.label || '') : (risk.riskReferentiel.category.label || '') }}
+        Catégorie baloise: {{ risk.riskReferentiel.category.parent ? risk.riskReferentiel.category.parent + ' > ' +
+        (risk.riskReferentiel.category.label || '') : (risk.riskReferentiel.category.label || '') }}
       </div>
       <div class="risk-category">
         Risque référentiel: {{ risk.riskReferentiel.reference | uppercase }} - {{ risk.riskReferentiel.libelle }}
@@ -30,166 +28,157 @@
           </p>
 
           <!-- Mini métriques -->
-        <div class="metrics">
-          <!-- Badge combiné brute/nette -->
-          <div class="metric">
-            <div class="metric-value risk-dual-badge">
-              <span class="left">
-                {{ groupedEvaluations?.[0]?.brut?.evaluation?.name | enumLabel:'riskLevel' }}
-              </span>
-              <span class="separator">|</span>
-              <span class="right">
-                {{ groupedEvaluations?.[0]?.net?.evaluation?.name | enumLabel:'riskLevel' }}
-              </span>
-            </div>
-            <div class="metric-label">Évaluations (Brute | Nette)</div>
-          </div>
-
-          <div class="metric">
-            <div class="metric-value">{{ risk.processName || 'N/R' }}</div>
-            <div class="metric-label">Processus affilié</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ----- Incident CARD -------------- -->
-      <div class="card">
-        <h2 class="card-title">Incidents liés</h2>
-
-        <ng-container *ngIf="linkedIncidents && linkedIncidents.length; else noInc">
-          <div class="incidents-grid">
-            <div *ngFor="let incident of linkedIncidents | slice:0:2" class="incident-card">
-              <div class="incident-header">
-                <span class="incident-ref">#{{ incident.reference }}</span>
-                <span class="incident-date">{{ incident.declaredAt | date:'dd/MM/yyyy' }}</span>
-              </div>
-
-              <div class="incident-footer">
-                <span class="incident-status badge" [ngClass]="incident?.state">
-                  {{ incident.state | enumLabel:'state' }}
+          <div class="metrics">
+            <!-- Badge combiné brute/nette -->
+            <div class="metric">
+              <div class="metric-value risk-dual-badge">
+                <span class="left">
+                  {{ groupedEvaluations?.[0]?.brut?.evaluation?.name | enumLabel:'riskLevel' }}
+                </span>
+                <span class="separator">|</span>
+                <span class="right">
+                  {{ groupedEvaluations?.[0]?.net?.evaluation?.name | enumLabel:'riskLevel' }}
                 </span>
               </div>
+              <div class="metric-label">Évaluations (Brute | Nette)</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-value">{{ risk.processName || 'N/R' }}</div>
+              <div class="metric-label">Processus affilié</div>
             </div>
           </div>
+        </div>
 
-          <!-- Bouton voir tous -->
-          <div class="see-all">
-            <button (click)="goToIncidents()">Voir tous les incidents liés</button>
-          </div>
-        </ng-container>
+        <!-- ----- Incident CARD -------------- -->
+        <div class="card">
+          <h2 class="card-title">Incidents liés</h2>
 
-        <ng-template #noInc>
-          <p class="no-exec">Aucun incident lié.</p>
-        </ng-template>
-      </div>
+          <ng-container *ngIf="linkedIncidents && linkedIncidents.length; else noInc">
+            <div class="incidents-grid">
+              <div *ngFor="let incident of linkedIncidents | slice:0:2" class="incident-card">
+                <div class="incident-header">
+                  <span class="incident-ref">#{{ incident.reference }}</span>
+                  <span class="incident-date">{{ incident.declaredAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+
+                <div class="incident-footer">
+                  <span class="incident-status badge" [ngClass]="incident?.state">
+                    {{ incident.state | enumLabel:'state' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bouton voir tous -->
+            <div class="see-all">
+              <button (click)="goToIncidents()">Voir tous les incidents liés</button>
+            </div>
+          </ng-container>
+
+          <ng-template #noInc>
+            <p class="no-exec">Aucun incident lié.</p>
+          </ng-template>
+        </div>
 
       </div>
 
       <!-- ---------------- TABS ------------------- -->
       <div class="tabs">
         <div class="tab-nav">
-          <button
-            class="tab-btn"
-            [class.active]="activeTab==='controls'"
-            (click)="selectTab('controls')">
+          <button class="tab-btn" [class.active]="activeTab==='controls'" (click)="selectTab('controls')">
             Contrôles
           </button>
-          <button
-            class="tab-btn"
-            [class.active]="activeTab==='evaluations'"
-            (click)="selectTab('evaluations')">
+          <button class="tab-btn" [class.active]="activeTab==='evaluations'" (click)="selectTab('evaluations')">
             Évaluations
           </button>
-          <button
-            class="tab-btn"
-            [class.active]="activeTab==='mitigations'"
-            (click)="selectTab('mitigations')">
+          <button class="tab-btn" [class.active]="activeTab==='mitigations'" (click)="selectTab('mitigations')">
             Mesures d'atténuations
           </button>
         </div>
 
-       <!-- ----- Tab « Contrôles » -->
-<div id="controls" class="tab-content" [class.active]="activeTab==='controls'">
-  <div class="card full-width">
-    <h3 class="card-title">Contrôles en place</h3>
+        <!-- ----- Tab « Contrôles » -->
+        <div id="controls" class="tab-content" [class.active]="activeTab==='controls'">
+          <div class="card full-width">
+            <h3 class="card-title">Contrôles en place</h3>
 
-    <ng-container *ngIf="risk.dmr?.controls && risk.dmr?.controls?.length; else noControls">
-<mat-accordion>
-  <mat-expansion-panel 
-    *ngFor="let control of risk.dmr?.controls" 
-    (opened)="loadControlExecutions(control.id)">
-    
-    <!-- ===== HEADER ===== -->
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        <span class="control-title">{{ control.libelle }}</span>
-      </mat-panel-title>
+            <ng-container *ngIf="risk.dmr?.controls && risk.dmr?.controls?.length; else noControls">
+              <mat-accordion>
+                <mat-expansion-panel *ngFor="let control of risk.dmr?.controls"
+                  (opened)="loadControlExecutions(control.id)">
 
-      <!-- Contenu header sous forme de "metrics" -->
-      <mat-panel-description class="control-metrics">
-          <div class="metric">
-            <div class="metric-value badge type">{{ control.controlType | enumLabel: 'controlType' }}</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value badge freq">{{ control.frequency | enumLabel: 'recurrence' }}</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value badge level">{{ control.controlLevel | enumLabel: 'degree' }}</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value badge status">
-              {{ (controlExecutions[control.id]?.[0]?.status | enumLabel:'status') || 'N/R' }}
-            </div>
-          </div>
-        </mat-panel-description>
-    </mat-expansion-panel-header>
+                  <!-- ===== HEADER ===== -->
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <span class="control-title">{{ control.libelle }}</span>
+                    </mat-panel-title>
+
+                    <!-- Contenu header sous forme de "metrics" -->
+                    <mat-panel-description class="control-metrics">
+                      <div class="metric">
+                        <div class="metric-value badge type">{{ control.controlType | enumLabel: 'controlType' }}</div>
+                      </div>
+                      <div class="metric">
+                        <div class="metric-value badge freq">{{ control.frequency | enumLabel: 'recurrence' }}</div>
+                      </div>
+                      <div class="metric">
+                        <div class="metric-value badge level">{{ control.controlLevel | enumLabel: 'degree' }}</div>
+                      </div>
+                      <div class="metric">
+                        <div class="metric-value badge status">
+                          {{ (controlExecutions[control.id]?.[0]?.status | enumLabel:'status') || 'N/R' }}
+                        </div>
+                      </div>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
 
 
-    <!-- ===== DETAIL ===== -->
-    <div class="control-detail">
-      <h4>Description</h4>
-      <ul class="control-info">
-        <li> {{ control.description }}</li>
-      </ul>
+                  <!-- ===== DETAIL ===== -->
+                  <div class="control-detail">
+                    <h4>Description</h4>
+                    <ul class="control-info">
+                      <li> {{ control.description }}</li>
+                    </ul>
 
-      <!-- Dernières exécutions -->
-      <div class="executions" *ngIf="controlExecutions[control.id]?.length; else noExec">
-        <h4>📊 Dernières exécutions</h4>
-        <div *ngFor="let exec of controlExecutions[control.id] | slice:0:3" class="execution-item">
-          <div class="exec-header">
-            <div>
-              <div class="exec-status">Statut : 
-                <span class="badge" [ngClass]="exec.status">
-                  {{ (exec.status | enumLabel:'status') || 'N/R' }}
-                </span>
-              </div>
-              <div class="exec-eval" *ngIf="controlEvaluationCache[exec.id]">
-                Évaluation : 
-                <span class="badge eval">
-                  {{ evalLabel(controlEvaluationCache[exec.id]?.evaluation) }}
-                </span>
-              </div>
-            </div>
-            <div>            
-              <div class="exec-responsible"> Éxecuté par: <strong>{{ exec.performedBy || 'N/R' }}</strong> le {{ exec.plannedAt | date:'dd/MM/yyyy' }} </div>
-            </div>
+                    <!-- Dernières exécutions -->
+                    <div class="executions" *ngIf="controlExecutions[control.id]?.length; else noExec">
+                      <h4>📊 Dernières exécutions</h4>
+                      <div *ngFor="let exec of controlExecutions[control.id] | slice:0:3" class="execution-item">
+                        <div class="exec-header" (click)="openProcessDialog(exec)">
+                          <div>
+                            <div class="exec-status">Statut :
+                              <span class="badge" [ngClass]="exec.status">
+                                {{ (exec.status | enumLabel:'status') || 'N/R' }}
+                              </span>
+                            </div>
+                            <div class="exec-eval" *ngIf="controlEvaluationCache[exec.id]">
+                              Évaluation :
+                              <span class="badge eval">
+                                {{ evalLabel(controlEvaluationCache[exec.id]?.evaluation) }}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <div class="exec-responsible"> Éxecuté par: <strong>{{ exec.performedBy || 'N/R' }}</strong>
+                              le {{ exec.plannedAt | date:'dd/MM/yyyy' }} </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template #noExec>
+                      <p class="no-exec">Aucune exécution trouvée.</p>
+                    </ng-template>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+
+            </ng-container>
+
+            <ng-template #noControls>
+              <p>Aucun contrôle enregistré.</p>
+            </ng-template>
           </div>
         </div>
-      </div>
-      <ng-template #noExec>
-        <p class="no-exec">Aucune exécution trouvée.</p>
-      </ng-template>
-    </div>
-  </mat-expansion-panel>
-</mat-accordion>
-
-    </ng-container>
-
-    <ng-template #noControls>
-      <p>Aucun contrôle enregistré.</p>
-    </ng-template>
-  </div>
-</div>
 
         <!-- ----- Tab « Évaluations » -->
         <div id="evaluations" class="tab-content" [class.active]="activeTab==='evaluations'">

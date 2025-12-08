@@ -183,7 +183,7 @@
               <mat-icon>label</mat-icon>
               Statut
             </span>
-            <span class="pill" [ngClass]="reviewBadgeClass">{{ evalDetails.reviewStatus }}</span>
+            <span class="pill" [ngClass]="reviewBadgeClass">{{ enumLabelPipe.transform(evalDetails.reviewStatus, 'reviewStatus') }}</span>
           </div>
 
           <div class="detail-row" *ngIf="evalDetails.reviewedBy">

@@ -32,6 +32,7 @@ import { TargetType } from '../../../core/enum/targettype.enum';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { CreateIncidentDialogComponent } from '../create-incident-dialog/create-incident-dialog.component';
 
 
 type ImpactRow = {
@@ -172,16 +173,16 @@ export class ViewComponent implements OnInit {
         label: "Modifier",
         icon: 'edit',
         class: 'btn-green',
-        show: this.canShowActions() && this.isDraft(),
+        show: this.canShowActions() && !this.isDraft(),
         permission: { teamId: this.incident?.teamId, permissions: ['UPDATE_INCIDENT'] },
-        action: () => this.goToModification()
+        action: () => this.openEditIncidentDialog(this.incident?.id || '')
       },
       {
         label: "Modifier",
         icon: 'edit',
         class: 'btn-green',
         show: this.isDraft() && this.sameCreator(),
-        action: () => this.goToModification()
+        action: () => this.openEditIncidentDialog(this.incident?.id || '')
       },
       {
         label: "Supprimer",
@@ -208,6 +209,20 @@ export class ViewComponent implements OnInit {
 
     ];
   }
+
+  openEditIncidentDialog(incidentId: string) {
+  const dialogRef = this.dialog.open(CreateIncidentDialogComponent, {
+    width: '900px',
+    maxWidth: '95vw',
+    data: { incidentId }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result?.success) {
+      console.log('Incident modifié:', result.incidentId);
+    }
+  });
+}
 
   sameCreator() {
     return this.authService.sameUser(this.incident?.creatorId || '');

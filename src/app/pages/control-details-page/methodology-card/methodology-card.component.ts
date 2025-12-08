@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 import { ControlService } from '../../../core/services/dmr/control/control.service';
 import { ControlMethodologyCreateDto, ControlMethodologyViewDto } from '../../../core/models/ControlMethodology';
@@ -11,10 +14,19 @@ import { ControlNature } from '../../../core/enum/ControlNature.enum';
 import { ExecutionMode } from '../../../core/enum/exceutionmode.enum';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
-
 @Component({
   selector: 'app-methodology-card',
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, EnumLabelPipe],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    MatFormFieldModule, 
+    MatSelectModule,
+    MatInputModule, 
+    MatCardModule, 
+    MatIconModule,
+    MatButtonModule,
+    EnumLabelPipe
+  ],
   templateUrl: './methodology-card.component.html',
   styleUrl: './methodology-card.component.scss'
 })
@@ -34,7 +46,7 @@ export class MethodologyCardComponent implements OnInit {
   ControlNature = ControlNature;
   ExecutionMode = ExecutionMode;
 
-  controlNatureValues = Object.values(ControlNature)
+  controlNatureValues = Object.values(ControlNature);
   executionModeValues = Object.values(ExecutionMode);
 
   constructor() {
@@ -57,7 +69,6 @@ export class MethodologyCardComponent implements OnInit {
     if (this.form.invalid || this.submitting) return;
     this.submitting = true;
 
-
     const payload: ControlMethodologyCreateDto = {
       controlTemplateId: this.controlId,
       controlNature: this.form.value.controlNature,
@@ -75,22 +86,5 @@ export class MethodologyCardComponent implements OnInit {
       },
       error: () => { this.submitting = false; }
     });
-  }
-
-  controlTypeLabel(t?: string): string {
-    switch (t) {
-      case 'PREVENTIVE': return 'Préventif';
-      case 'DETECTIVE': return 'Détectif';
-      case 'CORRECTIVE': return 'Correctif';
-      default: return t || '—';
-    }
-  }
-  executionModeLabel(m?: string): string {
-    switch (m) {
-      case 'CHECK_LIST': return 'Checklist';
-      case 'TESTING': return 'Tests';
-      case 'SAMPLING': return 'Échantillonnage';
-      default: return m || '—';
-    }
   }
 }

@@ -1,0 +1,120 @@
+<app-base-popup 
+  [title]="'Détail de l\'exécution'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
+
+  <!-- Bandeau méta -->
+  <div class="meta-banner" [ngClass]="computeMetaStripe(s)" *ngIf="s.exec">
+    <div class="meta-content">
+      <div class="meta-left">
+        <div class="meta-line">
+          <span class="badge" [ngClass]="getStatusClass(s.exec.status)">
+            {{ s.exec.status | enumLabel:'status' }}
+          </span>
+          <span class="meta-date" *ngIf="s.exec.plannedAt">
+            Planifiée le {{ s.exec.plannedAt | date:'dd/MM/yyyy' }}
+          </span>
+          <span class="meta-date" *ngIf="s.view?.evaluatedAt">
+            • Évaluée le {{ s.view.evaluatedAt | date:'dd/MM/yyyy' }}
+          </span>
+          <span class="meta-date" *ngIf="s.view?.reviewedAt">
+            • Validée le {{ s.view.reviewedAt | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+        <div class="meta-sub" *ngIf="s.exec.performedBy">
+          Attribuée à {{ s.exec.performedBy }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form>
+    <!-- Section Résultats & observations -->
+    <div class="section" *ngIf="s.view">
+      <div class="section-header">
+        <mat-icon class="section-icon">assessment</mat-icon>
+        <h3 class="section-title">Résultats & observations</h3>
+        <span class="badge" [ngClass]="getReviewBadgeClass(s.view.reviewStatus)">
+              {{ s.view.reviewStatus | enumLabel:'reviewStatus' }}
+            </span>
+      </div>
+
+      <div class="forms-container">
+        <div class="eval-header">
+          <div class="eval-left">
+            <span class="section-label">Évaluation du contrôle</span>
+            <span class="badge" [ngClass]="getEvalClass(s.view.evaluation)">
+              {{ s.view.evaluation | enumLabel:'evaluationControl' }}
+            </span>
+          </div>
+
+          <div class="eval-right">
+            <span class="meta-text" *ngIf="s.view?.evaluatedAt">
+              Évaluée le {{ s.view.evaluatedAt | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <div class="block-label">Résumé des constats</div>
+          <div class="block-text">{{ s.view.resume || '—' }}</div>
+        </div>
+
+        <div class="content-block">
+          <div class="block-label">Commentaires de l'exécutant</div>
+          <div class="block-text">{{ s.view.comments || '—' }}</div>
+        </div>
+
+        <button mat-raised-button type="button" class="btn-add-action" (click)="viewFiles()">
+          <mat-icon>attachment</mat-icon>
+          Voir les fichiers attachés
+        </button>
+      </div>
+    </div>
+
+    <!-- Section Validation / Approbation -->
+    <div class="section" *ngIf="s.view?.reviewStatus === 'APPROVED'">
+      <div class="section-header">
+        <mat-icon class="section-icon">verified</mat-icon>
+        <h3 class="section-title">Validation / Approbation</h3>
+            <div class="validation-status">
+          <span class="badge" [ngClass]="getReviewBadgeClass(s.view.reviewStatus)">
+            {{ s.view.reviewStatus | enumLabel:'reviewStatus' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="forms-container">
+        <div class="validation-grid">
+          <div class="validation-field">
+            <label>Nom du valideur / manager</label>
+            <div class="validation-value">{{ s.view.reviewedBy || '—' }}</div>
+          </div>
+
+          <div class="validation-field">
+            <label>Date de validation</label>
+            <div class="validation-value">
+              {{ s.view.reviewedAt ? (s.view.reviewedAt | date:'dd/MM/yyyy') : '—' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <div class="block-label">Commentaires ou avis du valideur</div>
+          <div class="block-text">{{ s.view.reviewComment || '—' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- État vide si pas d'évaluation -->
+    <div class="section" *ngIf="!s.view">
+      <div class="empty-state">
+        <mat-icon>info</mat-icon>
+        <p>Aucune évaluation disponible pour cette exécution.</p>
+      </div>
+    </div>
+  </form>
+
+</app-base-popup>

@@ -18,6 +18,8 @@ import { IncidentService } from '../../../../core/services/incident/incident.ser
 import { RiskEvaluationService } from '../../../../core/services/risk-evaluation/risk-evaluation.service';
 import { ControlExecutionView } from '../../../../core/models/ControlExecution';
 import { EnumLabelPipe } from '../../../../shared/pipes/enum-label.pipe';
+import { ExecutionDetailDialogComponent } from '../../../execution-detail-dialog/execution-detail-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -38,6 +40,7 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private controlService = inject(ControlService);
   private incidentService = inject(IncidentService);
+  private dialog = inject(MatDialog);
   
   controlExecutions: Record<string, ControlExecutionView[] | null> = {};
   controlEvaluationCache: Record<string, ControlEvaluationView | null> = {};
@@ -97,6 +100,15 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  openProcessDialog(row?: any) {
+        this.dialog.open(ExecutionDetailDialogComponent, {
+          minWidth: '700px',
+          data: row
+        }).afterClosed().subscribe(_ => {
+          this.ngOnInit();
+        });
+      }
 
   loadControlExecutions(controlId: string): void {
   this.controlService.getAllExecutions(controlId).subscribe(executions => {

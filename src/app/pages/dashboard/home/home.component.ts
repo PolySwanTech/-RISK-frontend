@@ -22,7 +22,6 @@ import { ControlCompletionRateComponent } from "../../../features/dashboard/cont
 import { ControlResultChartComponent } from "../../../features/dashboard/control-result-chart/control-result-chart.component";
 import { ControlStatusChartComponent } from "../../../features/dashboard/control-status-chart/control-status-chart.component";
 import { ActionPlanTimelinessChartComponent } from "../../../features/dashboard/action-plan-timeliness-chart/action-plan-timeliness-chart.component";
-import { AverageImplementationDelayComponent } from "../../../features/dashboard/average-implementation-delay/average-implementation-delay.component";
 import { PriorityDistributionChartComponent } from "../../../features/dashboard/priority-distribution-chart/priority-distribution-chart.component";
 import { RiskEvaluationSummaryComponent } from "../../../features/dashboard/risk-evaluation-summary/risk-evaluation-summary.component";
 import { RiskCriticalityChartComponent } from "../../../features/dashboard/risk-criticality-chart/risk-criticality-chart.component";
@@ -51,7 +50,6 @@ import { TopCriticalRisksComponent } from "../../../features/dashboard/top-criti
     BaloiseCategoryChartComponent,
     IncidentsTrendChartComponent,
     ActionPlanTimelinessChartComponent,
-    AverageImplementationDelayComponent,
     PriorityDistributionChartComponent,
     RiskEvaluationSummaryComponent,
     RiskCriticalityChartComponent,
