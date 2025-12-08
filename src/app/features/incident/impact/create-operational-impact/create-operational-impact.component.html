@@ -241,7 +241,7 @@
                 </button>
 
                 <!-- (optionnel) petit compteur si déjà chargés -->
-                <span class="op-meta" *ngIf="attachedCounts?.[impact.id] !== undefined">
+                <span class="op-meta" *ngIf="attachedCounts[impact.id] !== undefined">
                   {{ attachedCounts[impact.id] }} fichier(s)
                 </span>
               </div>
