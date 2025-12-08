@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { arrayNotEmptyValidator } from '../../../../shared/validators/custom-validators';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 import { BusinessUnit } from '../../../../core/models/BusinessUnit';
+import { UtilisateurCreate } from '../../../../core/models/Utilisateur';
 
 @Component({
   selector: 'app-create-user',
@@ -75,7 +76,6 @@ export class CreateUserComponent implements OnInit {
   onSubmit() {
     this.organigrammeComponent.getRoles();
     if (this.userForm.valid) {
-      console.log("ici")
       if (this.update) {
         this.userService.updateUserRoles(this.data.user.id, this.userForm.value.teamRoleList).subscribe({
           next: () => {
@@ -97,9 +97,13 @@ export class CreateUserComponent implements OnInit {
       else {
         this.authService.register(this.userForm.value).subscribe({
           next: user => {
-            this.userService.updateUserRoles(user.id, this.userForm.value.teamRoleList).subscribe({
+            const payload : UtilisateurCreate = {
+              id : user.id,
+              username: this.userForm.value.username,
+              teamRoleList: this.userForm.value.teamRoleList
+            }
+            this.userService.addUser(payload).subscribe({
               next: () => {
-                this.snackBarService.success("✅ Utilisateur créé avec succès");
                 this.dialogRef.close(true);
               }
             });
