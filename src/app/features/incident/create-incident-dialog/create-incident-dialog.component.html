@@ -1,0 +1,172 @@
+<app-base-popup 
+  [title]="data?.incidentId ? 'Modifier l\'incident' : 'Créer un incident'" 
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="closePopup()">
+
+  <!-- Indicateur d'étape -->
+  <div class="stepper-indicator">
+    <div class="step-item" [class.active]="currentStep === 0" [class.completed]="currentStep > 0">
+      <div class="step-circle">
+        <mat-icon *ngIf="currentStep > 0">check</mat-icon>
+        <span *ngIf="currentStep <= 0">1</span>
+      </div>
+      <span class="step-label">Informations de base</span>
+    </div>
+    <div class="step-line" [class.completed]="currentStep > 0"></div>
+    <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+      <div class="step-circle">
+        <mat-icon *ngIf="currentStep > 1">check</mat-icon>
+        <span *ngIf="currentStep <= 1">2</span>
+      </div>
+      <span class="step-label">Dates</span>
+    </div>
+    <div class="step-line" [class.completed]="currentStep > 1"></div>
+    <div class="step-item" [class.active]="currentStep === 2">
+      <div class="step-circle">
+        <span>3</span>
+      </div>
+      <span class="step-label">Autres informations</span>
+    </div>
+  </div>
+
+  <!-- Étape 1 : Informations de base -->
+  <div class="section" *ngIf="currentStep === 0">
+    <div class="section-header">
+      <mat-icon class="section-icon">info</mat-icon>
+      <h3 class="section-title">Informations de base</h3>
+    </div>
+
+    <form [formGroup]="incidentForm1" class="forms-container">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Titre</mat-label>
+        <input matInput formControlName="titre" placeholder="Ex: Panne de serveur">
+        <mat-icon matPrefix>title</mat-icon>
+        <button mat-icon-button matSuffix matTooltip="Saisissez le titre de l'incident.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description de l'incident</mat-label>
+        <textarea matInput formControlName="commentaire" rows="4" 
+                  placeholder="Décrivez l'incident en détail"></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+        <button mat-icon-button matSuffix matTooltip="Donnez une description détaillée de l'incident.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Localisation de l'incident</mat-label>
+        <input matInput formControlName="location" placeholder="Ex: Salle serveur A">
+        <mat-icon matPrefix>location_on</mat-icon>
+        <button mat-icon-button matSuffix matTooltip="Indiquez le lieu où l'incident s'est produit.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <!-- Étape 2 : Dates -->
+  <div class="section" *ngIf="currentStep === 1">
+    <div class="section-header">
+      <mat-icon class="section-icon">event</mat-icon>
+      <h3 class="section-title">Dates</h3>
+    </div>
+
+    <form [formGroup]="incidentForm2" class="forms-container">
+      <mat-form-field appearance="outline">
+        <mat-label>Date de déclaration</mat-label>
+        <input matInput [matDatepicker]="picker1" formControlName="dateDeDeclaration" readonly>
+        <mat-icon matPrefix>calendar_today</mat-icon>
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1 disabled></mat-datepicker>
+        <button mat-icon-button matSuffix matTooltip="Date à laquelle l'incident a été déclaré.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de survenance</mat-label>
+        <input matInput [max]="today" [matDatepicker]="picker2" formControlName="dateDeSurvenance">
+        <mat-icon matPrefix>calendar_today</mat-icon>
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+        <button mat-icon-button matSuffix matTooltip="Date à laquelle l'incident s'est produit.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de détection</mat-label>
+        <input matInput [min]="incidentForm2.get('dateDeSurvenance')?.value" [max]="today"
+               [matDatepicker]="picker3" formControlName="dateDeDetection">
+        <mat-icon matPrefix>calendar_today</mat-icon>
+        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+        <mat-datepicker #picker3></mat-datepicker>
+        <button mat-icon-button matSuffix matTooltip="Date à laquelle l'incident a été détecté.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <!-- Étape 3 : Autres informations -->
+  <div class="section" *ngIf="currentStep === 2">
+    <div class="section-header">
+      <mat-icon class="section-icon">settings</mat-icon>
+      <h3 class="section-title">Autres informations</h3>
+    </div>
+
+    <form [formGroup]="incidentForm3" class="forms-container">
+      <!-- Association BU / Processus / Événement -->
+      <div class="association-block">
+        <button mat-raised-button class="btn-purple" (click)="openBuProcessDialog()">
+          <mat-icon>add</mat-icon>
+          Associer BU / Processus / Événement redouté
+        </button>
+
+        <div class="chips-container" *ngIf="selectedBP">
+          <mat-chip-listbox>
+            <mat-chip>
+              <mat-icon matChipAvatar>business</mat-icon>
+              Équipe : {{ selectedBP.bu.name }}
+            </mat-chip>
+            <mat-chip>
+              <mat-icon matChipAvatar>account_tree</mat-icon>
+              Processus : {{ selectedBP.process.name }}
+            </mat-chip>
+            <mat-chip *ngIf="selectedBP?.risk"
+                      [matTooltip]="selectedBP.risk.isInfo ? 'Cet événement de risque n\'a pas encore été validé' : null">
+              <mat-icon matChipAvatar>warning</mat-icon>
+              Événement redouté : {{ selectedBP.risk.name }}
+              <mat-icon *ngIf="selectedBP.risk.isInfo" class="warning-icon">warning</mat-icon>
+            </mat-chip>
+          </mat-chip-listbox>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cause</mat-label>
+        <mat-select formControlName="cause" [compareWith]="compareById">
+          <mat-option *ngFor="let cause of listCauses" [value]="cause">
+            {{ cause.name }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>psychology</mat-icon>
+        <button mat-icon-button matSuffix matTooltip="Sélectionnez la cause principale de l'incident.">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <app-select-users 
+        [selectedUserId]="selectedUser" 
+        (userSelected)="changeUser($event)"
+        placeholder="Collaborateur pouvant vous aider">
+      </app-select-users>
+    </form>
+  </div>
+
+</app-base-popup>

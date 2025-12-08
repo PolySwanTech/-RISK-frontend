@@ -27,6 +27,8 @@ import { GlobalSearchBarComponent } from "../../../shared/components/global-sear
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+import { CreateIncidentDialogComponent } from '../create-incident-dialog/create-incident-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -114,6 +116,7 @@ export class ListComponent implements OnInit {
 
   selectedIncidents = new Set<string>();
 
+  private dialog = inject(MatDialog);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -164,7 +167,7 @@ export class ListComponent implements OnInit {
             class: 'btn-primary',
             show: true,
             permission: 'CREATE_INCIDENT',
-            action: () => this.add()
+            action: () => this.openCreateIncidentDialog()
           },
           {
             label: 'Exporter',
@@ -182,6 +185,26 @@ export class ListComponent implements OnInit {
   refreshData() {
     this.ngOnInit();
   }
+
+  openCreateIncidentDialog() {
+  const dialogRef = this.dialog.open(CreateIncidentDialogComponent, {
+    width: '900px',
+    maxWidth: '95vw',
+    data: null
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result?.success) {
+      if (result.draft) {
+        console.log('Brouillon sauvegardé:', result.incidentId);
+      } else {
+        console.log('Incident créé:', result.incidentId);
+        // Navigation vers la consultation si besoin
+        this.router.navigate(['incident', result.incidentId]);
+      }
+    }
+  });
+}
 
   // This method will be triggered when a row is clicked
   onRowClick(incident: IncidentListViewDto) {

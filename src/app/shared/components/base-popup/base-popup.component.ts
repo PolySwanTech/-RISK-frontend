@@ -10,9 +10,10 @@ export interface PopupAction {
   label: string;
   icon?: string;
   onClick: () => void;
+  hidden?: boolean | (() => boolean);
   disabled?: boolean | (() => boolean);
   primary?: boolean;
-  color?: 'primary' | 'accent' | 'warn' | 'red' | 'purple';
+  color?: 'primary' | 'accent' | 'warn' | 'red' | 'purple' | 'green';
 }
 
 @Component({
@@ -45,6 +46,7 @@ export interface PopupAction {
   mat-raised-button 
   [class]="getButtonClass(action)"
   [disabled]="isActionDisabled(action)"
+  [hidden]="isActionHidden(action)"
   (click)="action.onClick()">
   <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
   {{ action.label }}
@@ -76,6 +78,13 @@ export class BasePopupComponent {
   return action.disabled || false;
 }
 
+ isActionHidden(action: PopupAction): boolean {
+  if (typeof action.hidden === 'function') {
+    return action.hidden();
+  }
+  return action.hidden || false;
+}
+
   getButtonClass(action: PopupAction): string {
     if (action.color === 'red') {
       return 'btn-red';
@@ -91,6 +100,9 @@ export class BasePopupComponent {
     }
     if (action.color === 'purple') {
       return 'btn-purple';
+    }
+    if (action.color === 'green') {
+      return 'btn-green';
     }
     return '';
   }

@@ -1,9 +1,10 @@
 @if(users && users.length > 0){
 <div class="user-list">
-    <mat-form-field class="full-width autocomplete-field" >
+    <mat-form-field appearance="outline" class="full-width autocomplete-field" >
         <input type="text" matInput [placeholder]="placeholder" [matAutocomplete]="auto" [(ngModel)]="searchQuery"
             [formControl]="stateCtrl" (input)="filterBySearch();" (focus)="filterBySearch()"
             (keydown.enter)="filterBySearch()" />
+            <mat-icon matPrefix>group_add</mat-icon>
             <button mat-icon-button matSuffix matTooltip="Collaborateur qui aura accès à l'incident pour vous supporter">
                 <mat-icon>info</mat-icon>
               </button>
