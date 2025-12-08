@@ -25,6 +25,7 @@ import { FileService } from '../../../../core/services/file/file.service';
 import { TargetType } from '../../../../core/enum/targettype.enum';
 import { ConfirmService } from '../../../../core/services/confirm/confirm.service';
 import { EnumLabelPipe } from '../../../../shared/pipes/enum-label.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 // ------------------ Modèles locaux (form) ------------------
 interface FinancialImpactDetail {
@@ -58,7 +59,7 @@ type Errors = Record<string, string>;
 @Component({
   selector: 'app-create-operational-impact',
   standalone: true,
-  imports: [CommonModule, FormsModule, GoBackComponent, EnumLabelPipe],
+  imports: [CommonModule, FormsModule, GoBackComponent, EnumLabelPipe, MatTooltipModule],
   templateUrl: './create-operational-impact.component.html',
   styleUrl: './create-operational-impact.component.scss',
 })
