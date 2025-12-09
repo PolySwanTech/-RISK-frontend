@@ -18,7 +18,6 @@ import { PopupEvaluationControleComponent } from './pages/control-details-page/p
 import { AddActionDialogComponent } from './features/action-plan/add-action-dialog/add-action-dialog.component';
 import { CreateRisksReferentielComponent } from './features/reglages/risks/create-risks-referentiel/create-risks-referentiel.component';
 
-
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, FooterComponent, LoadingComponent, MatSidenavModule, SidebarComponent, DraftBannerComponent],
@@ -27,6 +26,9 @@ import { CreateRisksReferentielComponent } from './features/reglages/risks/creat
 })
 export class AppComponent {
   title = 'risk-view';
+  
+  private dialog = inject(MatDialog);
+  private draftService = inject(DraftService);
 
   constructor(private router: Router) {
     this.router.events
@@ -36,9 +38,6 @@ export class AppComponent {
       });
   }
 
-  private dialog = inject(MatDialog);
-  private draftService = inject(DraftService);
-
   ngOnInit(): void {
     // Écoute l'événement de restauration de brouillon
     window.addEventListener('restoreDraft', (event: any) => {
@@ -47,9 +46,11 @@ export class AppComponent {
   }
 
   private handleRestoreDraft(draft: any): void {
+    let dialogRef: any;
+
     switch (draft.component) {
       case 'AddEntityDialog':
-        this.dialog.open(AddEntityDialogComponent, {
+        dialogRef = this.dialog.open(AddEntityDialogComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -71,7 +72,7 @@ export class AppComponent {
           actionPlanData.reference = actionPlanDraft.data.incidentData.reference;
         }
         
-        this.dialog.open(CreateActionPlanDialogComponent, {
+        dialogRef = this.dialog.open(CreateActionPlanDialogComponent, {
           width: '900px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -81,7 +82,7 @@ export class AppComponent {
         break;
 
       case 'AddActionDialog':
-        this.dialog.open(AddActionDialogComponent, {
+        dialogRef = this.dialog.open(AddActionDialogComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -93,7 +94,7 @@ export class AppComponent {
         break;
 
       case 'CreateControlDialog':
-        this.dialog.open(CreateControlComponent, {
+        dialogRef = this.dialog.open(CreateControlComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -105,7 +106,7 @@ export class AppComponent {
         break;
 
       case 'CreateAttenuationMetricsDialog':
-        this.dialog.open(CreateAttenuationMetricsComponent, {
+        dialogRef = this.dialog.open(CreateAttenuationMetricsComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -117,7 +118,7 @@ export class AppComponent {
         break;
 
       case 'CreateProcessDialog':
-        this.dialog.open(CreateProcessComponent, {
+        dialogRef = this.dialog.open(CreateProcessComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -129,7 +130,7 @@ export class AppComponent {
         break;
         
       case 'CreateRisksComponent':
-        this.dialog.open(CreateRisksComponent, {
+        dialogRef = this.dialog.open(CreateRisksComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -140,8 +141,8 @@ export class AppComponent {
         });
         break;
 
-        case 'PopupEvaluationControleComponent':
-        this.dialog.open(PopupEvaluationControleComponent, {
+      case 'PopupEvaluationControleComponent':
+        dialogRef = this.dialog.open(PopupEvaluationControleComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -152,8 +153,8 @@ export class AppComponent {
         });
         break;
 
-        case 'CreateRiskReferentielDialog':
-        this.dialog.open(CreateRisksReferentielComponent, {
+      case 'CreateRiskReferentielDialog':
+        dialogRef = this.dialog.open(CreateRisksReferentielComponent, {
           width: '800px',
           maxWidth: '95vw',
           maxHeight: '90vh',
@@ -166,6 +167,15 @@ export class AppComponent {
 
       default:
         console.warn('Unknown draft component:', draft.component);
+        return;
+    }
+
+    // Après fermeture de la dialog, émettre un événement global de rechargement
+    if (dialogRef) {
+      dialogRef.afterClosed().subscribe(() => {
+        // Émettre un événement personnalisé pour notifier tous les composants
+        window.dispatchEvent(new CustomEvent('dataChanged'));
+      });
     }
   }
 }

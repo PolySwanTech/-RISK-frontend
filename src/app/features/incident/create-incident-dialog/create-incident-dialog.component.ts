@@ -12,7 +12,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
 import { SelectUsersComponent } from '../../../shared/components/select-users/select-users.component';
-import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { IncidentService } from '../../../core/services/incident/incident.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { ProcessService } from '../../../core/services/process/process.service';
@@ -25,6 +24,7 @@ import { Cause } from '../../../core/models/Cause';
 import { Incident, IncidentCreateDto } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { forkJoin, tap, map, firstValueFrom } from 'rxjs';
+import { ProcessManagerComponent } from '../../../shared/components/param-process/param-process.component';
 
 export interface CreateIncidentDialogData {
   incidentId?: string;
@@ -165,7 +165,6 @@ export class CreateIncidentDialogComponent implements OnInit {
         label: 'Suivant',
         icon: 'arrow_forward',
         primary: true,
-        disabled: () => this.isCurrentStepInvalid(),
         onClick: () => this.nextStep(),
         hidden: () => this.currentStep === 2
       },
@@ -208,19 +207,6 @@ export class CreateIncidentDialogComponent implements OnInit {
     if (this.currentStep > 0) {
       this.currentStep--;
       this.initActions();
-    }
-  }
-
-  isCurrentStepInvalid(): boolean {
-    switch (this.currentStep) {
-      case 0:
-        return this.incidentForm1.invalid;
-      case 1:
-        return this.incidentForm2.invalid;
-      case 2:
-        return this.incidentForm3.invalid;
-      default:
-        return false;
     }
   }
 
@@ -287,10 +273,10 @@ export class CreateIncidentDialogComponent implements OnInit {
       }
 
       if (incident.riskName) {
-        this.selectedBP = { 
-          bu: { name: incident.teamName }, 
-          process: { name: incident.processName }, 
-          risk: { name: incident.riskName } 
+        this.selectedBP = {
+          bu: { name: incident.teamName },
+          process: { name: incident.processName },
+          risk: { name: incident.riskName }
         };
       }
 
@@ -340,7 +326,7 @@ export class CreateIncidentDialogComponent implements OnInit {
     request$.subscribe({
       next: resp => {
         const id = this.data?.incidentId ? this.data.incidentId : resp;
-        
+
         if (this.currentDraftId) {
           this.draftService.deleteDraft(this.currentDraftId);
         }
@@ -402,15 +388,14 @@ export class CreateIncidentDialogComponent implements OnInit {
     this.incidentForm3.get('riskId')?.setValue(event.risk.id);
   }
 
+
+
   openBuProcessDialog() {
-    const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
-      minWidth: '750px',
-      height: '600px',
-      maxHeight: '600px',
-      data: {
-        stopAtProcess: false
-      }
+    const dialogRef = this.dialog.open(ProcessManagerComponent, {
+      minWidth: '1200px',
+      data: { popupMode: true, cartoMode: true }
     });
+
     dialogRef.afterClosed().subscribe(event => {
       if (event) {
         this.selectBP(event);

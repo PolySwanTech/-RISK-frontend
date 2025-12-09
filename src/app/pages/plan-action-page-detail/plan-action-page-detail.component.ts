@@ -53,6 +53,7 @@ export class PlanActionPageDetailComponent implements OnInit {
   private dialog = inject(MatDialog);
   private snackBarService = inject(SnackBarService)
   private auditService = inject(AuditService);
+  private dataChangedListener: any;
 
   actionPlan: ActionPlan | null = null;
   idPlanAction: string = this.route.snapshot.params['id'];
@@ -74,6 +75,10 @@ export class PlanActionPageDetailComponent implements OnInit {
 
   ngOnInit() {
     this.getActionPlan(this.idPlanAction);
+    this.dataChangedListener = () => {
+      this.ngOnInit();
+    };
+    window.addEventListener('dataChanged', this.dataChangedListener);
   }
 
   isNotStarted() {

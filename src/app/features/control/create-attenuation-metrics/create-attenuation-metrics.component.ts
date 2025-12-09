@@ -8,13 +8,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChip, MatChipListbox } from '@angular/material/chips';
-
-import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { AttenuationMetricsCreateDto, AttenuationMetricsTypeDto } from '../../../core/models/AttenuationMetrics';
 import { AttenuationMetricsService } from '../../../core/services/dmr/attenuationMetrics/attenuation-metrics.service';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
 import { DraftService } from '../../../core/services/draft.service';
+import { ProcessManagerComponent } from '../../../shared/components/param-process/param-process.component';
 
 export interface CreateAttenuationMetricsDialogData {
   draftId?: string;
@@ -208,15 +207,17 @@ export class CreateAttenuationMetricsComponent implements OnInit {
 
   /** Ouvre le sélecteur BU / Processus / Risque */
   create() {
-    const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
-      minWidth: '750px',
-      height: '600px',
-      maxHeight: '600px',
+    const dialogRef = this.dialog.open(ProcessManagerComponent, {
+      minWidth: '1200px',
+      data: { popupMode: true, cartoMode: true }
     });
 
     dialogRef.afterClosed().subscribe(event => {
-      if (event) this.selectBPR(event);
+      if (event) {
+        this.selectBPR(event);
+      }
     });
+
   }
 
   selectBPR(event: any) {

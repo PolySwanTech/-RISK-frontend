@@ -21,11 +21,11 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { Type } from '../../../core/enum/controltype.enum';
 import { MatIconModule } from '@angular/material/icon';
-import { BuProcessAccordionComponent } from '../../../shared/components/bu-process-accordion/bu-process-accordion.component';
 import { MatChipListbox, MatChip } from "@angular/material/chips";
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
 import { DraftService } from '../../../core/services/draft.service';
+import { ProcessManagerComponent } from '../../../shared/components/param-process/param-process.component';
 
 export interface CreateControlDialogData {
   draftId?: string;
@@ -250,10 +250,9 @@ export class CreateControlComponent {
   }
 
   create() {
-    const dialogRef = this.dialog.open(BuProcessAccordionComponent, {
-      minWidth: '750px',
-      height: '600px',
-      maxHeight: '600px',
+    const dialogRef = this.dialog.open(ProcessManagerComponent, {
+      minWidth: '1200px',
+      data: { popupMode: true, cartoMode: true }
     });
 
     dialogRef.afterClosed().subscribe(event => {
@@ -261,6 +260,7 @@ export class CreateControlComponent {
         this.selectBPR(event);
       }
     });
+
   }
 
   @HostListener('window:beforeunload')

@@ -53,6 +53,7 @@ export class AttenuationMetricsListComponent implements OnInit {
   private service = inject(AttenuationMetricsService);
   private dialog = inject(MatDialog);
   private fileService = inject(FileService);
+  private dataChangedListener: any;
 
   metrics: AttenuationMetrics[] = [];
   filteredMetrics: AttenuationMetrics[] = [];
@@ -85,6 +86,10 @@ export class AttenuationMetricsListComponent implements OnInit {
         action: () => this.openCreateDialog() 
       }
     ];
+    this.dataChangedListener = () => {
+      this.ngOnInit();
+    };
+    window.addEventListener('dataChanged', this.dataChangedListener);
   }
 
   loadMetrics(): void {

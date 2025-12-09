@@ -58,6 +58,7 @@ export class ControlListComponent implements OnInit, AfterViewInit {
 
   private snackBarService = inject(SnackBarService);
   private enumLabelPipe = inject(EnumLabelPipe);
+  private dataChangedListener: any;
 
   filterMode: 'general' | 'detailed' = 'general';
 
@@ -208,6 +209,11 @@ export class ControlListComponent implements OnInit, AfterViewInit {
         class: 'btn-green'
       }
     ]
+
+    this.dataChangedListener = () => {
+      this.ngOnInit();
+    };
+    window.addEventListener('dataChanged', this.dataChangedListener);
   }
 
   export() {

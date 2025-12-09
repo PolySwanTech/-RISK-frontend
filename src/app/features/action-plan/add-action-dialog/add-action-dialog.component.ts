@@ -71,12 +71,23 @@ export class AddActionDialogComponent implements OnInit {
   }
 
   loadDraft(draftId: string): void {
-    const draft = this.draftService.getDraftById(draftId);
-    if (draft) {
-      this.actions = draft.data.actions || [];
-      console.log('Brouillon d\'actions restauré:', draft);
-    }
-  }
+    const draft = this.draftService.getDraftById(draftId);
+    if (draft) {
+      // 🚨 CORRECTION ICI
+      const draftData = draft.data as { actions: Action[], actionPlanId: string };
+      
+      // 1. Restaurer les actions
+      this.actions = draftData.actions || [];
+      
+      // 2. Restaurer l'actionPlanId dans this.data si elle est présente dans le brouillon
+      if (draftData.actionPlanId) {
+        this.data.actionPlanId = draftData.actionPlanId;
+      }
+      
+      console.log('Brouillon d\'actions restauré:', draft);
+      console.log('ActionPlanId restauré:', this.data.actionPlanId); // Vérification
+    }
+  }
 
   initActions(): void {
     this.popupActions = [
@@ -113,6 +124,8 @@ export class AddActionDialogComponent implements OnInit {
       actions: this.actions,
       actionPlanId: this.data.actionPlanId
     };
+
+    console.log(draftData)
 
     const actionCount = this.actions.filter(a => a.name && a.name.trim() !== '').length;
     const title = `${actionCount} action${actionCount > 1 ? 's' : ''} à ajouter`;

@@ -7,7 +7,7 @@ import { ProcessService } from '../../../core/services/process/process.service';
 import { RiskService } from '../../../core/services/risk/risk.service';
 import { Process } from '../../../core/models/Process';
 import { CreateRisksComponent } from '../../../features/reglages/risks/create-risks/create-risks.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { PermissionName } from '../../../core/enum/permission.enum';
@@ -31,6 +31,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MatButtonModule } from "@angular/material/button";
+import { BasePopupComponent, PopupAction } from '../base-popup/base-popup.component';
 
 @Component({
   selector: 'app-process-manager',
@@ -50,7 +51,8 @@ import { MatButtonModule } from "@angular/material/button";
     EnumLabelPipe,
     MatSortModule,
     MatMenuModule,
-    MatButtonModule
+    MatButtonModule,
+    BasePopupComponent
   ],
   templateUrl: './param-process.component.html',
   styleUrls: ['./param-process.component.scss']
@@ -75,6 +77,10 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   buId: string = ''
 
   @Input() cartoMode: boolean = true
+  @Input() popupMode: boolean = false  // Nouveau mode popup
+
+  // Actions de la popup
+  popupActions: PopupAction[] = [];
 
   // Propriétés pour sauvegarder l'état de l'arborescence
   private expandedBuIds = new Set<string>();
@@ -93,6 +99,11 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   private entitiesService = inject(EntitiesService);
   private riskEvaluationService = inject(RiskEvaluationService);
   private risksCache = new Map<string, RiskTemplate[]>();
+  private dataChangedListener: any;
+
+  // Injection optionnelle du DialogRef pour le mode popup
+  dialogRef = inject(MatDialogRef<ProcessManagerComponent> , { optional: true });
+  data = inject(MAT_DIALOG_DATA, { optional: true });
 
   goBackButtons: GoBackButton[] = [
     {
@@ -129,6 +140,19 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       error: (err) => console.error("Erreur lors du chargement des BU :", err)
     });
 
+    this.dataChangedListener = () => {
+      this.ngOnInit();
+    };
+    window.addEventListener('dataChanged', this.dataChangedListener);
+
+    // En mode popup, récupérer les données passées via MAT_DIALOG_DATA
+
+      if (this.data) {
+        this.cartoMode = this.data.cartoMode ?? this.cartoMode;
+        this.popupMode = this.data.popupMode ?? this.popupMode;
+      }
+
+    // Sinon, récupérer depuis les query params (mode normal)
     if (this.route.snapshot.queryParams['carto']) {
       this.cartoMode = JSON.parse(this.route.snapshot.queryParams['carto']);
     }
@@ -140,6 +164,37 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
     if (this.route.snapshot.queryParams["create"]) {
       this.addProcess('');
+    }
+
+    // En mode popup, masquer le bouton "Ajouter une entité"
+    if (this.popupMode) {
+      this.goBackButtons = [];
+      // Configurer les actions de la popup
+      this.initPopupActions();
+    }
+  }
+
+  // Initialiser les actions de la popup
+  initPopupActions(): void {
+    this.popupActions = [
+      {
+        label: 'Annuler',
+        color: 'red',
+        icon: 'close',
+        onClick: () => this.closePopup()
+      }
+    ];
+  }
+
+  // Méthode pour obtenir le DialogRef
+  getDialogRef(): MatDialogRef<any> | null {
+    return this.dialogRef;
+  }
+
+  // Méthode pour fermer la popup
+  closePopup(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close();
     }
   }
 
@@ -656,6 +711,23 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    // MODE POPUP : Fermer le dialog avec les données
+    if (this.popupMode && this.dialogRef) {
+      const foundProcess = this.findProcessByRiskId(risk.id);
+      const foundBu = foundProcess ? this.findBuByProcess(foundProcess) : null;
+
+      if (foundProcess && foundBu) {
+        const result = {
+          bu: { id: foundBu.id, name: foundBu.name },
+          process: foundProcess,
+          risk: { id: risk.id, name: risk.libelle }
+        };
+        this.dialogRef.close(result);
+        return;
+      }
+    }
+
+    // MODE NORMAL (non-popup)
     if (!this.cartoMode) {
       this.viewRiskDetails(risk);
       return;
@@ -711,6 +783,11 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   }
 
   getRiskTooltip(risk: RiskTemplate): string {
+    // En mode popup, afficher un tooltip spécifique
+    if (this.popupMode) {
+      return 'Cliquez pour sélectionner ce risque';
+    }
+
     if (!this.cartoMode) {
       return 'Cliquez pour voir les détails du risque';
     }

@@ -49,6 +49,7 @@ export class PlanActionPageComponent implements OnInit {
   private confirmService = inject(ConfirmService)
   private actionPlanService = inject(ActionPlanService);
   private snackBarService = inject(SnackBarService);
+  private dataChangedListener: any;
 
   enumLabelPipe = inject(EnumLabelPipe);
 
@@ -257,8 +258,12 @@ export class PlanActionPageComponent implements OnInit {
         class: 'btn-green',
         action: () => this.export()
       },
-
     ]
+
+    this.dataChangedListener = () => {
+      this.ngOnInit();
+    };
+    window.addEventListener('dataChanged', this.dataChangedListener);
   }
 
   clearFilters(): void {

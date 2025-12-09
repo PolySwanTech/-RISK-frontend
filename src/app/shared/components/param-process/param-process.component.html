@@ -1,196 +1,269 @@
-<app-go-back [title]="cartoMode ? 'Cartographie' : 'Gestion des processus'" [buttons]="goBackButtons"></app-go-back>
+<ng-container *ngIf="popupMode; else normalMode">
+  <!-- MODE POPUP avec BasePopupComponent -->
+  <app-base-popup 
+    [title]="'Sélectionner un risque'" 
+    [showClose]="true"
+    [actions]="popupActions"
+    [dialogRef]="getDialogRef()"
+    (close)="closePopup()">
 
-<div class="container">
+    <div class="container popup-container">
+      <div class="content">
+        <!-- Arbre des processus -->
+        <div class="tree-section">
+          <h2>Structure des Processus</h2>
+          <div class="tree">
 
-  <div class="content">
-    <!-- Arbre des processus -->
-    <div class="tree-section">
-      <h2>Structure des Processus</h2>
-      <div class="tree">
+            <!-- Racines : Business Units -->
+            <div *ngFor="let bu of businessUnits" class="tree-node">
 
-        <!-- Racines : Business Units -->
-        <div *ngFor="let bu of businessUnits" class="tree-node">
+              <!-- Élément BU -->
+              <div class="process-item node-bu" [class.selected]="selectedBu?.id === bu.id" (click)="selectBu(bu)">
+                <span class="toggle" (click)="toggleExpand(bu, $event)">
+                  {{ (bu.children.length > 0 || bu.process.length > 0) ? (bu.expanded ? '▼' : '▶') : '•' }}
+                </span>
 
-          <!-- Élément BU -->
-          <div class="process-item node-bu" [class.selected]="selectedBu?.id === bu.id" (click)="selectBu(bu)">
-            <span class="toggle" (click)="toggleExpand(bu, $event)">
-              {{ (bu.children.length > 0 || bu.process.length > 0) ? (bu.expanded ? '▼' : '▶') : '•' }}
-            </span>
+                <span class="process-name">{{ bu.name }}</span>
+                <span class="badge badge-bu">BU</span>
+              </div>
 
-            <span class="process-name">{{ bu.name }}</span>
-            <span class="badge badge-bu">BU</span>
+              <!-- Enfants de la BU -->
+              <div *ngIf="bu.expanded" class="children">
+                <!-- Processus de la BU -->
+                <ng-container *ngTemplateOutlet="processTree; context: {$implicit: getRootProcesses(bu)}"></ng-container>
+
+                <!-- Sous-BU -->
+                <ng-container *ngTemplateOutlet="buTree; context: {$implicit: bu.children}"></ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Détails et actions -->
+        <div class="details-section">
+          <div *ngIf="!selectedBu && !selectedProcess" class="placeholder">
+            <p>Sélectionnez une Business Unit ou un Processus pour voir les risques</p>
           </div>
 
-          <!-- Enfants de la BU -->
-          <div *ngIf="bu.expanded" class="children">
-            <!-- Processus de la BU -->
-            <ng-container *ngTemplateOutlet="processTree; context: {$implicit: getRootProcesses(bu)}"></ng-container>
+          <!-- Détails BU sélectionnée -->
+          <div *ngIf="selectedBu && !selectedProcess" class="process-details">
+            <h2>{{ selectedBu.name }}</h2>
+            <p class="level-info">Unité métier</p>
 
-            <!-- Sous-BU -->
-            <ng-container *ngTemplateOutlet="buTree; context: {$implicit: bu.children}"></ng-container>
+            <!-- Utilisation du template partagé -->
+            <ng-container *ngTemplateOutlet="riskEventsSection"></ng-container>
+          </div>
+
+          <!-- Détails Processus sélectionné -->
+          <div *ngIf="selectedProcess" class="process-details">
+            <h2>{{ selectedProcess.name }}</h2>
+            <p class="level-info">Niveau : {{ getLevelLabel(selectedProcess.niveau) }}</p>
+
+            <!-- Utilisation du template partagé -->
+            <ng-container *ngTemplateOutlet="riskEventsSection"></ng-container>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Template des processus -->
-    <ng-template #processTree let-enfants>
-      <div *ngFor="let child of enfants" class="tree-node">
-        <div class="process-item child" [class.selected]="selectedProcess?.id === child.id"
-          (click)="selectProcess(child)">
-          <span class="toggle" (click)="toggleExpand(child, $event)">
-            {{ child.enfants.length > 0 ? (child.expanded ? '▼' : '▶') : '•' }}
-          </span>
-          <span class="process-name">{{ child.name }}</span>
-          <span class="badge" [class]="'badge-' + child.niveau">{{ getLevelLabel(child.niveau) }}</span>
-          <span class="risk-count" *ngIf="child.risks && child.risks.length > 0">
-            {{ child.risks.length }} risque(s)
-          </span>
-        </div>
-        <div *ngIf="child.expanded" class="enfants">
-          <ng-container *ngTemplateOutlet="processTree; context: {$implicit: child.enfants}"></ng-container>
-        </div>
-      </div>
-    </ng-template>
+  </app-base-popup>
+</ng-container>
 
-    <!-- Template récursif pour les sous-BU -->
-    <ng-template #buTree let-children>
-      <div *ngFor="let bu of children" class="tree-node">
-        <div class="process-item node-bu child" [class.selected]="selectedBu?.id === bu.id" (click)="selectBu(bu)">
-          <span class="toggle" (click)="toggleExpand(bu, $event)">
-            {{ (bu.children.length > 0 || bu.process.length > 0) ? (bu.expanded ? '▼' : '▶') : '•' }}
-          </span>
-          <span class="process-name">{{ bu.name }}</span>
-          <span class="badge badge-bu">BU</span>
-        </div>
+<!-- MODE NORMAL (sans popup) -->
+<ng-template #normalMode>
+  <app-go-back [title]="cartoMode ? 'Cartographie' : 'Gestion des processus'" [buttons]="goBackButtons"></app-go-back>
 
-        <div *ngIf="bu.expanded" class="children">
-          <ng-container *ngTemplateOutlet="processTree; context: {$implicit: bu.process}"></ng-container>
-          <ng-container *ngTemplateOutlet="buTree; context: {$implicit: bu.children}"></ng-container>
-        </div>
-      </div>
-    </ng-template>
+  <div class="container">
 
+    <div class="content">
+      <!-- Arbre des processus -->
+      <div class="tree-section">
+        <h2>Structure des Processus</h2>
+        <div class="tree">
 
-    <!-- Détails et actions -->
-    <div class="details-section">
-      <!-- Périodes disponibles -->
-      <div *ngIf="cartoMode && selectedBu && periods.length > 0" class="periods-container">
-        <h3>Périodes disponibles</h3>
-        <div class="chips">
-          <span *ngFor="let period of periods" class="chip" [class.selected]="period === selectedPeriod"
-            (click)="selectedPeriod = period">
-            {{ period }}
-          </span>
+          <!-- Racines : Business Units -->
+          <div *ngFor="let bu of businessUnits" class="tree-node">
+
+            <!-- Élément BU -->
+            <div class="process-item node-bu" [class.selected]="selectedBu?.id === bu.id" (click)="selectBu(bu)">
+              <span class="toggle" (click)="toggleExpand(bu, $event)">
+                {{ (bu.children.length > 0 || bu.process.length > 0) ? (bu.expanded ? '▼' : '▶') : '•' }}
+              </span>
+
+              <span class="process-name">{{ bu.name }}</span>
+              <span class="badge badge-bu">BU</span>
+            </div>
+
+            <!-- Enfants de la BU -->
+            <div *ngIf="bu.expanded" class="children">
+              <!-- Processus de la BU -->
+              <ng-container *ngTemplateOutlet="processTree; context: {$implicit: getRootProcesses(bu)}"></ng-container>
+
+              <!-- Sous-BU -->
+              <ng-container *ngTemplateOutlet="buTree; context: {$implicit: bu.children}"></ng-container>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div *ngIf="!selectedBu && !selectedProcess" class="placeholder">
-        <p>Sélectionnez une Business Unit ou un Processus pour voir les détails</p>
-      </div>
+      <!-- Détails et actions -->
+      <div class="details-section">
+        <!-- Périodes disponibles -->
+        <div *ngIf="cartoMode && selectedBu && periods.length > 0" class="periods-container">
+          <h3>Périodes disponibles</h3>
+          <div class="chips">
+            <span *ngFor="let period of periods" class="chip" [class.selected]="period === selectedPeriod"
+              (click)="selectedPeriod = period">
+              {{ period }}
+            </span>
+          </div>
+        </div>
 
-      <!-- Détails BU sélectionnée -->
-      <div *ngIf="selectedBu && !selectedProcess" class="process-details">
-        <h2>{{ selectedBu.name }}</h2>
-        <p class="level-info">Unité métier</p>
-        <div class="actions">
-          <button mat-raised-button class="btn-primary" (click)="addProcess(selectedBu.id)">
-            <mat-icon>add</mat-icon>
-            Ajouter un processus
-          </button>
+        <div *ngIf="!selectedBu && !selectedProcess" class="placeholder">
+          <p>Sélectionnez une Business Unit ou un Processus pour voir les détails</p>
+        </div>
 
-          <ng-container *ngIf="!cartoMode">
-            <button mat-raised-button class="btn-purple" (click)="goToMatrixPage(selectedBu.id)">
-              <mat-icon>grid_view</mat-icon>
-              Voir la matrice
+        <!-- Détails BU sélectionnée -->
+        <div *ngIf="selectedBu && !selectedProcess" class="process-details">
+          <h2>{{ selectedBu.name }}</h2>
+          <p class="level-info">Unité métier</p>
+          <div class="actions">
+            <button mat-raised-button class="btn-primary" (click)="addProcess(selectedBu.id)">
+              <mat-icon>add</mat-icon>
+              Ajouter un processus
             </button>
 
-            <button mat-raised-button class="btn-green" (click)="openEntityDialog(selectedBu, $event)">
-              <mat-icon>edit</mat-icon>
-              Modifier
-            </button>
-
-            <button mat-raised-button class="btn-red" (click)="deleteBu(selectedBu.id)">
-              <mat-icon>delete</mat-icon>
-              Supprimer
-            </button>
-          </ng-container>
-        </div>
-
-        <!-- Utilisation du template partagé -->
-        <ng-container *ngTemplateOutlet="riskEventsSection"></ng-container>
-      </div>
-
-      <!-- Détails Processus sélectionné -->
-      <div *ngIf="selectedProcess && !showDispatchModal" class="process-details">
-        <h2>{{ selectedProcess.name }}</h2>
-        <p class="level-info">Niveau : {{ getLevelLabel(selectedProcess.niveau) }}</p>
-
-        <div class="actions">
-          <button mat-raised-button *ngIf="selectedProcess && selectedProcess.niveau && selectedProcess.niveau < 3"
-            class="btn-primary" (click)="initiateAddChild()">
-            <mat-icon>add</mat-icon>
-            Ajouter un sous-processus
-          </button>
-        </div>
-
-        <!-- Utilisation du template partagé -->
-        <ng-container *ngTemplateOutlet="riskEventsSection"></ng-container>
-      </div>
-
-      <!-- Modal de dispatch -->
-      <div *ngIf="showDispatchModal" class="dispatch-modal">
-        <h2>Dispatcher les événements de risque redouté</h2>
-        <p *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0" class="warning">
-          ⚠️ Le processus "{{ selectedProcess.name }}" possède {{ selectedProcess.risks.length }} événement(s)
-          de risque.
-          Vous devez créer au moins 2 sous-processus et dispatcher les risques redoutés entre eux.
-        </p>
-
-        <div class="subprocess-creation">
-          <h3>Création des sous-processus</h3>
-          <div *ngFor="let sp of newSubprocesses; let i = index" class="subprocess-form">
-            <div class="form-row">
-              <label>Sous-processus {{ i + 1 }}</label>
-              <input type="text" [(ngModel)]="sp.name" placeholder="Nom du sous-processus" class="form-control">
-              <button mat-icon-button *ngIf="newSubprocesses.length > 2" (click)="removeSubprocess(i)">
-                <mat-icon>close</mat-icon>
+            <ng-container *ngIf="!cartoMode">
+              <button mat-raised-button class="btn-purple" (click)="goToMatrixPage(selectedBu.id)">
+                <mat-icon>grid_view</mat-icon>
+                Voir la matrice
               </button>
-            </div>
+
+              <button mat-raised-button class="btn-green" (click)="openEntityDialog(selectedBu, $event)">
+                <mat-icon>edit</mat-icon>
+                Modifier
+              </button>
+
+              <button mat-raised-button class="btn-red" (click)="deleteBu(selectedBu.id)">
+                <mat-icon>delete</mat-icon>
+                Supprimer
+              </button>
+            </ng-container>
           </div>
-          <button mat-raised-button class="btn-primary" (click)="addSubprocess()">
-            <mat-icon>add</mat-icon>
-            Ajouter un autre sous-processus
-          </button>
+
+          <!-- Utilisation du template partagé -->
+          <ng-container *ngTemplateOutlet="riskEventsSection"></ng-container>
         </div>
 
-        <div class="risk-dispatch" *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0">
-          <h3>Dispatcher les risques</h3>
-          <div *ngFor="let risk of selectedProcess?.risks" class="risk-dispatch-item">
-            <div class="risk-info">
-              <strong>{{ risk.libelle }}</strong>
-              <p>{{ risk.description }}</p>
-            </div>
-            <select [(ngModel)]="riskDispatch[risk.id]" class="form-control" [class.invalid]="!riskDispatch[risk.id]">
-              <option *ngFor="let sp of newSubprocesses; let i = index" [value]="i">
-                {{ sp.name || 'Sous-processus ' + (i + 1) }}
-              </option>
-            </select>
+        <!-- Détails Processus sélectionné -->
+        <div *ngIf="selectedProcess && !showDispatchModal" class="process-details">
+          <h2>{{ selectedProcess.name }}</h2>
+          <p class="level-info">Niveau : {{ getLevelLabel(selectedProcess.niveau) }}</p>
+
+          <div class="actions">
+            <button mat-raised-button *ngIf="selectedProcess && selectedProcess.niveau && selectedProcess.niveau < 3"
+              class="btn-primary" (click)="initiateAddChild()">
+              <mat-icon>add</mat-icon>
+              Ajouter un sous-processus
+            </button>
           </div>
+
+          <!-- Utilisation du template partagé -->
+          <ng-container *ngTemplateOutlet="riskEventsSection"></ng-container>
         </div>
 
-        <div class="modal-actions">
-          <button mat-raised-button class="btn-red" (click)="cancelDispatch()">
-            Annuler
-          </button>
-          <button mat-raised-button class="btn-primary" [disabled]="!canConfirmDispatch()" (click)="confirmDispatch()">
-            Confirmer
-          </button>
+        <!-- Modal de dispatch -->
+        <div *ngIf="showDispatchModal" class="dispatch-modal">
+          <h2>Dispatcher les événements de risque redouté</h2>
+          <p *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0" class="warning">
+            ⚠️ Le processus "{{ selectedProcess.name }}" possède {{ selectedProcess.risks.length }} événement(s)
+            de risque.
+            Vous devez créer au moins 2 sous-processus et dispatcher les risques redoutés entre eux.
+          </p>
+
+          <div class="subprocess-creation">
+            <h3>Création des sous-processus</h3>
+            <div *ngFor="let sp of newSubprocesses; let i = index" class="subprocess-form">
+              <div class="form-row">
+                <label>Sous-processus {{ i + 1 }}</label>
+                <input type="text" [(ngModel)]="sp.name" placeholder="Nom du sous-processus" class="form-control">
+                <button mat-icon-button *ngIf="newSubprocesses.length > 2" (click)="removeSubprocess(i)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+            <button mat-raised-button class="btn-primary" (click)="addSubprocess()">
+              <mat-icon>add</mat-icon>
+              Ajouter un autre sous-processus
+            </button>
+          </div>
+
+          <div class="risk-dispatch" *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0">
+            <h3>Dispatcher les risques</h3>
+            <div *ngFor="let risk of selectedProcess?.risks" class="risk-dispatch-item">
+              <div class="risk-info">
+                <strong>{{ risk.libelle }}</strong>
+                <p>{{ risk.description }}</p>
+              </div>
+              <select [(ngModel)]="riskDispatch[risk.id]" class="form-control" [class.invalid]="!riskDispatch[risk.id]">
+                <option *ngFor="let sp of newSubprocesses; let i = index" [value]="i">
+                  {{ sp.name || 'Sous-processus ' + (i + 1) }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button mat-raised-button class="btn-red" (click)="cancelDispatch()">
+              Annuler
+            </button>
+            <button mat-raised-button class="btn-primary" [disabled]="!canConfirmDispatch()" (click)="confirmDispatch()">
+              Confirmer
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</ng-template>
+
+<!-- Template des processus -->
+<ng-template #processTree let-enfants>
+  <div *ngFor="let child of enfants" class="tree-node">
+    <div class="process-item child" [class.selected]="selectedProcess?.id === child.id"
+      (click)="selectProcess(child)">
+      <span class="toggle" (click)="toggleExpand(child, $event)">
+        {{ child.enfants.length > 0 ? (child.expanded ? '▼' : '▶') : '•' }}
+      </span>
+      <span class="process-name">{{ child.name }}</span>
+      <span class="badge" [class]="'badge-' + child.niveau">{{ getLevelLabel(child.niveau) }}</span>
+      <span class="risk-count" *ngIf="child.risks && child.risks.length > 0">
+        {{ child.risks.length }} risque(s)
+      </span>
+    </div>
+    <div *ngIf="child.expanded" class="enfants">
+      <ng-container *ngTemplateOutlet="processTree; context: {$implicit: child.enfants}"></ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template récursif pour les sous-BU -->
+<ng-template #buTree let-children>
+  <div *ngFor="let bu of children" class="tree-node">
+    <div class="process-item node-bu child" [class.selected]="selectedBu?.id === bu.id" (click)="selectBu(bu)">
+      <span class="toggle" (click)="toggleExpand(bu, $event)">
+        {{ (bu.children.length > 0 || bu.process.length > 0) ? (bu.expanded ? '▼' : '▶') : '•' }}
+      </span>
+      <span class="process-name">{{ bu.name }}</span>
+      <span class="badge badge-bu">BU</span>
+    </div>
+
+    <div *ngIf="bu.expanded" class="children">
+      <ng-container *ngTemplateOutlet="processTree; context: {$implicit: bu.process}"></ng-container>
+      <ng-container *ngTemplateOutlet="buTree; context: {$implicit: bu.children}"></ng-container>
+    </div>
+  </div>
+</ng-template>
 
 <!-- ============================================ -->
 <!-- TEMPLATE PARTAGÉ POUR LES ÉVÉNEMENTS RISQUES -->
@@ -199,8 +272,8 @@
   <div class="risk-events-section">
     <h3>Événements de risque redouté ({{ viewedRisks.length }})</h3>
 
-    <!-- Bouton d'ajout d'événement (seulement pour les processus sans enfants) -->
-    <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button
+    <!-- Bouton d'ajout d'événement (seulement pour les processus sans enfants ET en mode normal) -->
+    <button *ngIf="!popupMode && selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button
       style="margin-bottom: 10px;" class="btn-primary" (click)="createNewEvent()">
       <mat-icon>add</mat-icon>
       Ajouter évènement redouté

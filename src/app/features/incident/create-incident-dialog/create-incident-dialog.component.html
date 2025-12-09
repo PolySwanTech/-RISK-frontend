@@ -122,31 +122,51 @@
 
     <form [formGroup]="incidentForm3" class="forms-container">
       <!-- Association BU / Processus / Événement -->
-      <div class="association-block">
-        <button mat-raised-button class="btn-purple" (click)="openBuProcessDialog()">
-          <mat-icon>add</mat-icon>
-          Associer BU / Processus / Événement redouté
-        </button>
-
-        <div class="chips-container" *ngIf="selectedBP">
-          <mat-chip-listbox>
-            <mat-chip>
-              <mat-icon matChipAvatar>business</mat-icon>
-              Équipe : {{ selectedBP.bu.name }}
-            </mat-chip>
-            <mat-chip>
-              <mat-icon matChipAvatar>account_tree</mat-icon>
-              Processus : {{ selectedBP.process.name }}
-            </mat-chip>
-            <mat-chip *ngIf="selectedBP?.risk"
-                      [matTooltip]="selectedBP.risk.isInfo ? 'Cet événement de risque n\'a pas encore été validé' : null">
-              <mat-icon matChipAvatar>warning</mat-icon>
-              Événement redouté : {{ selectedBP.risk.name }}
-              <mat-icon *ngIf="selectedBP.risk.isInfo" class="warning-icon">warning</mat-icon>
-            </mat-chip>
-          </mat-chip-listbox>
+      <div class="section">
+    <div class="section-header">
+        <mat-icon class="section-icon">link</mat-icon>
+        <h3 class="section-title">Association BU / Processus / Événement redouté</h3>
+        <div class="section-header-actions">
+            <button mat-raised-button type="button" class="btn-purple" (click)="openBuProcessDialog()">
+                <mat-icon>add</mat-icon>
+                Associer
+            </button>
         </div>
-      </div>
+    </div>
+
+    <div class="association-content">
+        <div class="chips-container" *ngIf="selectedBP">
+            <mat-chip-listbox class="chip-list">
+                <mat-chip class="custom-chip">
+                    <div>
+                        <mat-icon>business</mat-icon>
+                        Équipe : {{ selectedBP.bu.name }}
+                    </div>
+                </mat-chip>
+                <mat-chip class="custom-chip">
+                    <div>
+                        <mat-icon>account_tree</mat-icon>
+                        Processus : {{ selectedBP.process.name }}
+                    </div>
+                </mat-chip>
+                <mat-chip class="custom-chip"
+                          *ngIf="selectedBP?.risk"
+                          [matTooltip]="selectedBP.risk.isInfo ? 'Cet événement de risque n\'a pas encore été validé' : null">
+                    <div>
+                        <mat-icon>warning</mat-icon>
+                        Événement redouté : {{ selectedBP.risk.name }}
+                        <mat-icon *ngIf="selectedBP.risk.isInfo" class="warning-icon">warning</mat-icon>
+                    </div>
+                </mat-chip>
+            </mat-chip-listbox>
+        </div>
+
+        <div class="empty-state" *ngIf="!selectedBP">
+            <mat-icon>link_off</mat-icon>
+            <p>Aucune association définie. Cliquez sur "Associer" pour lier une Équipe, un Processus et un Événement redouté.</p>
+        </div>
+    </div>
+</div>
 
       <mat-form-field appearance="outline">
         <mat-label>Cause</mat-label>
