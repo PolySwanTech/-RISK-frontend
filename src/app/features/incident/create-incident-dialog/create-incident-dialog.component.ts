@@ -110,6 +110,7 @@ export class CreateIncidentDialogComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: CreateIncidentDialogData | null) { }
 
   async ngOnInit(): Promise<void> {
+    this.initActions();
     await this.fetchTeams();
 
     // Charger le brouillon si un draftId est fourni
@@ -125,7 +126,7 @@ export class CreateIncidentDialogComponent implements OnInit {
       this.loadTrees().subscribe();
     }
 
-    this.initActions();
+
   }
 
   loadDraft(draftId: string): void {
