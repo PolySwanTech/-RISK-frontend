@@ -20,3 +20,8 @@ export type UtilisateurProfil = Required<Pick<Utilisateur, 'id' | 'username' | '
 };
 
 export type UtilisateurUpdate = Partial<Pick<Utilisateur, 'username' | 'email'>>;
+
+export type UtilisateurCreate = Partial<Pick<Utilisateur, 'username' | 'id'>> &
+{
+  teamRoleList: any[];
+};

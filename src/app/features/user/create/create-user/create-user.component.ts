@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { arrayNotEmptyValidator } from '../../../../shared/validators/custom-validators';
 import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 import { BusinessUnit } from '../../../../core/models/BusinessUnit';
+import { UtilisateurCreate } from '../../../../core/models/Utilisateur';
 
 @Component({
   selector: 'app-create-user',
@@ -71,33 +72,38 @@ export class CreateUserComponent implements OnInit {
       teamRoleList: event
     });
   }
-  
+
   onSubmit() {
     this.organigrammeComponent.getRoles();
     if (this.userForm.valid) {
       if (this.update) {
-        let payload =
-        {
-          username: this.userForm.value.username,
-          email: this.userForm.value.email,
-        }
-        this.userService.updateUser(this.data.user.id, payload).subscribe({
-          next: user => {
+        this.userService.updateUserRoles(this.data.user.id, this.userForm.value.teamRoleList).subscribe({
+          next: () => {
             this.dialogRef.close(true);
-            this.userService.updateUserRoles(user.id, this.userForm.value.teamRoleList).subscribe({
-              next: () => {
-                this.dialogRef.close(true);
-              }
-            });
           }
         });
+        // TODO : Remettre cette partie pour modifier un utilisateur (nom et email) 
+        // let payload =
+        // {
+        //   username: this.userForm.value.username,
+        //   email: this.userForm.value.email,
+        // }
+        // this.userService.updateUser(this.data.user.id, payload).subscribe({
+        //   next: user => {
+        //     this.dialogRef.close(true);
+        //   }
+        // });
       }
       else {
         this.authService.register(this.userForm.value).subscribe({
           next: user => {
-            this.userService.updateUserRoles(user.id, this.userForm.value.teamRoleList).subscribe({
+            const payload : UtilisateurCreate = {
+              id : user.id,
+              username: this.userForm.value.username,
+              teamRoleList: this.userForm.value.teamRoleList
+            }
+            this.userService.addUser(payload).subscribe({
               next: () => {
-                this.snackBarService.success("✅ Utilisateur créé avec succès");
                 this.dialogRef.close(true);
               }
             });

@@ -198,7 +198,7 @@
                       {{ amount.reviewStatus | enumLabel:'reviewStatus' }}
                     </span>
 
-                    <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;">
+                    <div class="op-subcard--inline" style="display: flex; gap: 16px; flex-wrap: wrap;" matTooltip="Cliquer pour sélectionner/désélectionner">
                       <div class="op-field" style="flex: 1;">
                         <label class="op-label">Type</label>
                         <span class="op-display-field">
@@ -241,7 +241,7 @@
                 </button>
 
                 <!-- (optionnel) petit compteur si déjà chargés -->
-                <span class="op-meta" *ngIf="attachedCounts?.[impact.id] !== undefined">
+                <span class="op-meta" *ngIf="attachedCounts[impact.id] !== undefined">
                   {{ attachedCounts[impact.id] }} fichier(s)
                 </span>
               </div>

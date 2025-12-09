@@ -149,7 +149,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
       if (draft.data.mode) {
         this.mode = draft.data.mode;
       }
-      console.log('Brouillon d\'évaluation restauré:', draft);
     }
   }
 
@@ -205,7 +204,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
   hasFormData(): boolean {
     const evalData = this.evaluationForm.value;
     const reviewData = this.reviewForm.value;
-    console.log(evalData, reviewData);
     return !!(
       (evalData.resume && evalData.resume.trim() !== '') ||
       (evalData.comments && evalData.comments.trim() !== '') ||
@@ -378,7 +376,6 @@ export class PopupEvaluationControleComponent implements OnInit, OnDestroy {
 
   async viewFiles() {
     const target = TargetType.CONTROL;
-    console.log(this.executionId)
     const files = await firstValueFrom(this.fileService.getFiles(target, this.executionId));
     this.fileService.openFiles(files, target, this.executionId).afterClosed().subscribe();
   }

@@ -110,7 +110,6 @@ export class CreateActionPlanDialogComponent implements OnInit {
     if (draft) {
       this.actionPlan = { ...this.actionPlan, ...draft.data.actionPlan };
       this.actions = draft.data.actions || [];
-      console.log('Brouillon de plan d\'action restauré:', draft);
     }
   }
 
@@ -244,8 +243,6 @@ export class CreateActionPlanDialogComponent implements OnInit {
       taxonomieId: this.actionPlan.taxonomie ?? null,
       incidentId
     };
-
-    console.log(dto);
 
     this.actionPlanService.createActionPlan(dto)
       .subscribe(id => {

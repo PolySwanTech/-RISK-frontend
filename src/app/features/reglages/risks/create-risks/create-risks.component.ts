@@ -116,7 +116,6 @@ export class CreateRisksComponent implements OnInit {
     if (draft) {
       this.form.patchValue(draft.data.form);
       this.risk = draft.data.risk || null;
-      console.log(this.risk)
       if (draft.data.form.processId && this.data?.buId) {
         this.loadProcesses();
       }
@@ -189,7 +188,6 @@ export class CreateRisksComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Result from SelectRiskEventComponent:', result);
       if (result) {
         this.loadRiskReferentiel(result.id);
         this.form.get('parentRisk')?.setValue(result.id);

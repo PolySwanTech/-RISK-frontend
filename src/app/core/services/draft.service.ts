@@ -54,7 +54,6 @@ export class DraftService {
     });
     
     if (drafts.length !== this.draftsSubject.value.length) {
-      console.log(`🧹 Nettoyage: ${this.draftsSubject.value.length - drafts.length} brouillon(s) expiré(s) supprimé(s)`);
       this.draftsSubject.next(drafts);
     }
   }
@@ -76,7 +75,6 @@ export class DraftService {
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       )[0];
       
-      console.log(`⚠️ Limite atteinte pour ${componentName}, suppression du brouillon le plus ancien`);
       this.deleteDraft(oldest.id);
       drafts = this.draftsSubject.value; // Rafraîchir après suppression
     }
@@ -93,7 +91,6 @@ export class DraftService {
     drafts.push(draft);
     this.draftsSubject.next([...drafts]);
     
-    console.log(`✅ Brouillon créé: ${title} (${this.countDrafts(componentName)}/${this.MAX_DRAFTS_PER_COMPONENT})`);
     return draft.id;
   }
 
@@ -113,7 +110,6 @@ export class DraftService {
         visible
       };
       this.draftsSubject.next([...drafts]);
-      console.log(`✏️ Brouillon mis à jour: ${title}`);
     }
   }
 
@@ -163,7 +159,6 @@ export class DraftService {
   deleteDraft(draftId: string): void {
     const drafts = this.draftsSubject.value.filter(d => d.id !== draftId);
     this.draftsSubject.next(drafts);
-    console.log(`🗑️ Brouillon supprimé`);
   }
 
   /**
@@ -171,9 +166,7 @@ export class DraftService {
    */
   deleteAllDrafts(componentName: string): void {
     const drafts = this.draftsSubject.value.filter(d => d.component !== componentName);
-    const deletedCount = this.draftsSubject.value.length - drafts.length;
     this.draftsSubject.next(drafts);
-    console.log(`🗑️ ${deletedCount} brouillon(s) supprimé(s) pour ${componentName}`);
   }
 
   /**

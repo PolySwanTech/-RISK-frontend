@@ -127,7 +127,6 @@ export class CreateControlComponent {
     if (draft) {
       this.form.patchValue(draft.data.form);
       this.selectedBPR = draft.data.selectedBPR;
-      console.log('Brouillon de contrôle restauré:', draft);
     }
   }
 
