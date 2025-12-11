@@ -253,7 +253,7 @@ export class CreateActionPlanDialogComponent implements OnInit {
           this.draftService.deleteDraft(this.currentDraftId);
         }
         
-        this.dialogRef.close();
+        this.dialogRef.close({ success: true });
         this.confirmService.openConfirmDialog(
           "Création avec succès", "Aller à la consultation ?"
         ).subscribe((value) => {

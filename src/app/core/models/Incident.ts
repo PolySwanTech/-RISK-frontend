@@ -8,8 +8,8 @@ export interface Incident {
     id: string;
     reference: string
 
-    title: string;
-    location: string;
+    title: string | null;
+    location: string | null;
     commentaire : string
 
     declaredAt: Date;
@@ -18,7 +18,7 @@ export interface Incident {
     closedAt: Date | null ;
 
     risk: string;
-    riskName : string;
+    riskName : string | null;
     categoryBaloise : BaloiseCategoryDto;
     cause : Cause;
     process: string ;

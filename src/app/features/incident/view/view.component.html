@@ -15,7 +15,7 @@
                         <div class="timeline-row">
                             <div class="timeline-step">
                                 <div class="dot red"></div>
-                                <div class="date">{{ incident.survenueAt | date: 'dd/MM/yyyy' }}</div>
+                                <div class="date">{{ (incident.survenueAt | date: 'dd/MM/yyyy') ?? 'N/R' }}</div>
                                 <div class="label">
                                     <mat-icon fontIcon="place"></mat-icon> Date de survenance
                                 </div>
@@ -35,7 +35,7 @@
 
                             <div class="timeline-step">
                                 <div class="dot orange"></div>
-                                <div class="date">{{ incident.detectedAt | date: 'dd/MM/yyyy' }}</div>
+                                <div class="date">{{ (incident.detectedAt | date: 'dd/MM/yyyy') ?? 'N/R' }}</div>
                                 <div class="label">
                                     <mat-icon fontIcon="search"></mat-icon> Date de détection
                                 </div>
@@ -55,7 +55,7 @@
 
                             <div class="timeline-step">
                                 <div class="dot green"></div>
-                                <div class="date">{{ incident.declaredAt | date: 'dd/MM/yyyy' }}</div>
+                                <div class="date">{{ (incident.declaredAt | date: 'dd/MM/yyyy') ?? 'N/R' }}</div>
                                 <div class="label">
                                     <mat-icon fontIcon="calendar_today"></mat-icon> Date de déclaration
                                 </div>
@@ -78,11 +78,11 @@
                                 </div>
                                 <div class="info-field">
                                     <label>Intervenant</label>
-                                    <div class="info-box">{{ incident.intervenantName }}</div>
+                                    <div class="info-box">{{ incident.intervenantName ?? 'N/R' }}</div>
                                 </div>
                                 <div class="info-field">
                                     <label>Localisation</label>
-                                    <div class="info-box">{{ incident.location ? incident.location : 'N/R' }}</div>
+                                    <div class="info-box">{{ incident.location ?? 'N/R' }}</div>
                                 </div>
 
                                 <div class="info-field">
@@ -92,7 +92,7 @@
 
                                 <div class="info-field">
                                     <label>Risque</label>
-                                    <div class="info-box">{{ incident.riskName ? incident.riskName : 'N/R' }}</div>
+                                    <div class="info-box">{{ incident.riskName ?? 'N/R' }}</div>
                                 </div>
 
                                 <div class="info-field">
@@ -108,12 +108,12 @@
 
                                 <div class="info-field">
                                     <label>Libellé</label>
-                                    <div class="info-box">{{ incident.title }}</div>
+                                    <div class="info-box">{{ incident.title ?? 'N/R' }}</div>
                                 </div>
 
                                 <div class="info-field">
                                     <label>Entité Responsable</label>
-                                    <div class="info-box">{{ incident.teamName }}</div>
+                                    <div class="info-box">{{ incident.teamName ?? 'N/R' }}</div>
                                 </div>
                             </div>
                         </mat-card-content>

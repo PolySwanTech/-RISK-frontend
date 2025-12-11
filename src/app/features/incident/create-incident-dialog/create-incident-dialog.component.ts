@@ -25,6 +25,7 @@ import { Incident, IncidentCreateDto } from '../../../core/models/Incident';
 import { State } from '../../../core/enum/state.enum';
 import { forkJoin, tap, map, firstValueFrom } from 'rxjs';
 import { ProcessManagerComponent } from '../../../shared/components/param-process/param-process.component';
+import { Router } from '@angular/router';
 
 export interface CreateIncidentDialogData {
   incidentId?: string;
@@ -64,6 +65,7 @@ export class CreateIncidentDialogComponent implements OnInit {
   private entitiesService = inject(EntitiesService);
   private confirmService = inject(ConfirmService);
   private draftService = inject(DraftService);
+  private router = inject(Router);
 
   popupActions: PopupAction[] = [];
   incident: Incident | null = null;
@@ -283,6 +285,9 @@ export class CreateIncidentDialogComponent implements OnInit {
 
       this.incident = incident;
       this.selectedUser = incident.intervenantId || null;
+
+      this.determineStartStep();
+      this.initActions();
     });
   }
 
@@ -338,6 +343,7 @@ export class CreateIncidentDialogComponent implements OnInit {
           "Aller vers la consultation ?"
         ).subscribe(result => {
           if (result) {
+            this.router.navigate(['incident', id]);
             // Navigation gérée par le composant parent
           }
         });
@@ -402,5 +408,20 @@ export class CreateIncidentDialogComponent implements OnInit {
         this.selectBP(event);
       }
     });
+  }
+
+  private determineStartStep(): void {
+    // Si le formulaire de l'étape 1 (Infos de base) est valide
+    if (this.incidentForm1.valid) {
+      this.currentStep = 1;
+
+      // Si le formulaire de l'étape 2 (Dates) est AUSSI valide, on va à l'étape 3
+      if (this.incidentForm2.valid) {
+        this.currentStep = 2;
+      }
+    } else {
+      // Sinon on reste au début
+      this.currentStep = 0;
+    }
   }
 }

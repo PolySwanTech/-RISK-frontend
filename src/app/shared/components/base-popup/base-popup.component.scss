@@ -80,6 +80,11 @@
         background: darken(#ef4444, 10%) !important; // fonce de 10%
         box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
       }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
 
     &.btn-accent {

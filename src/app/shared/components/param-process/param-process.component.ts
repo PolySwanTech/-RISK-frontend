@@ -130,10 +130,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     this.entitiesService.loadEntities().subscribe({
       next: (bus) => {
         this.businessUnits = bus;
-        
         // Restaurer l'état d'expansion après le chargement
         this.restoreExpansionState();
-        
         // Restaurer la sélection
         this.restoreSelection();
       },

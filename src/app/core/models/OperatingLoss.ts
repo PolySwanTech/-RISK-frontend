@@ -25,7 +25,7 @@ export interface OperatingLoss {
   actif: boolean;
 }
 
-export type CreateOperatingLossDto = Pick<OperatingLoss, 'incidentId' | 'libelle'> & {
+export type CreateOperatingLossDto = Pick<OperatingLoss, 'incidentId' | 'libelle' | 'state'> & {
   businessUnitId: string;
   type: Required<OperatingLossTypeDto>; // toutes les propriétés du type sont obligatoires
   description?: string | null;          // facultatif

@@ -199,8 +199,6 @@ export class ListComponent implements OnInit {
         console.log('Brouillon sauvegardé:', result.incidentId);
       } else {
         console.log('Incident créé:', result.incidentId);
-        // Navigation vers la consultation si besoin
-        this.router.navigate(['incident', result.incidentId]);
       }
     }
   });

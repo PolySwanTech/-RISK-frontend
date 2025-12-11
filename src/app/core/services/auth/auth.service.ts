@@ -54,7 +54,7 @@ export class AuthService {
           console.error('Login error:', err);
           this.snackBarService.error("Nom ou mot de passe incorrect")
         }
-      });;
+      });
   }
 
   refreshToken() {

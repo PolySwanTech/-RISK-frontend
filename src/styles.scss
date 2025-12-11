@@ -304,7 +304,8 @@ tr.mat-mdc-row:last-child {
     &.in_progress,
     &.medium,
     &.brouillon,
-    &.partiel {
+    &.partiel,
+    &.waiting {
         background: #fef3c7;
         color: #92400e;
     }
@@ -317,7 +318,9 @@ tr.mat-mdc-row:last-child {
     &.minimal,
     &.level,
     &.new,
-    &.cloturé {
+    &.cloturé,
+    &.validated,
+    &.approved {
         background: #c6f6d5;
         color: #2f855a;
     }
@@ -327,7 +330,8 @@ tr.mat-mdc-row:last-child {
     &.not_achieved,
     &.non_conforme,
     &.maximum,
-    &.status {
+    &.status,
+    &.rejected {
         background: #fed7d7;
         color: #c53030;
     }

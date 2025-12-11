@@ -20,7 +20,7 @@ import { State } from '../../../core/enum/state.enum';
 import { BusinessUnit } from '../../../core/models/BusinessUnit';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { CreateActionPlanDialogComponent } from '../../action-plan/create-action-plan-dialog/create-action-plan-dialog.component';
-import { catchError, firstValueFrom, map, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { OperatingLossService } from '../../../core/services/operating-loss/operating-loss.service';
 import { saveAs } from 'file-saver';
 import { ActionPlanService } from '../../../core/services/action-plan/action-plan.service';
@@ -33,6 +33,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { RiskTemplate } from '../../../core/models/RiskTemplate';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { CreateIncidentDialogComponent } from '../create-incident-dialog/create-incident-dialog.component';
+import { CreateOperationalImpactComponent } from '../impact/create-operational-impact/create-operational-impact.component';
 
 
 type ImpactRow = {
@@ -144,14 +145,18 @@ export class ViewComponent implements OnInit {
     }
   }
 
-  async loadIncident(id: string) {
+ async loadIncident(id: string) {
     this.incident = await firstValueFrom(this.incidentService.getIncidentById(id));
-    this.actionPlanService.getActionPlanByIncident(id).pipe(
-      map(actionPlan => actionPlan?.id ?? ''),
-      catchError(() => {
-        return of(''); // fallback si erreur
-      })
-    ).subscribe(planActionId => this.planActionId = planActionId);
+
+    try {
+        const plan = await firstValueFrom(this.actionPlanService.getActionPlanByIncident(id));
+        this.planActionId = plan ? plan.id : null;
+    } catch (error) {
+        console.warn("Pas de plan d'action trouvé ou erreur API", error);
+        this.planActionId = null;
+    }
+    console.log(this.planActionId);
+
     this.goBackButtons = [
       {
         label: "Consulter le plan d'action",
@@ -376,11 +381,12 @@ export class ViewComponent implements OnInit {
         incidentId: incident.id,
         reference: incident.reference
       }
-    })
+    }).afterClosed().subscribe(result => {
+      if (result?.success) {
+        this.loadIncident(incident.id);
+      }
+    });
   }
-
-
-
 
   getLineColor(from: Date | string, to: Date | string): string {
     const date1 = new Date(from);
@@ -409,7 +415,17 @@ export class ViewComponent implements OnInit {
   }
 
   addImpact() {
-    this.router.navigate(['incident', this.idIncident, 'impacts']);
+    const dialogRef = this.dialog.open(CreateOperationalImpactComponent, {
+  width: '1000px',
+  maxWidth: '95vw',
+  data: {
+    incidentId: this.incident?.id,
+    businessUnitId: this.incident?.teamId
+  }
+});
+
+dialogRef.afterClosed().subscribe(() => {
+});
   }
 
   downloadPDF(): void {
