@@ -18,6 +18,7 @@ import { AttenuationMetricsListComponent } from './features/control/attenuation-
 import { ProcessManagerComponent } from './shared/components/param-process/param-process.component';
 import { EvaluationBruteComponent } from './shared/components/evaluation-brute/evaluation-brute.component';
 import { EvaluationNetteComponent } from './shared/components/evaluation-nette/evaluation-nette.component';
+import { CsvImportComponent } from './pages/csv-import/csv-import.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
@@ -45,4 +46,5 @@ export const routes: Routes = [
   { path: 'control', children: controlRoutes, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CONTROLES } },
   { path: 'attenuationMetrics', component : AttenuationMetricsListComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CONTROLES } },
   { path: 'todo', component: TodoComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_TODO } },
+  { path: 'csv', component: CsvImportComponent, canActivate: [AuthGuard] },
 ];

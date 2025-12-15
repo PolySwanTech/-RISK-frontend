@@ -1,0 +1,76 @@
+<div class="csv-import-container">
+  <h2>Import CSV</h2>
+
+  <div class="import-form">
+    <!-- Sélection de la table -->
+    <div class="form-group">
+      <label for="table-select">Sélectionner une table :</label>
+      <select 
+        id="table-select" 
+        [(ngModel)]="selectedTable"
+        (change)="onTableSelect(selectedTable)"
+        class="form-control"
+      >
+        <option value="">-- Choisir une table --</option>
+        <option *ngFor="let table of tables" [value]="table.value">
+          {{ table.label }}
+        </option>
+      </select>
+      
+      <!-- Information sur la table sélectionnée -->
+      <div *ngIf="selectedTableInfo" class="table-info">
+        <p class="description">{{ selectedTableInfo.description }}</p>
+        <div class="expected-columns">
+          <strong>Colonnes attendues :</strong>
+          <span class="columns-list">{{ selectedTableInfo.expectedColumns.join(', ') }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload de fichier -->
+    <div class="form-group" [class.disabled]="!selectedTable">
+      <label for="file-input">Sélectionner un fichier CSV :</label>
+      <input 
+        type="file" 
+        id="file-input"
+        accept=".csv"
+        (change)="onFileSelect($event)"
+        [disabled]="!selectedTable"
+        class="form-control"
+      >
+      <small class="help-text" *ngIf="selectedFile">
+        Fichier sélectionné : {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} Ko)
+      </small>
+    </div>
+
+    <!-- Message de feedback -->
+    <div 
+      *ngIf="uploadMessage" 
+      class="message"
+      [class.success]="uploadSuccess"
+      [class.error]="!uploadSuccess"
+    >
+      {{ uploadMessage }}
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="actions">
+      <button 
+        class="btn btn-primary"
+        (click)="onUpload()"
+        [disabled]="!selectedTable || !selectedFile || isUploading"
+      >
+        <span *ngIf="!isUploading">Importer</span>
+        <span *ngIf="isUploading">Import en cours...</span>
+      </button>
+
+      <button 
+        class="btn btn-secondary"
+        (click)="resetForm()"
+        [disabled]="isUploading"
+      >
+        Réinitialiser
+      </button>
+    </div>
+  </div>
+</div>

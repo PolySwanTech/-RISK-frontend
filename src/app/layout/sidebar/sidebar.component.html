@@ -79,6 +79,13 @@
           </a>
         </ng-container>
 
+        <ng-container>
+          <a mat-list-item routerLink="/csv">
+            <mat-icon>upload_file</mat-icon>
+            <span>Import CSV</span>
+          </a>
+        </ng-container>
+
         <!-- ✅ Menu Admin -->
         @if(isAdmin()){
         <a mat-list-item [matMenuTriggerFor]="menu">
