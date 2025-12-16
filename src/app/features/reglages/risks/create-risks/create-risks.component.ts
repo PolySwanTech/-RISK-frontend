@@ -215,7 +215,7 @@ export class CreateRisksComponent implements OnInit {
         this.closePopup({ createdEventId: riskId, libelle: this.form.value.libellePerso });
       },
       error: (err : HttpErrorResponse) => {
-        if(err.status == 422){
+        if(err.status == 409){
           this.snackBar.error("Le libellé existe déjà, veuillez en renseigner un autre.");
         }
         else{
