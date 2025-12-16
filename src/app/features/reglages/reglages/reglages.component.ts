@@ -6,7 +6,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddEntityDialogComponent } from '../add-entity-dialog/add-entity-dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { ProcessManagerComponent } from "../../../shared/components/param-process/param-process.component";
-import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-reglages',
@@ -19,9 +18,7 @@ export class ReglagesComponent implements OnInit {
 
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
-
-  private snakBarService = inject(SnackBarService);
-  // private authService = inject(AuthService);
+  private dataChangedListener: any;
   
   selectedTabIndex = 0;
 
@@ -37,9 +34,21 @@ export class ReglagesComponent implements OnInit {
 
   ngOnInit(): void {
     const label = this.route.snapshot.queryParams['label'];
-
     if (label === 'Taxonmie') {
       this.selectedTabIndex = 1; // Index de l'onglet "Taxonomie"
+    }
+
+    this.dataChangedListener = () => {
+      console.log('Événement dataChanged reçu dans ReglagesComponent');
+      // Les composants enfants vont se recharger automatiquement
+    };
+    window.addEventListener('dataChanged', this.dataChangedListener);
+  }
+
+  ngOnDestroy(): void {
+    // Nettoyer l'écouteur d'événements
+    if (this.dataChangedListener) {
+      window.removeEventListener('dataChanged', this.dataChangedListener);
     }
   }
 
@@ -55,10 +64,8 @@ export class ReglagesComponent implements OnInit {
 
       }
     ).afterClosed().subscribe(bu => {
-      if (bu) {
-        this.snakBarService.info("L'entité a été créée avec succès")
-        window.location.reload();
-      }
+      this.ngOnInit();
+      window.dispatchEvent(new CustomEvent('dataChanged'));
     })
   }
 }

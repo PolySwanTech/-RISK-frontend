@@ -372,9 +372,13 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     this.riskDataSource.data = this.viewedRisks;
 
     setTimeout(() => {
-      this.riskDataSource.paginator = this.paginator;
-      this.riskDataSource.sort = this.sort;
-      this.paginator.firstPage();
+      if (this.paginator) {
+        this.riskDataSource.paginator = this.paginator;
+        this.paginator.firstPage();
+      }
+      if (this.sort) {
+        this.riskDataSource.sort = this.sort;
+      }
     });
   }
 
@@ -842,21 +846,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
         enableDraft: false
       }
     }).afterClosed().subscribe(bu => {
-      if (bu) {
-        if (bu.id) {
-          this.entitiesService.update(bu).subscribe(_ => {
-            this.ngOnInit();
-            this.snackBarService.info("Entité modifiée avec succès !");
-          });
-        }
-        else {
-          this.entitiesService.save(bu).subscribe(_ => {
-            this.ngOnInit();
-            this.snackBarService.info("Entité ajoutée avec succès !");
-          });
-        }
-      }
-    });
+        this.ngOnInit();
+    })
   }
 
   goToMatrixPage(buId: any) {

@@ -15,6 +15,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { BasePopupComponent, PopupAction } from "../../../shared/components/base-popup/base-popup.component";
 import { DraftService } from '../../../core/services/draft.service';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 export interface EntityDialogData {
   id?: string;
@@ -66,6 +67,7 @@ export class AddEntityDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<AddEntityDialogComponent>);
   private draftService = inject(DraftService);
   public entitiesService = inject(EntitiesService);
+  private snackBarService = inject(SnackBarService);
 
   private currentDraftId: string | null = null;
 
@@ -211,13 +213,23 @@ export class AddEntityDialogComponent implements OnInit {
       if (this.enableDraft && this.currentDraftId) {
         this.draftService.deleteDraft(this.currentDraftId);
       }
-
-      this.entitiesService.save(businessUnitCreateDto).subscribe({
-        next: _ => {
-          this.dialogRef.close(businessUnitCreateDto);
+      const bu = businessUnitCreateDto;
+        if (bu.id) {
+          this.entitiesService.update(bu).subscribe(_ => {
+            this.ngOnInit();
+            this.snackBarService.info("Entité modifiée avec succès !");
+            window.dispatchEvent(new CustomEvent('dataChanged'));
+            this.dialogRef.close();
+          });
         }
-      });
-    }
+        else {
+          this.entitiesService.save(bu).subscribe(_ => {
+            this.ngOnInit();
+            this.snackBarService.info("Entité ajoutée avec succès !");
+            this.dialogRef.close();
+          });
+        }
+      }
   }
 
   entiteChange(event: any): void {
