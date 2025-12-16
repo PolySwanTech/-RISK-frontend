@@ -11,6 +11,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
 import { SmaItemData } from '../../../core/models/sma.model';
 
+interface SmaItemValueCreationDto {
+  year: string; // Doit être une chaîne de caractères (String)
+  values: { [key: string]: number }; // Map<SmaItemEnum, Double> devient un objet { [key: string]: number }
+}
+
 @Component({
   selector: 'pop-up-ajout-annee',
   standalone: true,
@@ -135,16 +140,22 @@ export class PopUpAjoutAnneeComponent implements OnInit {
   async onSave(): Promise<void> {
     if (this.yearForm.valid) {
       const rawValues = this.yearForm.value;
-      const newYear = rawValues.newYear;
 
-      const payload: { year: number, data: { itemKey: string, value: number }[] } = {
+      // Convertir l'année en String pour correspondre au DTO Java
+      const newYear: string = String(rawValues.newYear);
+
+      // 1. Définir le payload dans le format Map<String, Double>
+      const payload: SmaItemValueCreationDto = {
         year: newYear,
-        data: []
+        values: {} // Initialisation en tant qu'objet vide
       };
 
       Object.keys(rawValues).forEach(key => {
+        // Exclure la propriété 'newYear'
         if (key !== 'newYear') {
-          payload.data.push({ itemKey: key, value: rawValues[key] });
+          // Pour chaque item, la clé est le nom de l'Enum (String) et la valeur est le Double (number)
+          // C'est la structure exacte d'une Map Java sérialisée en JSON.
+          payload.values[key] = rawValues[key];
         }
       });
 

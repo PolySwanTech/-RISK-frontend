@@ -26,4 +26,8 @@ export class CalculService {
     return this.http.get<any[]>(this.baseUrl + '/result')
   }
 
+  addSmaItemValues(payload: { year: number, values: { itemKey: string, value: number } }) {
+    return this.http.post<void>(this.baseUrl + '/items', payload);
+  }
+
 }
