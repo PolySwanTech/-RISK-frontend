@@ -409,7 +409,8 @@ export class CalculViewComponent {
 
   openAddYearDialog(): void {
     const dialogRef = this.dialog.open(PopUpAjoutAnneeComponent, {
-      width: '600px', // Définir la largeur du pop-up
+      width: '900px',
+      maxWidth: '95vw'
     });
     dialogRef.afterClosed().subscribe(_ => {
       console.log('Le dialogue a été fermé');

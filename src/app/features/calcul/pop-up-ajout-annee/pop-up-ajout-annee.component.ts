@@ -1,47 +1,59 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { SmaItemData } from '../../../core/models/sma.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
+import { SmaItemData } from '../../../core/models/sma.model';
 
 @Component({
   selector: 'pop-up-ajout-annee',
+  standalone: true,
   templateUrl: './pop-up-ajout-annee.component.html',
   styleUrls: ['./pop-up-ajout-annee.component.scss'],
-  imports : [MatFormFieldModule, MatAccordion, ReactiveFormsModule,
-    MatExpansionModule, MatDialogModule, MatInputModule]
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatExpansionModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatDialogModule,
+    BasePopupComponent
+  ]
 })
 export class PopUpAjoutAnneeComponent implements OnInit {
 
-  yearForm: FormGroup
-  smaStructure: any; // Structure des données à afficher (Catégorie/Sous-catégorie/Items)
+  private dialogRef = inject(MatDialogRef<PopUpAjoutAnneeComponent>);
+  private fb = inject(FormBuilder);
 
-  constructor(
-    public dialogRef: MatDialogRef<PopUpAjoutAnneeComponent>,
-    private fb: FormBuilder
-  ) {
+  yearForm: FormGroup;
+  smaStructure: any[];
+  popupActions: PopupAction[] = [];
+  expandedPanels: Set<string> = new Set();
+
+  constructor() {
     this.yearForm = this.fb.group({
-      newYear: [null, [Validators.required, Validators.min(2026), Validators.max(3000)]], // Exemple: la nouvelle année doit être >= 2026
-      // Le reste du formulaire sera créé dynamiquement pour chaque item
+      newYear: [null, [Validators.required, Validators.min(2026), Validators.max(3000)]]
     });
+    this.smaStructure = [];
   }
 
-
-
   ngOnInit(): void {
-    // 1. Construire la structure hiérarchique à partir de l'énumération
+    // 1. Construire la structure hiérarchique
     this.smaStructure = this.buildSmaStructure();
 
-    // 2. Initialiser le Form Group
-
-
-    // 3. Ajouter les contrôles de formulaire pour chaque item
-    this.smaStructure.forEach((category: { subCategories: any[]; }) => {
-      category.subCategories.forEach(subCategory => {
-        subCategory.items.forEach((item: { name: any; }) => {
-          // Utilise le nom de l'item comme clé (ex: INTEREST_INCOME)
+    // 2. Ajouter les contrôles de formulaire pour chaque item
+    this.smaStructure.forEach(category => {
+      category.subCategories.forEach((subCategory: { items: any[]; }) => {
+        subCategory.items.forEach(item => {
           this.yearForm.addControl(
             item.name,
             new FormControl(null, [Validators.required, Validators.min(0)])
@@ -49,9 +61,32 @@ export class PopUpAjoutAnneeComponent implements OnInit {
         });
       });
     });
+
+    this.initActions();
   }
 
-  // Fonction pour transformer l'énumération en une structure de données utilisable par le formulaire
+  initActions(): void {
+    this.popupActions = [
+      {
+        label: 'Annuler',
+        icon: 'close',
+        color: 'red',
+        onClick: () => this.onCancel()
+      },
+      {
+        label: 'Enregistrer',
+        icon: 'check',
+        primary: true,
+        disabled: () => this.yearForm.invalid,
+        onClick: async () => await this.onSave(),
+      }
+    ];
+  }
+
+  getDialogRef() {
+    return this.dialogRef;
+  }
+
   private buildSmaStructure(): any[] {
     const enumValues = Object.values(SmaItemData) as any[];
     const structure: { [key: string]: any } = {};
@@ -60,7 +95,6 @@ export class PopUpAjoutAnneeComponent implements OnInit {
       const categoryName = item.subCategory.category.name;
       const subCategoryName = item.subCategory.name;
 
-      // Créer la catégorie si elle n'existe pas
       if (!structure[categoryName]) {
         structure[categoryName] = {
           name: categoryName,
@@ -69,7 +103,6 @@ export class PopUpAjoutAnneeComponent implements OnInit {
         };
       }
 
-      // Créer la sous-catégorie si elle n'existe pas
       if (!structure[categoryName].subCategories[subCategoryName]) {
         structure[categoryName].subCategories[subCategoryName] = {
           name: subCategoryName,
@@ -78,24 +111,29 @@ export class PopUpAjoutAnneeComponent implements OnInit {
         };
       }
 
-      // Ajouter l'item
       structure[categoryName].subCategories[subCategoryName].items.push({
         name: item.name,
         label: item.label,
-        value: null // Valeur initiale
+        value: null
       });
     });
 
-    // Convertir l'objet en tableau pour l'affichage dans le template
     return Object.values(structure).map((cat: any) => ({
       ...cat,
       subCategories: Object.values(cat.subCategories)
     }));
   }
 
-  onSave(): void {
+  togglePanel(categoryName: string): void {
+    if (this.expandedPanels.has(categoryName)) {
+      this.expandedPanels.delete(categoryName);
+    } else {
+      this.expandedPanels.add(categoryName);
+    }
+  }
+
+  async onSave(): Promise<void> {
     if (this.yearForm.valid) {
-      // Construction des données finales pour le backend
       const rawValues = this.yearForm.value;
       const newYear = rawValues.newYear;
 
@@ -104,21 +142,62 @@ export class PopUpAjoutAnneeComponent implements OnInit {
         data: []
       };
 
-      // Remplir le tableau 'data' avec toutes les clés/valeurs sauf 'newYear'
       Object.keys(rawValues).forEach(key => {
         if (key !== 'newYear') {
           payload.data.push({ itemKey: key, value: rawValues[key] });
         }
       });
 
-      this.dialogRef.close(payload); // Retourne la structure des données remplies
+      // Simuler un petit délai pour le loading
+      await new Promise(resolve => setTimeout(resolve, 500));
+      this.dialogRef.close(payload);
     } else {
-      // Marquer tous les champs comme 'touchés' pour afficher les erreurs
       this.yearForm.markAllAsTouched();
     }
   }
 
   onCancel(): void {
     this.dialogRef.close(null);
+  }
+
+  getFieldError(fieldName: string): string {
+    const control = this.yearForm.get(fieldName);
+    if (control?.hasError('required')) {
+      return 'Ce champ est requis';
+    }
+    if (control?.hasError('min')) {
+      return 'La valeur doit être supérieure ou égale à ' + control.errors?.['min'].min;
+    }
+    return '';
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.yearForm.get(fieldName);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  getTotalItems(): number {
+    return this.smaStructure.reduce((total, category) => {
+      return total + category.subCategories.reduce((subTotal: number, subCategory: { items: string | any[]; }) => {
+        return subTotal + subCategory.items.length;
+      }, 0);
+    }, 0);
+  }
+
+  getFilledItemsCount(): number {
+    let count = 0;
+    const values = this.yearForm.value;
+    
+    Object.keys(values).forEach(key => {
+      if (key !== 'newYear' && values[key] != null && values[key] !== '') {
+        count++;
+      }
+    });
+    
+    return count;
+  }
+
+  trackByName(_: number, item: any): string {
+    return item.name;
   }
 }
