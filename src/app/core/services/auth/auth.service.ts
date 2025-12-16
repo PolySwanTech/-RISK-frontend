@@ -62,7 +62,7 @@ export class AuthService {
       .subscribe({
         next: _ => {
           this.isLogin$.next(true)
-          this.router.navigate(['dashboard']);
+          this.router.navigate(['todo']);
         },
         error: err => {
           console.error('Refresh token error:', err);
