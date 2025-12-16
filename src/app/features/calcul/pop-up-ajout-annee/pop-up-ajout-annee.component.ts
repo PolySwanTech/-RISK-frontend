@@ -150,10 +150,6 @@ export class PopUpAjoutAnneeComponent implements OnInit {
         values: {} // Initialisation en tant qu'objet vide
       };
 
-<<<<<<< HEAD
-      // 2. Parcourir toutes les clés du formulaire
-=======
->>>>>>> e28f2d1fccc9b6bf9506e21827eedbbce27b4211
       Object.keys(rawValues).forEach(key => {
         // Exclure la propriété 'newYear'
         if (key !== 'newYear') {
@@ -163,13 +159,9 @@ export class PopUpAjoutAnneeComponent implements OnInit {
         }
       });
 
-<<<<<<< HEAD
-      this.dialogRef.close(payload); // Retourne le payload prêt à être envoyé au backend
-=======
       // Simuler un petit délai pour le loading
       await new Promise(resolve => setTimeout(resolve, 500));
       this.dialogRef.close(payload);
->>>>>>> e28f2d1fccc9b6bf9506e21827eedbbce27b4211
     } else {
       this.yearForm.markAllAsTouched();
     }
