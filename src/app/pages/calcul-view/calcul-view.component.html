@@ -1,180 +1,180 @@
+<app-go-back [title]="`Calcul des fonds propres - Méthode Standard SMA`" [buttons]="goBackButtons"></app-go-back>
 
-
-    <app-go-back [title]="`Calcul des fonds propres - Méthode Standard SMA`" [buttons]="goBackButtons"></app-go-back>
-
-    <!-- Tabs -->
-    <mat-tab-group class="main-tabs">
-        <!-- Synthèse des résultats -->
-        <mat-tab label="Synthèse des résultats">
-            <div class="tab-content">
-                <div class="results-grid">
-                    <!-- Exigence de fonds propres SMA -->
-                    <mat-card class="main-result-card">
-                        <mat-card-header>
-                            <mat-card-title>Exigence de fonds propres SMA</mat-card-title>
-                        </mat-card-header>
-                        <mat-card-content>
-                            <div class="main-amount">
-                                {{ formatCurrency(RWA) }}
-                                <span
-                                    [ngClass]="variationRWA > 0 ? 'percentage-change-red' : 'percentage-change-green'">
-                                    {{ variationRWA | number:'1.2-2' }}% vs précédent
-                                </span>
-                            </div>
-                            <div class="chart-placeholder">
-                                <canvas baseChart [data]="barLineChartData" [options]="barLineChartOptions"
-                                    [type]="'bar'">
-                                </canvas>
-                            </div>
-                        </mat-card-content>
-                    </mat-card>
-
-                    <!-- Indicateurs clés -->
-                    <mat-card class="indicators-card">
-                        <mat-card-header>
-                            <mat-card-title>Indicateurs clés</mat-card-title>
-                        </mat-card-header>
-                        <mat-card-content>
-                            <div class="indicator-item">
-                                <div class="indicator-label">Business Indicator (BI)</div>
-                                <div class="indicator-value">{{ formatCurrency(businessIndicator) }}</div>
-                            </div>
-                            <div class="indicator-item">
-                                <div class="indicator-label">Business Indicator Component (BIC)</div>
-                                <div class="indicator-value">{{ formatCurrency(businessIndicatorComponent) }}</div>
-                            </div>
-                            <div class="indicator-item">
-                                <div class="indicator-label">Internal Loss Multiplier (ILM)</div>
-                                <div class="indicator-value">{{ internalLossMultiplier | number : '1.2-2' }}</div>
-                            </div>
-                            <div class="indicator-item">
-                                <div class="indicator-label">Exigence finale</div>
-                                <div class="indicator-value">{{ formatCurrency(ORC) }}</div>
-                            </div>
-                            <div class="indicator-item">
-                                <div class="indicator-label">RWA opérationnel</div>
-                                <div class="indicator-value">{{ formatCurrency(RWA) }}</div>
-                            </div>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
-            </div>
-        </mat-tab>
-
-        <!-- Composante BI -->
-        <mat-tab label="Composante BI">
-            <mat-tab-group>
-                @for(yearData of allYearsData; let y = $index; track yearData) {
-                <mat-tab [label]="yearData.label">
-
-                    <p style="text-align : center;"> BI = <b>{{yearData.bi | number : "1.2-2"}} M€ </b></p>
-
-                    <div class="main-accordion">
-                        @for(section of yearData.sections; let i = $index; track section) {
-                        <!-- En-tête section principale -->
-                        <div class="main-accordion-header" (click)="toggleMainSection(y, i)"
-                            [class.expanded]="section.isExpanded">
-                            <h3>{{ section.title + ' - ' + section.value + ' M €' }}</h3>
-                            <span class="accordion-icon">{{ section.isExpanded ? '▼' : '▶' }}</span>
+<!-- Tabs -->
+<mat-tab-group class="main-tabs">
+    <!-- Synthèse des résultats -->
+    <mat-tab label="Synthèse des résultats">
+        <div class="tab-content">
+            <div class="results-grid">
+                <!-- Exigence de fonds propres SMA -->
+                <mat-card class="main-result-card">
+                    <mat-card-header>
+                        <mat-card-title>Exigence de fonds propres SMA</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <div class="main-amount">
+                            {{ formatCurrency(RWA) }}
+                            <span [ngClass]="variationRWA > 0 ? 'percentage-change-red' : 'percentage-change-green'">
+                                {{ variationRWA | number:'1.2-2' }}% vs précédent
+                            </span>
                         </div>
+                        <div class="chart-placeholder">
+                            <canvas baseChart [data]="barLineChartData" [options]="barLineChartOptions" [type]="'bar'">
+                            </canvas>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
 
-                        <!-- Contenu section principale -->
-                        <div class="main-accordion-content" [class.expanded]="section.isExpanded">
-                            <div class="sub-accordion">
-                                @for(subSection of section.sections; let j = $index; track subSection) {
-                                <!-- En-tête sous-section -->
-                                <div class="sub-accordion-header" (click)="toggleSubSection(y, i, j)"
-                                    [class.expanded]="subSection.isExpanded">
-                                    <h4>{{ subSection.title + ' - ' + subSection.value + ' M €'}}</h4>
-                                    <span class="accordion-icon">{{ subSection.isExpanded ? '▼' : '▶' }}</span>
-                                </div>
+                <!-- Indicateurs clés -->
+                <mat-card class="indicators-card">
+                    <mat-card-header>
+                        <mat-card-title>Indicateurs clés</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <div class="indicator-item">
+                            <div class="indicator-label">Business Indicator (BI)</div>
+                            <div class="indicator-value">{{ formatCurrency(businessIndicator) }}</div>
+                        </div>
+                        <div class="indicator-item">
+                            <div class="indicator-label">Business Indicator Component (BIC)</div>
+                            <div class="indicator-value">{{ formatCurrency(businessIndicatorComponent) }}</div>
+                        </div>
+                        <div class="indicator-item">
+                            <div class="indicator-label">Internal Loss Multiplier (ILM)</div>
+                            <div class="indicator-value">{{ internalLossMultiplier | number : '1.2-2' }}</div>
+                        </div>
+                        <div class="indicator-item">
+                            <div class="indicator-label">Exigence finale</div>
+                            <div class="indicator-value">{{ formatCurrency(ORC) }}</div>
+                        </div>
+                        <div class="indicator-item">
+                            <div class="indicator-label">RWA opérationnel</div>
+                            <div class="indicator-value">{{ formatCurrency(RWA) }}</div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </mat-tab>
 
-                                <!-- Contenu de la sous-section -->
-                                <div class="sub-accordion-content" [class.expanded]="subSection.isExpanded">
-                                    @for(item of subSection.data; track item) {
-                                    <mat-card class="item-card">
-                                        <div class="card-name">{{ item.name }}</div>
-                                        <div class="card-value">{{ item.value }} M €</div>
-                                    </mat-card>
-                                    }
-                                </div>
+    <!-- Composante BI -->
+    <mat-tab label="Composante BI">
+        <mat-tab-group>
+            @for(yearData of allYearsData; let y = $index; track yearData) {
+            <mat-tab [label]="yearData.label">
+
+                <p style="text-align : center;"> BI = <b>{{yearData.bi | number : "1.2-2"}} M€ </b></p>
+
+                <div class="main-accordion">
+                    @for(section of yearData.sections; let i = $index; track section) {
+                    <!-- En-tête section principale -->
+                    <div class="main-accordion-header" (click)="toggleMainSection(y, i)"
+                        [class.expanded]="section.isExpanded">
+                        <h3>{{ section.title + ' - ' + section.value + ' M €' }}</h3>
+                        <span class="accordion-icon">{{ section.isExpanded ? '▼' : '▶' }}</span>
+                    </div>
+
+                    <!-- Contenu section principale -->
+                    <div class="main-accordion-content" [class.expanded]="section.isExpanded">
+                        <div class="sub-accordion">
+                            @for(subSection of section.sections; let j = $index; track subSection) {
+                            <!-- En-tête sous-section -->
+                            <div class="sub-accordion-header" (click)="toggleSubSection(y, i, j)"
+                                [class.expanded]="subSection.isExpanded">
+                                <h4>{{ subSection.title + ' - ' + subSection.value + ' M €'}}</h4>
+                                <span class="accordion-icon">{{ subSection.isExpanded ? '▼' : '▶' }}</span>
+                            </div>
+
+                            <!-- Contenu de la sous-section -->
+                            <div class="sub-accordion-content" [class.expanded]="subSection.isExpanded">
+                                @for(item of subSection.data; track item) {
+                                <mat-card class="item-card">
+                                    <div class="card-name">{{ item.name }}</div>
+                                    <div class="card-value">{{ item.value }} M €</div>
+                                </mat-card>
                                 }
                             </div>
+                            }
                         </div>
-                        }
                     </div>
-                </mat-tab>
-                }
-                <mat-tab label="Calcul du BIC">
-                    <div class="tab-content calcul-details">
-                        <h3>Formule complète SMA</h3>
+                    }
+                </div>
+            </mat-tab>
+            }
+            <mat-tab label="+">
+                <button mat-icon-button class="add-year-button" (click)="openAddYearDialog()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </mat-tab>
+            <mat-tab label="Calcul du BIC">
+                <div class="tab-content calcul-details">
+                    <h3>Formule complète SMA</h3>
 
-                        <div class="bic-hover-container">
-                            <p class="bic-value" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave()">
-                                BIC = <b>{{ businessIndicatorComponent | number:'1.2-2' }}</b>
-                                <span>
-                                    <mat-icon>info</mat-icon>
-                                </span>
-                            </p>
+                    <div class="bic-hover-container">
+                        <p class="bic-value" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave()">
+                            BIC = <b>{{ businessIndicatorComponent | number:'1.2-2' }}</b>
+                            <span>
+                                <mat-icon>info</mat-icon>
+                            </span>
+                        </p>
 
-                            <!-- Affichage dynamique de la carte -->
-                            <div class="bi-card" *ngIf="biCardVisible" [ngStyle]="{
+                        <!-- Affichage dynamique de la carte -->
+                        <div class="bi-card" *ngIf="biCardVisible" [ngStyle]="{
                                 top: biCardY + 'px',
                                 left: (biCardX + 20) + 'px'
                                 }" (mouseenter)="biCardVisible = true" (mouseleave)="biCardVisible = false">
-                                <p>BI Moyen : <b> {{ businessIndicator | number:'1.2-2' }}</b> M€</p>
-                                <h4>Tranches BI et coefficients marginaux (αi)</h4>
-                                <table mat-table [dataSource]="tranchesBI" class="bi-table" matSort>
-                                    <ng-container matColumnDef="intervalle">
-                                        <th mat-header-cell *matHeaderCellDef>Intervalle BI</th>
-                                        <td mat-cell *matCellDef="let element">{{ element.intervalle }}</td>
-                                    </ng-container>
+                            <p>BI Moyen : <b> {{ businessIndicator | number:'1.2-2' }}</b> M€</p>
+                            <h4>Tranches BI et coefficients marginaux (αi)</h4>
+                            <table mat-table [dataSource]="tranchesBI" class="bi-table" matSort>
+                                <ng-container matColumnDef="intervalle">
+                                    <th mat-header-cell *matHeaderCellDef>Intervalle BI</th>
+                                    <td mat-cell *matCellDef="let element">{{ element.intervalle }}</td>
+                                </ng-container>
 
-                                    <ng-container matColumnDef="coefficient">
-                                        <th mat-header-cell *matHeaderCellDef>Coefficient marginal</th>
-                                        <td mat-cell *matCellDef="let element">{{ element.coefficient }}</td>
-                                    </ng-container>
+                                <ng-container matColumnDef="coefficient">
+                                    <th mat-header-cell *matHeaderCellDef>Coefficient marginal</th>
+                                    <td mat-cell *matCellDef="let element">{{ element.coefficient }}</td>
+                                </ng-container>
 
-                                    <tr mat-header-row *matHeaderRowDef="displayedColumnsBi"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: displayedColumnsBi;"></tr>
-                                    <tr class="mat-row no-data-row" *matNoDataRow>
-                                        <td class="mat-cell" [attr.colspan]="displayedColumnsBi.length">
-                                            <div class="no-data">
-                                                <span>Aucun résultat trouvé.</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </mat-tab>
-            </mat-tab-group>
-        </mat-tab>
-
-        <!-- Composante ILM -->
-        <mat-tab label="Composante ILM">
-            <!-- Historique des pertes -->
-            <div class="form-section">
-                <div class="section-content">
-                    <div class="form-group">
-                        <select [(ngModel)]="selectedYear">
-                            @for(year of years; track year){
-                            <option [value]="year">{{year}}</option>
-                            }
-                        </select>
-                        <!-- Graphique -->
-                        <div class="chart-container">
-                            <button mat-button class="btn btn-primary" (click)="validateLosses()">Valider les
-                                pertes</button>
-                            <button mat-button class="btn btn-primary" (click)="addLoss()">Ajouter une perte</button>
-                            <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line">
-                            </canvas>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumnsBi"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumnsBi;"></tr>
+                                <tr class="mat-row no-data-row" *matNoDataRow>
+                                    <td class="mat-cell" [attr.colspan]="displayedColumnsBi.length">
+                                        <div class="no-data">
+                                            <span>Aucun résultat trouvé.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </mat-tab>
+        </mat-tab-group>
+
+    </mat-tab>
+
+    <!-- Composante ILM -->
+    <mat-tab label="Composante ILM">
+        <!-- Historique des pertes -->
+        <div class="form-section">
+            <div class="section-content">
+                <div class="form-group">
+                    <select [(ngModel)]="selectedYear">
+                        @for(year of years; track year){
+                        <option [value]="year">{{year}}</option>
+                        }
+                    </select>
+                    <!-- Graphique -->
+                    <div class="chart-container">
+                        <button mat-button class="btn btn-primary" (click)="validateLosses()">Valider les
+                            pertes</button>
+                        <button mat-button class="btn btn-primary" (click)="addLoss()">Ajouter une perte</button>
+                        <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line">
+                        </canvas>
+                    </div>
+                </div>
             </div>
-        </mat-tab>
-    </mat-tab-group>
+        </div>
+    </mat-tab>
+</mat-tab-group>

@@ -194,13 +194,6 @@ export class ListComponent implements OnInit {
   });
 
   dialogRef.afterClosed().subscribe(result => {
-    if (result?.success) {
-      if (result.draft) {
-        console.log('Brouillon sauvegardé:', result.incidentId);
-      } else {
-        console.log('Incident créé:', result.incidentId);
-      }
-    }
   });
 }
 

@@ -45,7 +45,7 @@ export class AddActionDialogComponent implements OnInit {
 
   actions: Action[] = [];
   popupActions: PopupAction[] = [];
-  
+
   private currentDraftId: string | null = null;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: AddActionDialogData) { }
@@ -71,23 +71,20 @@ export class AddActionDialogComponent implements OnInit {
   }
 
   loadDraft(draftId: string): void {
-    const draft = this.draftService.getDraftById(draftId);
-    if (draft) {
-      // 🚨 CORRECTION ICI
-      const draftData = draft.data as { actions: Action[], actionPlanId: string };
-      
-      // 1. Restaurer les actions
-      this.actions = draftData.actions || [];
-      
+    const draft = this.draftService.getDraftById(draftId);
+    if (draft) {
+      // 🚨 CORRECTION ICI
+      const draftData = draft.data as { actions: Action[], actionPlanId: string };
+
+      // 1. Restaurer les actions
+      this.actions = draftData.actions || [];
+
       // 2. Restaurer l'actionPlanId dans this.data si elle est présente dans le brouillon
       if (draftData.actionPlanId) {
         this.data.actionPlanId = draftData.actionPlanId;
       }
-      
-      console.log('Brouillon d\'actions restauré:', draft);
-      console.log('ActionPlanId restauré:', this.data.actionPlanId); // Vérification
-    }
-  }
+    }
+  }
 
   initActions(): void {
     this.popupActions = [
@@ -125,7 +122,6 @@ export class AddActionDialogComponent implements OnInit {
       actionPlanId: this.data.actionPlanId
     };
 
-    console.log(draftData)
 
     const actionCount = this.actions.filter(a => a.name && a.name.trim() !== '').length;
     const title = `${actionCount} action${actionCount > 1 ? 's' : ''} à ajouter`;
@@ -155,7 +151,7 @@ export class AddActionDialogComponent implements OnInit {
     } else if (this.currentDraftId) {
       this.draftService.showDraft(this.currentDraftId);
     }
-    
+
     this.dialogRef.close();
   }
 
@@ -165,12 +161,12 @@ export class AddActionDialogComponent implements OnInit {
     this.actionPlanService.addActions(this.actions, this.data.actionPlanId).subscribe({
       next: (action) => {
         this.snackBarService.info("Action(s) ajoutée(s) avec succès");
-        
+
         // Supprimer le brouillon après sauvegarde réussie
         if (this.currentDraftId) {
           this.draftService.deleteDraft(this.currentDraftId);
         }
-        
+
         this.dialogRef.close(true);
       },
       error: (err) => {

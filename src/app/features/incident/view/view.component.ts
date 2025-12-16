@@ -155,7 +155,6 @@ export class ViewComponent implements OnInit {
         console.warn("Pas de plan d'action trouvé ou erreur API", error);
         this.planActionId = null;
     }
-    console.log(this.planActionId);
 
     this.goBackButtons = [
       {
@@ -223,9 +222,6 @@ export class ViewComponent implements OnInit {
   });
 
   dialogRef.afterClosed().subscribe(result => {
-    if (result?.success) {
-      console.log('Incident modifié:', result.incidentId);
-    }
   });
 }
 

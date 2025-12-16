@@ -139,7 +139,6 @@ export class CreateIncidentDialogComponent implements OnInit {
       this.incidentForm3.patchValue(draft.data.incidentForm3);
       this.selectedBP = draft.data.selectedBP;
       this.currentStep = draft.data.currentStep || 0;
-      console.log('Brouillon d\'incident restauré:', draft);
     }
   }
 

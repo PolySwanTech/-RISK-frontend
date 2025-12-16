@@ -131,7 +131,6 @@ export class ControlDetailsPageComponent implements OnInit {
 
     // 2. On ne garde que les 3 premiers pour l'affichage principal
     this.slides = this.allSlides.slice(0, 3);
-    console.log(this.slides);
   }
 
   getStatusClass(status?: Status): string {
@@ -141,7 +140,6 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   openEvaluationDetailsPopup(executionId: string, action: string): void {
-    console.log(action)
     this.dialog.open(PopupEvaluationControleComponent, {
       width: '800px',
       maxWidth: '95vw',

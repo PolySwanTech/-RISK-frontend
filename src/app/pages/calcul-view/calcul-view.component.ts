@@ -15,6 +15,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import { codeToEnumKeyMap } from '../../core/enum/sma.enum';
+import { forkJoin, map } from 'rxjs';
+import { PopUpAjoutAnneeComponent } from '../../features/calcul/pop-up-ajout-annee/pop-up-ajout-annee.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface DataItem {
   id: number;
@@ -98,6 +101,7 @@ function fillRowsFromEnumCodes(
 export class CalculViewComponent {
 
   @ViewChild(BaseChartDirective) chartComponent!: BaseChartDirective;
+  private dialog = inject(MatDialog);
 
   private calculService = inject(CalculService);
   private confirmService = inject(ConfirmService);
@@ -227,7 +231,6 @@ export class CalculViewComponent {
 
   displayedColumnsBi = ['intervalle', 'coefficient'];
 
-  annualLossesDetected: { lossYear: number, amount: number }[] = [];
   annualLossesDeclared: { lossYear: number, amount: number }[] = [];
   annualResult: { [year: number]: any } = {};
 
@@ -237,14 +240,9 @@ export class CalculViewComponent {
       datasets: [
         {
           ...this.lineChartData.datasets[0],
-          data: this.years.map(year =>
-            Number(this.annualLossesDetected.find(l => l.lossYear === year)?.amount || 0)
-          )
-        },
-        {
-          ...this.lineChartData.datasets[1],
-          data: this.years.map(year =>
-            Number(this.annualLossesDeclared.find(l => l.lossYear === year)?.amount || 0)
+          data: this.years.map(year => {
+            return Number(this.annualLossesDeclared.find(l => l.lossYear == year)?.amount || 0)
+          }
           )
         }
       ]
@@ -289,91 +287,101 @@ export class CalculViewComponent {
       .subscribe(res => {
         if (res) {
           this.calculService.saveLosses(this.annualLossesDeclared).subscribe();
-          this.calculService.saveLosses(this.annualLossesDetected).subscribe();
         }
       })
   }
 
   ngOnInit() {
 
-    this.calculService.getValues().subscribe((values: BackendResponse) => {
-      this.allYearsData = Object.entries(values).map(([year, categories]) => {
-        let biValue = 0;
+    // 1. Définir les trois Observables
+    const values$ = this.calculService.getValues().pipe(
+      // Utiliser 'map' pour effectuer la transformation des données 'values' ici
+      map((values: BackendResponse) => {
+        return Object.entries(values).map(([year, categories]) => {
+          let biValue = 0;
+          const categorySections: AccordionSection[] = Object.entries(categories)
+            .filter(([categoryName]) => categoryName !== 'BI')
+            .map(([categoryName, categoryData]) => {
+              const subCategorySections: AccordionSection[] = Object.entries(categoryData.subCategories).map(
+                ([subCategoryName, items]) => ({
+                  title: subCategoryName,
+                  isExpanded: false,
+                  value: items.reduce((sum, item) => sum + item.value, 0),
+                  data: items.map(item => ({
+                    id: item.id,
+                    name: item.itemKey.name,
+                    value: item.value,
+                    description: item.itemKey.label
+                  }))
+                })
+              );
 
-        const categorySections: AccordionSection[] = Object.entries(categories)
-          .filter(([categoryName]) => categoryName !== 'BI') // Exclure la catégorie 'BI'
-          .map(([categoryName, categoryData]) => {
-            const subCategorySections: AccordionSection[] = Object.entries(categoryData.subCategories).map(
-              ([subCategoryName, items]) => ({
-                title: subCategoryName, // ex: 'INTEREST_INCOME_COMPONENT'
+              return {
+                title: categoryName,
                 isExpanded: false,
-                value: items.reduce((sum, item) => sum + item.value, 0),
-                data: items.map(item => ({
-                  id: item.id,
-                  name: item.itemKey.name,
-                  value: item.value,
-                  description: item.itemKey.label
-                }))
-              })
-            );
+                value: categoryData.value,
+                sections: subCategorySections
+              };
+            });
 
-            return {
-              title: categoryName, // 'ILDC', 'SC', 'FC'
-              isExpanded: false,
-              value: categoryData.value,
-              sections: subCategorySections
-            };
-          });
+          if (categories['BI']) {
+            biValue = categories['BI'].value;
+          }
 
-        // Récupérer la valeur de BI si elle est présente
-        if (categories['BI']) {
-          biValue = categories['BI'].value;
-        }
+          return {
+            label: year,
+            bi: biValue,
+            sections: categorySections
+          };
+        });
+      })
+    );
 
-        return {
-          label: year,
-          bi: biValue,
-          sections: categorySections
-        };
-      });
-    });
+    const losses$ = this.calculService.getLosses();
+    const results$ = this.calculService.getResult();
 
+    // 2. Utiliser forkJoin pour attendre les trois
+    forkJoin({
+      values: values$,   // Le résultat sera stocké dans 'allYearsData' après transformation
+      losses: losses$,   // Le résultat sera stocké dans 'losses'
+      results: results$  // Le résultat sera stocké dans 'results'
+    }).subscribe(({ values, losses, results }) => {
+      // --- 3. TOUS LES APPELS SONT TERMINÉS ICI ---
 
-    // TODO : Ajouter la méthode pour recuperer les pertes declarées / detectées
+      // A. Traitement des valeurs (déjà transformées dans le 'map' de values$)
+      this.allYearsData = values;
 
-    this.calculService.getLosses().subscribe(losses => {
+      // B. Traitement des pertes (Losses)
       this.annualLossesDeclared = [];
-      this.annualLossesDetected = [];
-
       losses.forEach(l => {
         this.annualLossesDeclared.push({ lossYear: l.lossYear, amount: l.amount });
-        this.annualLossesDetected.push({ lossYear: l.lossYear, amount: l.amount * 1.5 });
       });
 
-      this.updateChart();
-    });
+      // C. Traitement des résultats (Results)
+      results.forEach(r => {
+        this.annualResult[r.lossYear] = r;
+      });
 
-
-    this.calculService.getResult().subscribe(results => {
-      results.forEach(
-        r => {
-          this.annualResult[r.lossYear] = r;
-        }
-      )
       if (results.length >= 2) {
         const lastYear = this.annualResult[2025].rwa;
         const prevYear = this.annualResult[2024].rwa;
-        this.variationRWA = ((lastYear - prevYear) / prevYear) * 100; // variation %
+        this.variationRWA = ((lastYear - prevYear) / prevYear) * 100;
       }
-      this.businessIndicator = this.annualResult[2025].bi;
-      this.businessIndicatorComponent = this.annualResult[2025].bic;
-      this.internalLossMultiplier = this.annualResult[2025].ilm;
-      this.ORC = this.annualResult[2025].orc;
-      this.RWA = this.annualResult[2025].rwa;
-      this.updateChart();
-    })
 
-    this.rebuildYears();
+      // Assurez-vous que les clés existent avant d'accéder à 2025 (surtout pour les données de test)
+      if (this.annualResult[2025]) {
+        this.businessIndicator = this.annualResult[2025].bi;
+        this.businessIndicatorComponent = this.annualResult[2025].bic;
+        this.internalLossMultiplier = this.annualResult[2025].ilm;
+        this.ORC = this.annualResult[2025].orc;
+        this.RWA = this.annualResult[2025].rwa;
+      }
+
+
+      // D. L'action finale, garantie d'être appelée en dernier
+      this.rebuildYears();
+
+    });
   }
 
   addLoss() {
@@ -384,7 +392,6 @@ export class CalculViewComponent {
 
       // 🔍 On vérifie si l’année existe déjà
       const declaredIndex = this.annualLossesDeclared.findIndex(l => l.lossYear == year);
-      const detectedIndex = this.annualLossesDetected.findIndex(l => l.lossYear == year);
 
       if (declaredIndex !== -1) {
         // 🔄 Met à jour la valeur existante
@@ -393,16 +400,21 @@ export class CalculViewComponent {
         // ➕ Ajoute une nouvelle entrée
         this.annualLossesDeclared.push({ lossYear: year, amount });
       }
-
-      if (detectedIndex !== -1) {
-        this.annualLossesDetected[detectedIndex].amount = amount * 1.5; // ou amount selon ton besoin
-      } else {
-        this.annualLossesDetected.push({ lossYear: year, amount: amount * 1.5 });
-      }
+      this.annualLossesDeclared.push({ lossYear: year, amount: amount });
 
       // 🧮 Mise à jour du graphique
       this.updateChart();
     }
+  }
+
+  openAddYearDialog(): void {
+    const dialogRef = this.dialog.open(PopUpAjoutAnneeComponent, {
+      width: '600px', // Définir la largeur du pop-up
+    });
+    dialogRef.afterClosed().subscribe(_ => {
+      console.log('Le dialogue a été fermé');
+      // Ici vous gérerez la création de l'année après la fermeture
+    });
   }
 
   exportExcel(): void {
