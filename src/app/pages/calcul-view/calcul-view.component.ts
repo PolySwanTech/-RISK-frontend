@@ -411,7 +411,11 @@ export class CalculViewComponent {
     const dialogRef = this.dialog.open(PopUpAjoutAnneeComponent, {
       width: '600px', // Définir la largeur du pop-up
     });
-    dialogRef.afterClosed().subscribe(_ => {
+    dialogRef.afterClosed().subscribe(payload => {
+      console.log(payload)
+      this.calculService.addSmaItemValues(payload).subscribe(
+        _ => console.log("ajout réussi")
+      )
       console.log('Le dialogue a été fermé');
       // Ici vous gérerez la création de l'année après la fermeture
     });

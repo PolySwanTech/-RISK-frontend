@@ -6,11 +6,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 import { MatInputModule } from '@angular/material/input';
 
+interface SmaItemValueCreationDto {
+  year: string; // Doit être une chaîne de caractères (String)
+  values: { [key: string]: number }; // Map<SmaItemEnum, Double> devient un objet { [key: string]: number }
+}
+
 @Component({
   selector: 'pop-up-ajout-annee',
   templateUrl: './pop-up-ajout-annee.component.html',
   styleUrls: ['./pop-up-ajout-annee.component.scss'],
-  imports : [MatFormFieldModule, MatAccordion, ReactiveFormsModule,
+  imports: [MatFormFieldModule, MatAccordion, ReactiveFormsModule,
     MatExpansionModule, MatDialogModule, MatInputModule]
 })
 export class PopUpAjoutAnneeComponent implements OnInit {
@@ -95,25 +100,29 @@ export class PopUpAjoutAnneeComponent implements OnInit {
 
   onSave(): void {
     if (this.yearForm.valid) {
-      // Construction des données finales pour le backend
       const rawValues = this.yearForm.value;
-      const newYear = rawValues.newYear;
 
-      const payload: { year: number, data: { itemKey: string, value: number }[] } = {
+      // Convertir l'année en String pour correspondre au DTO Java
+      const newYear: string = String(rawValues.newYear);
+
+      // 1. Définir le payload dans le format Map<String, Double>
+      const payload: SmaItemValueCreationDto = {
         year: newYear,
-        data: []
+        values: {} // Initialisation en tant qu'objet vide
       };
 
-      // Remplir le tableau 'data' avec toutes les clés/valeurs sauf 'newYear'
+      // 2. Parcourir toutes les clés du formulaire
       Object.keys(rawValues).forEach(key => {
+        // Exclure la propriété 'newYear'
         if (key !== 'newYear') {
-          payload.data.push({ itemKey: key, value: rawValues[key] });
+          // Pour chaque item, la clé est le nom de l'Enum (String) et la valeur est le Double (number)
+          // C'est la structure exacte d'une Map Java sérialisée en JSON.
+          payload.values[key] = rawValues[key];
         }
       });
 
-      this.dialogRef.close(payload); // Retourne la structure des données remplies
+      this.dialogRef.close(payload); // Retourne le payload prêt à être envoyé au backend
     } else {
-      // Marquer tous les champs comme 'touchés' pour afficher les erreurs
       this.yearForm.markAllAsTouched();
     }
   }
