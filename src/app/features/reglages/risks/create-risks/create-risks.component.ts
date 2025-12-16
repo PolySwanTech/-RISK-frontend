@@ -18,6 +18,7 @@ import { RiskTemplate, RiskTemplateCreateDto } from '../../../../core/models/Ris
 import { Process } from '../../../../core/models/Process';
 import { SelectRiskEventComponent } from '../../../../shared/components/select-risk-event/select-risk-event.component';
 import { RiskSelectionMode } from '../../../../core/enum/risk-enum';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface CreateRiskEventDialogData {
   processId?: string;
@@ -71,7 +72,7 @@ export class CreateRisksComponent implements OnInit {
   listProcess: Process[] = [];
   pageTitle = 'Créer un événement de risque';
 
-  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: CreateRiskEventDialogData | null) {}
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: CreateRiskEventDialogData | null) { }
 
   ngOnInit(): void {
     this.initActions();
@@ -213,7 +214,14 @@ export class CreateRisksComponent implements OnInit {
         this.snackBar.success('Événement de risque créé avec succès');
         this.closePopup({ createdEventId: riskId, libelle: this.form.value.libellePerso });
       },
-      error: (err) => this.snackBar.error(err.message || 'Erreur lors de la création')
+      error: (err : HttpErrorResponse) => {
+        if(err.status == 422){
+          this.snackBar.error("Le libellé existe déjà, veuillez en renseigner un autre.");
+        }
+        else{
+          this.snackBar.error(err.message || 'Erreur lors de la création');
+        }
+      }
     });
   }
 
