@@ -413,12 +413,11 @@ export class CalculViewComponent {
       maxWidth: '95vw'
     });
     dialogRef.afterClosed().subscribe(payload => {
-      console.log(payload)
-      this.calculService.addSmaItemValues(payload).subscribe(
-        _ => console.log("ajout réussi")
-      )
-      console.log('Le dialogue a été fermé');
-      // Ici vous gérerez la création de l'année après la fermeture
+      if (payload) {
+        this.calculService.addSmaItemValues(payload).subscribe(
+          _ => console.log("ajout réussi")
+        )
+      }
     });
   }
 
