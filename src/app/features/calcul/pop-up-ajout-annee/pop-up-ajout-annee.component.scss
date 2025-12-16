@@ -1,0 +1,225 @@
+@use '../../../../styles/popup-common' as popup;
+
+$primary: var(--mat-sys-primary);
+$success: var(--mat-purple-color);
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+
+// Progress info
+.progress-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  margin-bottom: $spacing-lg;
+  color: $primary;
+  font-weight: 500;
+
+  mat-icon {
+    color: $primary;
+  }
+}
+
+// Accordion customization
+::ng-deep {
+  .mat-expansion-panel {
+    margin-bottom: $spacing-md !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+
+    &:before {
+      display: none !important;
+    }
+
+    &.mat-expanded {
+      border-color: $primary !important;
+    }
+
+    .mat-expansion-panel-header {
+      padding: $spacing-md $spacing-lg;
+      height: auto !important;
+      min-height: 64px !important;
+
+      &:hover {
+        background: #f8fafc !important;
+      }
+
+      .mat-expansion-panel-header-title {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        font-size: 16px;
+        color: #1e293b;
+      }
+
+      .mat-expansion-panel-header-description {
+        font-size: 13px;
+        color: #64748b;
+      }
+    }
+
+    .mat-expansion-panel-content {
+      .mat-expansion-panel-body {
+        padding: $spacing-lg;
+        background: #f8fafc;
+      }
+    }
+  }
+}
+
+.category-icon {
+  color: $primary;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+// Category content
+.category-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.sub-category-group {
+  background: white;
+  padding: $spacing-lg;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
+}
+
+.sub-category-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 2px solid #e2e8f0;
+
+  mat-icon {
+    color: $success;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    flex: 1;
+  }
+
+  .item-count {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    padding: 4px 12px;
+    background: #f1f5f9;
+    border-radius: 12px;
+  }
+}
+
+// Items grid
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spacing-md;
+}
+
+.item-field {
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      background: white;
+    }
+
+    .mdc-text-field--outlined {
+      border-radius: 8px;
+    }
+
+    .mat-mdc-form-field-focus-overlay {
+      background-color: transparent;
+    }
+
+    .mat-icon[matPrefix] {
+      color: $primary;
+      margin-right: $spacing-sm;
+    }
+
+    // Style pour les champs avec erreur
+    &.mat-form-field-invalid {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: #ef4444 !important;
+      }
+    }
+
+    // Style pour les champs valides et remplis
+    &.mat-form-field-should-float:not(.mat-form-field-invalid) {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: $success !important;
+      }
+    }
+  }
+}
+
+// Info box
+.info-box {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  color: #92400e;
+  margin-top: $spacing-lg;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: #f59e0b;
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+
+  ::ng-deep {
+    .mat-expansion-panel-header {
+      .mat-expansion-panel-header-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-sm;
+      }
+    }
+  }
+
+  .sub-category-header {
+    flex-wrap: wrap;
+  }
+}

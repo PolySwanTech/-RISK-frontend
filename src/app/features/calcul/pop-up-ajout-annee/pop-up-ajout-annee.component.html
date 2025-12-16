@@ -1,53 +1,109 @@
-<h2 mat-dialog-title>Ajouter une Nouvelle Année de Données SMA</h2>
+<app-base-popup 
+  [title]="'Ajouter une Nouvelle Année de Données SMA'"
+  [showClose]="true"
+  [actions]="popupActions"
+  [dialogRef]="getDialogRef()"
+  (close)="onCancel()">
 
-<form [formGroup]="yearForm" (ngSubmit)="onSave()">
-    <mat-dialog-content>
-        <mat-form-field appearance="outline" class="full-width"> 
-            <mat-label>Année</mat-label>
-            <input matInput type="number" formControlName="newYear" placeholder="Ex: 2026">
-            @if(yearForm.get('newYear')?.invalid){
-            <mat-error>
-                L'année est requise et doit être un nombre supérieur à 2025.
-            </mat-error>
-            }
-        </mat-form-field>
+  <form [formGroup]="yearForm">
+    
+    <!-- Section Année -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">event</mat-icon>
+        <h3 class="section-title">Année de référence</h3>
+      </div>
 
-        <mat-accordion multi="true">
-            @for(category of smaStructure; track category.name) {
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <strong>{{ category.name }}</strong>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        {{ category.label }}
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Année</mat-label>
+        <input matInput type="number" formControlName="newYear" 
+               placeholder="Ex: 2026" min="2026" max="3000">
+        <mat-icon matPrefix>calendar_today</mat-icon>
+        <mat-error *ngIf="yearForm.get('newYear')?.hasError('required')">
+          L'année est requise
+        </mat-error>
+        <mat-error *ngIf="yearForm.get('newYear')?.hasError('min')">
+          L'année doit être supérieure à 2025
+        </mat-error>
+        <mat-error *ngIf="yearForm.get('newYear')?.hasError('max')">
+          L'année doit être inférieure à 3000
+        </mat-error>
+      </mat-form-field>
+    </div>
 
-                @for(subCategory of category.subCategories; track subCategory.name) {
-                <div class="sub-category-group">
-                    <h4>{{ subCategory.label }}</h4>
+    <!-- Indicateur de progression -->
+    <div class="progress-info" *ngIf="yearForm.get('newYear')?.valid">
+      <mat-icon>analytics</mat-icon>
+      <span>{{ getFilledItemsCount() }} / {{ getTotalItems() }} champs remplis</span>
+    </div>
 
-                    @for(item of subCategory.items; track item.name) {
-                    <mat-form-field appearance="fill" class="item-field">
-                        <mat-label>{{ item.label }}</mat-label>
-                        <input matInput type="number" [formControlName]="item.name" placeholder="Valeur M€">
-                        @if(yearForm.get(item.name)?.invalid && yearForm.get(item.name)?.touched){
-                        <mat-error>
-                            Champ requis (>= 0).
-                        </mat-error>
-                        }
-                    </mat-form-field>
-                    }
-                </div>
-                }
-            </mat-expansion-panel>
-            }
-        </mat-accordion>
+    <!-- Section Données SMA -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon class="section-icon">account_balance</mat-icon>
+        <h3 class="section-title">Données financières ({{ smaStructure.length }} catégories)</h3>
+      </div>
 
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-        <button mat-button (click)="onCancel()">Annuler</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="yearForm.invalid">Enregistrer</button>
-    </mat-dialog-actions>
-</form>
+      <mat-accordion multi="true">
+        <mat-expansion-panel 
+          *ngFor="let category of smaStructure; trackBy: trackByName"
+          [expanded]="expandedPanels.has(category.name)"
+          (opened)="expandedPanels.add(category.name)"
+          (closed)="expandedPanels.delete(category.name)">
+          
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="category-icon">folder</mat-icon>
+              <strong>{{ category.label }}</strong>
+            </mat-panel-title>
+            <mat-panel-description>
+              {{ category.subCategories.length }} sous-catégorie(s)
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="category-content">
+            <div class="sub-category-group" 
+                 *ngFor="let subCategory of category.subCategories; trackBy: trackByName">
+              
+              <div class="sub-category-header">
+                <mat-icon>account_tree</mat-icon>
+                <h4>{{ subCategory.label }}</h4>
+                <span class="item-count">{{ subCategory.items.length }} items</span>
+              </div>
+
+              <div class="items-grid">
+                <mat-form-field 
+                  appearance="outline" 
+                  class="item-field"
+                  *ngFor="let item of subCategory.items; trackBy: trackByName">
+                  
+                  <mat-label>{{ item.label }}</mat-label>
+                  <input 
+                    matInput 
+                    type="number" 
+                    [formControlName]="item.name" 
+                    placeholder="Valeur M€"
+                    min="0"
+                    step="0.01">
+                  <mat-icon matPrefix>euro</mat-icon>
+                  
+                  <mat-error *ngIf="isFieldInvalid(item.name)">
+                    {{ getFieldError(item.name) }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+
+    <!-- Message d'aide -->
+    <div class="info-box" *ngIf="yearForm.invalid && yearForm.touched">
+      <mat-icon>info</mat-icon>
+      <p>Veuillez remplir tous les champs requis pour enregistrer l'année.</p>
+    </div>
+
+  </form>
+
+</app-base-popup>
