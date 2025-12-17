@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Utilisateur, UtilisateurProfil } from '../../../../core/models/Utilisateur';
 import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { MatCardModule } from '@angular/material/card';
+import { SnackBarService } from '../../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-user-list',
@@ -28,6 +29,7 @@ import { MatCardModule } from '@angular/material/card';
 export class UserListComponent implements OnInit, AfterViewInit {
   private userService = inject(UtilisateurService);
   private dialog = inject(MatDialog);
+  private snackBarService = inject(SnackBarService);
 
   dataSource = new MatTableDataSource<UtilisateurProfil>();
   displayedColumns = ['username', 'email', 'actions'];
@@ -65,7 +67,12 @@ export class UserListComponent implements OnInit, AfterViewInit {
         user: user,
         update: true
       }
-    });
+    })
+      .afterClosed().subscribe(
+        maj => {
+          if (maj) this.snackBarService.info("Utilisateur mis à jour avec succès.")
+        }
+      );
   }
 
 
