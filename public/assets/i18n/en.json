@@ -10,14 +10,22 @@
     "LOGOUT": "Logout"
   },
     "LOGIN": {
-      "TITLE": "Login",
-      "USERNAME": "Username",
-      "PASSWORD": "Password",
-      "LOGIN_BUTTON": "Login",
-      "FORGOT_PASSWORD": "Forgot password?",
-      "RESET_TITLE": "Password Reset",
-      "EMAIL": "Email",
-      "RESET_BUTTON": "Reset Password",
-      "CANCEL_BUTTON": "Cancel"
-    }
+    "TITLE": "Login",
+    "USERNAME": "Username / Email",
+    "USERNAME_REQUIRED": "Username is required",
+    "PASSWORD": "Password",
+    "PASSWORD_REQUIRED": "Password is required",
+    "PASSWORD_MIN_LENGTH": "Password must be at least 6 characters",
+    "LOGIN_BUTTON": "Login",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "RESET_TITLE": "Password Reset",
+    "RESET_DESCRIPTION": "Enter your email address and we'll send you a link to reset your password.",
+    "EMAIL": "Email address",
+    "EMAIL_PLACEHOLDER": "example@email.com",
+    "EMAIL_REQUIRED": "Email address is required",
+    "EMAIL_INVALID": "Email address is not valid",
+    "RESET_BUTTON": "Send link",
+    "SENDING": "Sending...",
+    "CANCEL_BUTTON": "Cancel"
+  }
   }

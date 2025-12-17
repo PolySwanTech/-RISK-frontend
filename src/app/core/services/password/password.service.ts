@@ -7,14 +7,14 @@ import { environment } from '../../../environments/environment';
 })
 export class PasswordService {
 
-  private base = environment.apiUrl + '/password';
+  private base = environment.apiAuthUrl + '/password';
   private http = inject(HttpClient);
-
-  requestLink(email: string) {
-    return this.http.post(this.base + '/forgot', { mail: email })
-  }
 
   resetPassword(token: string, password: string) {
     return this.http.post<any>(this.base + '/reset', { token: token, newPassword: password })
+  }
+
+  sendResetPasswordEmail(email: string) {
+    return this.http.post(`${this.base}/forgot`, { email });
   }
 }

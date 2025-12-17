@@ -1,18 +1,33 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormGroup, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
+
+// Nouveaux imports Material
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+
 import { PasswordService } from '../../../core/services/password/password.service';
-import { finalize } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule,
-    MatButtonModule],
+  standalone: true,
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    ReactiveFormsModule, 
+    TranslateModule, 
+    MatButtonModule,
+    MatFormFieldModule, // Indispensable pour envelopper les inputs
+    MatInputModule,     // Pour la directive matInput
+    MatIconModule       // Pour l'icône de l'œil (mot de passe)
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -20,14 +35,18 @@ export class LoginComponent {
 
   private authService = inject(AuthService);
   private passwordService = inject(PasswordService);
-  private fb = inject(FormBuilder);
   private snackBarService = inject(SnackBarService);
+  private fb = inject(FormBuilder);
 
   loginForm: FormGroup;
   resetMdpForm: FormGroup;
   isForgotPassword: boolean = false;
+  isResettingPassword: boolean = false;
   errorMessage: string = '';
   isLoading = false;
+  
+  // Pour gérer l'affichage du mot de passe (text <-> password)
+  hidePassword = true; 
 
   constructor() {
     this.loginForm = this.fb.group({
@@ -40,31 +59,40 @@ export class LoginComponent {
     });
   }
 
-  // Login form submit
   onLogin() {
+    if (this.loginForm.invalid) return;
     const { username, password } = this.loginForm.value;
-    // Call API to authenticate
     this.authenticateUser(username, password);
   }
 
-  // Forgot Password handler
   onForgotPassword() {
     this.isForgotPassword = true;
+    this.errorMessage = '';
   }
 
-  // Reset Password functionality (send email for password reset)
   onResetPassword() {
-    const email = this.resetMdpForm.value.email;
-    if (!email) {
-      this.errorMessage = 'Merci de renseigner un mail pour la réinitialisation du mot de passe.';
+    if (this.resetMdpForm.invalid) {
+      this.errorMessage = 'Merci de renseigner une adresse email valide.';
       return;
     }
 
-    // Call the API for password reset request
-    this.resetPassword(email);
+    const email = this.resetMdpForm.value.email;
+    this.isResettingPassword = true;
+    this.errorMessage = '';
+
+    this.passwordService.sendResetPasswordEmail(email).subscribe({
+      next: () => {
+        this.isResettingPassword = false;
+        this.snackBarService.info('Un email de réinitialisation a été envoyé à votre adresse.');
+        this.closeForgotPassword();
+      },
+      error: (err) => {
+        this.isResettingPassword = false;
+        this.snackBarService.info(err.error?.error || 'Une erreur est survenue');
+      }
+    });
   }
 
-  // Simulated API calls (Replace these with real API calls)
   authenticateUser(email: string, password: string) {
     this.isLoading = true;
 
@@ -84,15 +112,9 @@ export class LoginComponent {
       });
   }
 
-  resetPassword(email: string) {
-    this.passwordService.requestLink(email).subscribe(
-      _ => alert("Un lien vous a été envoyé par mail.")
-    )
-  }
-
-  // Close Forgot Password form
   closeForgotPassword() {
     this.isForgotPassword = false;
     this.errorMessage = '';
+    this.resetMdpForm.reset();
   }
 }

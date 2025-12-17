@@ -1,26 +1,55 @@
 <div class="reset-password-container">
-    <h2>Réinitialisation du mot de passe</h2>
+  <h2>Réinitialisation du mot de passe</h2>
 
-    <form [formGroup]="resetPasswordForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-            <label for="newPassword">Nouveau mot de passe</label>
-            <input id="newPassword" type="password" formControlName="newPassword"
-                placeholder="Entrez votre nouveau mot de passe" />
-            <div *ngIf="resetPasswordForm.get('newPassword')?.invalid && resetPasswordForm.get('newPassword')?.touched"
-                class="error-message">
-                <small *ngIf="resetPasswordForm.get('newPassword')?.hasError('required')">Le mot de passe est
-                    requis.</small>
-                <small *ngIf="resetPasswordForm.get('newPassword')?.hasError('minlength')">Le mot de passe doit contenir
-                    au moins 8 caractères.</small>
-            </div>
-        </div>
+  <form [formGroup]="resetPasswordForm" (ngSubmit)="onSubmit()">
+    
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nouveau mot de passe</mat-label>
+      <input 
+        matInput 
+        [type]="hidePassword ? 'password' : 'text'" 
+        formControlName="newPassword"
+        placeholder="Entrez votre nouveau mot de passe" />
+      
+      <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
 
-        <button type="submit" [disabled]="resetPasswordForm.invalid">Réinitialiser le mot de passe</button>
+      @if (resetPasswordForm.get('newPassword')?.hasError('required')) {
+        <mat-error>Le mot de passe est requis.</mat-error>
+      }
+      @if (resetPasswordForm.get('newPassword')?.hasError('minlength')) {
+        <mat-error>Le mot de passe doit contenir au moins 8 caractères.</mat-error>
+      }
+    </mat-form-field>
 
-        @if(errorMessage){
-        <div class="error-message">
-            <p>{{ errorMessage }}</p>
-        </div>
-        }
-    </form>
+    @if(errorMessage){
+      <div class="error-message-box">
+        <p>{{ errorMessage }}</p>
+      </div>
+    }
+
+    <button 
+      mat-raised-button 
+      color="primary" 
+      class="full-width-btn" 
+      type="submit" 
+      [disabled]="resetPasswordForm.invalid">
+      Réinitialiser le mot de passe
+    </button>
+
+  </form>
+
+  <div class="resend-section">
+    <p class="info-text">Vous n'avez pas reçu l'email ou le lien a expiré ?</p>
+    
+    <button 
+      mat-stroked-button 
+      color="accent"
+      type="button" 
+      (click)="resendResetEmail()"
+      [disabled]="isResendingEmail || !email">
+      {{ isResendingEmail ? 'Envoi en cours...' : 'Renvoyer l\'email' }}
+    </button>
+  </div>
 </div>

@@ -1,0 +1,12 @@
+// Fait en sorte que les champs prennent 100% de la largeur du conteneur
+.full-width {
+  width: 100%;
+  margin-bottom: 10px; // Un peu d'espace entre les champs
+}
+
+.full-width-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+// ... ton CSS existant pour .login-container etc ...

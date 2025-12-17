@@ -1,60 +1,63 @@
-/* reset-password.component.css */
-
 .reset-password-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
+  max-width: 400px;
+  margin: 4rem auto; // Un peu plus d'espace en haut
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); // Ombre un peu plus moderne
+  background-color: white;
+
   h2 {
     text-align: center;
+    margin-bottom: 2rem;
     color: #333;
+    font-weight: 500;
   }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  input {
+
+  // Classe utilitaire pour étendre l'input Material
+  .full-width {
     width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
+    margin-bottom: 0.5rem;
+  }
+
+  .full-width-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 1.5rem 0; // Pour rendre le bouton un peu plus haut
+    line-height: 0;    // Correction centrage texte bouton haut
+  }
+
+  // Boite d'erreur globale
+  .error-message-box {
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #fee2e2; // Rouge très clair
+    border: 1px solid #fecaca;
     border-radius: 4px;
+    color: #dc2626; // Rouge foncé
+    font-size: 0.9rem;
+    
+    p { margin: 0; }
   }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-  }
-  
-  .error-message {
-    color: red;
-    font-size: 12px;
-  }
-  
-  .success-message {
-    color: green;
-    font-size: 14px;
+
+  .resend-section {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
     text-align: center;
-    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    .info-text {
+      color: #666;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    
+    // Le bouton resend prend sa largeur naturelle ou 100% selon préférence
+    button {
+      width: 100%; 
+    }
   }
-  
+}

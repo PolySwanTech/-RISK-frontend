@@ -12,12 +12,20 @@
   "LOGIN": {
     "TITLE": "Connexion",
     "USERNAME": "Nom d'utilisateur",
+    "USERNAME_REQUIRED": "Le nom d'utilisateur est requis",
     "PASSWORD": "Mot de passe",
-    "LOGIN_BUTTON": "Connexion",
+    "PASSWORD_REQUIRED": "Le mot de passe est requis",
+    "PASSWORD_MIN_LENGTH": "Le mot de passe doit contenir au moins 6 caractères",
+    "LOGIN_BUTTON": "Se connecter",
     "FORGOT_PASSWORD": "Mot de passe oublié ?",
     "RESET_TITLE": "Réinitialisation du mot de passe",
-    "EMAIL": "Email",
-    "RESET_BUTTON": "Réinitialiser le mot de passe",
+    "RESET_DESCRIPTION": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "EMAIL": "Adresse email",
+    "EMAIL_PLACEHOLDER": "exemple@email.com",
+    "EMAIL_REQUIRED": "L'adresse email est requise",
+    "EMAIL_INVALID": "L'adresse email n'est pas valide",
+    "RESET_BUTTON": "Envoyer le lien",
+    "SENDING": "Envoi en cours...",
     "CANCEL_BUTTON": "Annuler"
   }
 }
