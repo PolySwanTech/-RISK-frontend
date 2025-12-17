@@ -6,14 +6,13 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { PasswordService } from '../../../core/services/password/password.service';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-login',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule,
-    MatButtonModule, MatProgressSpinner],
+    MatButtonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
