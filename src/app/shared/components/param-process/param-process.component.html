@@ -200,7 +200,7 @@
 
           <div class="risk-dispatch" *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0">
             <h3>Dispatcher les risques</h3>
-            <div *ngFor="let risk of selectedProcess?.risks" class="risk-dispatch-item">
+            <div *ngFor="let risk of selectedProcess.risks" class="risk-dispatch-item">
               <div class="risk-info">
                 <strong>{{ risk.libelle }}</strong>
                 <p>{{ risk.description }}</p>
