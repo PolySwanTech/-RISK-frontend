@@ -37,8 +37,7 @@ export class UtilisateurService {
     return this.http.get<TeamMember[]>(`${this.baseUrl}/roles`, { params: params });
   }
 
-  updateUserRoles(id: string, roles: TeamMember[], user? : Utilisateur,) {
-    const payload = user ? { ...user, teamRoleList: roles } : { teamRoleList: roles };
-    return this.http.put(`${this.baseUrl}/${id}/roles`, payload);
+  updateUserRoles(id: string, roles: TeamMember[]) {
+    return this.http.put(`${this.baseUrl}/${id}/roles`, roles);
   }
 }
