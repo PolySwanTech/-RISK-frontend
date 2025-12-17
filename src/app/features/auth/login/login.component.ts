@@ -6,10 +6,14 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { PasswordService } from '../../../core/services/password/password.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
+import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule,
+    MatButtonModule, MatProgressSpinner],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -18,11 +22,13 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private passwordService = inject(PasswordService);
   private fb = inject(FormBuilder);
+  private snackBarService = inject(SnackBarService);
 
   loginForm: FormGroup;
   resetMdpForm: FormGroup;
   isForgotPassword: boolean = false;
   errorMessage: string = '';
+  isLoading = false;
 
   constructor() {
     this.loginForm = this.fb.group({
@@ -61,7 +67,22 @@ export class LoginComponent {
 
   // Simulated API calls (Replace these with real API calls)
   authenticateUser(email: string, password: string) {
+    this.isLoading = true;
+
     this.authService.login(email, password)
+      .pipe(
+        // finalize s'exécute à la fin (success ou error)
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe({
+        next: (res) => {
+          // Optionnel : redirection ou message de succès
+        },
+        error: (err) => {
+          console.error('Login error:', err);
+          this.snackBarService.error("Nom ou mot de passe incorrect");
+        }
+      });
   }
 
   resetPassword(email: string) {
