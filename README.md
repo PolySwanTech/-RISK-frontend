@@ -1,115 +1,114 @@
-# RiskView
+# 🛡️ RiskView
 
-## Changement Angular 19
+**RiskView** est une application moderne de gestion et de cartographie des risques, développée avec **Angular 19**. Elle permet de visualiser, d'évaluer et de piloter les plans d'action liés aux risques opérationnels.
 
-Mtn le projet est en standalone, ca veux dire qu'il faut importer les modules dans les components qui en on besoins et plus dans un app module qui le rendait dispo partout. 
+---
 
-## Architecture
+## 🚀 Évolutions Angular 19
 
-```
-my-angular-project/
-├── src/
-│   ├── app/                        # Dossier principal de l'application
-│   │   ├── core/                    # Module Core (services globaux)
-│   │   │   ├── services/            # Services réutilisables (ex: auth, API)
-│   │   │   ├── guards/              # Auth guards et autres protections de routes
-│   │   │   ├── interceptors/        # Intercepteurs HTTP
-│   │   │   ├── models/              # Interfaces et modèles de données HTTP
-│   │   └── shared/                   # Module Shared (composants réutilisables)
-│   │       ├── components/          # Composants UI (ex: boutons, modals)
-│   │       ├── directives/          # Directives personnalisées
-│   │       ├── pipes/               # Pipes personnalisés
-│   │  
-│   │   ├── features/                # Modules et composants spécifiques aux fonctionnalités
-│   │   │   ├── auth/                # Gestion de l'authentification
-│   │   │   │   ├── login/           # Page de connexion
-│   │   │   │   ├── register/        # Page d'inscription
-│   │   ├── layout/                  # Composants de mise en page globale
-│   │   │   ├── header/              # Barre de navigation
-│   │   │   ├── footer/              # Pied de page
-│   │   │   ├── sidebar/             # Menu latéral
-│   │  
-│   │   ├── pages/                   # Pages principales de l'application
-│   │   │   ├── home/                # Page d'accueil
-│   │   │   ├── about/               # Page "À propos"
-│   │   │   ├── contact/             # Page de contact
-│   │  
-│   │   ├── app.config.ts         # Configuration providers
-│   │   ├── app.routes.ts         # Module de routage principal
-│   │  
-│   ├── assets/                      # Fichiers statiques (images, JSON, etc.)
-│   │  
-│   ├── environments/                 # Fichiers de configuration des environnements
-│   │   ├── environment.ts            # Environnement de développement
-│   │   ├── environment.prod.ts       # Environnement de production
-│   │  
-├── e2e/                              # Tests end-to-end
-├── node_modules/                     # Dépendances Node.js
-├── angular.json                      # Configuration Angular CLI
-├── package.json                      # Dépendances et scripts npm
-├── tsconfig.json                      # Configuration TypeScript
-├── .editorconfig                      # Configuration de l'éditeur
-├── .gitignore                         # Fichiers à ignorer par Git
-└── README.md                          # Documentation du projet
+Le projet a été migré vers **Angular 19** en utilisant l'architecture **Standalone**.
+
+- **Plus de `AppModule`** : Le projet est en standalone, les composants gèrent désormais leurs propres dépendances.
+- **Imports explicites** : Il faut importer les modules directement dans les composants qui en ont besoin au lieu d'un module global.
+
+---
+
+## 🏗️ Architecture du Projet
+
+L'organisation des fichiers suit une structure modulaire pour garantir la scalabilité :
+
+```text
+src/app/
+├── core/            # Services globaux (auth, API), guards, interceptors et modèles
+├── features/        # Modules et composants spécifiques aux fonctionnalités (auth, login, etc.)
+├── layout/          # Éléments de mise en page globale (header, footer, sidebar)
+├── pages/           # Pages principales de l'application (home, about, contact)
+├── shared/          # Composants UI, directives et pipes réutilisables
+└── environments/    # Fichiers de configuration des environnements (dev / prod)
 ```
 
-## Variables css à utiliser en priorité (peut etre vu en inspectant la page de l'appli ou dans le readme sur vscode pour voir les couleurs)
+---
 
-```
-html {
-    --mat-sys-background: #fff8f8;
-    --mat-sys-error: #ba1a1a;
-    --mat-sys-error-container: #ffdad6;
-    --mat-sys-inverse-on-surface: #faeeef;
-    --mat-sys-inverse-primary: #ffb1c5;
-    --mat-sys-inverse-surface: #352f30;
-    --mat-sys-on-background: #201a1b;
-    --mat-sys-on-error: #ffffff;
-    --mat-sys-on-error-container: #93000a;
-    --mat-sys-on-primary: #ffffff;
-    --mat-sys-on-primary-container: #8f0045;
-    --mat-sys-on-primary-fixed: #3f001b;
-    --mat-sys-on-primary-fixed-variant: #8f0045;
-    --mat-sys-on-secondary: #ffffff;
-    --mat-sys-on-secondary-container: #5b3f46;
-    --mat-sys-on-secondary-fixed: #2b151b;
-    --mat-sys-on-secondary-fixed-variant: #5b3f46;
-    --mat-sys-on-surface: #201a1b;
-    --mat-sys-on-surface-variant: #514346;
-    --mat-sys-on-tertiary: #ffffff;
-    --mat-sys-on-tertiary-container: #930100;
-    --mat-sys-on-tertiary-fixed: #410000;
-    --mat-sys-on-tertiary-fixed-variant: #930100;
-    --mat-sys-outline: #847376;
-    --mat-sys-outline-variant: #d6c2c5;
-    --mat-sys-primary: #ba005c;
-    --mat-sys-primary-container: #ffd9e1;
-    --mat-sys-primary-fixed: #ffd9e1;
-    --mat-sys-primary-fixed-dim: #ffb1c5;
-    --mat-sys-scrim: #000000;
-    --mat-sys-secondary: #74565d;
-    --mat-sys-secondary-container: #ffd9e1;
-    --mat-sys-secondary-fixed: #ffd9e1;
-    --mat-sys-secondary-fixed-dim: #e3bdc5;
-    --mat-sys-shadow: #000000;
-    --mat-sys-surface: #fff8f8;
-    --mat-sys-surface-bright: #fff8f8;
-    --mat-sys-surface-container: #f7ebec;
-    --mat-sys-surface-container-high: #f1e5e6;
-    --mat-sys-surface-container-highest: #ece0e1;
-    --mat-sys-surface-container-low: #fdf1f2;
-    --mat-sys-surface-container-lowest: #ffffff;
-    --mat-sys-surface-dim: #e3d7d8;
-    --mat-sys-surface-tint: #ba005c;
-    --mat-sys-surface-variant: #f3dde1;
-    --mat-sys-tertiary: #c00100;
-    --mat-sys-tertiary-container: #ffdad4;
-    --mat-sys-tertiary-fixed: #ffdad4;
-    --mat-sys-tertiary-fixed-dim: #ffb4a8;
-    --mat-sys-neutral-variant20: #3a2d30;
-    --mat-sys-neutral10: #201a1b;
-}
+## 🎨 Guide de Style (Material 3)
+
+L'application utilise les variables CSS de **Angular Material 3**. Voici les variables prioritaires à utiliser pour maintenir la cohérence visuelle :
+
+| Élément       | Variable CSS                    |
+|---------------|---------------------------------|
+| Primaire      | `--mat-sys-primary`             |
+| Arrière-plan  | `--mat-sys-background`          |
+| Erreur        | `--mat-sys-error`               |
+| Surface       | `--mat-sys-surface-container`   |
+| Contour       | `--mat-sys-outline`             |
+
+---
+
+## 🛠️ Installation et Développement
+
+### Prérequis
+
+- **Node.js** : v19
+- **Angular CLI** : ^19.1.8
+
+### Installation
+
+```bash
+npm install
 ```
 
+### Lancer l'application
 
+```bash
+npm start
+```
 
+L'application utilise une configuration de proxy (`proxy.conf.json`) pour les appels API.
+
+### Tests & Qualité
+
+- **Tests unitaires** : `npm test`
+- **Build de production** : `npm run build`
+- **Linting** : Le projet utilise `stylelint` pour valider les fichiers SCSS.
+
+---
+
+## 📦 Stack Technique Principale
+
+- **Framework** : Angular ^19.1.0
+- **UI Component** : Angular Material ^19.2.1
+- **Graphiques** : Chart.js ^3.9.1 & ng2-charts ^4.1.1
+- **Tableaux** : angular-datatables ^19.0.0
+- **Internationalisation** : @ngx-translate/core ^16.0.4
+- **Utilitaires** : date-fns (dates), xlsx (Excel), mammoth (Docx)
+
+---
+
+## 🐳 Docker
+
+Une configuration Docker est disponible pour la production.
+
+### Construire l'image :
+
+```bash
+docker build -t risk-view .
+```
+
+### Lancer le conteneur :
+
+```bash
+docker run -p 80:80 risk-view
+```
+
+Le build de production est servi via **Nginx** sur le port 80.
+
+---
+
+## 📄 Licence
+
+Ce projet est développé en interne. Tous droits réservés.
+
+---
+
+## 👥 Contributeurs
+
+Pour toute question ou suggestion, contactez l'équipe de développement.
