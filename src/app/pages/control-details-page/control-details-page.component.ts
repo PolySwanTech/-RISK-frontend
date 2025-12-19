@@ -71,11 +71,11 @@ export class ControlDetailsPageComponent implements OnInit {
     this.controlService.getControl(id).subscribe(control => {
       this.control = control;
       this.goBackButtons = [{
-        label: 'Planifier exécution',
+        label: 'Planifier une exécution',
         icon: 'calendar_today',
         class: 'btn-purple',
         show: this.sameCreator(),
-        permission: 'CREATE_CONTROLE',
+        permission: { teamId: this.control.buId, permissions: ['VIEW_ACTION_PLAN'] },
         action: () => this.scheduleExecution()
       },
       {
@@ -89,7 +89,7 @@ export class ControlDetailsPageComponent implements OnInit {
   }
 
   sameCreator() {
-    return this.authService.sameUserName(this.control?.creator || '');
+    return this.authService.sameUser(this.control?.creatorId || '');
   }
 
   sameEvaluator(s: string) {
@@ -136,7 +136,7 @@ export class ControlDetailsPageComponent implements OnInit {
   getStatusClass(status?: Status): string {
     if (!status) return '';
     // Ces classes doivent correspondre à ce qui existe dans styles.scss (ex: .achieved, .in_progress)
-    return status.toLowerCase(); 
+    return status.toLowerCase();
   }
 
   openEvaluationDetailsPopup(executionId: string, action: string): void {
@@ -153,18 +153,18 @@ export class ControlDetailsPageComponent implements OnInit {
         canValidate: true
       }
     }).afterClosed().subscribe(() => {
-      if(this.control) this.loadControlExecutions(this.control.id);
+      if (this.control) this.loadControlExecutions(this.control.id);
     });
   }
 
   openProcessDialog(row?: any) {
-      this.dialog.open(ExecutionDetailDialogComponent, {
-        minWidth: '700px',
-        data: row
-      }).afterClosed().subscribe(_ => {
-        this.ngOnInit();
-      });
-    }
+    this.dialog.open(ExecutionDetailDialogComponent, {
+      minWidth: '700px',
+      data: row
+    }).afterClosed().subscribe(_ => {
+      this.ngOnInit();
+    });
+  }
 
   getActionLabel(s: any): string {
     // Cas 1 : Réexamen demandé -> Prioritaire
@@ -201,7 +201,7 @@ export class ControlDetailsPageComponent implements OnInit {
         canValidate: true
       }
     }).afterClosed().subscribe(() => {
-      if(this.control) this.loadControlExecutions(this.control.id);
+      if (this.control) this.loadControlExecutions(this.control.id);
     });
   }
 

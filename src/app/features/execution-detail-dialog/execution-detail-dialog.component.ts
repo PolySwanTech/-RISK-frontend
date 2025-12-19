@@ -21,6 +21,7 @@ export interface ExecutionDetailDialogData {
   status?: Status;
   plannedAt?: Date;
   performedBy?: string;
+  evaluatorId?: string;
 }
 
 @Component({
@@ -71,13 +72,13 @@ export class ExecutionDetailDialogComponent implements OnInit {
 
   initActions(): void {
     const actions: PopupAction[] = [];
-
-    actions.push({
-      label: 'Fermer',
-      icon: 'close',
-      color: 'red',
-      onClick: () => this.closePopup()
-    });
+    actions.push(
+      {
+        label: 'Fermer',
+        icon: 'close',
+        color: 'red',
+        onClick: () => this.closePopup()
+      });
 
     // Bouton Évaluer/Réévaluer
     if (!this.s.view || this.s.view?.reviewStatus === ReviewStatus.REEXAM_REQUESTED) {
@@ -85,12 +86,13 @@ export class ExecutionDetailDialogComponent implements OnInit {
         label: this.s.view?.reviewStatus === ReviewStatus.REEXAM_REQUESTED ? 'Réévaluer' : 'Évaluer',
         icon: 'rate_review',
         primary: true,
+        hidden : this.s.exec.performedById != this.authService.getUUID(),
         onClick: () => this.evaluateExec(this.data.id, 'eval')
       });
     }
 
     // Boutons de validation (si en attente et peut valider et même créateur)
-    if (this.s.view?.reviewStatus === ReviewStatus.PENDING && this.canValidate() && this.sameCreator()) {
+    if (this.s.view?.reviewStatus === ReviewStatus.PENDING && this.sameCreator()) {
       actions.push({
         label: 'Demander un réexamen',
         icon: 'assignment_return',
@@ -150,13 +152,8 @@ export class ExecutionDetailDialogComponent implements OnInit {
     });
   }
 
-  canValidate(): boolean {
-    // Implémenter votre logique de permission
-    return true;
-  }
-
   sameCreator(): boolean {
-    return this.authService.sameUserName(this.s.view?.performedBy || '');
+    return this.authService.sameUser(this.s.exec.evaluatorId || '');
   }
 
   async viewFiles(): Promise<void> {

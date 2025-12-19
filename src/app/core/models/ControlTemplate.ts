@@ -23,6 +23,7 @@ export interface ControlTemplate {
     actif : boolean;
     riskLevel : RiskLevel;
     creator: string;
+    creatorId : string;
     riskName: string;
     level: Degree;
 }
@@ -35,7 +36,9 @@ export type ControlTemplateListViewDto = Omit<
 export type ControlDetailsView = Omit<
   ControlTemplate,
   'planDate' | 'realizeDate' | 'execution' | 'riskLevel'
->;
+> & {
+  buId: string;
+};
 
 export type ControlTemplateCreateDto = Required<Pick<
   ControlTemplate,
