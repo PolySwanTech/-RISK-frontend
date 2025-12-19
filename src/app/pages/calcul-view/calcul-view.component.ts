@@ -357,24 +357,25 @@ export class CalculViewComponent {
         this.annualLossesDeclared.push({ lossYear: l.lossYear, amount: l.amount });
       });
 
+      this.years.sort((a, b) => a - b);
+
       // C. Traitement des résultats (Results)
       results.forEach(r => {
         this.annualResult[r.lossYear] = r;
       });
 
       if (results.length >= 2) {
-        const lastYear = this.annualResult[2025].rwa;
-        const prevYear = this.annualResult[2024].rwa;
+        const lastYear = this.annualResult[this.years[this.years.length - 1]].rwa;
+        const prevYear = this.annualResult[this.years[this.years.length - 2]].rwa;
         this.variationRWA = ((lastYear - prevYear) / prevYear) * 100;
       }
 
-      // Assurez-vous que les clés existent avant d'accéder à 2025 (surtout pour les données de test)
-      if (this.annualResult[2025]) {
-        this.businessIndicator = this.annualResult[2025].bi;
-        this.businessIndicatorComponent = this.annualResult[2025].bic;
-        this.internalLossMultiplier = this.annualResult[2025].ilm;
-        this.ORC = this.annualResult[2025].orc;
-        this.RWA = this.annualResult[2025].rwa;
+      if (this.annualResult[this.years[this.years.length - 1]]) {
+        this.businessIndicator = this.annualResult[this.years[this.years.length - 1]].bi;
+        this.businessIndicatorComponent = this.annualResult[this.years[this.years.length - 1]].bic;
+        this.internalLossMultiplier = this.annualResult[this.years[this.years.length - 1]].ilm;
+        this.ORC = this.annualResult[this.years[this.years.length - 1]].orc;
+        this.RWA = this.annualResult[this.years[this.years.length - 1]].rwa;
       }
 
 

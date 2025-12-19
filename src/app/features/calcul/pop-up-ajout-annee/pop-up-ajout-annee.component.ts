@@ -46,7 +46,7 @@ export class PopUpAjoutAnneeComponent implements OnInit {
 
   constructor() {
     this.yearForm = this.fb.group({
-      newYear: [null, [Validators.required, Validators.min(2026), Validators.max(3000)]]
+      newYear: [null, [Validators.required, Validators.min(2023), Validators.max(3000)]]
     });
     this.smaStructure = [];
   }
