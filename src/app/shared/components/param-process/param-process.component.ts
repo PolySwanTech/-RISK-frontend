@@ -32,6 +32,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ConfirmService } from '../../../core/services/confirm/confirm.service';
 import { MatButtonModule } from "@angular/material/button";
 import { BasePopupComponent, PopupAction } from '../base-popup/base-popup.component';
+import { OperatingLossState } from '../../../core/enum/operatingLossState.enum';
 
 @Component({
   selector: 'app-process-manager',
@@ -72,6 +73,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   riskDisplayedColumns: string[] = ['libelle', 'description', 'riskBrut', 'riskNet'];
   riskDataSource = new MatTableDataSource<RiskTemplate>([]);
 
+  attachmentState = OperatingLossState;
+
   viewedRisks: RiskTemplate[] = []
 
   buId: string = ''
@@ -102,7 +105,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   private dataChangedListener: any;
 
   // Injection optionnelle du DialogRef pour le mode popup
-  dialogRef = inject(MatDialogRef<ProcessManagerComponent> , { optional: true });
+  dialogRef = inject(MatDialogRef<ProcessManagerComponent>, { optional: true });
   data = inject(MAT_DIALOG_DATA, { optional: true });
 
   goBackButtons: GoBackButton[] = [
@@ -145,10 +148,10 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
     // En mode popup, récupérer les données passées via MAT_DIALOG_DATA
 
-      if (this.data) {
-        this.cartoMode = this.data.cartoMode ?? this.cartoMode;
-        this.popupMode = this.data.popupMode ?? this.popupMode;
-      }
+    if (this.data) {
+      this.cartoMode = this.data.cartoMode ?? this.cartoMode;
+      this.popupMode = this.data.popupMode ?? this.popupMode;
+    }
 
     // Sinon, récupérer depuis les query params (mode normal)
     if (this.route.snapshot.queryParams['carto']) {
@@ -157,8 +160,8 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
     // Adapter les colonnes selon le mode
     this.riskDisplayedColumns = this.cartoMode
-      ? ['reference', 'libelle', 'description', 'riskBrut', 'riskNet']
-      : ['reference', 'libelle', 'description', 'riskBrut', 'riskNet'];
+      ? ['attachmentState', 'reference', 'libelle', 'description', 'riskBrut', 'riskNet']
+      : ['attachmentState', 'reference', 'libelle', 'description', 'riskBrut', 'riskNet'];
 
     if (this.route.snapshot.queryParams["create"]) {
       this.addProcess('');
@@ -208,16 +211,16 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       if (bu.expanded) {
         this.expandedBuIds.add(bu.id);
       }
-      
+
       // Sauvegarder l'état des processus
       bu.process?.forEach(proc => this.saveProcessState(proc));
-      
+
       // Récursif pour les sous-BU
       bu.children?.forEach(saveBuState);
     };
 
     this.businessUnits.forEach(saveBuState);
-    
+
     // Sauvegarder les sélections
     this.selectedBuId = this.selectedBu?.id || null;
     this.selectedProcessId = this.selectedProcess?.id || null;
@@ -235,10 +238,10 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
       if (this.expandedBuIds.has(bu.id)) {
         bu.expanded = true;
       }
-      
+
       // Restaurer l'état des processus
       bu.process?.forEach(proc => this.restoreProcessState(proc));
-      
+
       // Récursif pour les sous-BU
       bu.children?.forEach(restoreBuState);
     };
@@ -260,7 +263,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
         this.selectBu(bu);
       }
     }
-    
+
     if (this.selectedProcessId) {
       const process = this.findProcessById(this.selectedProcessId);
       if (process) {
@@ -298,7 +301,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     for (const bu of this.businessUnits) {
       const found = findInProcessList(bu.process || []);
       if (found) return found;
-      
+
       if (bu.children?.length) {
         const findInBuChildren = (buList: BusinessUnit[]): Process | null => {
           for (const childBu of buList) {
@@ -324,7 +327,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
   addBu() {
     this.saveExpansionState();
-    
+
     this.dialog.open(AddEntityDialogComponent, {
       width: '800px'
     }).afterClosed().subscribe(bu => {
@@ -337,7 +340,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
 
   addProcess(buId: string) {
     this.saveExpansionState();
-    
+
     const dialogRef = this.dialog.open(CreateProcessComponent, {
       width: '800px',
       maxWidth: '95vw',
@@ -390,38 +393,6 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     this.viewedRisks = this.getAllRisksRecursive(process);
 
     this.riskDataSource.data = this.viewedRisks;
-  }
-
-  chooseRiskForCarto(risk: RiskTemplate) {
-    const foundProcess = this.findProcessByRiskId(risk.id);
-    if (!foundProcess) {
-      console.warn("Aucun process trouvé pour ce risque :", risk);
-      return;
-    }
-
-    const foundBu = this.findBuByProcess(foundProcess);
-    if (!foundBu) {
-      console.warn("Aucune BU trouvée pour le process :", foundProcess);
-      return;
-    }
-
-    this.selectedBu = foundBu;
-    this.selectedProcess = foundProcess;
-
-    const sessionStorageKey = "object_for_carto";
-    const obj = {
-      bu: { id: foundBu.id, name: foundBu.name },
-      process: foundProcess,
-      risk: risk
-    };
-
-    sessionStorage.setItem(sessionStorageKey, JSON.stringify(obj));
-
-    if (this.cartoMode) {
-      this.router.navigate(['cartographie', 'create'], {
-        queryParams: { data: true, key: sessionStorageKey }
-      });
-    }
   }
 
   private getAllRisksRecursive(process: Process, currentPeriod?: string): RiskTemplate[] {
@@ -708,6 +679,10 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
   }
 
   onRiskRowClick(risk: RiskTemplate, event: Event): void {
+    if(this.cartoMode && risk.attachmentState == OperatingLossState.WAITING) {
+      this.snackBarService.error("Ce risque est en attente de validation et ne peut pas être évalué.");
+      return;
+    }
     const target = event.target as HTMLElement;
     if (target.closest('.action-cell button')) {
       return;
@@ -813,7 +788,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     ).subscribe(confirm => {
       if (confirm) {
         this.saveExpansionState();
-        
+
         this.entitiesService.delete(id).subscribe({
           next: () => {
             this.snackBarService.info("Business Unit supprimée avec succès !");
@@ -833,9 +808,9 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
     if (event) {
       event.stopPropagation();
     }
-    
+
     this.saveExpansionState();
-    
+
     this.dialog.open(AddEntityDialogComponent, {
       width: '800px',
       maxWidth: '95vw',
@@ -846,7 +821,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
         enableDraft: false
       }
     }).afterClosed().subscribe(bu => {
-        this.ngOnInit();
+      this.ngOnInit();
     })
   }
 

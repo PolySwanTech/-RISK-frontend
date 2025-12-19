@@ -1,11 +1,7 @@
 <ng-container *ngIf="popupMode; else normalMode">
   <!-- MODE POPUP avec BasePopupComponent -->
-  <app-base-popup 
-    [title]="'Sélectionner un risque'" 
-    [showClose]="true"
-    [actions]="popupActions"
-    [dialogRef]="getDialogRef()"
-    (close)="closePopup()">
+  <app-base-popup [title]="'Sélectionner un risque'" [showClose]="true" [actions]="popupActions"
+    [dialogRef]="getDialogRef()" (close)="closePopup()">
 
     <div class="container popup-container">
       <div class="content">
@@ -30,7 +26,8 @@
               <!-- Enfants de la BU -->
               <div *ngIf="bu.expanded" class="children">
                 <!-- Processus de la BU -->
-                <ng-container *ngTemplateOutlet="processTree; context: {$implicit: getRootProcesses(bu)}"></ng-container>
+                <ng-container
+                  *ngTemplateOutlet="processTree; context: {$implicit: getRootProcesses(bu)}"></ng-container>
 
                 <!-- Sous-BU -->
                 <ng-container *ngTemplateOutlet="buTree; context: {$implicit: bu.children}"></ng-container>
@@ -198,7 +195,8 @@
             </button>
           </div>
 
-          <div class="risk-dispatch" *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0">
+          <div class="risk-dispatch"
+            *ngIf="selectedProcess && selectedProcess.risks && selectedProcess.risks.length > 0">
             <h3>Dispatcher les risques</h3>
             <div *ngFor="let risk of selectedProcess.risks" class="risk-dispatch-item">
               <div class="risk-info">
@@ -217,7 +215,8 @@
             <button mat-raised-button class="btn-red" (click)="cancelDispatch()">
               Annuler
             </button>
-            <button mat-raised-button class="btn-primary" [disabled]="!canConfirmDispatch()" (click)="confirmDispatch()">
+            <button mat-raised-button class="btn-primary" [disabled]="!canConfirmDispatch()"
+              (click)="confirmDispatch()">
               Confirmer
             </button>
           </div>
@@ -230,8 +229,7 @@
 <!-- Template des processus -->
 <ng-template #processTree let-enfants>
   <div *ngFor="let child of enfants" class="tree-node">
-    <div class="process-item child" [class.selected]="selectedProcess?.id === child.id"
-      (click)="selectProcess(child)">
+    <div class="process-item child" [class.selected]="selectedProcess?.id === child.id" (click)="selectProcess(child)">
       <span class="toggle" (click)="toggleExpand(child, $event)">
         {{ child.enfants.length > 0 ? (child.expanded ? '▼' : '▶') : '•' }}
       </span>
@@ -284,8 +282,20 @@
         <div class="table-container">
           <table mat-table [dataSource]="riskDataSource" matSort class="mat-elevation-z8 modern-table">
 
+            <ng-container matColumnDef="attachmentState">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+              <td mat-cell *matCellDef="let risk">
+                @if(risk.attachmentState == attachmentState.WAITING){
+                  <mat-icon class="warning-icon">warning</mat-icon>
+                }
+                @else{
+                  <mat-icon class="validated-icon">check_circle</mat-icon>
+                }
+              </td>
+            </ng-container>
+
             <ng-container matColumnDef="reference">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Ref</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Reférence</th>
               <td mat-cell *matCellDef="let risk">
                 <strong>{{ risk.reference }}</strong>
               </td>
