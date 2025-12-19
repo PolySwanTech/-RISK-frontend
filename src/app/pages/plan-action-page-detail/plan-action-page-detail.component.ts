@@ -91,7 +91,7 @@ export class PlanActionPageDetailComponent implements OnInit {
 
       // Todo: métriques doivent être calculées côté backend
       if (this.actionPlan?.actions?.length) {
-        this.totalActions = this.actionPlan.actions.length;
+        this.totalActions = this.actionPlan.actions.filter(a => a.actif == true).length;
         this.completedActions = this.getCompletedCount(this.actionPlan.actions);
         this.progressionPercent = this.getCompletionRate(this.actionPlan.actions);
       }
@@ -158,7 +158,7 @@ export class PlanActionPageDetailComponent implements OnInit {
   }
 
   canAbandonAction(action: Action) {
-    return action.performedAt == null && this.actionPlan?.status != Status.ACHIEVED && this.actionPlan?.status != Status.CANCELLED
+    return action.performedAt == null && this.actionPlan?.status == Status.NOT_STARTED;
   }
 
   validateAction(actionId: string) {
@@ -199,11 +199,11 @@ export class PlanActionPageDetailComponent implements OnInit {
   }
 
   getCompletedCount(actions: Action[]): number {
-    return actions.filter(a => a.performedAt).length;
+    return actions.filter(a => a.actif && a.performedAt).length;
   }
 
   getCompletionRate(actions: Action[]): number {
-    return actions.length ? Math.round((this.getCompletedCount(actions) / actions.length) * 100) : 0;
+    return actions.length ? Math.round((this.getCompletedCount(actions) / actions.filter(a => a.actif == true).length) * 100) : 0;
   }
 
   getReadableStatut(status: Status): string {
@@ -284,6 +284,13 @@ export class PlanActionPageDetailComponent implements OnInit {
   }
 
   endActionPlan() {
+    if (this.actionPlan == null) {
+      return;
+    }
+    if (this.actionPlan.actions.filter(a => a.actif).filter(a => a.performedAt == null).length > 0) {
+      this.snackBarService.error("Vous ne pouvez pas cloturer un plan d'action tant qu'il reste des actions non terminées.");
+      return;
+    }
     if (this.actionPlan && this.actionPlan.status !== Status.ACHIEVED && this.actionPlan.status !== Status.NOT_STARTED) {
       this.actionPlanService.endActionPlan(this.actionPlan.id!).subscribe(
         _ => {
