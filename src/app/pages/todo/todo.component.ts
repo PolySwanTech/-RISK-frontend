@@ -35,13 +35,15 @@ export class TodoComponent implements OnInit {
     [ToDoType.ACTION_PLAN]: false,
     [ToDoType.CONTROL]: false,
     [ToDoType.INCIDENT]: false,
+    [ToDoType.RISK]: false,
   };
 
   typeFilters = [
     { value: null, label: 'Tous' },
     { value: ToDoType.ACTION_PLAN, label: ToDoLabels[ToDoType.ACTION_PLAN] },
     { value: ToDoType.INCIDENT, label: ToDoLabels[ToDoType.INCIDENT] },
-    { value: ToDoType.CONTROL, label: ToDoLabels[ToDoType.CONTROL] }
+    { value: ToDoType.CONTROL, label: ToDoLabels[ToDoType.CONTROL] },
+    { value: ToDoType.RISK, label: ToDoLabels[ToDoType.RISK] }
   ];
 
   todoLabels = ToDoLabels;
@@ -97,6 +99,7 @@ export class TodoComponent implements OnInit {
       case ToDoType.ACTION_PLAN: return 'plans';
       case ToDoType.INCIDENT: return 'incidents';
       case ToDoType.CONTROL: return 'controls';
+      case ToDoType.RISK: return 'risks';
       default: return type;
     }
   }
@@ -106,6 +109,7 @@ export class TodoComponent implements OnInit {
       case ToDoType.ACTION_PLAN: return 'Échéance';
       case ToDoType.INCIDENT: return 'Créé';
       case ToDoType.CONTROL: return 'Planifié';
+      case ToDoType.RISK: return 'Soumis';
       default: return 'Date';
     }
   }
@@ -120,6 +124,9 @@ export class TodoComponent implements OnInit {
         break;
       case ToDoType.CONTROL:
         this.router.navigate(['control', 'details', item.id]);
+        break;
+      case ToDoType.RISK:
+        this.router.navigate(['reglages', 'risks', item.id]);
         break;
       default:
         console.warn('Unknown ToDo type:', item.type);

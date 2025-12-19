@@ -17,6 +17,9 @@
           <mat-chip class="stat-chip controls">
             {{ getItemCount(todoEnum.CONTROL) }} Contrôles
           </mat-chip>
+            <mat-chip class="stat-chip risks">
+              {{ getItemCount(todoEnum.RISK) }} Risques
+            </mat-chip>
         </mat-chip-set>
       </div>
     </mat-card-content>
@@ -131,6 +134,34 @@
             </div>
             <div class="item-actions">
               <button class="action-btn" (click)="viewItem(item)">Accéder</button>
+            </div>
+          </div>
+        </div>
+        }
+
+      </div>
+
+      <div class="group" *ngIf="shouldShowGroup(todoEnum.RISK)"
+        [style.display]="currentTypeFilter.value === null || currentTypeFilter.value === todoEnum.RISK ? 'block' : 'none'">
+        <div class="group-header" (click)="toggleGroup(todoEnum.RISK)">
+          <span>⚠️ Risques</span>
+          <div class="group-header-right">
+            <span class="group-count">{{ getFilteredGroupCount(todoEnum.RISK) }}</span>
+            <span class="chevron" [class.collapsed]="collapsedGroups[todoEnum.RISK]">▼</span>
+          </div>
+        </div>
+        @for(item of getFilteredItems(todoEnum.RISK); track item.id){
+        <div (click)="viewItem(item)" class="group-content" [class.collapsed]="collapsedGroups[todoEnum.RISK]">
+          <div class="item" matTooltip="Accéder au risque" [style.display]="shouldShowItem(item) ? 'flex' : 'none'">
+            <div class="item-type type-controls">Risques</div>
+            <div class="item-content">
+              <div class="item-title">{{ item.libelle }}</div>
+              <div class="item-meta">
+                <span>Planifié: {{ item.date | date : "dd/MM/yyyy" }}</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button class="action-btn" (click)="viewItem(item)">Valider</button>
             </div>
           </div>
         </div>

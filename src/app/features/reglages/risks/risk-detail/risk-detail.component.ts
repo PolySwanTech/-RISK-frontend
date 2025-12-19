@@ -7,7 +7,7 @@ import { RiskEvaluation, RiskEvaluationDto } from '../../../../core/models/RiskE
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
+import { GoBackButton, GoBackComponent } from '../../../../shared/components/go-back/go-back.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { ControlService } from '../../../../core/services/dmr/control/control.service';
@@ -20,12 +20,13 @@ import { ControlExecutionView } from '../../../../core/models/ControlExecution';
 import { EnumLabelPipe } from '../../../../shared/pipes/enum-label.pipe';
 import { ExecutionDetailDialogComponent } from '../../../execution-detail-dialog/execution-detail-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { OperatingLossState } from '../../../../core/enum/operatingLossState.enum';
 
 
 @Component({
   standalone: true,
   imports: [
-    CommonModule, MatDividerModule, GoBackComponent, MatProgressSpinnerModule, 
+    CommonModule, MatDividerModule, GoBackComponent, MatProgressSpinnerModule,
     MatExpansionModule, MatIconModule, EnumLabelPipe
   ],
   selector: 'app-risk-detail',
@@ -41,33 +42,14 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
   private controlService = inject(ControlService);
   private incidentService = inject(IncidentService);
   private dialog = inject(MatDialog);
-  
+
   controlExecutions: Record<string, ControlExecutionView[] | null> = {};
   controlEvaluationCache: Record<string, ControlEvaluationView | null> = {};
   linkedIncidents: IncidentListDto[] = [];
   riskEvaluations: RiskEvaluationDto[] = [];
   groupedEvaluations?: { period: string, brut?: RiskEvaluationDto, net?: RiskEvaluationDto }[] = [];
 
-  goBackButtons = [
-    // {
-    //   label: 'Évaluer ce risque',
-    //   icon: '', // pas d’icône ici, ou ajoute-en si tu veux (ex: 'assessment')
-    //   class: 'mat-primary', // ou remplace par 'btn-primary' si tu utilises des classes
-    //   show: true,
-    //   action: () => this.onEvaluate()
-    // },
-    // {
-    //   label: 'Générer Rapport',
-    //   icon: '', // idem
-    //   class: 'mat-accent outlined', // à styliser si tu veux un style stroked
-    //   show: true,
-    //   action: () => {} // à ajouter si fonction disponible
-    // }
-    ];
-
-  // get frequency() : number | string {
-  //   return (this.risk?.dmr?.[0]?.probability || 0) * 10 || '-';
-  // }
+  goBackButtons: GoBackButton[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -86,13 +68,23 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
         next: (risk) => {
           this.risk = risk;
           this.loading = false;
-
           risk.dmr?.controls?.forEach(control => {
             this.loadControlExecutions(control.id);
           });
 
-          this.incidentService.getIncidentByProcessAndRisk(risk.id).subscribe(incidents => {this.linkedIncidents = incidents;});
-          this.riskEvaluationService.getEvaluationsByRisk(risk.id).subscribe(evals => {this.riskEvaluations = evals; this.groupEvaluations();});
+          this.goBackButtons = [
+            {
+              label: 'Valider le risque',
+              icon: '', // pas d’icône ici, ou ajoute-en si tu veux (ex: 'assessment')
+              class: 'mat-primary', // ou remplace par 'btn-primary' si tu utilises des classes
+              show: this.canValidateRisk(this.risk),
+              permission: { teamId: this.risk.buId, permissions: ['PARTICIPATE_RISK_ASSESSMENT'] },
+              action: () => this.valid()
+            }
+          ]
+
+          this.incidentService.getIncidentByProcessAndRisk(risk.id).subscribe(incidents => { this.linkedIncidents = incidents; });
+          this.riskEvaluationService.getEvaluationsByRisk(risk.id).subscribe(evals => { this.riskEvaluations = evals; this.groupEvaluations(); });
         },
         error: () => {
           this.loading = false;
@@ -101,31 +93,42 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+
+  canValidateRisk(risk: RiskTemplate): boolean | undefined {
+    return risk.attachmentState !== OperatingLossState.VALIDATED;
+  }
+
+  valid() {
+    this.riskService.validateRisk(this.risk!.id).subscribe(() => {
+      this.ngOnInit();
+    });
+  }
+
   openProcessDialog(row?: any) {
-        this.dialog.open(ExecutionDetailDialogComponent, {
-          minWidth: '700px',
-          data: row
-        }).afterClosed().subscribe(_ => {
-          this.ngOnInit();
-        });
-      }
+    this.dialog.open(ExecutionDetailDialogComponent, {
+      minWidth: '700px',
+      data: row
+    }).afterClosed().subscribe(_ => {
+      this.ngOnInit();
+    });
+  }
 
   loadControlExecutions(controlId: string): void {
-  this.controlService.getAllExecutions(controlId).subscribe(executions => {
-    const sorted = [...executions].sort((a, b) =>
-      new Date(b.plannedAt as any).getTime() - new Date(a.plannedAt as any).getTime()
-    );
-    this.controlExecutions[controlId] = sorted;
+    this.controlService.getAllExecutions(controlId).subscribe(executions => {
+      const sorted = [...executions].sort((a, b) =>
+        new Date(b.plannedAt as any).getTime() - new Date(a.plannedAt as any).getTime()
+      );
+      this.controlExecutions[controlId] = sorted;
 
-    const calls = executions.map(e =>
-      this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
-    );
+      const calls = executions.map(e =>
+        this.controlService.getEvaluationByExecution(e.id).pipe(catchError(() => of(null)))
+      );
 
-    forkJoin(calls).subscribe(views => {
-      executions.forEach((e, i) => this.controlEvaluationCache[e.id] = views[i] as ControlEvaluationView | null);
+      forkJoin(calls).subscribe(views => {
+        executions.forEach((e, i) => this.controlEvaluationCache[e.id] = views[i] as ControlEvaluationView | null);
+      });
     });
-  });
-}
+  }
 
 
   ngOnDestroy(): void {
@@ -135,10 +138,10 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
 
   activeTab = 'controls';
 
-  selectTab(tab: 'controls' | 'evaluations' | 'mitigations' ): void {
+  selectTab(tab: 'controls' | 'evaluations' | 'mitigations'): void {
     this.activeTab = tab;
   }
-    
+
   evalLabel(s: string | undefined): string {
     if (!s) return '—';
     const v = (s || '').toUpperCase();
@@ -175,5 +178,5 @@ export class RiskDetailComponent implements OnInit, OnDestroy {
       queryParams: { riskId: this.risk.id, processId: this.risk!.processId }
     });
   }
-    
+
 }

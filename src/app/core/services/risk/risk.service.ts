@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class RiskService {
 
+
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl + '/taxonomie';
 
@@ -32,7 +33,7 @@ export class RiskService {
     return this.http.get<RiskTemplate[]>(this.baseUrl, { params });
   }
 
-// TODO remplacer any par un type adéquat
+  // TODO remplacer any par un type adéquat
   getRisksTree(processId?: string) {
     let params = new HttpParams();
     const option = processId ? { params: params.set('processId', processId) } : {};
@@ -47,5 +48,9 @@ export class RiskService {
   getRiskOfIncident(incidentId: string) {
     const params = new HttpParams().set('incidentId', incidentId);
     return this.http.get<RiskTemplate>(`${this.baseUrl}/incident`, { params: params });
+  }
+
+  validateRisk(id: string) {
+    return this.http.patch(`${this.baseUrl}/validate`, { id });
   }
 }

@@ -19,6 +19,7 @@ export class RiskTemplate {
   libelle!: string;
   reference!: string;
   buName: string = '';
+  buId: string = '';
   creatorName!: string;
   creatorId!: string;
   processId?: string;

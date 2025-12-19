@@ -31,6 +31,11 @@
     background: #dcfce7 !important;
     color: #16a34a !important;
   }
+
+  &.risks {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+  }
 }
 
 .filters-card {
@@ -160,6 +165,7 @@
 .type-plans { background: #dbeafe; color: #1d4ed8; }
 .type-incidents { background: #fee2e2; color: #dc2626; }
 .type-controls { background: #dcfce7; color: #16a34a; }
+.type-risks { background: #fee2e2; color: #dc2626; }
 
 .item-content {
   flex: 1;
