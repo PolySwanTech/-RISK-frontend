@@ -273,7 +273,7 @@
     <h3>Événements de risque redouté ({{ viewedRisks.length }})</h3>
 
     <!-- Bouton d'ajout d'événement (seulement pour les processus sans enfants ET en mode normal) -->
-    <button *ngIf="!popupMode && selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button
+    <button *ngIf="selectedProcess && selectedProcess.enfants.length == 0" mat-raised-button
       style="margin-bottom: 10px;" class="btn-primary" (click)="createNewEvent()">
       <mat-icon>add</mat-icon>
       Ajouter évènement redouté

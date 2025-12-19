@@ -155,7 +155,7 @@
                     <div>
                         <mat-icon>warning</mat-icon>
                         Événement redouté : {{ selectedBP.risk.name }}
-                        <mat-icon *ngIf="selectedBP.risk.isInfo" class="warning-icon">warning</mat-icon>
+                        <mat-icon *ngIf="selectedBP.risk.attachmentState == attachementState.WAITING" class="warning-icon">warning</mat-icon>
                     </div>
                 </mat-chip>
             </mat-chip-listbox>

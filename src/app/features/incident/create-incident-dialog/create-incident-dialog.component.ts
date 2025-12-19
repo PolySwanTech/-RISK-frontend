@@ -26,6 +26,7 @@ import { State } from '../../../core/enum/state.enum';
 import { forkJoin, tap, map, firstValueFrom } from 'rxjs';
 import { ProcessManagerComponent } from '../../../shared/components/param-process/param-process.component';
 import { Router } from '@angular/router';
+import { OperatingLossState } from '../../../core/enum/operatingLossState.enum';
 
 export interface CreateIncidentDialogData {
   incidentId?: string;
@@ -66,6 +67,8 @@ export class CreateIncidentDialogComponent implements OnInit {
   private confirmService = inject(ConfirmService);
   private draftService = inject(DraftService);
   private router = inject(Router);
+
+  attachementState = OperatingLossState
 
   popupActions: PopupAction[] = [];
   incident: Incident | null = null;
@@ -270,17 +273,29 @@ export class CreateIncidentDialogComponent implements OnInit {
           next: (risk) => {
             this.risk = risk;
             this.incidentForm3.get('riskId')?.setValue(risk.id);
+
+            // On construit selectedBP ici, une fois que 'risk' est bien chargé
+            if (incident.riskName) {
+              this.selectedBP = {
+                bu: { name: incident.teamName },
+                process: { name: incident.processName },
+                risk: {
+                  name: incident.riskName,
+                  attachmentState: risk.attachmentState // On utilise l'objet reçu du service
+                }
+              };
+            }
           }
         });
-      }
-
-      if (incident.riskName) {
+      } else if (incident.riskName) {
         this.selectedBP = {
           bu: { name: incident.teamName },
           process: { name: incident.processName },
-          risk: { name: incident.riskName }
+          risk: { name: incident.riskName, attachmentState: null }
         };
       }
+
+      console.log(incident);
 
       this.incident = incident;
       this.selectedUser = incident.intervenantId || null;
