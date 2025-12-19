@@ -722,7 +722,7 @@ export class ProcessManagerComponent implements OnInit, AfterViewInit {
         const result = {
           bu: { id: foundBu.id, name: foundBu.name },
           process: foundProcess,
-          risk: { id: risk.id, name: risk.libelle }
+          risk: { id: risk.id, name: risk.libelle, attachmentState: risk.attachmentState }
         };
         this.dialogRef.close(result);
         return;

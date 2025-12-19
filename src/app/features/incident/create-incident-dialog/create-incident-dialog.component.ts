@@ -68,7 +68,7 @@ export class CreateIncidentDialogComponent implements OnInit {
   private draftService = inject(DraftService);
   private router = inject(Router);
 
-  attachementState = OperatingLossState
+  attachmentState = OperatingLossState
 
   popupActions: PopupAction[] = [];
   incident: Incident | null = null;
@@ -273,7 +273,7 @@ export class CreateIncidentDialogComponent implements OnInit {
           next: (risk) => {
             this.risk = risk;
             this.incidentForm3.get('riskId')?.setValue(risk.id);
-
+            console.log(risk);
             // On construit selectedBP ici, une fois que 'risk' est bien chargé
             if (incident.riskName) {
               this.selectedBP = {

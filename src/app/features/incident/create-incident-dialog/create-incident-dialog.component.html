@@ -151,11 +151,10 @@
                 </mat-chip>
                 <mat-chip class="custom-chip"
                           *ngIf="selectedBP?.risk"
-                          [matTooltip]="selectedBP.risk.isInfo ? 'Cet événement de risque n\'a pas encore été validé' : null">
+                          [matTooltip]="selectedBP.risk.attachmentState == attachmentState.WAITING ? 'Cet événement de risque n\'a pas encore été validé' : null">
                     <div>
-                        <mat-icon>warning</mat-icon>
+                      <mat-icon *ngIf="selectedBP.risk.attachmentState === attachmentState.WAITING" class="warning-icon">warning</mat-icon>
                         Événement redouté : {{ selectedBP.risk.name }}
-                        <mat-icon *ngIf="selectedBP.risk.attachmentState == attachementState.WAITING" class="warning-icon">warning</mat-icon>
                     </div>
                 </mat-chip>
             </mat-chip-listbox>

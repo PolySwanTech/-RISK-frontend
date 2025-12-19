@@ -142,7 +142,7 @@
                                     </div>
                                     @if(!action.performedAt && actionPlan.status != statusEnum.NOT_STARTED){
                                     <button mat-raised-button
-                                        *appHasPermission="{teamId: this.actionPlan?.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
+                                        *appHasPermission="{teamId: this.actionPlan.teamId, permissions: ['UPDATE_ACTION_PLAN']}"
                                         class="btn-primary" (click)="viewFiles(action.id)">
                                         <mat-icon>upload</mat-icon>
                                         Déposer un justificatif
