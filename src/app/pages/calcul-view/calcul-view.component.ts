@@ -436,7 +436,7 @@ export class CalculViewComponent {
     const headerRow1 = ['', ''];
     const headerRow2 = ['Code', 'Description'];
 
-    const years = [2023, 2024, 2025];
+    const years = this.years.slice(-3); // Dernières 3 années
 
     years.map(y => y.toString()).forEach(year => {
       headerRow1.push(year, '');
