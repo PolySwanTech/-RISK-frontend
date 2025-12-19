@@ -24,10 +24,11 @@ interface TimelineSegment {
 })
 export class TimelineActionPlanComponent implements OnInit, OnDestroy {
 
-  @Input() actionPlan : ActionPlan | null = null;
-  
+  @Input() actionPlan: ActionPlan | null = null;
+
   creationDate: Date = new Date();
-  dueDate: Date =  new Date();
+  endDate: Date | undefined = undefined;
+  dueDate: Date = new Date();
   currentDate: Date = new Date();
 
   points: TimelinePoint[] = [];
@@ -36,8 +37,9 @@ export class TimelineActionPlanComponent implements OnInit, OnDestroy {
   private intervalId: any;
 
   ngOnInit() {
-    if(this.actionPlan){
+    if (this.actionPlan) {
       this.creationDate = new Date(this.actionPlan.createdAt);
+      this.endDate = this.actionPlan.closedAt ? new Date(this.actionPlan.closedAt) : undefined;
       this.dueDate = new Date(this.actionPlan.echeance);
     }
     this.updateTimeline();
@@ -56,11 +58,21 @@ export class TimelineActionPlanComponent implements OnInit, OnDestroy {
   }
 
   updateTimeline() {
+    // ... (votre code de tri des points reste identique)
     const dates = [
       { date: this.creationDate, label: 'Création' },
       { date: this.dueDate, label: 'Échéance' },
-      { date: this.currentDate, label: 'Aujourd\'hui' }
-    ].sort((a, b) => a.date.getTime() - b.date.getTime());
+    ];
+
+    if (this.endDate) {
+      // Si clôturé, on ajoute uniquement la clôture
+      dates.push({ date: this.endDate, label: 'Clôture' });
+    } else {
+      // Sinon, on garde le marqueur temporel actuel
+      dates.push({ date: this.currentDate, label: 'Aujourd\'hui' });
+    }
+
+    dates.sort((a, b) => a.date.getTime() - b.date.getTime());
 
     const minDate = dates[0].date.getTime();
     const maxDate = dates[dates.length - 1].date.getTime();
@@ -73,32 +85,46 @@ export class TimelineActionPlanComponent implements OnInit, OnDestroy {
       position: totalRange === 0 ? 50 : ((d.date.getTime() - minDate) / totalRange) * 100
     }));
 
-    // Créer les segments
+    // Récupération sécurisée des positions
+    const creationPos = this.points.find(p => p.label === 'Création')?.position || 0;
+    const duePos = this.points.find(p => p.label === 'Échéance')?.position || 0;
+    const closedPoint = this.points.find(p => p.label === 'Clôture');
+    const currentPoint = this.points.find(p => p.label === 'Aujourd\'hui');
+
+    const currentPos = currentPoint ? currentPoint.position : (closedPoint ? closedPoint.position : duePos);
+
     this.segments = [];
 
-    const creationPos = this.points.find(p => p.label === 'Création')!.position;
-    const duePos = this.points.find(p => p.label === 'Échéance')!.position;
-    const currentPos = this.points.find(p => p.label === 'Aujourd\'hui')!.position;
-
-    const daysUntilDue = this.getDaysDifference(this.currentDate, this.dueDate);
+    // Déterminer la couleur du segment principal
+    let mainSegmentColor: string;
     const daysFromCreation = this.getDaysDifference(this.creationDate, this.dueDate);
 
+    if (this.endDate) {
+      // Si clôturé : on compare la date de clôture à l'échéance
+      const diffClosureDue = this.getDaysDifference(this.endDate, this.dueDate);
+      mainSegmentColor = this.getSegmentColor(diffClosureDue, true);
+    } else {
+      // Si pas clôturé : logique classique basée sur la date du jour
+      const daysUntilDue = this.getDaysDifference(this.currentDate, this.dueDate);
+      mainSegmentColor = this.getSegmentColor(daysUntilDue, false);
+    }
+
     // Segment 1 : Création -> Échéance
-    const color1 = this.getSegmentColor(daysUntilDue);
     this.segments.push({
       start: creationPos,
       end: duePos,
-      color: color1,
+      color: mainSegmentColor,
       days: daysFromCreation,
-      label: `${daysFromCreation} jours (planifié)`
+      label: this.endDate ? "Terminer" : `${daysFromCreation} jours (planifié)`
     });
 
-    // Segment 2 : Échéance -> Aujourd'hui (si applicable)
-    if (this.currentDate > this.dueDate) {
-      const daysOverdue = this.getDaysDifference(this.dueDate, this.currentDate);
+    // Segment 2 : Échéance -> Aujourd'hui ou Clôture (si retard)
+    const referenceDate = this.endDate || this.currentDate;
+    if (referenceDate > this.dueDate) {
+      const daysOverdue = this.getDaysDifference(this.dueDate, referenceDate);
       this.segments.push({
         start: duePos,
-        end: currentPos,
+        end: closedPoint ? closedPoint.position : currentPos,
         color: '#f44336',
         days: daysOverdue,
         label: `${daysOverdue} jours de retard`
@@ -111,16 +137,18 @@ export class TimelineActionPlanComponent implements OnInit, OnDestroy {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 
-  getSegmentColor(daysUntilDue: number): string {
-    if (daysUntilDue < 0) {
-      return '#f44336'; // Rouge (en retard)
-    } else if (daysUntilDue < 7) {
-      return '#f44336'; // Rouge (moins de 7 jours)
-    } else if (daysUntilDue <= 30) {
-      return '#ff9800'; // Orange (7-30 jours)
-    } else {
-      return '#4caf50'; // Vert (plus de 30 jours)
+  getSegmentColor(daysUntilDue: number, isClosed: boolean = false): string {
+    // Si le plan est clôturé
+    if (isClosed) {
+      // Si la clôture a eu lieu après l'échéance (daysUntilDue est calculé entre clôture et échéance ici)
+      return daysUntilDue < 0 ? '#f44336' : '#4caf50';
     }
+
+    // Logique existante pour les plans en cours
+    if (daysUntilDue < 0) return '#f44336';
+    if (daysUntilDue < 7) return '#f44336';
+    if (daysUntilDue <= 30) return '#ff9800';
+    return '#4caf50';
   }
 
   getStatus(): string {
