@@ -22,7 +22,7 @@ import { MethodologyCardComponent } from './methodology-card/methodology-card.co
 import { AuthService } from '../../core/services/auth/auth.service';
 import { ControlExecutionDetails } from '../../core/models/ControlExecution';
 import { EnumLabelPipe } from '../../shared/pipes/enum-label.pipe';
-import { ExecutionDetailDialogComponent } from '../../features/execution-detail-dialog/execution-detail-dialog.component';
+import { ExecutionDetailDialogComponent } from '../../features/control/execution-detail-dialog/execution-detail-dialog.component';
 
 @Component({
   selector: 'app-control-details-page',

@@ -4,17 +4,17 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { BasePopupComponent, PopupAction } from '../../shared/components/base-popup/base-popup.component';
-import { EnumLabelPipe } from '../../shared/pipes/enum-label.pipe';
-import { ControlService } from '../../core/services/dmr/control/control.service';
-import { FileService } from '../../core/services/file/file.service';
-import { AuthService } from '../../core/services/auth/auth.service';
-import { ReviewStatus } from '../../core/enum/reviewStatus.enum';
-import { Status } from '../../core/enum/status.enum';
-import { PopupEvaluationControleComponent } from '../../pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
+import { BasePopupComponent, PopupAction } from '../../../shared/components/base-popup/base-popup.component';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+import { ControlService } from '../../../core/services/dmr/control/control.service';
+import { FileService } from '../../../core/services/file/file.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { ReviewStatus } from '../../../core/enum/reviewStatus.enum';
+import { Status } from '../../../core/enum/status.enum';
+import { PopupEvaluationControleComponent } from '../../../pages/control-details-page/popup-evaluation-controle/popup-evaluation-controle/popup-evaluation-controle.component';
 import { firstValueFrom } from 'rxjs';
-import { TargetType } from '../../core/enum/targettype.enum';
-import { EvaluationControl } from '../../core/enum/evaluation-controle.enum';
+import { TargetType } from '../../../core/enum/targettype.enum';
+import { EvaluationControl } from '../../../core/enum/evaluation-controle.enum';
 
 export interface ExecutionDetailDialogData {
   id: string;

@@ -18,7 +18,7 @@ import { IncidentService } from '../../../../core/services/incident/incident.ser
 import { RiskEvaluationService } from '../../../../core/services/risk-evaluation/risk-evaluation.service';
 import { ControlExecutionView } from '../../../../core/models/ControlExecution';
 import { EnumLabelPipe } from '../../../../shared/pipes/enum-label.pipe';
-import { ExecutionDetailDialogComponent } from '../../../execution-detail-dialog/execution-detail-dialog.component';
+import { ExecutionDetailDialogComponent } from '../../../control/execution-detail-dialog/execution-detail-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { OperatingLossState } from '../../../../core/enum/operatingLossState.enum';
 

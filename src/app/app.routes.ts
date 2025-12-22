@@ -11,7 +11,6 @@ import { permissionRoutes } from './features/permissions/permissions.routes';
 import { PermissionName } from './core/enum/permission.enum';
 import { actionPlanRoutes } from './features/action-plan/action-plan.routes';
 import { controlRoutes } from './features/control/control.routes';
-import { RiskPageComponent } from './pages/risk-page/risk-page.component';
 import { CalculViewComponent } from './pages/calcul-view/calcul-view.component';
 import { TodoComponent } from './pages/todo/todo.component';
 import { AttenuationMetricsListComponent } from './features/control/attenuation-metrics-list/attenuation-metrics-list.component';
@@ -19,11 +18,12 @@ import { ProcessManagerComponent } from './shared/components/param-process/param
 import { EvaluationBruteComponent } from './shared/components/evaluation-brute/evaluation-brute.component';
 import { EvaluationNetteComponent } from './shared/components/evaluation-nette/evaluation-nette.component';
 import { CsvImportComponent } from './pages/csv-import/csv-import.component';
+import { MatrixComponent } from './features/cartographie/matrix/matrix.component';
 
 export const routes: Routes = [
   { pathMatch: 'full', path: '', redirectTo: 'auth/login' },
   { path: 'dashboard', component: HomeComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_DASHBOARDS } },
-  { path: 'risk/:id', component : RiskPageComponent, canActivate : [AuthGuard] },
+  { path: 'risk/:id', component : MatrixComponent, canActivate : [AuthGuard] },
   { path: 'cartographie', component: ProcessManagerComponent, canActivate: [AuthGuard, PermissionGuard], data: { permission: PermissionName.VIEW_CARTOGRAPHIE } },
   {
     path: 'cartographie/evaluation-brute',

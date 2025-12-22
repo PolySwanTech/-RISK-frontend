@@ -1,33 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
+import { Component, inject, HostListener, OnInit, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RiskLevelScores } from '../../../core/enum/riskLevel.enum';
-import { RiskSelectionDialogComponent } from '../risk-selection-dialog/risk-selection-dialog.component';
-import { RiskTemplate } from '../../../core/models/RiskTemplate';
-import { MatrixSettingsComponent } from '../matrix-settings/matrix-settings.component';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
 import { Range } from '../../../core/models/range';
+import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
+import { ActivatedRoute } from '@angular/router';
+import { EntitiesService } from '../../../core/services/entities/entities.service';
+import { MatCardModule } from '@angular/material/card';
+import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
 
 @Component({
   selector: 'app-matrix',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatTooltipModule, MatrixSettingsComponent],
+  imports: [CommonModule, FormsModule, MatTooltipModule, GoBackComponent, MatCardModule, EnumLabelPipe],
   templateUrl: './matrix.component.html',
   styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent {
-  @Input() modifPlan = true;
+export class MatrixComponent implements OnInit {
 
-  @Input() set risks(value: RiskTemplate[] | null | undefined) {
-    if (value?.length) {
-      this._risks = this.arrayToMatrixMap(value);
-    } else {
-      this._risks = {}; // reset si rien
-    }
-  }
+  @Input() modif: boolean = true;
+  @Input() buId: string | undefined = undefined;
 
   rowLabels: Range[] = [];
   colLabels: Range[] = [];
@@ -40,15 +34,51 @@ export class MatrixComponent {
   matrixLevels: any;
 
   activeCell: any = null;
+  activeScale: any = null;
   overlayPosition: any = {};
+  goBackButtons: GoBackButton[] = []
+
+  private route = inject(ActivatedRoute);
+  private entitiesSrv = inject(EntitiesService);
+  private matrixService = inject(MatrixService);
+  private snackBarService = inject(SnackBarService);
+
+  selectedColor = '';
+
+  buName: string = ""
+
+  ngOnInit(): void {
+    this.goBackButtons = [
+      { label: 'Sauvegarder', icon: 'save', class: 'btn-primary', action: () => this.saveMatrix(), show: true },
+    ];
+
+    if (!this.buId) {
+      this.buId = this.route.snapshot.paramMap.get('id')!;
+    }
+
+    this.matrixService.getDefaultMatrix(this.buId).subscribe({
+      next: resp => this.matrixData = resp,
+      error: err => console.error(err)
+    });
+
+
+    this.entitiesSrv.findById(this.buId).subscribe(resp => {
+      this.buName = resp.name
+    });
+  }
 
   openColorOverlay(event: MouseEvent, cell: any) {
-    if(this.modifPlan === false) return;
+    if (!this.modif) return;
+    if (this.activeCell == cell) {
+      this.activeCell = null;
+      return;
+    }
     event.stopPropagation(); // éviter fermeture immédiate
     this.activeCell = cell;
     this.overlayPosition = {
-      top: `${event.clientY - 300}px`,
+      top: `${event.clientY}px`,
       left: `${event.clientX - 250}px`,
+      'border-radius': '5%',
     };
   }
 
@@ -57,25 +87,33 @@ export class MatrixComponent {
     this.updatedCells.push({ id: cell.id, riskLevel: { name: cell.riskLevel.name, color: cell.riskLevel.color } });
     this.activeCell = null; // ferme l’overlay
   }
-
+  
   // ferme overlay si on clique en dehors
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     this.activeCell = null;
+    this.activeScale = null;
   }
-
-  @Input() set matrixData(value: any) {
-  this._matrixData = value ?? {};
-  this.buildMatrixFromCells(value?.cells || []);
-}
-
-  private dialog = inject(MatDialog);
-  private snackBarService = inject(SnackBarService);
-  private matrixService = inject(MatrixService);
-
-  @Output() selectedRiskEvent = new EventEmitter<any>();
-
-  selectedColor = '';
+  
+  set matrixData(value: any) {
+    this._matrixData = value ?? {};
+    this.buildMatrixFromCells(value?.cells || []);
+  }
+  
+  openScaleOverlay(event: MouseEvent, scale: any) {
+    if (!this.modif) return;
+    if (this.activeScale == scale) {
+      this.activeScale = null;
+      return;
+    }
+    event.stopPropagation(); // éviter fermeture immédiate
+    this.activeScale = scale;
+    this.overlayPosition = {
+      top: `${event.clientY}px`,
+      left: `${event.clientX - 250}px`,
+      'border-radius': '5%',
+    };
+  }
 
   private buildMatrixFromCells(cells: any[]) {
     if (!cells?.length) {
@@ -122,87 +160,20 @@ export class MatrixComponent {
     this.matrixLevels = matrix.reverse();
   }
 
-  /* ===================== HELPERS ===================== */
-  private cellKey(row: number, col: number): string {
-    return `${row},${col}`;
-  }
-  
   cellStyle(cell: any) {
-  const bg = cell?.riskLevel?.color || '#fff'; // blanc si rien
-  return {
-    backgroundColor: bg,
-    border: '1px solid #ccc',
-    width: '60px',
-    height: '60px',
-    position: 'relative',
-    cursor: this.modifPlan ? 'pointer' : 'default',
-  };
-}
+    const bg = cell?.riskLevel?.color || '#fff'; // blanc si rien
+    return {
+      backgroundColor: bg,
+      border: '1px solid #ccc',
+      width: '60px',
+      height: '60px',
+      position: 'relative',
+      cursor: 'pointer',
+    };
+  }
 
   setColor(cell: any) {
-    if (!this.modifPlan || !this.selectedColor) return;
     this.matrixLevels[cell.position.row][cell.position.col] = null;
-  }
-
-  /* ===================== RISKS ===================== */
-  private _risks: Record<string, any | any[]> = {};
-
-  private arrayToMatrixMap(arr: RiskTemplate[]) {
-    const map: Record<string, any | any[]> = {};
-
-    arr.forEach(risk => {
-      let impact = 0;
-      // let frequency = risk.dmr.at(-1)?.probability;
-      let frequency = risk.riskBrut![0]?.probability;
-
-      if (!impact || !frequency) {
-        // const last = risk.dmr?.at(-1);
-        const last = risk.riskBrut![0];
-        if (last) {
-          frequency = Math.ceil((last.probability ?? 1) / 2);
-          impact = RiskLevelScores[last.evaluation.name];
-        }
-      }
-
-      if (impact && frequency) {
-        const key = this.cellKey(impact - 1, frequency - 1);
-        map[key] = map[key] ? ([] as any[]).concat(map[key], risk) : risk;
-      }
-    });
-
-    return map;
-  }
-
-  cellRiskInfo(row: number, col: number) {
-    const data = this._risks[this.cellKey(row, col)];
-    if (!data) return { id: '', name: '' };
-
-    return Array.isArray(data)
-      ? { id: '+' + data.length, name: 'Cliquez pour voir les risques' }
-      : { id: data.reference, name: data.name };
-  }
-
-  concat(row: number, col: number) {
-    const id = this.cellRiskInfo(row, col).id; // ex: "CON_2025_001"
-    const afterLastUnderscore = id.split('_').pop();
-    return "R" + Number(afterLastUnderscore);
-  }
-
-  onRiskClick(cell: any) {
-    const data = this._risks[this.cellKey(cell.position.row, cell.position.col)];
-    if (!data) return;
-
-    if (Array.isArray(data)) {
-      const ref = this.dialog.open(RiskSelectionDialogComponent, {
-        width: '400px',
-        data: { risks: data }
-      });
-      ref.afterClosed().subscribe(risk => {
-        if (risk) this.selectedRiskEvent.emit(risk);
-      });
-    } else {
-      this.selectedRiskEvent.emit(data);
-    }
   }
 
   /* ===================== SAVE ===================== */
@@ -210,25 +181,6 @@ export class MatrixComponent {
     this.matrixService.updateCells(this.updatedCells).subscribe(_ => {
       this.snackBarService.success("La matrice a bien été mise à jour");
     });
-    // const matrixId = this._matrixData.id || '';
-    // const labels = this.buildLabels(matrixId);
-
-    // const cells = this.matrixLevels.flatMap((row, rowIdx) =>
-    //   row.map((riskLevel, colIdx) => ({
-    //     matrix: matrixId,
-    //     rowPosition: rowIdx + 1,
-    //     colPosition: colIdx + 1,
-    //     riskLevel,
-    //     colorHex: this.levelToColor(riskLevel)
-    //   }))
-    // );
-
-    // const payload = { id: matrixId, labels, cells };
-
-    // this.matrixService.saveMatrix(payload).subscribe({
-    //   next: resp => this.snackBarService.success("La matrice a bien été sauvegardée"),
-    //   error: err => this.snackBarService.error("Une erreur est survenu")
-    // });
   }
 
   /* ===================== TRACKERS ===================== */

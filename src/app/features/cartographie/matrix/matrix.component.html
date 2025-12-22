@@ -1,62 +1,51 @@
-<section id="matrix">
+<app-go-back [title]="`Paramétrage de la matrice d'aversion de ` + buName" [buttons]="goBackButtons"></app-go-back>
 
-  <!-- ========= Matrice & axes ========= -->
+<section class="dashboard-container">
   <div class="matrix-container">
+    <section id="matrix">
 
-    <!-- Axe vertical IMPACT -->
-    <div class="impact-label">IMPACT</div>
+      <div class="matrix-container">
 
-    <div class="matrix-wrapper">
-      <table class="risk-matrix">
-        <tbody>
-          <tr *ngFor="let row of matrixLevels; let rIdx = index; trackBy: trackByIdx">
-            <th class="row-header">
-              <label class="row-input">{{rowLabels[matrixLevels.length - 1 - rIdx].libelle}}</label>
-            </th>
+        <!-- Axe vertical IMPACT -->
+        <div class="impact-label">IMPACT</div>
 
-            <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
-              (click)="openColorOverlay($event, cell)" class="matrix-cell">
-            </td>
-            <div *ngIf="activeCell" class="color-overlay" [ngStyle]="overlayPosition">
-              <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
-                (click)="selectColor(activeCell, risk)">
-                {{ risk.name }}
-              </div>
-            </div>
-          </tr>
+        <div class="matrix-wrapper">
+          <table class="risk-matrix">
+            <tbody>
+              <tr *ngFor="let row of matrixLevels; let rIdx = index; trackBy: trackByIdx">
+                <th class="row-header">
+                  <label class="row-input">{{rowLabels[matrixLevels.length - 1 - rIdx].libelle}}</label>
+                </th>
 
-          <!-- ligne d’entête des colonnes PROBABILITÉ -->
-          <tr class="column-labels-row">
-            <th class="probability-header">PROBABILITÉ</th>
-            <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx">
-              <label class="col-input">{{colLabels[i].libelle}}</label>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
+                  (click)="openColorOverlay($event, cell)" class="matrix-cell">
+                </td>
+                <div *ngIf="activeCell" class="color-overlay" [ngStyle]="overlayPosition">
+                  <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
+                    (click)="selectColor(activeCell, risk)">
+                    {{ risk.name | enumLabel: 'riskLevel' }}
+                  </div>
+                </div>
+              </tr>
+
+              <!-- ligne d’entête des colonnes PROBABILITÉ -->
+              <tr class="column-labels-row">
+                <th class="probability-header">PROBABILITÉ</th>
+                <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx" (click)="openScaleOverlay($event, colLabels[i])">
+                  <label class="col-input">
+                    {{colLabels[i].libelle}}</label>
+                </td>
+                <div *ngIf="activeScale" class="scale-overlay" [ngStyle]="overlayPosition">
+                  <label>Min : </label>
+                  <input type="number" [(ngModel)]="activeScale.min">
+                  <label>Max : </label>
+                  <input type="number" [(ngModel)]="activeScale.max">
+                </div>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </div>
-
-  <!-- ========= légende des couleurs ========= -->
-  <div class="color-legend">
-    <!-- <div *ngFor="let l of riskLevels" class="legend-item" 
-      [class.modif]="modifPlan"
-      [class.selected]="selectedColor===l.color" 
-      (click)="modifPlan ? selectedColor=l.color : null">
-      <div class="legend-color" [style.backgroundColor]="l.color"></div>
-      <span class="legend-label">{{ l.label }}</span>
-    </div> -->
-  </div>
-
-  <!-- ========= bouton sauvegarde ========= -->
-  @if(modifPlan){
-  <button mat-raised-button class="btn-primary" (click)="saveMatrix()">Sauvegarder</button>
-  }
-
 </section>
-@if(modifPlan){
-<h2>⚙️ Paramétrage des Sévérités</h2>
-<app-matrix-settings [list]="rowLabels" [type]="'SEVERITY'"></app-matrix-settings>
-<h2>⚙️ Paramétrage des Fréquences</h2>
-<app-matrix-settings [list]="colLabels" [type]="'FREQUENCY'"></app-matrix-settings>
-}

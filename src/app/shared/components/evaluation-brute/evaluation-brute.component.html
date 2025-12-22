@@ -82,7 +82,7 @@
 
     <div class="matrix-section" *ngIf="matrixData">
       <h3>🎯 Matrice de Risques</h3>
-      <app-matrix [matrixData]="matrixData" [modifPlan]="false"></app-matrix>
+      <app-matrix [modif]="false" [buId]="selectedBU.id"></app-matrix>
     </div>
 
     <div class="actions">

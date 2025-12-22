@@ -25,7 +25,7 @@ import { Status } from '../../core/enum/status.enum';
 import { EvaluationControl, EvaluationControlLabels } from '../../core/enum/evaluation-controle.enum';
 import { Priority } from '../../core/enum/Priority';
 import { EnumLabelPipe } from '../../shared/pipes/enum-label.pipe';
-import { ExecutionDetailDialogComponent } from '../../features/execution-detail-dialog/execution-detail-dialog.component';
+import { ExecutionDetailDialogComponent } from '../../features/control/execution-detail-dialog/execution-detail-dialog.component';
 
 @Component({
   selector: 'app-executions-list',
