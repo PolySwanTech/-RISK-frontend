@@ -30,12 +30,11 @@ export class ControlService {
   }
 
   getAllTemplates(
-    processId?: string,
     riskId?: string,
   ) {
     let params = new HttpParams();
-    if (processId && riskId) {
-      params = params.set('riskId', riskId).set('processId', processId);
+    if (riskId) {
+      params = params.set('riskId', riskId);
     }
     return this.http.get<ControlTemplateListViewDto[]>(`${this.baseUrlTemp}`, { params: params });
   }

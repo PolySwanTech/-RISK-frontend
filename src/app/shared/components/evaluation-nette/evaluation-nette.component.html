@@ -11,16 +11,15 @@
       </mat-chip-listbox>
     </div>
 
-    <div class="controls-section" *ngIf="controls.length > 0">
+    <div class="controls-section">
       <h3>🎯 Contrôles Existants</h3>
-      <div class="controls-grid">
+      <div class="controls-grid" *ngIf="controls.length > 0; else noControls">
         <mat-card *ngFor="let ctrl of controls" class="control-card"
           [ngStyle]="{'border-left': '5px solid ' + ctrl.riskLevel.color}">
           <mat-card-header>
             <div class="control-header-content">
               <mat-card-title>{{ ctrl.libelle }}</mat-card-title>
-              <mat-chip 
-                class="risk-chip"
+              <mat-chip class="risk-chip"
                 [ngStyle]="{'background-color': ctrl.riskLevel.color, 'color': getContrastColor(ctrl.riskLevel.color)}">
                 {{ ctrl.riskLevel.name }}
               </mat-chip>
@@ -51,11 +50,20 @@
           </mat-card-content>
         </mat-card>
       </div>
+
+      <ng-template #noControls>
+        <div class="no-data">
+          <div class="no-data-icon">🎯</div>
+          <p>Aucun contrôle associé à ce risque</p>
+        </div>
+      </ng-template>
     </div>
+
+
 
     <div class="attenuation-section">
       <h3>🛡️ Mesures d'Atténuation</h3>
-      
+
       <div class="attenuation-grid" *ngIf="attenuationMetrics.length > 0; else noMetrics">
         <mat-card *ngFor="let metric of attenuationMetrics" class="attenuation-card">
           <mat-card-header>
@@ -69,10 +77,10 @@
               <span class="type-badge">{{ metric.type.label || 'Type inconnu' }}</span>
             </mat-card-subtitle>
           </mat-card-header>
-          
+
           <mat-card-content>
             <p class="description">{{ metric.description || 'Aucune description disponible.' }}</p>
-            
+
             <div class="metric-details">
               <div class="metric-detail">
                 <span class="detail-icon">👤</span>
@@ -105,13 +113,13 @@
         <div class="summary-info">
           <p class="summary-label">Après application des contrôles et mesures d'atténuation</p>
           <p class="summary-detail" *ngIf="initialRiskLevel">
-            Niveau de risque brut : 
+            Niveau de risque brut :
             <strong [style.color]="getRiskColorEnum(initialRiskLevel)">
               {{ initialRiskLevel | enumLabel:'riskLevel' }}
             </strong>
           </p>
         </div>
-        
+
         <div class="risk-selection">
           <mat-form-field appearance="outline" class="risk-level-select">
             <mat-label>Niveau de Risque Net Proposé</mat-label>
@@ -121,9 +129,8 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          
-          <div class="risk-indicator" 
-            *ngIf="highestRiskLevelNet"
+
+          <div class="risk-indicator" *ngIf="highestRiskLevelNet"
             [style.backgroundColor]="getRiskColorEnum(highestRiskLevelNet)">
             {{ highestRiskLevelNet | enumLabel:'riskLevel' }}
           </div>
@@ -135,11 +142,7 @@
       <button mat-raised-button class="btn-secondary" (click)="handleCancel()">
         ✕ Annuler
       </button>
-      <button 
-        mat-raised-button 
-        class="btn-primary" 
-        (click)="handleSave()"
-        [disabled]="!highestRiskLevelNet">
+      <button mat-raised-button class="btn-primary" (click)="handleSave()" [disabled]="!highestRiskLevelNet">
         💾 Enregistrer l'évaluation
       </button>
     </div>

@@ -101,8 +101,10 @@ export class EvaluationNetteComponent implements OnInit {
     if (!this.selectedProcess || !this.selectedRisk) return;
 
     // Charger les contrôles
-    this.controlService.getAllTemplates(this.selectedProcess.id, this.selectedRisk.id).subscribe({
-      next: controls => this.controls = controls,
+    this.controlService.getAllTemplates(this.selectedRisk.id).subscribe({
+      next: controls => {
+        this.controls = controls
+      },
       error: err => console.error('Erreur chargement contrôles', err)
     });
 
