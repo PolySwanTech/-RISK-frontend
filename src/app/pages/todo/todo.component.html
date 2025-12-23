@@ -173,10 +173,10 @@
     <!-- Unified View -->
     <div *ngIf="currentView === 'unified'" class="unified-content">
       <div *ngFor="let item of getAllFilteredItems()" class="item">
-        <div class="item-type" [ngClass]="'type-' + getTypeLabel(item.type)">
+        <div (click)="viewItem(item)" class="item-type" [ngClass]="'type-' + getTypeLabel(item.type)">
           {{ getTypeLabel(item.type) }}
         </div>
-        <div class="item-content">
+        <div (click)="viewItem(item)" class="item-content">
           <div class="item-title">{{ item.libelle }}</div>
           <div class="item-meta">
             <span>{{ getDateLabel(item) }}: {{ item.date | date : "dd/MM/yyyy" }}</span>
