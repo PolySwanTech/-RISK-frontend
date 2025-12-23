@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.service';
 import { MatrixService } from '../../../core/services/matrix/matrix.service';
-import { Range } from '../../../core/models/range';
 import { GoBackButton, GoBackComponent } from '../../../shared/components/go-back/go-back.component';
 import { ActivatedRoute } from '@angular/router';
 import { EntitiesService } from '../../../core/services/entities/entities.service';
 import { MatCardModule } from '@angular/material/card';
 import { EnumLabelPipe } from '../../../shared/pipes/enum-label.pipe';
+import { Range } from '../../../core/models/range';
 
 @Component({
   selector: 'app-matrix',
@@ -23,8 +23,14 @@ export class MatrixComponent implements OnInit {
   @Input() modif: boolean = true;
   @Input() buId: string | undefined = undefined;
 
+  @Input() frequency: number = -1;
+  @Input() severity: number = -1;
+
   rowLabels: Range[] = [];
   colLabels: Range[] = [];
+
+  frequencies: Map<string, Range> = new Map();
+  severities: Map<string, Range> = new Map();
 
   updatedCells: any[] = [];
 
@@ -57,7 +63,25 @@ export class MatrixComponent implements OnInit {
     }
 
     this.matrixService.getDefaultMatrix(this.buId).subscribe({
-      next: resp => this.matrixData = resp,
+      next: resp => {
+        this.matrixData = resp;
+        for (let cell of resp.cells) {
+          const isCorrectFreq = this.frequency >= cell.frequence.min &&
+            (cell.frequence.max === undefined || cell.frequence.max === null || this.frequency < cell.frequence.max);
+
+          // Sévérité : idem, si cell.severite.max est undefined, on accepte tout ce qui est > min
+          const isCorrectSev = this.severity >= cell.severite.min &&
+            (cell.severite.max === undefined || cell.severite.max === null || this.severity < cell.severite.max);
+
+          if (isCorrectFreq && isCorrectSev) {
+            cell.hasEvaluation = true;
+            cell.actualLoss = this.severity;
+            cell.actualFreq = this.frequency;
+          }
+          this.frequencies.set(cell.frequence.id, cell.frequence);
+          this.severities.set(cell.severite.id, cell.severite);
+        }
+      },
       error: err => console.error(err)
     });
 
@@ -87,19 +111,19 @@ export class MatrixComponent implements OnInit {
     this.updatedCells.push({ id: cell.id, riskLevel: { name: cell.riskLevel.name, color: cell.riskLevel.color } });
     this.activeCell = null; // ferme l’overlay
   }
-  
+
   // ferme overlay si on clique en dehors
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     this.activeCell = null;
     this.activeScale = null;
   }
-  
+
   set matrixData(value: any) {
     this._matrixData = value ?? {};
     this.buildMatrixFromCells(value?.cells || []);
   }
-  
+
   openScaleOverlay(event: MouseEvent, scale: any) {
     if (!this.modif) return;
     if (this.activeScale == scale) {

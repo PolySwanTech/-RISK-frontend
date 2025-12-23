@@ -328,7 +328,6 @@ export class ViewComponent implements OnInit {
         row.nonFinancialLabels.push(this.impactLabel(loss));
       }
     }
-
     return Array.from(byBL.values()).sort((a, b) => a.bl.localeCompare(b.bl));
   }
 

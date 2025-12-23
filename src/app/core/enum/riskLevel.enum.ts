@@ -31,9 +31,9 @@ export const RiskLevelLabels: Record<RiskLevelEnum, string> = {
 };
 
 export const RiskLevelColor: Record<RiskLevelEnum, string> = {
-  [RiskLevelEnum.LOW]: 'rgb(245, 248, 250)',
-  [RiskLevelEnum.MEDIUM]: 'rgb(255, 165, 0)',
-  [RiskLevelEnum.HIGH]: 'rgb(255, 69, 0)',
-  [RiskLevelEnum.VERY_HIGH]: 'rgb(139, 0, 0)',
+  [RiskLevelEnum.LOW]: '#10b981',
+  [RiskLevelEnum.MEDIUM]: '#f59e0b',
+  [RiskLevelEnum.HIGH]: '#f97316',
+  [RiskLevelEnum.VERY_HIGH]: '#dc2626',
 };
 

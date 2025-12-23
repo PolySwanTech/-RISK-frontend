@@ -2,7 +2,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Matrix } from '../../models/Matrix';
 import { RangeType, Range } from '../../models/range';
 
 @Injectable({
@@ -13,9 +12,9 @@ export class MatrixService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl + '/matrix';
 
-  getDefaultMatrix(buId: string): Observable<any> {
+  getDefaultMatrix(buId: string): Observable<{ cells: any[] }> {
     const params = new HttpParams().set("buId", buId);
-    return this.http.get<Matrix>(this.baseUrl, { params: params });
+    return this.http.get<{ cells: any[] }>(this.baseUrl, { params: params });
   }
 
   updateCells(cells: any[]): Observable<any> {

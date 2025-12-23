@@ -50,12 +50,16 @@ export type IncidentListViewDto = Pick<
   | 'creatorName'
   | 'closedAt'
   | 'categoryBaloise'
->;
+> & {
+  'totalLossAmount': number
+};
 
 export type IncidentListDto = Pick<
   Incident,
   'id' | 'reference' | 'title' | 'state' | 'declaredAt' | 'survenueAt' | 'closedAt'
->;
+> & {
+  'totalLossAmount': number
+};
 
 export interface IncidentCreateDto {
   reference: string;

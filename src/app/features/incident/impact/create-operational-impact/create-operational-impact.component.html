@@ -1,10 +1,6 @@
-<app-base-popup 
-  [title]="currentStep === 'select-type' ? 'Gérer les Impacts Opérationnels' : 
+<app-base-popup [title]="currentStep === 'select-type' ? 'Gérer les Impacts Opérationnels' : 
            currentStep === 'create-new' ? 'Créer un Impact ' + (isFinancial ? 'Financier' : 'Non Financier') :
-           'Gérer les Impacts Existants'"
-  [showClose]="true"
-  [actions]="popupActions"
-  [dialogRef]="getDialogRef()"
+           'Gérer les Impacts Existants'" [showClose]="true" [actions]="popupActions" [dialogRef]="getDialogRef()"
   (close)="closePopup()">
 
   <!-- ÉTAPE 1 : Sélection du type d'action -->
@@ -47,8 +43,7 @@
       <div class="row-fields">
         <mat-form-field appearance="outline">
           <mat-label>Titre de l'impact</mat-label>
-          <input matInput [(ngModel)]="newImpact.title" name="title" 
-                 placeholder="Ex: Perte de revenus Q1" required>
+          <input matInput [(ngModel)]="newImpact.title" name="title" placeholder="Ex: Perte de revenus Q1" required>
           <mat-icon matPrefix>title</mat-icon>
         </mat-form-field>
 
@@ -75,8 +70,8 @@
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Description</mat-label>
-        <textarea matInput [(ngModel)]="newImpact.description" name="description" 
-                  rows="3" placeholder="Décrivez l'impact en détail..."></textarea>
+        <textarea matInput [(ngModel)]="newImpact.description" name="description" rows="3"
+          placeholder="Décrivez l'impact en détail..."></textarea>
         <mat-icon matPrefix>description</mat-icon>
       </mat-form-field>
     </form>
@@ -86,8 +81,8 @@
     <div class="section-header">
       <mat-icon class="section-icon">calculate</mat-icon>
       <h3 class="section-title">Montants</h3>
-      <button mat-icon-button class="add-btn" (click)="addAmountLine()" 
-              *ngIf="isFinancial" matTooltip="Ajouter un montant">
+      <button mat-icon-button class="add-btn" (click)="addAmountLine()" *ngIf="isFinancial"
+        matTooltip="Ajouter un montant">
         <mat-icon>add_circle</mat-icon>
       </button>
     </div>
@@ -106,15 +101,13 @@
 
         <mat-form-field appearance="outline" *ngIf="isFinancial">
           <mat-label>Réf. comptable</mat-label>
-          <input matInput [(ngModel)]="amount.accountingRef" [name]="'ref-' + i" 
-                 placeholder="Ex: CMP-2025-001">
+          <input matInput [(ngModel)]="amount.accountingRef" [name]="'ref-' + i" placeholder="Ex: CMP-2025-001">
           <mat-icon matPrefix>receipt</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" *ngIf="isFinancial">
           <mat-label>Date comptabilisation</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="amount.accountingDate" 
-                 [name]="'date-' + i">
+          <input matInput [matDatepicker]="picker" [(ngModel)]="amount.accountingDate" [name]="'date-' + i">
           <mat-icon matPrefix>event</mat-icon>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
@@ -122,14 +115,13 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Montant (€)</mat-label>
-          <input matInput type="number" [(ngModel)]="amount.amount" [name]="'amount-' + i" 
-                 placeholder="0.00" min="0" step="0.01" required>
+          <input matInput type="number" [(ngModel)]="amount.amount" [name]="'amount-' + i" placeholder="0.00" min="0"
+            step="0.01" required>
           <mat-icon matPrefix>euro</mat-icon>
         </mat-form-field>
 
-        <button mat-icon-button color="warn" (click)="removeAmountLine(i)" 
-                *ngIf="isFinancial && newImpact.amounts.length > 1"
-                matTooltip="Supprimer">
+        <button mat-icon-button color="warn" (click)="removeAmountLine(i)"
+          *ngIf="isFinancial && newImpact.amounts.length > 1" matTooltip="Supprimer">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
@@ -146,20 +138,17 @@
     <div class="impacts-list">
       <mat-accordion multi>
         <mat-expansion-panel *ngFor="let impact of existingImpacts; trackBy: trackByImpactId"
-                             [expanded]="expandedImpacts.has(impact.id)"
-                             (opened)="expandedImpacts.add(impact.id)"
-                             (closed)="expandedImpacts.delete(impact.id)">
-          
+          [expanded]="expandedImpacts.has(impact.id)" (opened)="expandedImpacts.add(impact.id)"
+          (closed)="expandedImpacts.delete(impact.id)">
+
           <mat-expansion-panel-header>
             <mat-panel-title>
-              <mat-checkbox 
-                [checked]="selectedImpacts.has(impact.id)"
-                (click)="$event.stopPropagation()"
+              <mat-checkbox [checked]="selectedImpacts.has(impact.id)" (click)="$event.stopPropagation()"
                 (change)="toggleImpactSelection(impact.id, $event)">
               </mat-checkbox>
               <div class="impact-title">
                 <mat-icon [class.financial]="impact.type.family === OperatingLossFamily.FINANCIER"
-                          [class.non-financial]="impact.type.family === OperatingLossFamily.NON_FINANCIER">
+                  [class.non-financial]="impact.type.family === OperatingLossFamily.NON_FINANCIER">
                   {{ impact.type.family === OperatingLossFamily.FINANCIER ? 'attach_money' : 'warning' }}
                 </mat-icon>
                 <span>{{ impact.libelle }}</span>
@@ -200,15 +189,58 @@
             <div class="section-header">
               <mat-icon class="section-icon">calculate</mat-icon>
               <h4 class="section-title">Montants associés</h4>
+              <button mat-icon-button class="add-btn" (click)="initNewAmountForImpact(impact)"
+                *ngIf="(!editingImpactId || editingImpactId !== impact.id) && impact.state != 'VALIDATED'" matTooltip="Ajouter un montant">
+                <mat-icon>add_circle</mat-icon>
+              </button>
+            </div>
+
+            <div class="quick-add-amount-form" *ngIf="editingImpactId === impact.id">
+              <div class="amount-row edit-mode">
+                <mat-form-field appearance="outline">
+                  <mat-label>Type de montant</mat-label>
+                  <mat-select [(ngModel)]="tempAmount.amountType" name="tempType" required>
+                    <mat-option *ngFor="let type of currentAmountTypes" [value]="type.libelle">
+                      {{ type.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" *ngIf="impact.type.family === OperatingLossFamily.FINANCIER">
+                  <mat-label>Réf. comptable</mat-label>
+                  <input matInput [(ngModel)]="tempAmount.accountingRef" name="tempRef">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Montant (€)</mat-label>
+                  <input matInput type="number" [(ngModel)]="tempAmount.amount" name="tempVal" required>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" *ngIf="isFinancial">
+                  <mat-label>Date comptabilisation</mat-label>
+                  <input matInput [matDatepicker]="picker" [(ngModel)]="tempAmount.accountingDate" [name]="'date-'">
+                  <mat-icon matPrefix>event</mat-icon>
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+                <div class="edit-actions">
+                  <button mat-icon-button color="primary" (click)="saveNewAmount(impact.id)"
+                    [disabled]="!tempAmount.amount">
+                    <mat-icon>check_circle</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="cancelEdition()">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="amounts-grid" *ngIf="impactAmounts.get(impact.id) as amounts">
-              <div class="amount-card" 
-                   *ngFor="let amount of amounts; trackBy: trackByAmountId"
-                   [class.selected]="selectedAmounts.get(impact.id)?.has(amount.id)"
-                   (click)="toggleAmountSelection(impact.id, amount.id)">
-                <mat-checkbox 
-                  [checked]="selectedAmounts.get(impact.id)?.has(amount.id)"
+              <div class="amount-card" *ngFor="let amount of amounts; trackBy: trackByAmountId"
+                [class.selected]="selectedAmounts.get(impact.id)?.has(amount.id)"
+                (click)="toggleAmountSelection(impact.id, amount.id)">
+                <mat-checkbox [checked]="selectedAmounts.get(impact.id)?.has(amount.id)"
                   (click)="$event.stopPropagation()" (change)="toggleAmountSelection(impact.id, amount.id)">
                 </mat-checkbox>
                 <div class="amount-info">

@@ -19,6 +19,8 @@ import { SnackBarService } from '../../../core/services/snack-bar/snack-bar.serv
 import { MatrixComponent } from '../../../features/cartographie/matrix/matrix.component';
 import { GoBackComponent } from '../go-back/go-back.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { IncidentService } from '../../../core/services/incident/incident.service';
+import { IncidentListDto } from '../../../core/models/Incident';
 
 interface Indicator {
   frequenceId: number;
@@ -35,7 +37,7 @@ interface MatrixCell {
 @Component({
   selector: 'app-evaluation-brute',
   standalone: true,
-   imports: [
+  imports: [
     CommonModule,
     FormsModule,
     MatFormFieldModule,
@@ -52,6 +54,7 @@ interface MatrixCell {
 })
 export class EvaluationBruteComponent implements OnInit {
   private matrixService = inject(MatrixService);
+  private incidentService = inject(IncidentService);
   private evaluationSrv = inject(RiskEvaluationService);
   private snackBarService = inject(SnackBarService);
   private route = inject(ActivatedRoute);
@@ -60,6 +63,9 @@ export class EvaluationBruteComponent implements OnInit {
   selectedRisk: RiskTemplate | null = null;
   selectedBU: BusinessUnit | null = null;
   selectedProcess: Process | null = null;
+
+  actualFrequency: number = -1;
+  actualSeverity: number = -1;
 
   // Données chargées en interne
   frequencyList: Range[] = [];
@@ -70,18 +76,34 @@ export class EvaluationBruteComponent implements OnInit {
   financierNonFinancier: RiskLevelEnum | null = null;
   highestRiskLevel: RiskLevelEnum | null = null;
   riskLevels = Object.values(RiskLevelEnum);
-  
+
   indicators: Indicator[] = [];
   severitiesMap: Map<number, number> = new Map();
 
+  incidents: IncidentListDto[] = [];
+
   ngOnInit(): void {
     this.loadDataFromSessionStorage();
-    
+
     if (this.selectedRisk && this.selectedBU && this.selectedProcess) {
       this.loadData();
     } else {
       this.snackBarService.info("Données manquantes pour l'évaluation");
       this.router.navigate(['/cartographie']);
+    }
+
+    if (this.selectedRisk) {
+      this.incidentService.getIncidentByProcessAndRisk(this.selectedRisk.id).subscribe({
+        next: resp => {
+          this.incidents = resp;
+          this.actualFrequency = resp.length;
+          this.actualSeverity = resp.reduce((sum, incident) => {
+            // Le '+' force la conversion en nombre pour éviter les erreurs de type
+            return sum + (+incident.totalLossAmount || 0);
+          }, 0);
+        },
+        error: err => console.error('Erreur chargement incidents', err)
+      });
     }
   }
 
@@ -91,7 +113,7 @@ export class EvaluationBruteComponent implements OnInit {
 
     if (dataIsInSessionStorage && sessionStorageKey) {
       const obj = JSON.parse(sessionStorage.getItem(sessionStorageKey) || "{}");
-      
+
       if (obj) {
         this.selectedBU = obj.bu;
         this.selectedProcess = obj.process;
@@ -220,11 +242,11 @@ export class EvaluationBruteComponent implements OnInit {
         brut: true,
         commentaire: ""
       };
-      
+
       this.evaluationSrv.saveEvaluation(riskEvaluationCreateDto).subscribe({
         next: _ => {
           this.snackBarService.info("Évaluation brute sauvegardée");
-          
+
           // Rediriger vers l'évaluation nette
           const sessionStorageKey = this.route.snapshot.queryParams['key'] || 'object_for_carto';
           this.router.navigate(['/cartographie/evaluation-nette'], {

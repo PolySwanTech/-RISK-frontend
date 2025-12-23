@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Incident } from '../../models/Incident';
+import { IncidentListViewDto } from '../../models/Incident';
 
 type FilterType = 'time' | 'state' | 'category';
 
 @Injectable({ providedIn: 'root' })
 export class IncidentFilterService {
-  private allIncidents: Incident[] = [];
-  private filters: Partial<Record<FilterType, (inc: Incident) => boolean>> = {};
+  private allIncidents: IncidentListViewDto[] = [];
+  private filters: Partial<Record<FilterType, (inc: IncidentListViewDto) => boolean>> = {};
 
-  private filteredIncidentsSubject = new BehaviorSubject<Incident[]>([]);
+  private filteredIncidentsSubject = new BehaviorSubject<IncidentListViewDto[]>([]);
   filteredIncidents$ = this.filteredIncidentsSubject.asObservable();
 
   /** Initialise la liste complète */
-  setIncidents(incidents: Incident[]) {
+  setIncidents(incidents: IncidentListViewDto[]) {
     this.allIncidents = incidents;
     this.applyFilters();
   }
 
   /** Active ou remplace un filtre pour une dimension */
-  setFilter(type: FilterType, fn: (inc: Incident) => boolean) {
+  setFilter(type: FilterType, fn: (inc: IncidentListViewDto) => boolean) {
     this.filters[type] = fn;
     this.applyFilters();
   }

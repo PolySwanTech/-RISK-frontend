@@ -80,9 +80,9 @@
       </div>
     </div>
 
-    <div class="matrix-section" *ngIf="matrixData">
+    <div class="matrix-section" *ngIf="matrixData && actualFrequency != -1 && actualSeverity != -1">
       <h3>🎯 Matrice de Risques</h3>
-      <app-matrix [modif]="false" [buId]="selectedBU.id"></app-matrix>
+      <app-matrix [modif]="false" [buId]="selectedBU.id" [frequency]="actualFrequency" [severity]="actualSeverity"></app-matrix>
     </div>
 
     <div class="actions">

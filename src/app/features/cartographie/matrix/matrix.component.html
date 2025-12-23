@@ -1,4 +1,6 @@
+@if(modif){
 <app-go-back [title]="`Paramétrage de la matrice d'aversion de ` + buName" [buttons]="goBackButtons"></app-go-back>
+}
 
 <section class="dashboard-container">
   <div class="matrix-container">
@@ -19,6 +21,18 @@
 
                 <td *ngFor="let cell of row; let cIdx = index; trackBy: trackByIdx" [ngStyle]="cellStyle(cell)"
                   (click)="openColorOverlay($event, cell)" class="matrix-cell">
+                  @if(cell.hasEvaluation){
+                  <div class="cell-content">
+                    <div class="dot"></div>
+
+                    <span class="eval-label">Évaluation proposée</span>
+
+                    <div class="tooltip">
+                      <div><strong>Fréquence:</strong> {{cell.actualFreq}}</div>
+                      <div><strong>Sévérité:</strong> {{cell.actualLoss | number}} €</div>
+                    </div>
+                  </div>
+                  }
                 </td>
                 <div *ngIf="activeCell" class="color-overlay" [ngStyle]="overlayPosition">
                   <div *ngFor="let risk of riskLevels" class="color-box" [style.background]="risk.color"
@@ -31,7 +45,8 @@
               <!-- ligne d’entête des colonnes PROBABILITÉ -->
               <tr class="column-labels-row">
                 <th class="probability-header">PROBABILITÉ</th>
-                <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx" (click)="openScaleOverlay($event, colLabels[i])">
+                <td *ngFor="let _ of colLabels; let i = index; trackBy: trackByIdx"
+                  (click)="openScaleOverlay($event, colLabels[i])">
                   <label class="col-input">
                     {{colLabels[i].libelle}}</label>
                 </td>

@@ -102,6 +102,10 @@ export class CreateOperationalImpactComponent implements OnInit {
   OperatingLossFamily = OperatingLossFamily;
   TargetType = TargetType;
 
+  editingImpactId: string | null = null;
+  tempAmount: any = null;
+
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: CreateOperationalImpactDialogData) { }
 
   async ngOnInit(): Promise<void> {
@@ -133,7 +137,7 @@ export class CreateOperationalImpactComponent implements OnInit {
   async loadExistingImpacts(): Promise<void> {
     const impacts = await this.operatingLossService.listByIncident(this.data.incidentId)
       .pipe(catchError(() => of([]))).toPromise();
-    
+
     this.existingImpacts = impacts || [];
 
     // Charger les montants pour chaque impact
@@ -160,15 +164,15 @@ export class CreateOperationalImpactComponent implements OnInit {
   }
 
   private processBulkUpdate(
-    lossState: OperatingLossState, 
-    amountStatus: ReviewStatus, 
+    lossState: OperatingLossState,
+    amountStatus: ReviewStatus,
     successMsg: string
   ): void {
     const tasks$: any[] = [];
 
     // 1. Récupérer les IDs des impacts sélectionnés (depuis le Set)
     const selectedImpactIds = Array.from(this.selectedImpacts);
-    
+
     // 2. Récupérer les IDs des montants sélectionnés (depuis la Map de Sets)
     const selectedAmountIds: string[] = [];
     this.selectedAmounts.forEach((amountSet) => {
@@ -211,10 +215,10 @@ export class CreateOperationalImpactComponent implements OnInit {
         // Vérifier s'il y a eu des erreurs partielles si nécessaire, 
         // sinon on considère que c'est un succès global
         this.snackBarService.success(successMsg);
-        
+
         // On recharge tout pour avoir les statuts à jour
         await this.loadExistingImpacts();
-        
+
         // On vide la sélection
         this.clearSelection();
       },
@@ -223,7 +227,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         this.snackBarService.error("Une erreur est survenue lors du traitement.");
       }
     });
-  }  
+  }
 
   initActions(): void {
     this.popupActions = [
@@ -247,7 +251,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         primary: true,
         disabled: () => this.isNewImpactInvalid(),
         onClick: async () => await this.submitNewImpact(),
-     
+
         hidden: () => this.currentStep !== 'create-new'
       },
       {
@@ -256,7 +260,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         primary: true,
         disabled: () => !this.hasSelection(),
         onClick: async () => await this.validateSelection(),
- 
+
         hidden: () => this.currentStep !== 'manage-existing'
       },
       {
@@ -265,7 +269,7 @@ export class CreateOperationalImpactComponent implements OnInit {
         color: 'red',
         disabled: () => !this.hasSelection(),
         onClick: async () => await this.rejectSelection(),
-     
+
         hidden: () => this.currentStep !== 'manage-existing'
       }
     ];
@@ -315,6 +319,42 @@ export class CreateOperationalImpactComponent implements OnInit {
     return this.selectedFamily === OperatingLossFamily.FINANCIER;
   }
 
+
+  initNewAmountForImpact(impact: any) {
+    this.selectedFamily = impact.type.family;
+    this.editingImpactId = impact.id;
+    this.tempAmount = {
+      amountType: null,
+      amount: null,
+      accountingRef: '',
+      accountingDate: new Date()
+    };
+  }
+
+  cancelEdition() {
+    this.editingImpactId = null;
+    this.tempAmount = null;
+  }
+
+  saveNewAmount(impactId: string) {
+
+    this.amountService.create(impactId, {
+      amountType: this.tempAmount.amountType,
+      montant: +this.tempAmount.amount,
+      comptabilityRef: this.tempAmount.accountingRef || null,
+      comptabilisationDate: this.tempAmount.accountingDate || null
+    }).subscribe({
+      next: () => {
+        this.snackBarService.success('Montant ajouté avec succès !');
+        this.loadAmountsForImpact(impactId);
+      }
+    });
+
+    // Une fois sauvegardé, on ferme le petit formulaire
+    this.cancelEdition();
+    // Ne pas oublier de rafraîchir la liste impactAmounts.get(impactId)
+  }
+
   addAmountLine(): void {
     this.newImpact.amounts.push({ amountType: null, accountingRef: '', accountingDate: '', amount: '' });
   }
@@ -327,10 +367,10 @@ export class CreateOperationalImpactComponent implements OnInit {
 
   isNewImpactInvalid(): boolean {
     return !this.newImpact.title ||
-           !this.newImpact.type ||
-           !this.newImpact.businessUnitId ||
-           this.newImpact.amounts.length === 0 ||
-           this.newImpact.amounts.some(a => !a.amountType || !a.amount || isNaN(+a.amount));
+      !this.newImpact.type ||
+      !this.newImpact.businessUnitId ||
+      this.newImpact.amounts.length === 0 ||
+      this.newImpact.amounts.some(a => !a.amountType || !a.amount || isNaN(+a.amount));
   }
 
   async submitNewImpact(): Promise<void> {
@@ -360,7 +400,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     try {
       const operatingLossId = await this.operatingLossService.create(dto, 'Création impact').toPromise();
-      
+
       if (!operatingLossId) throw new Error('Pas d\'ID retourné');
 
       // Créer les montants
@@ -411,7 +451,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
   toggleImpactSelection(impactId: string, event: MatCheckboxChange): void {
     // Note: Pas besoin de event.stopPropagation() ici car géré dans le (click) du HTML
-    
+
     const isChecked = event.checked; // On utilise la valeur réelle de la checkbox
 
     if (isChecked) {
@@ -420,14 +460,14 @@ export class CreateOperationalImpactComponent implements OnInit {
 
       // 2. On récupère tous les montants de cet impact
       const amounts = this.impactAmounts.get(impactId) || [];
-      
+
       // 3. On crée un Set contenant TOUS les IDs des montants
       const allAmountIds = new Set(amounts.map(a => a.id));
       this.selectedAmounts.set(impactId, allAmountIds);
     } else {
       // 1. On retire le parent
       this.selectedImpacts.delete(impactId);
-      
+
       // 2. On vide la sélection des montants pour cet impact
       this.selectedAmounts.delete(impactId);
     }
@@ -438,7 +478,7 @@ export class CreateOperationalImpactComponent implements OnInit {
     if (!this.selectedAmounts.has(impactId)) {
       this.selectedAmounts.set(impactId, new Set());
     }
-    
+
     const amountSet = this.selectedAmounts.get(impactId)!;
 
     // 2. Basculer l'état du montant cliqué
@@ -450,7 +490,7 @@ export class CreateOperationalImpactComponent implements OnInit {
 
     // 3. Vérifier l'état global pour mettre à jour le PARENT
     const allAmounts = this.impactAmounts.get(impactId) || [];
-    
+
     // Si la liste est vide, on ne coche pas le parent
     if (allAmounts.length === 0) {
       this.selectedImpacts.delete(impactId);
@@ -468,22 +508,22 @@ export class CreateOperationalImpactComponent implements OnInit {
   }
 
   hasSelection(): boolean {
-    return this.selectedImpacts.size > 0 || 
-           Array.from(this.selectedAmounts.values()).some(set => set.size > 0);
+    return this.selectedImpacts.size > 0 ||
+      Array.from(this.selectedAmounts.values()).some(set => set.size > 0);
   }
 
-    async validateSelection(): Promise<void> {
+  async validateSelection(): Promise<void> {
     this.processBulkUpdate(
-      OperatingLossState.VALIDATED, 
-      ReviewStatus.APPROVED, 
+      OperatingLossState.VALIDATED,
+      ReviewStatus.APPROVED,
       "Validation effectuée avec succès !"
     );
   }
 
   async rejectSelection(): Promise<void> {
     this.processBulkUpdate(
-      OperatingLossState.REJECTED, 
-      ReviewStatus.REJECTED, 
+      OperatingLossState.REJECTED,
+      ReviewStatus.REJECTED,
       "Rejet effectué avec succès !"
     );
   }

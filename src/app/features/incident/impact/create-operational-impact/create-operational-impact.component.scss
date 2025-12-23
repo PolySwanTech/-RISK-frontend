@@ -333,3 +333,34 @@ $danger: var(--mat-sys-error);
 .mat-expansion-panel-header-description{
   gap: 20px;
 }
+
+.quick-add-amount-form {
+  background: rgba(0, 0, 0, 0.03);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px dashed #ccc;
+
+  .amount-row.edit-mode {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto; // S'adapte au nombre de champs
+    gap: 12px;
+    align-items: center;
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 0; // Enlève l'espace du message d'erreur pour compacter
+    }
+  }
+
+  .edit-actions {
+    display: flex;
+    gap: 4px;
+  }
+}
+
+// Pour s'assurer que les icônes mat-prefix ne cassent pas le design compact
+.mat-form-field-appearance-outline .mat-form-field-wrapper {
+  margin: 0 !important;
+  padding-bottom: 0 !important;
+}
