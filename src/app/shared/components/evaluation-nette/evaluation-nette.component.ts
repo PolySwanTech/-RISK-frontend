@@ -150,7 +150,7 @@ export class EvaluationNetteComponent implements OnInit {
       this.evaluationSrv.saveEvaluation(riskEvaluationCreateDto).subscribe({
         next: _ => {
           this.snackBarService.info("Évaluation nette sauvegardée avec succès");
-          this.router.navigate(['/reglages/risks', this.selectedRisk!.id]);
+          this.router.navigate(['cartographie']);
         },
         error: err => {
           this.snackBarService.info("Erreur lors de la sauvegarde");

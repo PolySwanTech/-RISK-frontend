@@ -7,6 +7,7 @@ import { Action, ActionPlan, ActionPlanCreateDto } from '../../models/ActionPlan
   providedIn: 'root'
 })
 export class ActionPlanService {
+  
 
   base = environment.apiUrl + '/action-plans';
   baseAction = environment.apiUrl + '/actions';
@@ -51,5 +52,9 @@ export class ActionPlanService {
 
   delete(id: string) {
     return this.http.put(`${this.base}/${id}/deactivate`, {})
+  }
+
+  exportActionPlan(idPlanAction: string) {
+    return this.http.get(`${this.base}/${idPlanAction}/export`, { responseType: 'blob' });
   }
 }
